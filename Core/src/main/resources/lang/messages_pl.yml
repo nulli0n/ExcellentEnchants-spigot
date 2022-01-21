@@ -1,0 +1,18 @@
+# Przetłumaczone przez nitolar play
+# Tłumaczenie utworzono: 06.11.2020
+Command:
+  Enchant:
+    Usage: <zaklęcie> <poziom>
+    Desc: Zaklnij przedmiot w swojej ręce.
+    Done: '&aSukcesywnie Zaklnięto!'
+  Book:
+    Usage: <gracz> <zaklęcie> <poziom>
+    Desc: Dodaje niestandardowo zaklniętą książke.
+    Done: Dodano zaklniętą ksiązke z zaklęciem &6%enchant%&7 do gracza &6%player%&7.
+  TierBook:
+    Usage: <gracz> <żadkość> <poziom>
+    Desc: Dodaje zaklniętą książke.
+    Error: '&cZły poziom żadkości!'
+    Done: Dodano zaklniętą ksiązke z zaklęciem &6%enchant%&7 do gracza &6%player%&7.
+Error:
+  NoEnchant: '&cNie ma takiego zaklęcia.'

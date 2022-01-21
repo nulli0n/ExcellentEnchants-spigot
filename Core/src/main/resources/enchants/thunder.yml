@@ -1,0 +1,29 @@
+Is_Treasure: false
+Name: Thunder
+Tier: rare
+Description:
+  - '%enchantment_trigger_chance%% chance to summon lightning to enemy on hit.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 70.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 70.0
+Villagers:
+  Chance: 70.0
+Loot_Generation:
+  Chance: 70.0
+Mob_Spawning:
+  Chance: 40.0
+Settings:
+  Trigger_Chance: '10.0 * %enchantment_level%'
+  During_Thunderstorm_Only: false
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1

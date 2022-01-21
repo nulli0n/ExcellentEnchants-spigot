@@ -1,0 +1,29 @@
+Is_Treasure: true
+Name: Curse of Misfortune
+Tier: cursed
+Description:
+  - '%enchantment_trigger_chance%% chance to have no drops from blocks or mobs.'
+Level:
+  Min: 1
+  Max: 1
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 20.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '15.0 * %enchantment_level%'
+  Chance: 0.0
+Villagers:
+  Chance: 20.0
+Loot_Generation:
+  Chance: 20.0
+Mob_Spawning:
+  Chance: 0.0
+Settings:
+  Trigger_Chance: '20.0 * %enchantment_level%'
+  Drop_Exp: false
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1

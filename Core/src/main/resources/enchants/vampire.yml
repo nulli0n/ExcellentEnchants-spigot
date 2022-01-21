@@ -1,0 +1,34 @@
+Is_Treasure: false
+Name: Vampire
+Tier: exotic
+Description:
+  - '%enchantment_trigger_chance%% chance to heal yourself for %enchantment_heal_amount% heart(s) on hit.'
+Level:
+  Min: 1
+  Max: 4
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 30.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '7 * %enchantment_level%'
+  Chance: 40.0
+Villagers:
+  Chance: 40.0
+Loot_Generation:
+  Chance: 40.0
+Mob_Spawning:
+  Chance: 20.0
+Settings:
+  Trigger_Chance: '10.0 + %enchantment_level% * 5.0'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Particle:
+    Name: 'HEART'
+    Data: ''
+  Heal:
+    Amount: '0.35 * %enchantment_level%'
+    As_Multiplier: false

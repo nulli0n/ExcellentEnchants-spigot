@@ -1,0 +1,31 @@
+Name: 'Aquaman'
+Tier: 'exotic'
+Description:
+  - 'Grants %enchantment_potion_type% %enchantment_potion_level% effect that costs x1 %enchantment_cost_item%.'
+Is_Treasure: false
+Level:
+  Min: 1
+  Max: 1
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Enchanting_Table:
+  Level_By_Exp_Cost: '%enchantment_level% * 15.0'
+  Chance: 20.0
+Villagers:
+  Chance: 20.0
+Loot_Generation:
+  Chance: 25.0
+Fishing:
+  Chance: 30.0
+Mob_Spawning:
+  Chance: 0.0
+Settings:
+  Trigger_Chance: '100.0'
+  Cost:
+    Enabled: true
+    Item:
+      Material: PRISMARINE_SHARD
+      Amount: 1
+  Potion_Effect:
+    Level: '1'
+    Duration: '25.0'

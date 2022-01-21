@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>su.nightexpress.excellentenchants</groupId>
+    <artifactId>ExcellentEnchants</artifactId>
+    <packaging>pom</packaging>
+    <version>3.1.0</version>
+    <modules>
+        <module>Core</module>
+        <module>NMS</module>
+        <module>V1_17_R1</module>
+        <module>V1_16_R1</module>
+        <module>V1_18_R1</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>su.nexmedia</groupId>
+            <artifactId>NexEngine</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>su.nexmedia</groupId>
+            <artifactId>NexEngine_CustomEffects</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+
+</project>

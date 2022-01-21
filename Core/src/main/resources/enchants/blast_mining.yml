@@ -1,0 +1,31 @@
+Is_Treasure: false
+Name: Blast Mining
+Tier: legendary
+Description:
+  - '%enchantment_trigger_chance%% chance to mine blocks by x%enchantment_explosion_power% power explosion.'
+Level:
+  Min: 1
+  Max: 5
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 5.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '6.0 * %enchantment_level%'
+  Chance: 10.0
+Villagers:
+  Chance: 10.0
+Loot_Generation:
+  Chance: 20.0
+Mob_Spawning:
+  Chance: 0.0
+Settings:
+  Trigger_Chance: '20.0 * %enchantment_level%'
+  Min_Block_Strength: '1.5 - %enchantment_level% / 10'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Explosion:
+    Power: '3.0 + (%enchantment_level% - 1.0 * 0.25)'

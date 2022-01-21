@@ -1,0 +1,37 @@
+Is_Treasure: false
+Name: Explosive Arrows
+Tier: exotic
+Description:
+  - '%enchantment_trigger_chance%% chance to launch an explosive arrow with x%enchantment_explosion_power% power.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 40.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 40.0
+Villagers:
+  Chance: 40.0
+Loot_Generation:
+  Chance: 50.0
+Mob_Spawning:
+  Chance: 25.0
+Settings:
+  Trigger_Chance: '10.0 + %enchantment_level% * 5'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Explosion:
+    Fire_Spread: true
+    Damage_Items: true
+    Damage_Blocks: false
+    Size: '2.0 + %enchantment_level%'
+  Arrow:
+    Trail:
+      Name: 'SMOKE_NORMAL'
+      Data: ''

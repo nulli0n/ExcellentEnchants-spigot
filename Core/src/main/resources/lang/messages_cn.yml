@@ -1,0 +1,18 @@
+# Tranlsated by @qsefthuopq
+# Last updated:2021-03-15
+Command:
+  Enchant:
+    Usage: <附魔名> <等级>
+    Desc: 附魔你手中的物品。
+    Done: '&a附魔成功！'
+  Book:
+    Usage: <玩家> <附魔名> <等级>
+    Desc: 给予自定义附魔书。
+    Done: 已给予&6%player%&6%enchant%&7附魔书。
+  TierBook:
+    Usage: <玩家> <品质> <等级>
+    Desc: 给予自定义品质的附魔书
+    Error: '&c无效品质！'
+    Done: 已给予&6%player&6%enchant%&7附魔书。
+Error:
+  NoEnchant: '&c没有这种附魔'

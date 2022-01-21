@@ -1,0 +1,29 @@
+Is_Treasure: false
+Name: Bomber
+Tier: exotic
+Description:
+  - '%enchantment_trigger_chance%% chance to launch TNT that explodes in %enchantment_fuse_ticks%s.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 20.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 20.0
+Villagers:
+  Chance: 20.0
+Loot_Generation:
+  Chance: 20.0
+Mob_Spawning:
+  Chance: 5.0
+Settings:
+  Trigger_Chance: '4.0 * %enchantment_level%'
+  Cost:
+    Enabled: false
+    Item:
+      Material: TNT
+      Amount: 1
+  Fuse_Ticks: '100 - %enchantment_level% * 10'

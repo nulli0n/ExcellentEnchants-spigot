@@ -1,0 +1,28 @@
+Is_Treasure: false
+Name: Ender Bow
+Tier: legendary
+Description:
+  - '%enchantment_trigger_chance%% chance to shoot Ender Pearl instead of arrows.'
+Level:
+  Min: 1
+  Max: 1
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 5.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '30'
+  Chance: 5.0
+Villagers:
+  Chance: 3.0
+Loot_Generation:
+  Chance: 10.0
+Mob_Spawning:
+  Chance: 0.0
+Settings:
+  Trigger_Chance: '100.0'
+  Cost:
+    Enabled: false
+    Item:
+      Material: ENDER_PEARL
+      Amount: 1

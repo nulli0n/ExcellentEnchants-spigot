@@ -1,0 +1,29 @@
+Is_Treasure: false
+Name: Flame Walker
+Tier: exotic
+Description:
+  - 'Ability to walk on lava and on magma blocks without getting damage.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 40.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 40.0
+Villagers:
+  Chance: 40.0
+Loot_Generation:
+  Chance: 50.0
+Mob_Spawning:
+  Chance: 0.0
+Settings:
+  Trigger_Chance: '100.0'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Block_Decay: '5.0 + %enchantment_level% * 2'

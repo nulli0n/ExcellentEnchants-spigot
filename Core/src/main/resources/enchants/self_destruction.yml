@@ -1,0 +1,30 @@
+Is_Treasure: false
+Name: Self-Destruction
+Tier: exotic
+Description:
+  - '%enchantment_trigger_chance%% chance to create an x%enchantment_explosion_power% power explosion on death.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 20.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 20.0
+Villagers:
+  Chance: 20.0
+Loot_Generation:
+  Chance: 20.0
+Mob_Spawning:
+  Chance: 15.0
+Settings:
+  Trigger_Chance: '20.0 + %enchantment_level% * 10'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Explosion:
+    Size: '1.0 + %enchantment_level%'

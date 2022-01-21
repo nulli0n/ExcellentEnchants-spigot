@@ -1,0 +1,35 @@
+Command:
+  List:
+    Desc: Список всех пользовательских зачарований.
+  Enchant:
+    Usage: <зачарование> <уровень>
+    Desc: Зачаровывает предмет в вашей руке.
+    Done: '&aУспешно зачарован!'
+  Book:
+    Usage: <игрок> <зачарование> <уровень>
+    Desc: Даёт кастомную книгу зачарования.
+    Done: Выдана книга зачарованя &6%enchant%&7 &6%player%&7.
+  TierBook:
+    Usage: <игрок> <клас> <уровень>
+    Desc: Даёт зачарованную книгу.
+    Error: '&cНеверный уровень!'
+    Done: Выдан зачарованная книга класа &6%tier%&7 &6%player%&7.
+Error:
+  NoEnchant: '&cНет такого зачарования.'
+EnchantmentTarget:
+  ALL: All
+  ARMOR: Armor
+  ARMOR_FEET: Armor Feet
+  ARMOR_LEGS: Armor Legs
+  ARMOR_TORSO: Armor Torso
+  ARMOR_HEAD: Armor Head
+  WEAPON: Weapon
+  TOOL: Tool
+  BOW: Bow
+  FISHING_ROD: Fishing Rod
+  BREAKABLE: Breakable
+  WEARABLE: Wearable
+  TRIDENT: Trident
+  CROSSBOW: Crossbow
+  VANISHABLE: Vanishable
+  BOW_AND_CROSSBOW: Bow And Crossbow

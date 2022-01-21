@@ -1,0 +1,29 @@
+Is_Treasure: false
+Name: Infernus
+Tier: common
+Description:
+  - '%enchantment_trigger_chance%% chance to launch flaming Trident that ignites the enemy for %enchantment_fire_duration%s.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 45.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 35.0
+Villagers:
+  Chance: 45.0
+Loot_Generation:
+  Chance: 45.0
+Mob_Spawning:
+  Chance: 30.0
+Settings:
+  Trigger_Chance: '100.0'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Fire_Ticks: '60 + %enchantment_level% * 20'

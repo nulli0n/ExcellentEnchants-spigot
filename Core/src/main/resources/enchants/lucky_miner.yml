@@ -1,0 +1,29 @@
+Is_Treasure: false
+Name: Lucky Miner
+Tier: common
+Description:
+  - '%enchantment_trigger_chance%% chance to obtain +%enchantment_exp_modifier%% more exp from ores.'
+Level:
+  Min: 1
+  Max: 5
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 50.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '6 * %enchantment_level%'
+  Chance: 50.0
+Villagers:
+  Chance: 50.0
+Loot_Generation:
+  Chance: 60.0
+Mob_Spawning:
+  Chance: 0.0
+Settings:
+  Trigger_Chance: '30.0 + %enchantment_level% * 7.0'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Exp_Modifier: '1.0 + %enchantment_level% * 0.5'

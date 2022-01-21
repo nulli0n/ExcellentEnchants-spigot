@@ -1,0 +1,30 @@
+Is_Treasure: false
+Name: Bunny Hop
+Tier: common
+Description:
+  - 'Grants permanent %enchantment_potion_type% %enchantment_potion_level%.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 50.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 50.0
+Villagers:
+  Chance: 50.0
+Loot_Generation:
+  Chance: 50.0
+Mob_Spawning:
+  Chance: 25.0
+Settings:
+  Trigger_Chance: '100.0'
+  Cost:
+    Enabled: false
+    Item:
+      Material: RABBIT_FOOT
+  Potion_Effect:
+    Duration: '25.0'
+    Level: '%enchantment_level%'

@@ -1,0 +1,30 @@
+Is_Treasure: false
+Name: Ghast
+Tier: rare
+Description:
+  - '%enchantment_trigger_chance%% chance to launch a fireball instead of arrow.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 40.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 40.0
+Villagers:
+  Chance: 40.0
+Loot_Generation:
+  Chance: 40.0
+Mob_Spawning:
+  Chance: 20.0
+Settings:
+  Trigger_Chance: '100.0'
+  Fire_Spread: true
+  Yield: '1.0 * %enchantment_level%'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1

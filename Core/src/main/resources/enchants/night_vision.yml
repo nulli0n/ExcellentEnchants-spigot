@@ -1,0 +1,31 @@
+Is_Treasure: false
+Name: Night Vision
+Tier: rare
+Description:
+  - 'Grants %enchantment_potion_type% %enchantment_potion_level% effect that costs x1 %enchantment_cost_item%.'
+Level:
+  Min: 1
+  Max: 1
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 20.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '15'
+  Chance: 20.0
+Villagers:
+  Chance: 20.0
+Loot_Generation:
+  Chance: 20.0
+Mob_Spawning:
+  Chance: 0.0
+Settings:
+  Trigger_Chance: '100.0'
+  Cost:
+    Enabled: true
+    Item:
+      Material: GLOWSTONE_DUST
+      Amount: 1
+  Potion_Effect:
+    Duration: '60.0'
+    Level: '1'

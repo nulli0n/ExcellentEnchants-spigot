@@ -1,0 +1,34 @@
+Is_Treasure: false
+Name: Blindness
+Tier: common
+Description:
+  - '%enchantment_trigger_chance%% chance to apply %enchantment_potion_type% %enchantment_potion_level% for %enchantment_potion_duration%s. on hit.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 60.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 60.0
+Villagers:
+  Chance: 60.0
+Loot_Generation:
+  Chance: 60.0
+Mob_Spawning:
+  Chance: 30.0
+Settings:
+  Trigger_Chance: '15.0 + %enchantment_level% * 3'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Potion_Effect:
+    Duration: '3.5 + %enchantment_level%'
+    Level: '%enchantment_level%'
+  Particle:
+    Name: SMOKE_NORMAL
+    Data: ''

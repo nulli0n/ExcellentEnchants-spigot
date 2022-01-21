@@ -1,0 +1,34 @@
+Name: Bane of Netherspawn
+Tier: common
+Description:
+  - '%enchantment_trigger_chance%% chance to inflict %enchantment_damage% more damage to Nether mobs.'
+Is_Treasure: false
+Level:
+  Min: 1
+  Max: 5
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 25.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '6 * %enchantment_level%'
+  Chance: 80.0
+Villagers:
+  Chance: 80.0
+Loot_Generation:
+  Chance: 80.0
+Mob_Spawning:
+  Chance: 50.0
+Settings:
+  Trigger_Chance: '100.0'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Particle:
+    Name: 'SMOKE_NORMAL'
+    Data: ''
+  Damage:
+    As_Modifier: false
+    Formula: '0.5 * %enchantment_level%'

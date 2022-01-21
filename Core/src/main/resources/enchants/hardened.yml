@@ -1,0 +1,31 @@
+Is_Treasure: false
+Name: Hardened
+Tier: rare
+Description:
+  - '%enchantment_trigger_chance%% chance to obtain %enchantment_potion_type% %enchantment_potion_level% for %enchantment_potion_duration%s. when damaged.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 30.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 30.0
+Villagers:
+  Chance: 30.0
+Loot_Generation:
+  Chance: 30.0
+Mob_Spawning:
+  Chance: 20.0
+Settings:
+  Trigger_Chance: '10.0 + %enchantment_level% * 5'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Potion_Effect:
+    Duration: '2.5 + %enchantment_level%'
+    Level: '%enchantment_level%'

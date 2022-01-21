@@ -1,0 +1,38 @@
+Is_Treasure: false
+Name: Smelter
+Tier: rare
+Description:
+  - '%enchantment_trigger_chance%% chance to smelt ore or a block on mining.'
+Level:
+  Min: 1
+  Max: 5
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 60.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '5 * %enchantment_level%'
+  Chance: 60.0
+Villagers:
+  Chance: 60.0
+Loot_Generation:
+  Chance: 60.0
+Mob_Spawning:
+  Chance: 60.0
+Settings:
+  Trigger_Chance: '25.0 + %enchantment_level% * 10'
+  Particle:
+    Name: 'FLAME'
+    Data: ''
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Smelting_Table:
+    IRON_ORE: IRON_INGOT
+    RAW_IRON: IRON_INGOT
+    GOLD_ORE: GOLD_INGOT
+    RAW_GOLD: GOLD_INGOT
+    RAW_COPPER: COPPER_INGOT
+    SAND: GLASS
