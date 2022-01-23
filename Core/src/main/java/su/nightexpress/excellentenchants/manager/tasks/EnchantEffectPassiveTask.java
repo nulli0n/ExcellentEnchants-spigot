@@ -12,7 +12,7 @@ import su.nightexpress.excellentenchants.config.Config;
 public class EnchantEffectPassiveTask extends AbstractEnchantPassiveTask {
 
     public EnchantEffectPassiveTask(@NotNull ExcellentEnchants plugin) {
-        super(plugin, Config.TASKS_PASSIVE_ENCHANTS_TICKS_INTERVAL, true);
+        super(plugin, Config.TASKS_PASSIVE_ENCHANTS_TICKS_INTERVAL, false);
     }
 
     @Override
