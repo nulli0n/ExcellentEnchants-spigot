@@ -2,7 +2,7 @@ Is_Treasure: false
 Name: Self-Destruction
 Tier: exotic
 Description:
-  - '%enchantment_trigger_chance%% chance to create an x%enchantment_explosion_power% power explosion on death.'
+  - '%enchantment_trigger_chance%% chance to create a x%enchantment_explosion_power% power explosion on death.'
 Level:
   Min: 1
   Max: 3
