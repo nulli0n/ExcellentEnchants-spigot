@@ -66,7 +66,7 @@ public class EnchantSaturation extends IEnchantChanceTemplate implements Passive
     @Override
     @NotNull
     public EnchantmentTarget getItemTarget() {
-        return EnchantmentTarget.ARMOR_TORSO;
+        return EnchantmentTarget.ARMOR_HEAD;
     }
 
     public final double getSaturationAmount(int level) {
@@ -94,7 +94,7 @@ public class EnchantSaturation extends IEnchantChanceTemplate implements Passive
     class Task extends AbstractEnchantPassiveTask {
 
         public Task(@NotNull ExcellentEnchants plugin) {
-            super(plugin, saturationInterval, true);
+            super(plugin, saturationInterval, false);
         }
 
         @Override
