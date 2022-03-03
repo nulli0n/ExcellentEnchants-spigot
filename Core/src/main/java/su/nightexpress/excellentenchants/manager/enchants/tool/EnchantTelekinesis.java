@@ -1,5 +1,7 @@
 package su.nightexpress.excellentenchants.manager.enchants.tool;
 
+import com.google.common.collect.Sets;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
@@ -23,10 +25,7 @@ import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.UnaryOperator;
 
 public class EnchantTelekinesis extends IEnchantChanceTemplate implements BlockBreakEnchant {
@@ -38,6 +37,12 @@ public class EnchantTelekinesis extends IEnchantChanceTemplate implements BlockB
     private final String messageItemSeparator;
 
     public static final String ID = "telekinesis";
+    private static final Set<Material> INFESTED = Sets.newHashSet(
+        Material.INFESTED_CHISELED_STONE_BRICKS, Material.INFESTED_COBBLESTONE,
+        Material.INFESTED_CRACKED_STONE_BRICKS, Material.INFESTED_DEEPSLATE,
+        Material.INFESTED_MOSSY_STONE_BRICKS, Material.INFESTED_STONE,
+        Material.INFESTED_STONE_BRICKS
+    );
 
     public EnchantTelekinesis(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.HIGHEST);
@@ -85,6 +90,7 @@ public class EnchantTelekinesis extends IEnchantChanceTemplate implements BlockB
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isEnchantmentAvailable(player)) return false;
         if (e.getBlock().getState() instanceof Container) return false;
+        if (INFESTED.contains(e.getBlock().getType())) return false;
         if (!e.isDropItems()) return false;
         if (!this.checkTriggerChance(level)) return false;
 

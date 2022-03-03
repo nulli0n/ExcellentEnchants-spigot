@@ -2,10 +2,7 @@ package su.nightexpress.excellentenchants.manager.listeners;
 
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Minecart;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.enchantment.EnchantItemEvent;
@@ -259,25 +256,12 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         EntityEquipment equipment = entity.getEquipment();
         if (equipment == null) return;
 
-        ItemStack[] armor = equipment.getArmorContents();
-        for (ItemStack item : armor) {
-            if (item != null && EnchantManager.isEnchantable(item)) {
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            ItemStack item = equipment.getItem(slot);
+            if (EnchantManager.isEnchantable(item)) {
                 EnchantManager.populateEnchantments(item, ObtainType.MOB_SPAWNING);
+                equipment.setItem(slot, item);
             }
         }
-
-        ItemStack itemMain = equipment.getItemInMainHand();
-        if (EnchantManager.isEnchantable(itemMain)) {
-            EnchantManager.populateEnchantments(itemMain, ObtainType.MOB_SPAWNING);
-        }
-
-        ItemStack itemOff = equipment.getItemInOffHand();
-        if (EnchantManager.isEnchantable(itemOff)) {
-            EnchantManager.populateEnchantments(itemOff, ObtainType.MOB_SPAWNING);
-        }
-
-        equipment.setArmorContents(armor);
-        equipment.setItemInMainHand(itemMain);
-        equipment.setItemInOffHand(itemOff);
     }
 }
