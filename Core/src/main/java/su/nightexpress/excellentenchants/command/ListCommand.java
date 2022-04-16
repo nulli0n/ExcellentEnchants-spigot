@@ -22,7 +22,7 @@ public class ListCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     @NotNull
     public String getDescription() {
-        return plugin.lang().Command_List_Desc.getMsg();
+        return plugin.lang().Command_List_Desc.getLocalized();
     }
 
     @Override

@@ -33,6 +33,8 @@ public class EnchantEnderBow extends IEnchantChanceTemplate implements BowEnchan
         this.addConflict(EnchantRegister.EXPLOSIVE_ARROWS);
         this.addConflict(EnchantRegister.WITHERED_ARROWS);
         this.addConflict(EnchantRegister.POISONED_ARROWS);
+        this.addConflict(EnchantRegister.DRAGONFIRE_ARROWS);
+        this.addConflict(EnchantRegister.ELECTRIFIED_ARROWS);
         this.addConflict(Enchantment.ARROW_FIRE);
         this.addConflict(Enchantment.ARROW_DAMAGE);
         this.addConflict(Enchantment.ARROW_KNOCKBACK);

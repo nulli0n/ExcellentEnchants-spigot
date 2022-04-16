@@ -16,8 +16,6 @@ import su.nightexpress.excellentenchants.nms.EnchantNMS;
 
 public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
-    private static ExcellentEnchants instance;
-
     public static boolean isLoaded = false;
 
     private Config config;
@@ -25,14 +23,6 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     private EnchantNMS     enchantNMS;
     private EnchantManager enchantManager;
-
-    public ExcellentEnchants() {
-        instance = this;
-    }
-
-    public static ExcellentEnchants getInstance() {
-        return instance;
-    }
 
     @Override
     public void enable() {
@@ -52,11 +42,6 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
             this.enchantManager.shutdown();
             this.enchantManager = null;
         }
-    }
-
-    @Override
-    public boolean useNewConfigFields() {
-        return true;
     }
 
     private boolean setNMS() {

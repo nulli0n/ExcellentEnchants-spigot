@@ -27,13 +27,13 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     @NotNull
     public String getDescription() {
-        return plugin.lang().Command_TierBook_Desc.getMsg();
+        return plugin.lang().Command_TierBook_Desc.getLocalized();
     }
 
     @Override
     @NotNull
     public String getUsage() {
-        return plugin.lang().Command_TierBook_Usage.getMsg();
+        return plugin.lang().Command_TierBook_Usage.getLocalized();
     }
 
     @Override
@@ -43,17 +43,17 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
 
     @Override
     @NotNull
-    public List<String> getTab(@NotNull Player player, int i, @NotNull String[] args) {
-        if (i == 1) {
+    public List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
+        if (arg == 1) {
             return PlayerUtil.getPlayerNames();
         }
-        if (i == 2) {
+        if (arg == 2) {
             return EnchantManager.getTierIds();
         }
-        if (i == 3) {
+        if (arg == 3) {
             return Arrays.asList("-1", "1", "5", "10");
         }
-        return super.getTab(player, i, args);
+        return super.getTab(player, arg, args);
     }
 
     @Override

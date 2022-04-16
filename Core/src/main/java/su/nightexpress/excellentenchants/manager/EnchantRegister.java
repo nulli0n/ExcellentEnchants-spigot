@@ -58,6 +58,7 @@ public class EnchantRegister {
     public static final EnchantRage    RAGE;
     public static final EnchantScavenger SCAVENGER;
     public static final EnchantSurprise  SURPRISE;
+    public static final EnchantTemper            TEMPER;
     public static final EnchantThrifty           THRIFTY;
     public static final EnchantThunder           THUNDER;
     public static final EnchantVillageDefender   VILLAGE_DEFENDER;
@@ -75,14 +76,18 @@ public class EnchantRegister {
     public static final EnchantRegrowth         REGROWTH;
 
     public static final EnchantBomber          BOMBER;
+    public static final EnchantConfusingArrows CONFUSING_ARROWS;
+    public static final EnchantDragonfireArrows DRAGONFIRE_ARROWS;
+    public static final EnchantElectrifiedArrows ELECTRIFIED_ARROWS;
     public static final EnchantEnderBow        ENDER_BOW;
     public static final EnchantGhast           GHAST;
+    public static final EnchantHover           HOVER;
     public static final EnchantPoisonedArrows  POISONED_ARROWS;
     public static final EnchantWitheredArrows  WITHERED_ARROWS;
     public static final EnchantExplosiveArrows EXPLOSIVE_ARROWS;
 
     static {
-        PLUGIN = ExcellentEnchants.getInstance();
+        PLUGIN = ExcellentEnchants.getPlugin(ExcellentEnchants.class);
         PLUGIN.getConfigManager().extract("enchants");
         ENCHANT_LIST = new HashSet<>();
 
@@ -119,6 +124,7 @@ public class EnchantRegister {
         ROCKET = init(EnchantRocket.class, EnchantRocket.ID);
         SCAVENGER = init(EnchantScavenger.class, EnchantScavenger.ID);
         SURPRISE = init(EnchantSurprise.class, EnchantSurprise.ID);
+        TEMPER = init(EnchantTemper.class, EnchantTemper.ID);
         THRIFTY = init(EnchantThrifty.class, EnchantThrifty.ID);
         THUNDER = init(EnchantThunder.class, EnchantThunder.ID);
         VAMPIRE = init(EnchantVampire.class, EnchantVampire.ID);
@@ -140,9 +146,13 @@ public class EnchantRegister {
 
         // Bow enchants
         BOMBER = init(EnchantBomber.class, EnchantBomber.ID);
+        CONFUSING_ARROWS = init(EnchantConfusingArrows.class, EnchantConfusingArrows.ID);
+        DRAGONFIRE_ARROWS = init(EnchantDragonfireArrows.class, EnchantDragonfireArrows.ID);
+        ELECTRIFIED_ARROWS = init(EnchantElectrifiedArrows.class, EnchantElectrifiedArrows.ID);
         ENDER_BOW = init(EnchantEnderBow.class, EnchantEnderBow.ID);
         EXPLOSIVE_ARROWS = init(EnchantExplosiveArrows.class, EnchantExplosiveArrows.ID);
         GHAST = init(EnchantGhast.class, EnchantGhast.ID);
+        HOVER = init(EnchantHover.class, EnchantHover.ID);
         POISONED_ARROWS = init(EnchantPoisonedArrows.class, EnchantPoisonedArrows.ID);
         WITHERED_ARROWS = init(EnchantWitheredArrows.class, EnchantWitheredArrows.ID);
 

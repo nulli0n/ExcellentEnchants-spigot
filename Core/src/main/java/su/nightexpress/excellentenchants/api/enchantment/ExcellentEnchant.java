@@ -118,7 +118,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
 
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        String conflicts = this.getConflicts().isEmpty() ? plugin.lang().Other_None.getMsg() : this.getConflicts().stream().filter(Objects::nonNull).map(en -> plugin.lang().getEnchantment(en)).collect(Collectors.joining("\n"));
+        String conflicts = this.getConflicts().isEmpty() ? plugin.lang().Other_None.getLocalized() : this.getConflicts().stream().filter(Objects::nonNull).map(en -> plugin.lang().getEnchantment(en)).collect(Collectors.joining("\n"));
 
         return str -> str
             .replace(PLACEHOLDER_NAME, this.getDisplayName())
@@ -135,7 +135,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
             .replace(PLACEHOLDER_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
             .replace(PLACEHOLDER_OBTAIN_CHANCE_FISHING, NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
             .replace(PLACEHOLDER_OBTAIN_CHANCE_MOB_SPAWNING, NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
-            .replace(PLACEHOLDER_COST_ITEM, this.hasCostItem() ? ItemUtil.getItemName(this.costItem) : plugin.lang().Other_None.getMsg())
+            .replace(PLACEHOLDER_COST_ITEM, this.hasCostItem() ? ItemUtil.getItemName(this.costItem) : plugin.lang().Other_None.getLocalized())
             ;
     }
 

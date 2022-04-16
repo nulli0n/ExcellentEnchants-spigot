@@ -6,10 +6,11 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
@@ -23,18 +24,16 @@ import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantDropContainer;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
-import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.CustomDropEnchant;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class EnchantSilkChest extends IEnchantChanceTemplate implements BlockBreakEnchant, CustomDropEnchant {
+public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDropEnchant {
 
     private final Map<Integer, NamespacedKey> keyItems;
     private final String                      chestName;
@@ -42,7 +41,7 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements BlockBre
     public static final String ID = "silk_chest";
 
     public EnchantSilkChest(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
-        super(plugin, cfg, EnchantPriority.MEDIUM);
+        super(plugin, cfg, EnchantPriority.HIGH);
         this.keyItems = new TreeMap<>();
         this.chestName = StringUtil.color(cfg.getString("Settings.Chest_Item.Name", "%name% &7(%items% items)"));
 
@@ -78,8 +77,7 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements BlockBre
 
     @NotNull
     public ItemStack getSilkChest(@NotNull Chest chest) {
-        Block block = chest.getBlock();
-        ItemStack chestItem = new ItemStack(block.getType());
+        ItemStack chestItem = new ItemStack(chest.getType());
 
         // Store and count chest items.
         int amount = 0;
@@ -91,7 +89,7 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements BlockBre
             String base64 = ItemUtil.toBase64(itemInv);
             if (base64 == null) continue;
             if (base64.length() >= Short.MAX_VALUE) {
-                block.getWorld().dropItemNaturally(block.getLocation(), itemInv);
+                chest.getWorld().dropItemNaturally(chest.getLocation(), itemInv);
                 continue;
             }
             PDCUtil.setData(chestItem, this.getItemKey(count++), base64);
@@ -110,38 +108,26 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements BlockBre
     }
 
     @Override
-    @NotNull
-    public List<ItemStack> getCustomDrops(@NotNull Player player, @NotNull ItemStack item, @NotNull Block block, int level) {
-        if (block.getType() == Material.ENDER_CHEST) return Collections.emptyList();
-        if (!(block.getState() instanceof Chest chest)) return Collections.emptyList();
+    public void handleDrop(@NotNull EnchantDropContainer e, @NotNull Player player, @NotNull ItemStack item, int level) {
+        BlockDropItemEvent parent = e.getParent();
+        BlockState state = parent.getBlockState();
+        Block block = state.getBlock();
 
-        return Collections.singletonList(this.getSilkChest(chest));
-    }
+        if (!this.isEnchantmentAvailable(player)) return;
+        if (!(state instanceof Chest chest)) return;
+        if (!this.checkTriggerChance(level)) return;
+        if (!this.takeCostItem(player)) return;
 
-    @Override
-    public boolean isEventMustHaveDrops() {
-        return true;
-    }
+        // Добавляем в сундук обратно предметы из дроп листа, кроме самого сундука.
+        parent.getItems().removeIf(drop -> drop.getItemStack().getType() == state.getType());
+        chest.getBlockInventory().addItem(parent.getItems().stream().map(Item::getItemStack).toList().toArray(new ItemStack[0]));
 
-    @Override
-    public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        Block block = e.getBlock();
-        if (!this.isEnchantmentAvailable(player)) return false;
-        if (EnchantTelekinesis.isDropHandled(block)) return false;
-        if (block.getType() == Material.ENDER_CHEST) return false;
-        if (this.isEventMustHaveDrops() && !e.isDropItems()) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!(block.getState() instanceof Chest chest)) return false;
-        if (!this.takeCostItem(player)) return false;
+        // Добавляем кастомный сундук в кастомный дроп лист.
+        e.getDrop().add(this.getSilkChest(chest));
 
-        // Drop custom chest and do not drop the original one.
-        this.getCustomDrops(player, item, block, level).forEach(chestItem -> block.getWorld().dropItemNaturally(block.getLocation(), chestItem));
-
-        // Do not drop chest items.
+        // Очищаем инвентарь сундука и дефолтный дроп лист.
         chest.getBlockInventory().clear();
-        e.setDropItems(false);
-
-        return true;
+        parent.getItems().clear();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

@@ -27,13 +27,13 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     @NotNull
     public String getDescription() {
-        return plugin.lang().Command_Enchant_Desc.getMsg();
+        return plugin.lang().Command_Enchant_Desc.getLocalized();
     }
 
     @Override
     @NotNull
     public String getUsage() {
-        return plugin.lang().Command_Enchant_Usage.getMsg();
+        return plugin.lang().Command_Enchant_Usage.getLocalized();
     }
 
     @Override
@@ -43,14 +43,14 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
 
     @Override
     @NotNull
-    public List<String> getTab(@NotNull Player player, int i, @NotNull String[] args) {
-        if (i == 1) {
+    public List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
+        if (arg == 1) {
             return Arrays.stream(Enchantment.values()).map(e -> e.getKey().getKey()).toList();
         }
-        if (i == 2) {
+        if (arg == 2) {
             return Arrays.asList("-1", "1", "5", "10");
         }
-        return super.getTab(player, i, args);
+        return super.getTab(player, arg, args);
     }
 
     @Override
@@ -81,12 +81,12 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return;
 
-        if (meta instanceof EnchantmentStorageMeta) {
+        if (meta instanceof EnchantmentStorageMeta storageMeta) {
             if (level == 0) {
-                ((EnchantmentStorageMeta) meta).removeStoredEnchant(enchantment);
+                storageMeta.removeStoredEnchant(enchantment);
             }
             else {
-                ((EnchantmentStorageMeta) meta).addStoredEnchant(enchantment, level, true);
+                storageMeta.addStoredEnchant(enchantment, level, true);
             }
         }
         else {

@@ -22,7 +22,7 @@ public class EnchantCurseOfMisfortune extends IEnchantChanceTemplate implements 
     public static final String ID = "curse_of_misfortune";
 
     public EnchantCurseOfMisfortune(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
-        super(plugin, cfg, EnchantPriority.LOW);
+        super(plugin, cfg, EnchantPriority.LOWEST);
 
         this.dropExp = cfg.getBoolean("Settings.Drop_Exp");
     }
@@ -58,7 +58,6 @@ public class EnchantCurseOfMisfortune extends IEnchantChanceTemplate implements 
     @Override
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isEnchantmentAvailable(player)) return false;
-        if (EnchantTelekinesis.isDropHandled(e.getBlock())) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!this.takeCostItem(player)) return false;
 

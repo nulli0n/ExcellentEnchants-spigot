@@ -123,17 +123,6 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         return true;
     }
 
-    @Deprecated
-    public static boolean hasEnchant(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
-        return item.getEnchantmentLevel(enchantment) != 0;
-    }
-
-    @Deprecated
-    public static int getEnchantLevel(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
-        ItemMeta meta = item.getItemMeta();
-        return meta != null ? meta.getEnchantLevel(enchantment) : item.getEnchantmentLevel(enchantment);
-    }
-
     public static void updateItemLoreEnchants(@NotNull ItemStack item) {
         EnchantRegister.ENCHANT_LIST.forEach(ench -> {
             ItemUtil.delLore(item, ench.getId());

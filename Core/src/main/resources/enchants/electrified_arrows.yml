@@ -1,0 +1,33 @@
+Is_Treasure: false
+Name: Electrified Arrows
+Tier: rare
+Description:
+  - '%enchantment_trigger_chance%% chance to launch an electrified arrow.'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 75.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 25.0
+Villagers:
+  Chance: 45.0
+Loot_Generation:
+  Chance: 40.0
+Mob_Spawning:
+  Chance: 10.0
+
+Settings:
+  Trigger_Chance: '10.0 + %enchantment_level% * 5'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Arrow:
+    Trail:
+      Name: 'FIREWORKS_SPARK'
+      Data: ''

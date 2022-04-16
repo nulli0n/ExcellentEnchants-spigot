@@ -249,7 +249,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEnchantPopulatePiglinBarter(CreatureSpawnEvent e) {
+    public void onEnchantPopulateSpawn(CreatureSpawnEvent e) {
         if (Config.getObtainSettings(ObtainType.MOB_SPAWNING) == null) return;
 
         LivingEntity entity = e.getEntity();

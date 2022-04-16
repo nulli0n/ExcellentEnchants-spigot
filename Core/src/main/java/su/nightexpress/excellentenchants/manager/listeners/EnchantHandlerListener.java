@@ -10,6 +10,7 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -23,6 +24,7 @@ import su.nexmedia.engine.api.manager.AbstractListener;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantDropContainer;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 
 public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> {
@@ -190,6 +192,28 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
 
         EnchantManager.getItemCustomEnchants(tool, BlockBreakEnchant.class).forEach((blockEnchant, level) -> {
             blockEnchant.use(e, player, tool, level);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEnchantBlockDropItem(BlockDropItemEvent e) {
+        Player player = e.getPlayer();
+        if (player.getGameMode() == GameMode.CREATIVE) return;
+
+        ItemStack tool = player.getInventory().getItemInMainHand();
+        if (tool.getType().isAir() || tool.getType() == Material.ENCHANTED_BOOK) return;
+
+        EnchantManager.getItemCustomEnchants(tool, BlockDropEnchant.class).forEach((blockEnchant, level) -> {
+            blockEnchant.use(e, player, tool, level);
+        });
+
+        EnchantDropContainer dropContainer = new EnchantDropContainer(e);
+        EnchantManager.getItemCustomEnchants(tool, CustomDropEnchant.class).forEach((blockEnchant, level) -> {
+            blockEnchant.handleDrop(dropContainer, player, tool, level);
+        });
+
+        dropContainer.getDrop().forEach(item -> {
+            e.getBlockState().getBlock().getWorld().dropItem(e.getBlockState().getLocation(), item);
         });
     }
 }

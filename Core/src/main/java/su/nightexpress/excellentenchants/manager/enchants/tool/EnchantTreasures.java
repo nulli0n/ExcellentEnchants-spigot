@@ -7,43 +7,40 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.NexEngine;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.ICleanable;
-import su.nexmedia.engine.manager.player.listener.PlayerBlockPlacedListener;
+import su.nexmedia.engine.manager.player.PlayerBlockTracker;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.MessageUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantDropContainer;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
-import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.CustomDropEnchant;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class EnchantTreasures extends IEnchantChanceTemplate implements BlockBreakEnchant, CustomDropEnchant, ICleanable {
+public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDropEnchant, ICleanable {
 
     private final String particleName;
     private final String particleData;
     private final String sound;
     private final Map<Material, Map<Material, Double>> treasures;
-    private final Predicate<Block>                     userBlockFilter;
+    private final Predicate<Block>                     blockTracker;
 
     public static final String ID = "treasures";
 
     public EnchantTreasures(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
-        super(plugin, cfg, EnchantPriority.LOWEST);
+        super(plugin, cfg, EnchantPriority.MEDIUM);
 
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.REDSTONE.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "200,180,0");
@@ -72,15 +69,15 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements BlockBre
             }
         }
 
-        NexEngine.get().getPlayerManager().enableUserBlockListening();
-        PlayerBlockPlacedListener.BLOCK_FILTERS.add(this.userBlockFilter = (block) -> {
-           return this.getTreasure(block) != null;
+        PlayerBlockTracker.initialize();
+        PlayerBlockTracker.BLOCK_FILTERS.add(this.blockTracker = (block) -> {
+           return this.getTreasure(block.getType()) != null;
         });
     }
 
     @Override
     public void clear() {
-        PlayerBlockPlacedListener.BLOCK_FILTERS.remove(this.userBlockFilter);
+        PlayerBlockTracker.BLOCK_FILTERS.remove(this.blockTracker);
     }
 
     @Override
@@ -105,50 +102,34 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements BlockBre
     }
 
     @Override
-    @NotNull
-    public List<ItemStack> getCustomDrops(@NotNull Player player, @NotNull ItemStack item, @NotNull Block block, int level) {
-        ItemStack drop = this.getTreasure(block);
-        if (PlayerBlockPlacedListener.isUserPlaced(block) || drop == null) return Collections.emptyList();
-        return Collections.singletonList(drop);
-    }
+    public void handleDrop(@NotNull EnchantDropContainer e, @NotNull Player player, @NotNull ItemStack item, int level) {
+        BlockDropItemEvent parent = e.getParent();
+        Block block = parent.getBlockState().getBlock();
+        if (!this.isEnchantmentAvailable(player)) return;
+        if (PlayerBlockTracker.isTracked(block)) return;
+        if (!this.checkTriggerChance(level)) return;
+        if (!this.takeCostItem(player)) return;
 
-    @Override
-    public boolean isEventMustHaveDrops() {
-        return false;
+        ItemStack treasure = this.getTreasure(parent.getBlockState().getType());
+        if (treasure == null) return;
+
+        e.getDrop().add(treasure);
+        this.playEffect(block);
     }
 
     @Nullable
-    public final ItemStack getTreasure(@NotNull Block block) {
-        Map<Material, Double> treasures = this.treasures.get(block.getType());
+    public final ItemStack getTreasure(@NotNull Material type) {
+        Map<Material, Double> treasures = this.treasures.get(type);
         if (treasures == null) return null;
 
         Material mat = Rnd.get(treasures);
         return mat != null && !mat.isAir() ? new ItemStack(mat) : null;
     }
 
+    @Deprecated
     public void playEffect(@NotNull Block block) {
         Location location = LocationUtil.getCenter(block.getLocation());
         MessageUtil.sound(location, this.sound);
         EffectUtil.playEffect(location, this.particleName, this.particleData, 0.2f, 0.2f, 0.2f, 0.12f, 20);
-    }
-
-
-    @Override
-    public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        Block block = e.getBlock();
-        if (!this.isEnchantmentAvailable(player)) return false;
-        if (EnchantTelekinesis.isDropHandled(block)) return false;
-        if (this.isEventMustHaveDrops() && !e.isDropItems()) return false;
-        if (PlayerBlockPlacedListener.isUserPlaced(block)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(player)) return false;
-
-        Location location = LocationUtil.getCenter(block.getLocation());
-        List<ItemStack> drops = this.getCustomDrops(player, item, block, level);
-        if (drops.isEmpty()) return false;
-
-        drops.forEach(itemDrop -> block.getWorld().dropItem(location, itemDrop));
-        this.playEffect(block);
-        return true;
     }
 }

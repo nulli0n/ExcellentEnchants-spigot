@@ -11,11 +11,6 @@ public class Lang extends CoreLang {
 
     public Lang(@NotNull ExcellentEnchants plugin) {
         super(plugin);
-    }
-
-    @Override
-    public void setup() {
-        super.setup();
         this.setupEnum(EnchantmentTarget.class);
         this.setupEnum(FitItemType.class);
     }

@@ -1,0 +1,35 @@
+Is_Treasure: false
+Name: Dragonfire Arrows
+Tier: exotic
+Description:
+  - '%enchantment_trigger_chance%% chance to launch an dragonfire arrow (R=%enchantment_fire_radius%, %enchantment_fire_duration%s).'
+Level:
+  Min: 1
+  Max: 3
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 25.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '9 * %enchantment_level%'
+  Chance: 20.0
+Villagers:
+  Chance: 25.0
+Loot_Generation:
+  Chance: 30.0
+Mob_Spawning:
+  Chance: 5.0
+Settings:
+  Trigger_Chance: '10.0 + %enchantment_level% * 5'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Fire:
+    Duration: '%enchantment_level% * 100.0'
+    Radius: '2.0 + %enchantment_level%'
+  Arrow:
+    Trail:
+      Name: 'DRAGON_BREATH'
+      Data: ''

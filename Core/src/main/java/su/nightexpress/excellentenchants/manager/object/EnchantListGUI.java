@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.manager.object;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -117,7 +118,7 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
     }
 
     @Override
-    public boolean cancelClick(@NotNull SlotType slotType, int slot) {
+    public boolean cancelClick(@NotNull InventoryClickEvent e, @NotNull SlotType slotType) {
         return true;
     }
 }

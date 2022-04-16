@@ -1,0 +1,34 @@
+Is_Treasure: false
+Name: Temper
+Tier: rare
+Description:
+  - '%enchantment_trigger_chance%% chance to inflict %enchantment_damage_amount%% (max. %enchantment_damage_capacity%%) more damage for each %enchantment_health_point% hearts missing.'
+Level:
+  Min: 1
+  Max: 5
+Anvil:
+  Merge_Cost: '%enchantment_level%'
+Fishing:
+  Chance: 25.0
+Enchanting_Table:
+  Level_By_Exp_Cost: '6 * %enchantment_level%'
+  Chance: 15.0
+Villagers:
+  Chance: 20.0
+Loot_Generation:
+  Chance: 25.0
+Mob_Spawning:
+  Chance: 10.0
+
+Settings:
+  Trigger_Chance: '100.0'
+  Cost:
+    Enabled: false
+    Item:
+      Material: AIR
+      Amount: 1
+  Damage:
+    Amount: '0.01 * %enchantment_level%'
+    Capacity: '2.0'
+  Health:
+    Point: '0.5'

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class EnchantTier {
 
     private final String                  id;
-    private final int priority;
+    private final int                     priority;
     private final String                  name;
     private final String                  color;
     private final Map<ObtainType, Double> chance;
@@ -73,8 +73,8 @@ public class EnchantTier {
     @NotNull
     public Set<ExcellentEnchant> getEnchants(@NotNull ObtainType obtainType, @Nullable ItemStack item) {
         Set<ExcellentEnchant> set = this.getEnchants().stream()
-                .filter(en -> en.getObtainChance(obtainType) > 0)
-                .filter(en -> item == null || en.canEnchantItem(item)).collect(Collectors.toSet());
+            .filter(en -> en.getObtainChance(obtainType) > 0)
+            .filter(en -> item == null || en.canEnchantItem(item)).collect(Collectors.toSet());
         set.removeIf(en -> obtainType == ObtainType.ENCHANTING && en.isTreasure());
         return set;
     }

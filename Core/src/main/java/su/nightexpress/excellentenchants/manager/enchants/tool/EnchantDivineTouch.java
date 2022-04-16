@@ -3,23 +3,26 @@ package su.nightexpress.excellentenchants.manager.enchants.tool;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantDropContainer;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
@@ -27,16 +30,14 @@ import su.nightexpress.excellentenchants.api.enchantment.type.CustomDropEnchant;
 import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 
-import java.util.Collections;
-import java.util.List;
-
 public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockBreakEnchant, CustomDropEnchant {
+
+    public static final String  ID          = "divine_touch";
+    private static final String META_HANDLE = ID + "_handle";
 
     private final String particleName;
     private final String particleData;
     private final String spawnerName;
-
-    public static final String ID = "divine_touch";
 
     public EnchantDivineTouch(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
@@ -44,12 +45,6 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.VILLAGER_HAPPY.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "");
         this.spawnerName = StringUtil.color(cfg.getString("Settings.Spawner_Item.Name", "&aMob Spawner &7(%type%)"));
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.SMELTER);
     }
 
     @Override
@@ -65,6 +60,12 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
     @NotNull
     public FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.PICKAXE};
+    }
+
+    @Override
+    protected void addConflicts() {
+        super.addConflicts();
+        this.addConflict(EnchantRegister.SMELTER);
     }
 
     @Override
@@ -90,36 +91,31 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
     }
 
     @Override
-    @NotNull
-    public List<ItemStack> getCustomDrops(@NotNull Player player, @NotNull ItemStack item, @NotNull Block block, int level) {
-        if (!(block.getState() instanceof CreatureSpawner spawnerBlock)) return Collections.emptyList();
+    public void handleDrop(@NotNull EnchantDropContainer e, @NotNull Player player, @NotNull ItemStack item, int level) {
+        BlockDropItemEvent parent = e.getParent();
+        BlockState state = parent.getBlockState();
+        Block block = state.getBlock();
+        if (!block.hasMetadata(META_HANDLE)) return;
+        if (!(state instanceof CreatureSpawner spawnerBlock)) return;
 
-        return Collections.singletonList(this.getSpawner(spawnerBlock));
-    }
+        e.getDrop().add(this.getSpawner(spawnerBlock));
 
-    @Override
-    public boolean isEventMustHaveDrops() {
-        return false;
+        Location location = LocationUtil.getCenter(block.getLocation());
+        EffectUtil.playEffect(location, this.particleName, this.particleData, 0.3f, 0.3f, 0.3f, 0.15f, 30);
+        block.removeMetadata(META_HANDLE, this.plugin);
     }
 
     @Override
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (!this.isEnchantmentAvailable(player)) return false;
         Block block = e.getBlock();
-        if (EnchantTelekinesis.isDropHandled(block)) return false;
+        if (!this.isEnchantmentAvailable(player)) return false;
         if (!(block.getState() instanceof CreatureSpawner spawnerBlock)) return false;
-        if (this.isEventMustHaveDrops() && !e.isDropItems()) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!this.takeCostItem(player)) return false;
 
-        Location location = LocationUtil.getCenter(block.getLocation());
-        World world = block.getWorld();
-
-        this.getCustomDrops(player, item, block, level).forEach(itemSpawner -> world.dropItemNaturally(location, itemSpawner));
-        EffectUtil.playEffect(location, this.particleName, this.particleData, 0.3f, 0.3f, 0.3f, 0.15f, 30);
-
         e.setExpToDrop(0);
-        e.setDropItems(false);
+        e.setDropItems(true);
+        block.setMetadata(META_HANDLE, new FixedMetadataValue(this.plugin, true));
         return true;
     }
 
@@ -130,16 +126,8 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
         if (block.getType() != Material.SPAWNER) return;
 
         Player player = e.getPlayer();
-        ItemStack spawner = player.getInventory().getItemInMainHand();
-        if (spawner.getType().isAir() || spawner.getType() != Material.SPAWNER) {
-            spawner = player.getInventory().getItemInOffHand();
-        }
-        if (spawner.getType().isAir() || spawner.getType() != Material.SPAWNER) {
-            return;
-        }
-
-        BlockStateMeta meta = (BlockStateMeta) spawner.getItemMeta();
-        if (meta == null) return;
+        ItemStack spawner = player.getInventory().getItem(e.getHand());
+        if (spawner.getType() != Material.SPAWNER || !(spawner.getItemMeta() instanceof BlockStateMeta meta)) return;
 
         CreatureSpawner spawnerItem = (CreatureSpawner) meta.getBlockState();
         CreatureSpawner spawnerBlock = (CreatureSpawner) block.getState();
