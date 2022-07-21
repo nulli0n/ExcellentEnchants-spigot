@@ -96,7 +96,7 @@ public class EnchantCutter extends IEnchantChanceTemplate implements CombatEncha
         drop.getVelocity().multiply(3D);
 
         EffectUtil.playEffect(victim.getEyeLocation(), Particle.ITEM_CRACK.name(), itemCut.getType().name(), 0.2f, 0.15f, 0.2f, 0.15f, 40);
-        if (this.sound != null) MessageUtil.sound(victim.getLocation(), this.sound.name());
+        MessageUtil.sound(victim.getLocation(), this.sound);
         return true;
     }
 }

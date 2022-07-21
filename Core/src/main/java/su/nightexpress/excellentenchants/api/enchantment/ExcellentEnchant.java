@@ -10,11 +10,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.IListener;
+import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.*;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.config.Config;
+import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 import su.nightexpress.excellentenchants.manager.object.EnchantTier;
@@ -28,9 +30,9 @@ import java.util.stream.Stream;
 
 public abstract class ExcellentEnchant extends Enchantment implements IListener {
 
-    public static final String PLACEHOLDER_NAME                          = "%enchantment_name%";
-    public static final String PLACEHLDER_NAME_FORMATTED                 = "%enchantment_name_formatted%";
-    public static final String PLACEHOLDER_DESCRIPTION                   = "%enchantment_description%";
+    public static final String PLACEHOLDER_NAME           = "%enchantment_name%";
+    public static final String PLACEHOLDER_NAME_FORMATTED = "%enchantment_name_formatted%";
+    public static final String PLACEHOLDER_DESCRIPTION    = "%enchantment_description%";
     public static final String PLACEHOLDER_LEVEL                         = "%enchantment_level%";
     public static final String PLACEHOLDER_LEVEL_MIN                     = "%enchantment_level_min%";
     public static final String PLACEHOLDER_LEVEL_MAX                     = "%enchantment_level_max%";
@@ -74,7 +76,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
         this.priority = priority;
 
         this.displayName = StringUtil.color(cfg.getString("Name", this.getId()));
-        this.tier = EnchantManager.getTierById(cfg.getString("Tier", Constants.DEFAULT));
+        this.tier = EnchantManager.getTierById(cfg.getString("Tier", Placeholders.DEFAULT));
         if (this.tier == null) {
             throw new IllegalStateException("Invalid tier provided for the '" + id + "' enchantment!");
         }
@@ -114,28 +116,75 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
         for (ObtainType obtainType : ObtainType.values()) {
             cfg.addMissing(obtainType.getPathName() + ".Chance", 25D);
         }
+
+        /*String scalabe = "Scalable. Placeholder: " + PLACEHOLDER_LEVEL + ". See: http://77.222.60.131:8080/plugin/engine/config/formats";
+        cfg.setComments("Is_Treasure", Arrays.asList("Defines if this enchantment is a treasure enchantment.", "Treasure enchantments can only be received via looting, trading, or fishing."));
+        cfg.setComments("Name", Arrays.asList("Enchantment display name. This name will be displayed in item lore and in enchantments list GUI."));
+        cfg.setComments("Tier", Arrays.asList("Enchantment tier. Must be a valid tier from the 'config.yml'. Enchantments with invalid tier won't be loaded."));
+        cfg.setComments("Description", Arrays.asList("Enchantment description. Will be displayed in item lore (if not disabled in the main config.yml) and in enchantments list GUI.", "You can use multiple lines here.", "You can use 'Enchantment' placeholders: http://77.222.60.131:8080/plugin/excellentenchants/utils/placeholders"));
+        cfg.setComments("Level", Arrays.asList("Enchantment level settings."));
+        cfg.setComments("Level.Min", Arrays.asList("Minimal (start) enchantment level. Can not be smaller then 1."));
+        cfg.setComments("Level.Max", Arrays.asList("Maximal (final) enchantment level.", "Keep in mind that while you can enchant items with bypass max. enchantment level, all enchantment 'Scalable' option values will not exceed the max. enchantment level."));
+        cfg.setComments("Anvil", Arrays.asList("Enchantment settings for Anvil."));
+        cfg.setComments("Anvil.Merge_Cost", Arrays.asList("Defines the exp cost to merge this enchantment on other items on anvil.", scalabe));
+        cfg.setComments("Enchanting_Table", Arrays.asList("Enchantment settings for Enchanting Table."));
+        cfg.setComments("Enchanting_Table.Level_By_Exp_Cost", Arrays.asList("Defines which enchantment level will be generated in Enchanting Table depends on the enchanting cost.", "Example: expression '9 * %enchantment_level%' for enchantment levels 1-3 will result in I = 9+ Levels, II = 18+ Levels, III = 27+ Levels.", scalabe));
+        cfg.setComments("Enchanting_Table.Chance", Arrays.asList("A chance that this enchantment will be appeared in Enchanting Table."));
+        cfg.setComments("Villagers.Chance", Arrays.asList("A chance that this enchantment will be populated on items in Villager trades."));
+        cfg.setComments("Loot_Generation.Chance", Arrays.asList("A chance that this enchantment will be populated on items in cave/dungeon/castle chests/minecarts and other containers."));
+        cfg.setComments("Fishing.Chance", Arrays.asList("A chance that this enchantment will be populated on items received from fishing."));
+        cfg.setComments("Mob_Spawning.Chance", Arrays.asList("A chance that this enchantment will be populated on items equipped on mob on spawning."));
+        cfg.setComments("Settings", Arrays.asList("Individual enchantment settings."));
+        cfg.setComments("Settings.Trigger_Chance", Arrays.asList("A chance that this enchantment will be triggered.", scalabe));
+        cfg.setComments("Settings.Cost", Arrays.asList("A cost a player will have to pay to have this enchantment triggered."));
+        cfg.setComments("Settings.Cost.Enabled", Arrays.asList("Enables/Disables cost feature."));
+        cfg.setComments("Settings.Cost.Item", Arrays.asList("A (custom) item that player must have in his inventory, that will be consumed to trigger the enchantment effect.", "See http://77.222.60.131:8080/plugin/engine/config/formats for item options."));
+        cfg.setComments("Settings.Potion_Effect", Arrays.asList("Enchantment settings for the Potion Effect applied to a wearer or victim."));
+        cfg.setComments("Settings.Potion_Effect.Level", Arrays.asList("Potion effect level (amplifier).", scalabe));
+        cfg.setComments("Settings.Potion_Effect.Duration", Arrays.asList("Potion effect duration (in seconds). Keep in mind that settings this to a low value (smaller than Passive Task Interval in the config.yml) will result in effect reappear delay.", scalabe));
+        cfg.setComments("Settings.Particle", Arrays.asList("Particle effect that will be played on enchantment trigger."));
+        cfg.setComments("Settings.Particle.Name", Arrays.asList("Particle name. Set this to empty '' or 'NONE' to disable.", "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Particle.html"));
+        cfg.setComments("Settings.Particle.Data", Arrays.asList("Particle data (additional settings).", "- BLOCK_DUST, BLOCK_MARKER, BLOCK_CRACK, ITEM_CRACK, FALLING_DUST: Use https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html", "- REDSTONE: Use RGB (like 255,255,255)"));
+        cfg.setComments("Settings.Sound", Arrays.asList("Sound that will be played on enchantment trigger.", "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html"));
+        cfg.setComments("Settings.Arrow", Arrays.asList("Enchantment arrow settings."));
+        cfg.setComments("Settings.Arrow.Trail", Arrays.asList("A particle effect to play as an arrow trail."));
+        cfg.setComments("Settings.Arrow.Trail.Name", Arrays.asList("Particle name. Set this to empty '' or 'NONE' to disable.", "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Particle.html"));
+        cfg.setComments("Settings.Arrow.Trail.Data", Arrays.asList("Particle data (additional settings).", "- BLOCK_DUST, BLOCK_MARKER, BLOCK_CRACK, ITEM_CRACK, FALLING_DUST: Use https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html", "- REDSTONE: Use RGB (like 255,255,255)"));
+
+        List<String> placeholders = new ArrayList<>();
+        placeholders.add("Additional placeholders:");
+        for (Field field : Reflex.getFields(this.getClass())) {
+            if (field.getType() != String.class) continue;
+            if (!field.getName().startsWith("PLACEHOLDER")) continue;
+            if (field.getDeclaringClass().equals(ExcellentEnchant.class)) continue;
+
+            String value = (String) Reflex.getFieldValue(this, field.getName());
+            String name = StringUtil.capitalizeFully(value.replace("%", "").replace("_", " "));
+            placeholders.add("- " + value + ": " + name.trim());
+        }
+        cfg.options().setHeader(placeholders);*/
     }
 
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        String conflicts = this.getConflicts().isEmpty() ? plugin.lang().Other_None.getLocalized() : this.getConflicts().stream().filter(Objects::nonNull).map(en -> plugin.lang().getEnchantment(en)).collect(Collectors.joining("\n"));
+        String conflicts = this.getConflicts().isEmpty() ? plugin.getMessage(Lang.OTHER_NONE).getLocalized() : this.getConflicts().stream().filter(Objects::nonNull).map(LangManager::getEnchantment).collect(Collectors.joining("\n"));
 
         return str -> str
             .replace(PLACEHOLDER_NAME, this.getDisplayName())
-            .replace(PLACEHLDER_NAME_FORMATTED, this.getNameFormatted(level))
+            .replace(PLACEHOLDER_NAME_FORMATTED, this.getNameFormatted(level))
             .replace(PLACEHOLDER_LEVEL, NumberUtil.toRoman(level))
             .replace(PLACEHOLDER_LEVEL_MIN, String.valueOf(this.getStartLevel()))
             .replace(PLACEHOLDER_LEVEL_MAX, String.valueOf(this.getMaxLevel()))
-            .replace(PLACEHOLDER_TARGET, plugin.lang().getEnum(this.getItemTarget()))
+            .replace(PLACEHOLDER_TARGET, plugin.getLangManager().getEnum(this.getItemTarget()))
             .replace(PLACEHOLDER_TIER, this.getTier().getName())
             .replace(PLACEHOLDER_CONFLICTS, conflicts)
-            .replace(PLACEHOLDER_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.lang().getEnum(type)).toList()))
+            .replace(PLACEHOLDER_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
             .replace(PLACEHOLDER_OBTAIN_CHANCE_ENCHANTING, NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
             .replace(PLACEHOLDER_OBTAIN_CHANCE_VILLAGER, NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
             .replace(PLACEHOLDER_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
             .replace(PLACEHOLDER_OBTAIN_CHANCE_FISHING, NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
             .replace(PLACEHOLDER_OBTAIN_CHANCE_MOB_SPAWNING, NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
-            .replace(PLACEHOLDER_COST_ITEM, this.hasCostItem() ? ItemUtil.getItemName(this.costItem) : plugin.lang().Other_None.getLocalized())
+            .replace(PLACEHOLDER_COST_ITEM, this.hasCostItem() ? ItemUtil.getItemName(this.costItem) : plugin.getMessage(Lang.OTHER_NONE).getLocalized())
             ;
     }
 
@@ -246,7 +295,8 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
     }
 
     public int getLevelByEnchantCost(int expLevel) {
-        Optional<Map.Entry<Integer, Double>> opt = this.levelByEnchantCost.getValues().entrySet().stream().filter(en -> expLevel >= en.getValue().intValue()).max(Comparator.comparingInt(Map.Entry::getKey));
+        Optional<Map.Entry<Integer, Double>> opt = this.levelByEnchantCost.getValues().entrySet().stream()
+            .filter(en -> expLevel >= en.getValue().intValue()).max(Comparator.comparingInt(Map.Entry::getKey));
         return opt.isPresent() ? opt.get().getKey() : Rnd.get(this.getStartLevel(), this.getMaxLevel());
     }
 

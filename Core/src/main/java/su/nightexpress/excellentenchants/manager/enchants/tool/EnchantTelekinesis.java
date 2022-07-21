@@ -8,7 +8,7 @@ import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.api.config.LangMessage;
+import su.nexmedia.engine.api.lang.LangMessage;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PlayerUtil;
 import su.nexmedia.engine.utils.StringUtil;
@@ -28,14 +28,14 @@ public class EnchantTelekinesis extends IEnchantChanceTemplate implements Custom
 
     private final LangMessage messageDropReceived;
     private final String      messageItemName;
-    private final String messageItemSeparator;
+    private final String      messageItemSeparator;
 
     public static final String ID = "telekinesis";
 
     public EnchantTelekinesis(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.LOWEST);
 
-        this.messageDropReceived = new LangMessage(plugin.lang(), cfg.getString("Settings.Message.Drop_Received", ""));
+        this.messageDropReceived = new LangMessage(plugin, cfg.getString("Settings.Message.Drop_Received", ""));
         this.messageItemName = StringUtil.color(cfg.getString("Settings.Message.Item_Name", "&7x%item_amount% &f%item_name%"));
         this.messageItemSeparator = StringUtil.color(cfg.getString("Settings.Message.Item_Separator", "&7, "));
     }

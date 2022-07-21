@@ -9,16 +9,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_18_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class V1_18_R1 implements EnchantNMS {
+public class V1_19_R1 implements EnchantNMS {
 
     @Override
     @NotNull
@@ -33,7 +33,7 @@ public class V1_18_R1 implements EnchantNMS {
 
         Set<Block> blocks = new HashSet<>();
         for (BlockPos posNear : BlockPos.betweenClosed(pos.offset(-radius, -1.0, -radius), pos.offset(radius, -1.0, radius))) {
-            if (!posNear.closerThan(entity.position(), radius)) continue;
+            if (!posNear.closerThan(entity.blockPosition(), radius)) continue;
 
             posAbove.set(posNear.getX(), posNear.getY() + 1, posNear.getZ());
 

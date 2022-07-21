@@ -104,7 +104,6 @@ public class EnchantSmelter extends IEnchantChanceTemplate implements BlockDropE
         return this.smeltingTable.containsKey(material);
     }
 
-    @Deprecated
     public void playEffect(@NotNull Block block) {
         Location location = LocationUtil.getCenter(block.getLocation(), true);
         MessageUtil.sound(location, this.sound);

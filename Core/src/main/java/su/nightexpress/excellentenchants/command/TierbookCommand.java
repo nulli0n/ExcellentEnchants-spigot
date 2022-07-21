@@ -12,6 +12,7 @@ import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.object.EnchantTier;
 
@@ -27,13 +28,13 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     @NotNull
     public String getDescription() {
-        return plugin.lang().Command_TierBook_Desc.getLocalized();
+        return plugin.getMessage(Lang.COMMAND_TIER_BOOK_DESC).getLocalized();
     }
 
     @Override
     @NotNull
     public String getUsage() {
-        return plugin.lang().Command_TierBook_Usage.getLocalized();
+        return plugin.getMessage(Lang.COMMAND_TIER_BOOK_USAGE).getLocalized();
     }
 
     @Override
@@ -71,13 +72,13 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
 
         EnchantTier tier = EnchantManager.getTierById(args[2].toLowerCase());
         if (tier == null) {
-            plugin.lang().Command_TierBook_Error.send(sender);
+            plugin.getMessage(Lang.COMMAND_TIER_BOOK_ERROR).send(sender);
             return;
         }
 
         ExcellentEnchant enchant = Rnd.get(tier.getEnchants());
         if (enchant == null) {
-            plugin.lang().Error_NoEnchant.send(sender);
+            plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
             return;
         }
 
@@ -90,7 +91,7 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
         EnchantManager.addEnchant(item, enchant, level, true);
         PlayerUtil.addItem(player, item);
 
-        plugin.lang().Command_TierBook_Done
+        plugin.getMessage(Lang.COMMAND_TIER_BOOK_DONE)
             .replace("%tier%", tier.getName())
             .replace("%player%", player.getName()).send(sender);
     }

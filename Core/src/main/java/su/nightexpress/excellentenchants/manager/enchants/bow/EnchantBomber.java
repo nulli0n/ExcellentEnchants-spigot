@@ -64,6 +64,7 @@ public class EnchantBomber extends IEnchantChanceTemplate implements BowEnchant 
         this.addConflict(EnchantRegister.POISONED_ARROWS);
         this.addConflict(EnchantRegister.DRAGONFIRE_ARROWS);
         this.addConflict(EnchantRegister.ELECTRIFIED_ARROWS);
+        this.addConflict(EnchantRegister.CONFUSING_ARROWS);
         this.addConflict(Enchantment.ARROW_FIRE);
         this.addConflict(Enchantment.ARROW_DAMAGE);
         this.addConflict(Enchantment.ARROW_KNOCKBACK);

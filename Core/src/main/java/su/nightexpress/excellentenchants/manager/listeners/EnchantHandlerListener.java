@@ -19,7 +19,9 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.AbstractListener;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -29,8 +31,19 @@ import su.nightexpress.excellentenchants.manager.EnchantManager;
 
 public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> {
 
+    private static final String META_PROJECTILE_WEAPON = "sourceWeapon";
+
     public EnchantHandlerListener(@NotNull EnchantManager enchantManager) {
         super(enchantManager.plugin());
+    }
+
+    private void setSourceWeapon(@NotNull Projectile projectile, @NotNull ItemStack item) {
+        projectile.setMetadata(META_PROJECTILE_WEAPON, new FixedMetadataValue(plugin, item));
+    }
+
+    @Nullable
+    private ItemStack getSourceWeapon(@NotNull Projectile projectile) {
+        return projectile.hasMetadata(META_PROJECTILE_WEAPON) ? (ItemStack) projectile.getMetadata(META_PROJECTILE_WEAPON).get(0).value() : null;
     }
 
     // ---------------------------------------------------------------
@@ -103,7 +116,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         });
 
         if (e.getProjectile() instanceof Projectile projectile) {
-            EnchantManager.setArrowWeapon(projectile, bow);
+            this.setSourceWeapon(projectile, bow);
         }
     }
 
@@ -116,7 +129,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         if (!(e.getDamager() instanceof Projectile projectile)) return;
         if (!(projectile.getShooter() instanceof LivingEntity damager)) return;
 
-        ItemStack bow = EnchantManager.getArrowWeapon(projectile);
+        ItemStack bow = this.getSourceWeapon(projectile);
         if (bow == null || bow.getType().isAir() || bow.getType() == Material.ENCHANTED_BOOK) return;
 
         EnchantManager.getItemCustomEnchants(bow, BowEnchant.class).forEach((bowEnchant, level) -> {
@@ -131,7 +144,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     public void onEnchantBowHit(ProjectileHitEvent e) {
         Projectile projectile = e.getEntity();
 
-        ItemStack bow = EnchantManager.getArrowWeapon(projectile);
+        ItemStack bow = this.getSourceWeapon(projectile);
         if (bow == null || bow.getType().isAir() || bow.getType() == Material.ENCHANTED_BOOK) return;
 
         EnchantManager.getItemCustomEnchants(bow, BowEnchant.class).forEach((bowEnchant, level) -> {

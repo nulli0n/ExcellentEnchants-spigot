@@ -106,8 +106,8 @@ public class EnchantDecapitator extends IEnchantChanceTemplate implements DeathE
                 String texture = this.headTextures.get(victim.getType().name());
                 if (texture == null) return false;
 
-                entityName = this.headName.replace("%entity%", plugin.lang().getEnum(victim.getType()));
-                ItemUtil.addSkullTexture(item, texture, ID + victim.getType().name());
+                entityName = this.headName.replace("%entity%", plugin.getLangManager().getEnum(victim.getType()));
+                ItemUtil.setSkullTexture(item, texture);
                 meta = (SkullMeta) item.getItemMeta();
             }
 

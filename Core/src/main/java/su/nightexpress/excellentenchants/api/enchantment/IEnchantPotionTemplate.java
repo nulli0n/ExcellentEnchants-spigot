@@ -5,6 +5,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
+import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -41,7 +42,7 @@ public abstract class IEnchantPotionTemplate extends IEnchantChanceTemplate {
         return str -> super.replacePlaceholders(level).apply(str
             .replace(PLACEHOLDER_POTION_LEVEL, NumberUtil.toRoman(this.getEffectLevel(level)))
             .replace(PLACEHOLDER_POTION_DURATION, NumberUtil.format((double) this.getEffectDuration(level) / 20D))
-            .replace(PLACEHOLDER_POTION_TYPE, plugin.lang().getPotionType(this.getEffectType()))
+            .replace(PLACEHOLDER_POTION_TYPE, LangManager.getPotionType(this.getEffectType()))
         );
     }
 

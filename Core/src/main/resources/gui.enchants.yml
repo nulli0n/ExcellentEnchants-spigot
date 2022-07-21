@@ -1,3 +1,4 @@
+# See http://77.222.60.131:8080/plugin/engine/config/menuConfig
 # Menu title.
 Title: 'Excellent Enchants List'
 # Menu size. Allowed values: 9, 18, 27, 36, 45, 54.
@@ -6,6 +7,7 @@ Size: 36
 # Enchantment display settings.
 Enchantments:
   # Enchantment display item options.
+  # You can use 'Enchantment' placeholders: http://77.222.60.131:8080/plugin/excellentenchants/utils/placeholders
   Icon:
     Material: 'ENCHANTED_BOOK'
     Name: '%enchantment_name_formatted%'

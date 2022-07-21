@@ -13,6 +13,7 @@ import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
+import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 
 import java.util.Arrays;
@@ -27,13 +28,13 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     @NotNull
     public String getDescription() {
-        return plugin.lang().Command_Enchant_Desc.getLocalized();
+        return plugin.getMessage(Lang.COMMAND_ENCHANT_DESC).getLocalized();
     }
 
     @Override
     @NotNull
     public String getUsage() {
-        return plugin.lang().Command_Enchant_Usage.getLocalized();
+        return plugin.getMessage(Lang.COMMAND_ENCHANT_USAGE).getLocalized();
     }
 
     @Override
@@ -69,7 +70,7 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
 
         Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(args[1].toLowerCase()));
         if (enchantment == null) {
-            plugin.lang().Error_NoEnchant.send(sender);
+            plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
             return;
         }
 
@@ -100,6 +101,6 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
         item.setItemMeta(meta);
         EnchantManager.updateItemLoreEnchants(item);
 
-        plugin.lang().Command_Enchant_Done.send(sender);
+        plugin.getMessage(Lang.COMMAND_ENCHANT_DONE).send(sender);
     }
 }

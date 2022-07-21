@@ -9,11 +9,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
+import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.PlayerUtil;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
+import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 
 import java.util.Arrays;
@@ -28,13 +30,13 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     @NotNull
     public String getDescription() {
-        return plugin.lang().Command_Book_Desc.getLocalized();
+        return plugin.getMessage(Lang.COMMAND_BOOK_DESC).getLocalized();
     }
 
     @Override
     @NotNull
     public String getUsage() {
-        return plugin.lang().Command_Book_Usage.getLocalized();
+        return plugin.getMessage(Lang.COMMAND_BOOK_USAGE).getLocalized();
     }
 
     @Override
@@ -72,7 +74,7 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
 
         Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(args[2].toLowerCase()));
         if (enchantment == null) {
-            plugin.lang().Error_NoEnchant.send(sender);
+            plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
             return;
         }
 
@@ -91,8 +93,8 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
         EnchantManager.updateItemLoreEnchants(item);
         PlayerUtil.addItem(player, item);
 
-        plugin.lang().Command_Book_Done
-            .replace("%enchant%", plugin.lang().getEnchantment(enchantment))
+        plugin.getMessage(Lang.COMMAND_BOOK_DONE)
+            .replace("%enchant%", LangManager.getEnchantment(enchantment))
             .replace("%player%", player.getName()).send(sender);
     }
 }

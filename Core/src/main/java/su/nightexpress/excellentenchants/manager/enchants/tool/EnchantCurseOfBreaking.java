@@ -31,6 +31,11 @@ public class EnchantCurseOfBreaking extends IEnchantChanceTemplate {
         this.durabilityAmount = new EnchantScaler(this, "Settings.Durability_Amount");
     }
 
+    @Override
+    public boolean isCursed() {
+        return true;
+    }
+
     public int getDurabilityAmount(int level) {
         return (int) this.durabilityAmount.getValue(level);
     }

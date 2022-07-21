@@ -2,8 +2,8 @@ package su.nightexpress.excellentenchants.config;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.api.config.ConfigTemplate;
-import su.nexmedia.engine.utils.Constants;
+import su.nexmedia.engine.api.config.JYML;
+import su.nexmedia.engine.utils.Placeholders;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -14,11 +14,7 @@ import su.nightexpress.excellentenchants.manager.type.ObtainType;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Config extends ConfigTemplate {
-
-    public Config(@NotNull ExcellentEnchants plugin) {
-        super(plugin);
-    }
+public class Config {
 
     public static long TASKS_ARROW_TRAIL_TICKS_INTERVAL;
     public static long TASKS_PASSIVE_ENCHANTS_TICKS_INTERVAL;
@@ -37,14 +33,15 @@ public class Config extends ConfigTemplate {
     private static Map<ObtainType, ObtainSettings> OBTAIN_SETTINGS;
     private static Map<String, EnchantTier>        TIERS;
 
-    @Override
-    public void load() {
+    public static void load(@NotNull ExcellentEnchants plugin) {
+        JYML cfg = plugin.getConfig();
+
         String path = "General.Tasks.";
         TASKS_ARROW_TRAIL_TICKS_INTERVAL = cfg.getLong(path + "Arrow_Trails.Ticks_Interval", 1);
         TASKS_PASSIVE_ENCHANTS_TICKS_INTERVAL = cfg.getLong(path + "Passive_Enchants.Ticks_Interval", 100);
 
         path = "General.Enchantments.";
-        cfg.addMissing(path + "Disabled_In_Worlds.my_world", Collections.singletonList(Constants.MASK_ANY));
+        cfg.addMissing(path + "Disabled_In_Worlds.my_world", Collections.singletonList(Placeholders.MASK_ANY));
         cfg.addMissing(path + "Disabled_In_Worlds.other_world", Arrays.asList("enchant_name", "another_enchant"));
 
         ENCHANTMENTS_DISABLED = cfg.getStringSet(path + "Disabled").stream().map(String::toLowerCase).collect(Collectors.toSet());
@@ -87,19 +84,20 @@ public class Config extends ConfigTemplate {
             OBTAIN_SETTINGS.put(obtainType, settings);
         }
 
-        this.setupTiers();
+        setupTiers(plugin);
     }
 
-    private void setupTiers() {
+    private static void setupTiers(@NotNull ExcellentEnchants plugin) {
         // Reloading tiers will reset their lists with enchants = break the plugin mechanics
         if (ExcellentEnchants.isLoaded) return;
 
+        JYML cfg = plugin.getConfig();
         TIERS = new HashMap<>();
 
         // No tiers defined, setup a default one.
         // Every enchantment must have a tier.
         if (cfg.getSection("Tiers").isEmpty()) {
-            this.plugin.info("No tiers defined! Creating a default one for you...");
+            plugin.info("No tiers defined! Creating a default one for you...");
             cfg.set("Tiers.default.Name", "&7Default");
             cfg.set("Tiers.default.Color", "&7");
             for (ObtainType obtainType : ObtainType.values()) {
@@ -128,12 +126,12 @@ public class Config extends ConfigTemplate {
             TIERS.put(tier.getId(), tier);
         }
 
-        this.plugin.info("Tiers Loaded: " + TIERS.size());
+        plugin.info("Tiers Loaded: " + TIERS.size());
     }
 
     public static boolean isEnchantmentDisabled(@NotNull ExcellentEnchant enchant, @NotNull String world) {
         Set<String> disabled = ENCHANTMENTS_DISABLED_IN_WORLDS.getOrDefault(world, Collections.emptySet());
-        return disabled.contains(enchant.getKey().getKey()) || disabled.contains(Constants.MASK_ANY);
+        return disabled.contains(enchant.getKey().getKey()) || disabled.contains(Placeholders.MASK_ANY);
     }
 
     @Nullable

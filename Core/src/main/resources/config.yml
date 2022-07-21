@@ -10,8 +10,8 @@ Plugin:
   # To create a new language config, simply copy the default one and rename it to your language code.
   Language: en
   # Plugin prefix name.
-  # To change a prefix format, edit language config in '/NexEngine/lang'.
-  Prefix: ExcellentEnchants
+  Name: ExcellentEnchants
+  Prefix: '&e%plugin_name% &8» &7'
 
 # General plugin settings.
 General:

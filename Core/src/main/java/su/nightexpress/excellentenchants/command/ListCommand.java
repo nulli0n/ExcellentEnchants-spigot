@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
+import su.nightexpress.excellentenchants.config.Lang;
 
 public class ListCommand extends AbstractCommand<ExcellentEnchants> {
 
@@ -22,7 +23,7 @@ public class ListCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     @NotNull
     public String getDescription() {
-        return plugin.lang().Command_List_Desc.getLocalized();
+        return plugin.getMessage(Lang.COMMAND_LIST_DESC).getLocalized();
     }
 
     @Override

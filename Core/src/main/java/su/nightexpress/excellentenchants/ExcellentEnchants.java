@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants;
 
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.Version;
@@ -12,17 +13,21 @@ import su.nightexpress.excellentenchants.command.TierbookCommand;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
+import su.nightexpress.excellentenchants.manager.type.FitItemType;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 
 public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     public static boolean isLoaded = false;
 
-    private Config config;
-    private Lang   lang;
-
     private EnchantNMS     enchantNMS;
     private EnchantManager enchantManager;
+
+    @Override
+    @NotNull
+    protected ExcellentEnchants getSelf() {
+        return this;
+    }
 
     @Override
     public void enable() {
@@ -62,12 +67,16 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     }
 
     @Override
-    public void setConfig() {
-        this.config = new Config(this);
-        this.config.setup();
+    public void loadConfig() {
+        Config.load(this);
+    }
 
-        this.lang = new Lang(this);
-        this.lang.setup();
+    @Override
+    public void loadLang() {
+        this.getLangManager().loadMissing(Lang.class);
+        this.getLangManager().setupEnum(EnchantmentTarget.class);
+        this.getLangManager().setupEnum(FitItemType.class);
+        this.getLang().saveChanges();
     }
 
     @Override
@@ -81,18 +90,6 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     @Override
     public void registerHooks() {
 
-    }
-
-    @Override
-    @NotNull
-    public Config cfg() {
-        return this.config;
-    }
-
-    @Override
-    @NotNull
-    public Lang lang() {
-        return this.lang;
     }
 
     @NotNull

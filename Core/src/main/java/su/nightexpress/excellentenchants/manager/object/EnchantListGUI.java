@@ -8,11 +8,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.menu.*;
+import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.manager.EnchantRegister;
 
 import java.util.*;
@@ -63,9 +65,9 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
 
         // Override the conflicts placeholder display to make it in a list.
         List<String> conflicts = enchant.getConflicts().isEmpty()
-            ? plugin.lang().Other_None.asList()
+            ? plugin.getMessage(Lang.OTHER_NONE).asList()
             : enchant.getConflicts().stream().filter(Objects::nonNull)
-                .map(en -> plugin.lang().getEnchantment(en)).toList();
+                .map(LangManager::getEnchantment).toList();
 
         ItemUtil.replaceLore(icon, ExcellentEnchant.PLACEHOLDER_CONFLICTS, conflicts);
         ItemUtil.replace(icon, enchant.formatString(level));

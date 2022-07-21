@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.ICleanable;
-import su.nexmedia.engine.manager.player.PlayerBlockTracker;
+import su.nexmedia.engine.manager.player.blocktracker.PlayerBlockTracker;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.MessageUtil;
@@ -33,7 +33,7 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDr
 
     private final String particleName;
     private final String particleData;
-    private final String sound;
+    private final Sound sound;
     private final Map<Material, Map<Material, Double>> treasures;
     private final Predicate<Block>                     blockTracker;
 
@@ -44,7 +44,7 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDr
 
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.REDSTONE.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "200,180,0");
-        this.sound = cfg.getString("Settings.Sound", Sound.BLOCK_NOTE_BLOCK_BELL.name());
+        this.sound = cfg.getEnum("Settings.Sound", Sound.class, Sound.BLOCK_NOTE_BLOCK_BELL);
         this.treasures = new HashMap<>();
         for (String sFromArray : cfg.getSection("Settings.Treasures")) {
             for (String sFrom : sFromArray.split(",")) {
@@ -126,7 +126,6 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDr
         return mat != null && !mat.isAir() ? new ItemStack(mat) : null;
     }
 
-    @Deprecated
     public void playEffect(@NotNull Block block) {
         Location location = LocationUtil.getCenter(block.getLocation());
         MessageUtil.sound(location, this.sound);

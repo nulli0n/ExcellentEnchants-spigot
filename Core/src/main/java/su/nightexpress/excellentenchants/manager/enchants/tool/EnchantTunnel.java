@@ -10,7 +10,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.Version;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
@@ -37,9 +36,7 @@ public class EnchantTunnel extends IEnchantChanceTemplate implements BlockBreakE
 
     static {
         INTERACTABLE_BLOCKS.add(Material.REDSTONE_ORE);
-        if (Version.CURRENT.isHigher(Version.V1_16_R3)) {
-            INTERACTABLE_BLOCKS.add(Material.DEEPSLATE_REDSTONE_ORE);
-        }
+        INTERACTABLE_BLOCKS.add(Material.DEEPSLATE_REDSTONE_ORE);
     }
 
     public EnchantTunnel(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {

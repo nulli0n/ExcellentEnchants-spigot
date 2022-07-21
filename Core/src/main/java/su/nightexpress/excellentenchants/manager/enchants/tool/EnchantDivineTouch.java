@@ -84,7 +84,7 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
         spawnerItem.setSpawnedType(spawnerBlock.getSpawnedType());
         spawnerItem.update(true);
         stateItem.setBlockState(spawnerItem);
-        stateItem.setDisplayName(this.spawnerName.replace("%type%", plugin.lang().getEnum(spawnerBlock.getSpawnedType())));
+        stateItem.setDisplayName(this.spawnerName.replace("%type%", plugin.getLangManager().getEnum(spawnerBlock.getSpawnedType())));
         itemSpawner.setItemMeta(stateItem);
 
         return itemSpawner;

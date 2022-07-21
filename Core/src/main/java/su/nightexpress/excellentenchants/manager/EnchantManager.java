@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,8 +34,6 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     private EnchantListGUI      enchantListGUI;
     private ArrowTrailsTask          arrowTrailsTask;
     private EnchantEffectPassiveTask enchantEffectPassiveTask;
-
-    private static final Map<UUID, ItemStack> PROJECTILE_WEAPON = new HashMap<>();
 
     public EnchantManager(@NotNull ExcellentEnchants plugin) {
         super(plugin);
@@ -235,14 +232,5 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     @Nullable
     public static EnchantTier getTierByChance(@NotNull ObtainType obtainType) {
         return Config.getTierByChance(obtainType);
-    }
-
-    public static void setArrowWeapon(@NotNull Projectile projectile, @NotNull ItemStack bow) {
-        PROJECTILE_WEAPON.put(projectile.getUniqueId(), bow);
-    }
-
-    @Nullable
-    public static ItemStack getArrowWeapon(@NotNull Projectile projectile) {
-        return PROJECTILE_WEAPON.get(projectile.getUniqueId());
     }
 }
