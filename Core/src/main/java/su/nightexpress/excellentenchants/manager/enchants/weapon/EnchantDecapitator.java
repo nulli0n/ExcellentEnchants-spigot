@@ -26,17 +26,21 @@ import java.util.stream.Collectors;
 
 public class EnchantDecapitator extends IEnchantChanceTemplate implements DeathEnchant {
 
-    private final String      particleName;
-    private final String      particleData;
-    private final Set<String> ignoredEntityTypes;
-    private final String      headName;
-    private final Map<String, String> headTextures;
+    private String      particleName;
+    private String      particleData;
+    private Set<String> ignoredEntityTypes;
+    private String      headName;
+    private Map<String, String> headTextures;
 
     public static final String ID = "decapitator";
 
     public EnchantDecapitator(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.BLOCK_CRACK.name());
         this.particleData = cfg.getString("Settings.Particle.Data", Material.REDSTONE_BLOCK.name());
         this.ignoredEntityTypes = cfg.getStringSet("Settings.Ignored_Entity_Types").stream().map(String::toUpperCase).collect(Collectors.toSet());

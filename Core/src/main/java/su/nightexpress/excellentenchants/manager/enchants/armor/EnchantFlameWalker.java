@@ -5,7 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -40,16 +39,20 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
     private static final BlockFace[]      FACES             = {BlockFace.SOUTH, BlockFace.NORTH, BlockFace.EAST, BlockFace.WEST};
     private static final Map<Block, Long> BLOCKS_TO_DESTROY = new HashMap<>();
 
-    private final Scaler        blockDecayTime;
-    private       BlockTickTask blockTickTask;
+    private Scaler        blockDecayTime;
+    private BlockTickTask blockTickTask;
 
     public EnchantFlameWalker(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
 
-        this.blockDecayTime = new EnchantScaler(this, "Settings.Block_Decay");
-
         this.blockTickTask = new BlockTickTask(plugin);
         this.blockTickTask.start();
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
+        this.blockDecayTime = new EnchantScaler(this, "Settings.Block_Decay");
     }
 
     @Override
@@ -71,12 +74,6 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
 
     public static void addBlock(@NotNull Block block, double seconds) {
         BLOCKS_TO_DESTROY.put(block, (long) (System.currentTimeMillis() + seconds * 1000L));
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(Enchantment.FROST_WALKER);
     }
 
     @Override

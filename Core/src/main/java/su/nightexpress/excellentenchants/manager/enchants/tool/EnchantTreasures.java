@@ -31,10 +31,10 @@ import java.util.function.Predicate;
 
 public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDropEnchant, ICleanable {
 
-    private final String particleName;
-    private final String particleData;
-    private final Sound sound;
-    private final Map<Material, Map<Material, Double>> treasures;
+    private String particleName;
+    private String particleData;
+    private Sound sound;
+    private Map<Material, Map<Material, Double>> treasures;
     private final Predicate<Block>                     blockTracker;
 
     public static final String ID = "treasures";
@@ -42,6 +42,15 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDr
     public EnchantTreasures(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
 
+        PlayerBlockTracker.initialize();
+        PlayerBlockTracker.BLOCK_FILTERS.add(this.blockTracker = (block) -> {
+           return this.getTreasure(block.getType()) != null;
+        });
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.REDSTONE.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "200,180,0");
         this.sound = cfg.getEnum("Settings.Sound", Sound.class, Sound.BLOCK_NOTE_BLOCK_BELL);
@@ -68,11 +77,6 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDr
                 this.treasures.put(mFrom, treasuresList);
             }
         }
-
-        PlayerBlockTracker.initialize();
-        PlayerBlockTracker.BLOCK_FILTERS.add(this.blockTracker = (block) -> {
-           return this.getTreasure(block.getType()) != null;
-        });
     }
 
     @Override

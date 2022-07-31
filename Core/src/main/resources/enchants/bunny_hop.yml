@@ -16,6 +16,9 @@ Tier: common
 # You can use 'Enchantment' placeholders: http://77.222.60.131:8080/plugin/excellentenchants/utils/placeholders
 Description:
 - Grants permanent %enchantment_potion_type% %enchantment_potion_level%.
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts: []
 # Enchantment level settings.
 Level:
   # Minimal (start) enchantment level. Can not be smaller then 1.

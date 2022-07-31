@@ -20,7 +20,11 @@ public abstract class IEnchantCombatPotionTemplate extends IEnchantPotionTemplat
                                         @NotNull EnchantPriority priority,
                                         @NotNull PotionEffectType effectType) {
         super(plugin, cfg, priority, effectType);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.particleName = cfg.getString("Settings.Particle.Name", "");
         this.particleData = cfg.getString("Settings.Particle.Data", "");
     }

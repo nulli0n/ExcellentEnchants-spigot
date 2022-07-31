@@ -15,6 +15,14 @@ Tier: exotic
 Description:
 - '%enchantment_trigger_chance%% chance to launch an explosive arrow with x%enchantment_explosion_power%
   power.'
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts:
+  - confusing_arrows
+  - poisoned_arrows
+  - dragonfire_arrows
+  - withered_arrows
+  - electrified_arrows
 # Enchantment level settings.
 Level:
   # Minimal (start) enchantment level. Can not be smaller then 1.

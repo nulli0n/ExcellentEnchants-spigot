@@ -20,6 +20,9 @@ Level:
   # Maximal (final) enchantment level.
   # Keep in mind that while you can enchant items with bypass max. enchantment level, all enchantment 'Scalable' option values will not exceed the max. enchantment level.
   Max: 1
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts: []
 # Enchantment settings for Anvil.
 Anvil:
   # Defines the exp cost to merge this enchantment on other items on anvil.

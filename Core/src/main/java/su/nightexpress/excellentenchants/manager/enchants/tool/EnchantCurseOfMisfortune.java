@@ -17,25 +17,22 @@ import su.nightexpress.excellentenchants.manager.type.FitItemType;
 
 public class EnchantCurseOfMisfortune extends IEnchantChanceTemplate implements BlockBreakEnchant, DeathEnchant {
 
-    private final boolean dropExp;
+    private boolean dropExp;
 
     public static final String ID = "curse_of_misfortune";
 
     public EnchantCurseOfMisfortune(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.LOWEST);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.dropExp = cfg.getBoolean("Settings.Drop_Exp");
     }
 
     public boolean isDropExp() {
         return dropExp;
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(LOOT_BONUS_BLOCKS);
-        this.addConflict(LOOT_BONUS_MOBS);
     }
 
     @Override

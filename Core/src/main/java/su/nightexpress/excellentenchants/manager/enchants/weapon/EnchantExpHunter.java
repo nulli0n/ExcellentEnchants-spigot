@@ -18,13 +18,18 @@ import java.util.function.UnaryOperator;
 
 public class EnchantExpHunter extends IEnchantChanceTemplate implements DeathEnchant {
 
-    private final Scaler expModifier;
+    private Scaler expModifier;
 
     public static final String ID = "exp_hunter";
     public static final String PLACEHOLDER_EXP_MODIFIER = "%enchantment_exp_modifier%";
 
     public EnchantExpHunter(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.expModifier = new EnchantScaler(this, "Settings.Exp_Modifier");
     }
 

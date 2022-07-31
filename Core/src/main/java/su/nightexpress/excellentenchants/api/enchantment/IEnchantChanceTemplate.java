@@ -18,7 +18,11 @@ public abstract class IEnchantChanceTemplate extends ExcellentEnchant {
 
     public IEnchantChanceTemplate(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg, @NotNull EnchantPriority priority) {
         super(plugin, cfg, priority);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.triggerChance = new EnchantScaler(this, "Settings.Trigger_Chance");
     }
 

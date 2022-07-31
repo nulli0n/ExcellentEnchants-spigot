@@ -32,8 +32,8 @@ import java.util.stream.Stream;
 
 public class EnchantVeinminer extends IEnchantChanceTemplate implements BlockBreakEnchant {
 
-    private final Scaler        blocksLimit;
-    private final Set<Material> blocksAffected;
+    private Scaler        blocksLimit;
+    private Set<Material> blocksAffected;
 
     public static final  String      ID                = "veinminer";
 
@@ -43,17 +43,14 @@ public class EnchantVeinminer extends IEnchantChanceTemplate implements BlockBre
 
     public EnchantVeinminer(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.HIGH);
-
-        this.blocksLimit = new EnchantScaler(this, "Settings.Blocks.Max_At_Once");
-        this.blocksAffected = cfg.getStringSet("Settings.Blocks.Affected").stream()
-            .map(type -> Material.getMaterial(type.toUpperCase())).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.TUNNEL);
-        this.addConflict(EnchantRegister.BLAST_MINING);
+    public void loadConfig() {
+        super.loadConfig();
+        this.blocksLimit = new EnchantScaler(this, "Settings.Blocks.Max_At_Once");
+        this.blocksAffected = cfg.getStringSet("Settings.Blocks.Affected").stream()
+            .map(type -> Material.getMaterial(type.toUpperCase())).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     @NotNull

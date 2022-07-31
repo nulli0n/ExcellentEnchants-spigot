@@ -17,19 +17,22 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
 
-    private final boolean fireSpread;
-    private final Scaler yield;
+    private boolean fireSpread;
+    private Scaler yield;
 
     public static final String ID = "ghast";
 
     public EnchantGhast(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.HIGHEST);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.fireSpread = cfg.getBoolean("Settings.Fire_Spread");
         this.yield = new EnchantScaler(this, "Settings.Yield");
     }
@@ -40,21 +43,6 @@ public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
 
         cfg.addMissing("Settings.Fire_Spread", true);
         cfg.addMissing("Settings.Yield", "1.0 * " + PLACEHOLDER_LEVEL);
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.BOMBER);
-        this.addConflict(EnchantRegister.ENDER_BOW);
-        this.addConflict(EnchantRegister.EXPLOSIVE_ARROWS);
-        this.addConflict(EnchantRegister.WITHERED_ARROWS);
-        this.addConflict(EnchantRegister.POISONED_ARROWS);
-        this.addConflict(EnchantRegister.DRAGONFIRE_ARROWS);
-        this.addConflict(EnchantRegister.ELECTRIFIED_ARROWS);
-        this.addConflict(EnchantRegister.CONFUSING_ARROWS);
-        this.addConflict(Enchantment.ARROW_FIRE);
-        this.addConflict(Enchantment.ARROW_KNOCKBACK);
     }
 
     public boolean isFireSpread() {

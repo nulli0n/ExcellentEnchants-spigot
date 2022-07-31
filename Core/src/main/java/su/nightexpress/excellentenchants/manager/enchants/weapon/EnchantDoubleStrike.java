@@ -17,15 +17,19 @@ import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 
 public class EnchantDoubleStrike extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private final String particleName;
-    private final String particleData;
-    private final Sound sound;
+    private String particleName;
+    private String particleData;
+    private Sound sound;
 
     public static final String ID = "double_strike";
 
     public EnchantDoubleStrike(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.LOW);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.EXPLOSION_NORMAL.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "");
         this.sound = cfg.getEnum("Settings.Sound", Sound.class);

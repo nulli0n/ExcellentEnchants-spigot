@@ -24,13 +24,17 @@ public class EnchantTemper extends IEnchantChanceTemplate implements CombatEncha
     public static final String PLACEHOLDER_DAMAGE_CAPACITY = "%enchantment_damage_capacity%";
     public static final String PLACEHOLDER_HEALTH_POINT    = "%enchantment_health_point%";
 
-    private final EnchantScaler damageAmount;
-    private final EnchantScaler damageCapacity;
-    private final EnchantScaler healthPoint;
+    private EnchantScaler damageAmount;
+    private EnchantScaler damageCapacity;
+    private EnchantScaler healthPoint;
 
     public EnchantTemper(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.damageAmount = new EnchantScaler(this, "Settings.Damage.Amount");
         this.damageCapacity = new EnchantScaler(this, "Settings.Damage.Capacity");
         this.healthPoint = new EnchantScaler(this, "Settings.Health.Point");
@@ -82,7 +86,7 @@ public class EnchantTemper extends IEnchantChanceTemplate implements CombatEncha
 
         double damageAmount = this.getDamageAmount(level);
         double damageCap = this.getDamageCapacity(level);
-        double damageFinal = Math.min(damageCap, damageAmount * pointAmount);
+        double damageFinal = Math.min(damageCap, 1D + damageAmount * pointAmount);
 
         e.setDamage(e.getDamage() * damageFinal);
         return true;

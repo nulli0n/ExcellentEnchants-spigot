@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 
 public class EnchantThrifty extends IEnchantChanceTemplate implements DeathEnchant {
 
-    private final Set<String> ignoredEntityTypes;
-    private final Set<String> ignoredSpawnReasons;
+    private Set<String> ignoredEntityTypes;
+    private Set<String> ignoredSpawnReasons;
     private final NamespacedKey keyEntityIgnored;
 
     public static final String ID = "thrifty";
@@ -33,7 +33,11 @@ public class EnchantThrifty extends IEnchantChanceTemplate implements DeathEncha
     public EnchantThrifty(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
         this.keyEntityIgnored = new NamespacedKey(plugin, ID + "_ignored");
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.ignoredEntityTypes = cfg.getStringSet("Settings.Ignored_Entity_Types").stream().map(String::toUpperCase).collect(Collectors.toSet());
         this.ignoredSpawnReasons = cfg.getStringSet("Settings.Ignored_Spawn_Reasons").stream().map(String::toUpperCase).collect(Collectors.toSet());
     }

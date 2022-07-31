@@ -15,6 +15,11 @@ Tier: legendary
 Description:
 - '%enchantment_trigger_chance%% chance to mine blocks by x%enchantment_explosion_power%
   power explosion.'
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts:
+  - tunnel
+  - veinminer
 # Enchantment level settings.
 Level:
   # Minimal (start) enchantment level. Can not be smaller then 1.

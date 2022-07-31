@@ -5,7 +5,7 @@ author: NightExpress
 desciption: Vanilla-like enchants for your server.
 depend: [ NexEngine ]
 softdepend: [ Towny, Residence, WorldGuard, GriefPrevention, Lands ]
-api-version: 1.16
+api-version: 1.17
 load: STARTUP
 
 permissions:

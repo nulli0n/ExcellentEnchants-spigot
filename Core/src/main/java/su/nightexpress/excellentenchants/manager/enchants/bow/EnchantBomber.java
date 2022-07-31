@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.manager.enchants.bow;
 
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -17,14 +16,13 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 import java.util.function.UnaryOperator;
 
 public class EnchantBomber extends IEnchantChanceTemplate implements BowEnchant {
 
-    private final Scaler fuseTicks;
+    private Scaler fuseTicks;
 
     public static final String ID = "bomber";
 
@@ -32,7 +30,11 @@ public class EnchantBomber extends IEnchantChanceTemplate implements BowEnchant 
 
     public EnchantBomber(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.HIGHEST);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.fuseTicks = new EnchantScaler(this, "Settings.Fuse_Ticks");
     }
 
@@ -52,22 +54,6 @@ public class EnchantBomber extends IEnchantChanceTemplate implements BowEnchant 
 
     public int getFuseTicks(int level) {
         return (int) this.fuseTicks.getValue(level);
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.ENDER_BOW);
-        this.addConflict(EnchantRegister.GHAST);
-        this.addConflict(EnchantRegister.EXPLOSIVE_ARROWS);
-        this.addConflict(EnchantRegister.WITHERED_ARROWS);
-        this.addConflict(EnchantRegister.POISONED_ARROWS);
-        this.addConflict(EnchantRegister.DRAGONFIRE_ARROWS);
-        this.addConflict(EnchantRegister.ELECTRIFIED_ARROWS);
-        this.addConflict(EnchantRegister.CONFUSING_ARROWS);
-        this.addConflict(Enchantment.ARROW_FIRE);
-        this.addConflict(Enchantment.ARROW_DAMAGE);
-        this.addConflict(Enchantment.ARROW_KNOCKBACK);
     }
 
     @Override

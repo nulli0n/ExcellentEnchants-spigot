@@ -21,19 +21,24 @@ public abstract class IEnchantPotionTemplate extends IEnchantChanceTemplate {
     public static final String PLACEHOLDER_POTION_DURATION = "%enchantment_potion_duration%";
     public static final String PLACEHOLDER_POTION_TYPE     = "%enchantment_potion_type%";
 
-    protected       PotionEffectType potionEffectType;
+    protected PotionEffectType potionEffectType;
+    protected final boolean          potionParticles;
     protected       Scaler           potionDuration;
-    protected       Scaler  potionLevel;
-    protected final boolean potionParticles;
+    protected       Scaler           potionLevel;
 
     public IEnchantPotionTemplate(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg,
                                   @NotNull EnchantPriority priority,
                                   @NotNull PotionEffectType potionEffectType) {
         super(plugin, cfg, priority);
         this.potionEffectType = potionEffectType;
+        this.potionParticles = !(this instanceof PassiveEnchant);
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.potionDuration = new EnchantScaler(this, "Settings.Potion_Effect.Duration");
         this.potionLevel = new EnchantScaler(this, "Settings.Potion_Effect.Level");
-        this.potionParticles = !(this instanceof PassiveEnchant);
     }
 
     @Override

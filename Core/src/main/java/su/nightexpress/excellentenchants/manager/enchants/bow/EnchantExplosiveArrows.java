@@ -18,17 +18,16 @@ import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantBowTemplate;
-import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 import java.util.function.UnaryOperator;
 
 public class EnchantExplosiveArrows extends IEnchantBowTemplate {
 
-    private final boolean explosionFireSpread;
-    private final boolean explosionDamageItems;
-    private final boolean explosionDamageBlocks;
-    private final Scaler  explosionSize;
+    private boolean explosionFireSpread;
+    private boolean explosionDamageItems;
+    private boolean explosionDamageBlocks;
+    private Scaler  explosionSize;
 
     public static final String ID                          = "explosive_arrows";
     public static final String PLACEHOLDER_EXPLOSION_POWER = "%enchantment_explosion_power%";
@@ -37,6 +36,11 @@ public class EnchantExplosiveArrows extends IEnchantBowTemplate {
 
     public EnchantExplosiveArrows(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.explosionFireSpread = cfg.getBoolean("Settings.Explosion.Fire_Spread");
         this.explosionDamageItems = cfg.getBoolean("Settings.Explosion.Damage_Items");
         this.explosionDamageBlocks = cfg.getBoolean("Settings.Explosion.Damage_Blocks");
@@ -50,16 +54,6 @@ public class EnchantExplosiveArrows extends IEnchantBowTemplate {
         this.cfg.addMissing("Settings.Explosion.Fire_Spread", true);
         this.cfg.addMissing("Settings.Explosion.Damage_Items", true);
         this.cfg.addMissing("Settings.Explosion.Damage_Blocks", false);
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.CONFUSING_ARROWS);
-        this.addConflict(EnchantRegister.POISONED_ARROWS);
-        this.addConflict(EnchantRegister.ELECTRIFIED_ARROWS);
-        this.addConflict(EnchantRegister.WITHERED_ARROWS);
-        this.addConflict(EnchantRegister.DRAGONFIRE_ARROWS);
     }
 
     @Override

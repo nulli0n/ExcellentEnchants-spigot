@@ -13,6 +13,10 @@ Tier: exotic
 # You can use 'Enchantment' placeholders: http://77.222.60.131:8080/plugin/excellentenchants/utils/placeholders
 Description:
 - Ability to walk on lava and on magma blocks without getting damage.
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts:
+  - frost_walker
 # Enchantment level settings.
 Level:
   # Minimal (start) enchantment level. Can not be smaller then 1.

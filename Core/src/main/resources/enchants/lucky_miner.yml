@@ -15,6 +15,9 @@ Tier: common
 Description:
 - '%enchantment_trigger_chance%% chance to obtain +%enchantment_exp_modifier%% more
   exp from ores.'
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts: []
 # Enchantment level settings.
 Level:
   # Minimal (start) enchantment level. Can not be smaller then 1.

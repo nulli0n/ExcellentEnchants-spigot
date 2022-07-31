@@ -1,7 +1,6 @@
 package su.nightexpress.excellentenchants.manager.enchants.weapon;
 
 import org.bukkit.Particle;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Illager;
 import org.bukkit.entity.LivingEntity;
@@ -16,24 +15,27 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 import java.util.function.UnaryOperator;
 
 public class EnchantVillageDefender extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private final boolean damageMultiplier;
-    private final Scaler damageAmount;
-    private final String particleName;
-    private final String particleData;
+    private boolean damageMultiplier;
+    private Scaler damageAmount;
+    private String particleName;
+    private String particleData;
 
     public static final String ID = "village_defender";
     public static final String PLACEHOLDER_DAMAGE_AMOUNT = "%enchantment_damage_amount%";
 
     public EnchantVillageDefender(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.damageAmount = new EnchantScaler(this, "Settings.Damage.Formula");
         this.damageMultiplier = cfg.getBoolean("Settings.Damage.As_Modifier");
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.VILLAGER_ANGRY.name());
@@ -63,15 +65,6 @@ public class EnchantVillageDefender extends IEnchantChanceTemplate implements Co
         cfg.remove("Settings.Particle_Effect");
         cfg.addMissing("Settings.Particle.Name", Particle.VILLAGER_ANGRY.name());
         cfg.addMissing("Settings.Particle.Data", "");
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.BANE_OF_NETHERSPAWN);
-        this.addConflict(Enchantment.DAMAGE_ARTHROPODS);
-        this.addConflict(Enchantment.DAMAGE_UNDEAD);
-        this.addConflict(Enchantment.DAMAGE_ALL);
     }
 
     @Override

@@ -26,15 +26,19 @@ import java.util.function.UnaryOperator;
 
 public class EnchantTelekinesis extends IEnchantChanceTemplate implements CustomDropEnchant {
 
-    private final LangMessage messageDropReceived;
-    private final String      messageItemName;
-    private final String      messageItemSeparator;
+    private LangMessage messageDropReceived;
+    private String      messageItemName;
+    private String      messageItemSeparator;
 
     public static final String ID = "telekinesis";
 
     public EnchantTelekinesis(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.LOWEST);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.messageDropReceived = new LangMessage(plugin, cfg.getString("Settings.Message.Drop_Received", ""));
         this.messageItemName = StringUtil.color(cfg.getString("Settings.Message.Item_Name", "&7x%item_amount% &f%item_name%"));
         this.messageItemSeparator = StringUtil.color(cfg.getString("Settings.Message.Item_Separator", "&7, "));

@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.manager.enchants.tool;
 
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,14 +19,18 @@ import java.util.function.UnaryOperator;
 
 public class EnchantCurseOfBreaking extends IEnchantChanceTemplate {
 
-    private final Scaler durabilityAmount;
+    private Scaler durabilityAmount;
 
     public static final String ID = "curse_of_breaking";
     public static final String PLACEHOLDER_DURABILITY_AMOUNT = "%enchantment_durability_amount%";
 
     public EnchantCurseOfBreaking(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.durabilityAmount = new EnchantScaler(this, "Settings.Durability_Amount");
     }
 
@@ -38,12 +41,6 @@ public class EnchantCurseOfBreaking extends IEnchantChanceTemplate {
 
     public int getDurabilityAmount(int level) {
         return (int) this.durabilityAmount.getValue(level);
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(Enchantment.DURABILITY);
     }
 
     @Override

@@ -22,15 +22,19 @@ import java.util.function.UnaryOperator;
 
 public class EnchantSelfDestruction extends IEnchantChanceTemplate implements DeathEnchant {
 
-    private final Scaler explosionSize;
+    private Scaler explosionSize;
 
     public static final String ID = "self_destruction";
     private static final String META_EXPLOSION_SOURCE = ID + "_explosion_source";
-
     private static final String PLACEHOLDER_EXPLOSION_POWER = "%enchantment_explosion_power%";
 
     public EnchantSelfDestruction(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.explosionSize = new EnchantScaler(this, "Settings.Explosion.Size");
     }
 

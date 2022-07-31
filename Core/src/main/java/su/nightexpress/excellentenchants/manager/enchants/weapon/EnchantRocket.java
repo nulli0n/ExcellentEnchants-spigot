@@ -20,12 +20,17 @@ import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 public class EnchantRocket extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private final Scaler fireworkPower;
+    private Scaler fireworkPower;
 
     public static final String ID = "rocket";
 
     public EnchantRocket(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.fireworkPower = new EnchantScaler(this, "Settings.Firework_Power");
     }
 

@@ -23,12 +23,17 @@ import java.util.Map;
 
 public class EnchantScavenger extends IEnchantChanceTemplate implements DeathEnchant {
 
-    private final Map<EntityType, Map<Material, Map.Entry<int[], Double>>> loot;
+    private Map<EntityType, Map<Material, Map.Entry<int[], Double>>> loot;
 
     public static final String ID = "scavenger";
 
     public EnchantScavenger(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.loot = new HashMap<>();
 
         for (String eId : cfg.getSection("Settings.Treasures")) {

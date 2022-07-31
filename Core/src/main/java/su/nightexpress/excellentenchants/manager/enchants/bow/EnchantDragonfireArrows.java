@@ -14,7 +14,6 @@ import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantBowTemplate;
-import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 import java.util.function.UnaryOperator;
@@ -26,24 +25,18 @@ public class EnchantDragonfireArrows extends IEnchantBowTemplate {
     public static final String PLACEHOLDER_FIRE_RADIUS = "%enchantment_fire_radius%";
     public static final String PLACEHOLDER_FIRE_DURATION = "%enchantment_fire_duration%";
 
-    private final EnchantScaler fireDuration;
-    private final EnchantScaler fireRadius;
+    private EnchantScaler fireDuration;
+    private EnchantScaler fireRadius;
 
     public EnchantDragonfireArrows(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
-
-        this.fireDuration = new EnchantScaler(this, "Settings.Fire.Duration");
-        this.fireRadius = new EnchantScaler(this, "Settings.Fire.Radius");
     }
 
     @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.CONFUSING_ARROWS);
-        this.addConflict(EnchantRegister.POISONED_ARROWS);
-        this.addConflict(EnchantRegister.EXPLOSIVE_ARROWS);
-        this.addConflict(EnchantRegister.WITHERED_ARROWS);
-        this.addConflict(EnchantRegister.ELECTRIFIED_ARROWS);
+    public void loadConfig() {
+        super.loadConfig();
+        this.fireDuration = new EnchantScaler(this, "Settings.Fire.Duration");
+        this.fireRadius = new EnchantScaler(this, "Settings.Fire.Radius");
     }
 
     @Override

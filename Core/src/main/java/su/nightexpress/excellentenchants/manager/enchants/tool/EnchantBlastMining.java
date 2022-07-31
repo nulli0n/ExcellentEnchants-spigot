@@ -30,8 +30,8 @@ import java.util.function.UnaryOperator;
 
 public class EnchantBlastMining extends IEnchantChanceTemplate implements BlockBreakEnchant {
 
-    private final Scaler explosionPower;
-    private final Scaler minBlockStrength;
+    private Scaler explosionPower;
+    private Scaler minBlockStrength;
 
     public static final String ID = "blast_mining";
     public static final String PLACEHOLDER_EXPLOSION_POWER = "%enchantment_explosion_power%";
@@ -41,7 +41,11 @@ public class EnchantBlastMining extends IEnchantChanceTemplate implements BlockB
 
     public EnchantBlastMining(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.explosionPower = new EnchantScaler(this, "Settings.Explosion.Power");
         this.minBlockStrength = new EnchantScaler(this, "Settings.Min_Block_Strength");
     }
@@ -67,24 +71,12 @@ public class EnchantBlastMining extends IEnchantChanceTemplate implements BlockB
     }
 
     @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.TUNNEL);
-        this.addConflict(EnchantRegister.VEINMINER);
-    }
-
-    @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
         return str -> super.replacePlaceholders(level).apply(str
             .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionPower(level)))
         );
     }
-
-    /*@Override
-    public boolean isFitItemType(@NotNull ItemStack item) {
-        return ItemUtil.isPickaxe(item);
-    }*/
 
     @Override
     @NotNull

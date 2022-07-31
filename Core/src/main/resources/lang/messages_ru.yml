@@ -1,35 +1,53 @@
 Command:
   List:
-    Desc: Список всех пользовательских зачарований.
+    Desc: 'Список всех пользовательских зачарований.'
   Enchant:
-    Usage: <зачарование> <уровень>
-    Desc: Зачаровывает предмет в вашей руке.
-    Done: '&aУспешно зачарован!'
+    Usage: '<чары> <уровень>'
+    Desc: 'Зачаровывает предмет в вашей руке.'
+    Done: '&aУспешно зачаровано!'
   Book:
-    Usage: <игрок> <зачарование> <уровень>
-    Desc: Даёт кастомную книгу зачарования.
-    Done: Выдана книга зачарованя &6%enchant%&7 &6%player%&7.
+    Usage: '<игрок> <чары> <уровень>'
+    Desc: 'Даёт книгу с выбранным зачарованием.'
+    Done: 'Книга зачарования &6%enchant%&7 выдана &6%player%&7.'
   TierBook:
-    Usage: <игрок> <клас> <уровень>
-    Desc: Даёт зачарованную книгу.
+    Usage: '<игрок> <класс> <уровень>'
+    Desc: 'Даёт книгу со случайными чарами определенного класса.'
     Error: '&cНеверный уровень!'
-    Done: Выдан зачарованная книга класа &6%tier%&7 &6%player%&7.
+    Done: 'Зачарованная книга класса &6%tier%&7 выдана &6%player%&7.'
 Error:
-  NoEnchant: '&cНет такого зачарования.'
+  NoEnchant: '&cЗачарование не существует.'
 EnchantmentTarget:
-  ALL: All
-  ARMOR: Armor
-  ARMOR_FEET: Armor Feet
-  ARMOR_LEGS: Armor Legs
-  ARMOR_TORSO: Armor Torso
-  ARMOR_HEAD: Armor Head
-  WEAPON: Weapon
-  TOOL: Tool
-  BOW: Bow
-  FISHING_ROD: Fishing Rod
-  BREAKABLE: Breakable
-  WEARABLE: Wearable
-  TRIDENT: Trident
-  CROSSBOW: Crossbow
-  VANISHABLE: Vanishable
-  BOW_AND_CROSSBOW: Bow And Crossbow
+  ALL: Всё
+  ARMOR: Броня
+  ARMOR_FEET: Ботинки
+  ARMOR_LEGS: Ноги
+  ARMOR_TORSO: Грудь
+  ARMOR_HEAD: Голова
+  WEAPON: Оружие
+  TOOL: Инструмент
+  BOW: Лук
+  FISHING_ROD: Удочка
+  BREAKABLE: Ломаемое
+  WEARABLE: Надеваемое
+  TRIDENT: Трезубец
+  CROSSBOW: Арбалет
+  VANISHABLE: Утрачиваемое
+  BOW_AND_CROSSBOW: Лук и Арбалет
+FitItemType:
+  HELMET: Шлем
+  CHESTPLATE: Нагрудник
+  LEGGINGS: Поножи
+  BOOTS: Ботинки
+  ELYTRA: Элитры
+  WEAPON: Оружие
+  TOOL: Инструмент
+  ARMOR: Броня
+  SWORD: Меч
+  TRIDENT: Трезубец
+  AXE: Топор
+  BOW: Лук
+  CROSSBOW: Арбалет
+  HOE: Мотыга
+  PICKAXE: Кирка
+  SHOVEL: Лопата
+  FISHING_ROD: Удочка

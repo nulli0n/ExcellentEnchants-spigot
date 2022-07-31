@@ -19,7 +19,7 @@ import java.util.function.UnaryOperator;
 
 public class EnchantLuckyMiner extends IEnchantChanceTemplate implements BlockBreakEnchant {
 
-    private final Scaler expModifier;
+    private Scaler expModifier;
 
     public static final String ID = "lucky_miner";
 
@@ -27,6 +27,11 @@ public class EnchantLuckyMiner extends IEnchantChanceTemplate implements BlockBr
 
     public EnchantLuckyMiner(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.expModifier = new EnchantScaler(this, "Settings.Exp_Modifier");
     }
 

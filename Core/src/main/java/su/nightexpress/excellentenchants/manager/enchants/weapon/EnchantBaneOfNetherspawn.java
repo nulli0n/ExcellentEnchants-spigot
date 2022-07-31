@@ -2,7 +2,6 @@ package su.nightexpress.excellentenchants.manager.enchants.weapon;
 
 import com.google.common.collect.Sets;
 import org.bukkit.Particle;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -17,7 +16,6 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 import java.util.Set;
@@ -25,10 +23,10 @@ import java.util.function.UnaryOperator;
 
 public class EnchantBaneOfNetherspawn extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private final String  particleName;
-    private final String particleData;
-    private final boolean damageModifier;
-    private final Scaler  damageFormula;
+    private String  particleName;
+    private String particleData;
+    private boolean damageModifier;
+    private Scaler  damageFormula;
     private final Set<EntityType> entityTypes;
 
     public static final String ID = "bane_of_netherspawn";
@@ -37,11 +35,6 @@ public class EnchantBaneOfNetherspawn extends IEnchantChanceTemplate implements 
 
     public EnchantBaneOfNetherspawn(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
-
-        this.particleName = cfg.getString("Settings.Particle.Name", "");
-        this.particleData = cfg.getString("Settings.Particle.Data", "");
-        this.damageModifier = cfg.getBoolean("Settings.Damage.As_Modifier");
-        this.damageFormula = new EnchantScaler(this, "Settings.Damage.Formula");
 
         this.entityTypes = Sets.newHashSet(EntityType.BLAZE, EntityType.MAGMA_CUBE,
             EntityType.WITHER_SKELETON, EntityType.GHAST, EntityType.WITHER);
@@ -52,6 +45,15 @@ public class EnchantBaneOfNetherspawn extends IEnchantChanceTemplate implements 
         this.entityTypes.add(EntityType.HOGLIN);
         this.entityTypes.add(EntityType.STRIDER);
         this.entityTypes.add(EntityType.ZOMBIFIED_PIGLIN);
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
+        this.particleName = cfg.getString("Settings.Particle.Name", "");
+        this.particleData = cfg.getString("Settings.Particle.Data", "");
+        this.damageModifier = cfg.getBoolean("Settings.Damage.As_Modifier");
+        this.damageFormula = new EnchantScaler(this, "Settings.Damage.Formula");
     }
 
     public double getDamageModifier(int level) {
@@ -65,15 +67,6 @@ public class EnchantBaneOfNetherspawn extends IEnchantChanceTemplate implements 
         cfg.remove("Settings.Particle_Effect");
         cfg.addMissing("Settings.Particle.Name", Particle.SMOKE_NORMAL.name());
         cfg.addMissing("Settings.Particle.Data", "");
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.VILLAGE_DEFENDER);
-        this.addConflict(Enchantment.DAMAGE_ARTHROPODS);
-        this.addConflict(Enchantment.DAMAGE_UNDEAD);
-        this.addConflict(Enchantment.DAMAGE_ALL);
     }
 
     @Override

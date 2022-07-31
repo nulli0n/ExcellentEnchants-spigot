@@ -20,9 +20,9 @@ import java.util.Set;
 
 public class EnchantCure extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private final Sound sound;
-    private final String particleName;
-    private final String particleData;
+    private Sound sound;
+    private String particleName;
+    private String particleData;
 
     public static final String ID = "cure";
 
@@ -30,7 +30,11 @@ public class EnchantCure extends IEnchantChanceTemplate implements CombatEnchant
 
     public EnchantCure(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.sound = cfg.getEnum("Settings.Sound", Sound.class);
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.CLOUD.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "");
@@ -61,19 +65,15 @@ public class EnchantCure extends IEnchantChanceTemplate implements CombatEnchant
         e.setCancelled(true);
 
         EffectUtil.playEffect(victim.getLocation(), this.particleName, this.particleData, 0.25, 0.25, 0.25, 0.1f, 20);
-        if (this.sound != null) MessageUtil.sound(victim.getLocation(), this.sound);
+        MessageUtil.sound(victim.getLocation(), this.sound);
 
         if (victim instanceof PigZombie pigZombie) {
             victim.getWorld().spawn(victim.getLocation(), Piglin.class);
+            victim.remove();
         }
         else if (victim instanceof ZombieVillager zombieVillager) {
-            Villager.Profession profession = zombieVillager.getVillagerProfession();
-            Villager villager = victim.getWorld().spawn(victim.getLocation(), Villager.class);
-            if (profession != null) {
-                villager.setProfession(profession);
-            }
+            zombieVillager.setConversionTime(1);
         }
-        victim.remove();
         return true;
     }
 }

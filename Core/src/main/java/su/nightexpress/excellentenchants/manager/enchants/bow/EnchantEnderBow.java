@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.manager.enchants.bow;
 
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.LivingEntity;
@@ -15,7 +14,6 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.manager.EnchantRegister;
 
 public class EnchantEnderBow extends IEnchantChanceTemplate implements BowEnchant {
 
@@ -23,22 +21,6 @@ public class EnchantEnderBow extends IEnchantChanceTemplate implements BowEnchan
 
     public EnchantEnderBow(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.HIGHEST);
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.BOMBER);
-        this.addConflict(EnchantRegister.GHAST);
-        this.addConflict(EnchantRegister.EXPLOSIVE_ARROWS);
-        this.addConflict(EnchantRegister.WITHERED_ARROWS);
-        this.addConflict(EnchantRegister.POISONED_ARROWS);
-        this.addConflict(EnchantRegister.DRAGONFIRE_ARROWS);
-        this.addConflict(EnchantRegister.ELECTRIFIED_ARROWS);
-        this.addConflict(EnchantRegister.CONFUSING_ARROWS);
-        this.addConflict(Enchantment.ARROW_FIRE);
-        this.addConflict(Enchantment.ARROW_DAMAGE);
-        this.addConflict(Enchantment.ARROW_KNOCKBACK);
     }
 
     @Override

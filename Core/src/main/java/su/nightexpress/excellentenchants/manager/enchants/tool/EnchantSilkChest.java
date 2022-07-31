@@ -36,18 +36,24 @@ import java.util.TreeMap;
 public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDropEnchant {
 
     private final Map<Integer, NamespacedKey> keyItems;
-    private final String                      chestName;
+
+    private String chestName;
 
     public static final String ID = "silk_chest";
 
     public EnchantSilkChest(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.HIGH);
         this.keyItems = new TreeMap<>();
-        this.chestName = StringUtil.color(cfg.getString("Settings.Chest_Item.Name", "%name% &7(%items% items)"));
 
         for (int pos = 0; pos < 27; pos++) {
             this.getItemKey(pos);
         }
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
+        this.chestName = StringUtil.color(cfg.getString("Settings.Chest_Item.Name", "%name% &7(%items% items)"));
     }
 
     @Override
@@ -138,6 +144,9 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDr
         Block block = e.getBlockPlaced();
         BlockState state = block.getState();
         if (!(state instanceof Chest chest)) return;
+
+        chest.setCustomName(null);
+        chest.update(true);
 
         Inventory inventory = chest.getBlockInventory();
         for (int pos = 0; pos < inventory.getSize(); pos++) {

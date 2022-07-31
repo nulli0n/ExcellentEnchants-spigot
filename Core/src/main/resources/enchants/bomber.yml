@@ -14,6 +14,20 @@ Tier: exotic
 # You can use 'Enchantment' placeholders: http://77.222.60.131:8080/plugin/excellentenchants/utils/placeholders
 Description:
 - '%enchantment_trigger_chance%% chance to launch TNT that explodes in %enchantment_fuse_ticks%s.'
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts:
+  - ender_bow
+  - ghast
+  - explosive_arrows
+  - withered_arrows
+  - poisoned_arrows
+  - dragonfire_arrows
+  - electrified_arrows
+  - confusing_arrows
+  - flame
+  - power
+  - punch
 # Enchantment level settings.
 Level:
   # Minimal (start) enchantment level. Can not be smaller then 1.

@@ -16,13 +16,18 @@ import su.nightexpress.excellentenchants.manager.tasks.ArrowTrailsTask;
 
 public abstract class IEnchantBowTemplate extends IEnchantChanceTemplate implements BowEnchant {
 
-    protected final String arrowTrailName;
-    protected final String arrowTrailData;
+    protected String arrowTrailName;
+    protected String arrowTrailData;
     protected final String arrowMeta;
 
     public IEnchantBowTemplate(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg, @NotNull EnchantPriority priority) {
         super(plugin, cfg, priority);
         this.arrowMeta = this.getId() + "_arrow";
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.arrowTrailName = cfg.getString("Settings.Arrow.Trail.Name", "");
         this.arrowTrailData = cfg.getString("Settings.Arrow.Trail.Data", "");
     }

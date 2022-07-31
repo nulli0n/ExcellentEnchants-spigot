@@ -74,6 +74,13 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
         this.updateConfig();
         this.cfg.saveChanges();
         this.priority = priority;
+        this.conflicts = new HashSet<>();
+
+        this.loadConfig();
+    }
+
+    public void loadConfig() {
+        this.cfg.reload();
 
         this.displayName = StringUtil.color(cfg.getString("Name", this.getId()));
         this.tier = EnchantManager.getTierById(cfg.getString("Tier", Placeholders.DEFAULT));
@@ -83,7 +90,6 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
         this.tier.getEnchants().add(this);
         this.description = StringUtil.color(cfg.getStringList("Description"));
 
-        this.conflicts = new HashSet<>();
         this.isTreasure = cfg.getBoolean("Is_Treasure");
         this.levelMin = cfg.getInt("Level.Min");
         this.levelMax = cfg.getInt("Level.Max");
@@ -102,6 +108,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
 
     protected void updateConfig() {
         cfg.addMissing("Is_Treasure", false);
+        cfg.addMissing("Conflicts", new ArrayList<String>());
         cfg.addMissing("Settings.Cost.Enabled", false);
         cfg.addMissing("Settings.Cost.Item.Material", Material.AIR.name());
         cfg.addMissing("Settings.Cost.Item.Amount", 1);
@@ -201,12 +208,11 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
         return itemType == null ? new FitItemType[0] : new FitItemType[]{itemType};
     }
 
-    protected void addConflicts() {
-
-    }
-
-    protected void addConflict(@NotNull Enchantment enchantment) {
-        this.conflicts.add(enchantment);
+    private void addConflicts() {
+        this.conflicts.addAll(this.getConfig().getStringSet("Conflicts").stream()
+            .map(enchId -> Enchantment.getByKey(NamespacedKey.minecraft(enchId.toLowerCase())))
+            .filter(Objects::nonNull)
+            .toList());
     }
 
     public boolean hasCostItem() {
@@ -325,26 +331,6 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
         }
         return Stream.of(this.getFitItemTypes()).anyMatch(fitItemType -> fitItemType.isIncluded(item));
     }
-
-    /*protected boolean isFitItemType(@NotNull ItemStack item) {
-        EnchantmentTarget target = this.getItemTarget();
-        return switch (target) {
-            case ARMOR -> ItemUtil.isArmor(item);
-            case ARMOR_FEET -> ItemUtil.isBoots(item);
-            case ARMOR_LEGS -> ItemUtil.isLeggings(item);
-            case ARMOR_TORSO -> ItemUtil.isChestplate(item) || (Config.ENCHANTMENTS_ITEM_ELYTRA_AS_CHESTPLATE && item.getType() == Material.ELYTRA);
-            case ARMOR_HEAD -> ItemUtil.isHelmet(item);
-            case WEAPON -> ItemUtil.isSword(item) || (Config.ENCHANTMENTS_ITEM_AXES_AS_SWORDS && ItemUtil.isAxe(item));
-            case TOOL -> ItemUtil.isTool(item);
-            case BOW -> item.getType() == Material.BOW || (Config.ENCHANTMENTS_ITEM_CROSSBOWS_AS_BOWS && ItemUtil.isBow(item));
-            case FISHING_ROD -> item.getType() == Material.FISHING_ROD;
-            case BREAKABLE -> true;
-            case WEARABLE -> EnchantManager.isEnchantable(item);
-            case TRIDENT -> ItemUtil.isTrident(item);
-            case CROSSBOW -> item.getType() == Material.CROSSBOW;
-            default -> false;
-        };
-    }*/
 
     @Override
     public boolean isCursed() {

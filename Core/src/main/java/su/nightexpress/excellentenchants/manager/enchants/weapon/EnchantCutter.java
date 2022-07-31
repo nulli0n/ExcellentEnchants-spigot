@@ -36,6 +36,11 @@ public class EnchantCutter extends IEnchantChanceTemplate implements CombatEncha
 
     public EnchantCutter(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.LOWEST);
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.durabilityReduction = new EnchantScaler(this, "Settings.Item.Durability_Reduction");
         this.sound = cfg.getEnum("Settings.Item.Sound", Sound.class);
     }

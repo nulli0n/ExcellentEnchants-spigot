@@ -15,6 +15,13 @@ Description:
 # Defines if this enchantment is a treasure enchantment.
 # Treasure enchantments can only be received via looting, trading, or fishing.
 Is_Treasure: false
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts:
+  - village_defender
+  - sharpness
+  - smite
+  - bane_of_arthropods
 # Enchantment level settings.
 Level:
   # Minimal (start) enchantment level. Can not be smaller then 1.

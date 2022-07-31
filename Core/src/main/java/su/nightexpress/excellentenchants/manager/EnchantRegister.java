@@ -159,7 +159,11 @@ public class EnchantRegister {
     }
 
     public static void setup() {
-        if (ExcellentEnchants.isLoaded) return; // Prevent to register enchantments during the runtime.
+        // Prevent to register enchantments during the runtime.
+        if (ExcellentEnchants.isLoaded) {
+            ENCHANT_LIST.forEach(ExcellentEnchant::loadConfig);
+            return;
+        }
 
         //ENCHANT_LIST.clear();
         Reflex.setFieldValue(Enchantment.class, "acceptingNew", true);

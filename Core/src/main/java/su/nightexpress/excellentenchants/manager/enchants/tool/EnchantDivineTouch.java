@@ -27,7 +27,6 @@ import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.CustomDropEnchant;
-import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 
 public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockBreakEnchant, CustomDropEnchant {
@@ -35,13 +34,17 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
     public static final String  ID          = "divine_touch";
     private static final String META_HANDLE = ID + "_handle";
 
-    private final String particleName;
-    private final String particleData;
-    private final String spawnerName;
+    private String particleName;
+    private String particleData;
+    private String spawnerName;
 
     public EnchantDivineTouch(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.VILLAGER_HAPPY.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "");
         this.spawnerName = StringUtil.color(cfg.getString("Settings.Spawner_Item.Name", "&aMob Spawner &7(%type%)"));
@@ -60,12 +63,6 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
     @NotNull
     public FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.PICKAXE};
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.SMELTER);
     }
 
     @Override

@@ -15,6 +15,9 @@ Tier: exotic
 Description:
 - '%enchantment_trigger_chance%% chance to throw away enemy''s armor and damage it
   for %enchantment_durability_damage%%.'
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts: []
 # Enchantment level settings.
 Level:
   # Minimal (start) enchantment level. Can not be smaller then 1.

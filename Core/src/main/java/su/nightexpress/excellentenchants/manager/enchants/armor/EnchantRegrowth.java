@@ -26,10 +26,10 @@ public class EnchantRegrowth extends IEnchantChanceTemplate implements PassiveEn
 
     public static final String ID = "regrowth";
 
-    private final String particleName;
-    private final String particleData;
-    private final long   healthInterval;
-    private final Scaler healthAmount;
+    private String particleName;
+    private String particleData;
+    private long   healthInterval;
+    private Scaler healthAmount;
     private Task healthTask;
 
     private static final String PLACEHOLDER_HEALTH_AMOUNT   = "%enchantment_health_amount%";
@@ -37,12 +37,18 @@ public class EnchantRegrowth extends IEnchantChanceTemplate implements PassiveEn
 
     public EnchantRegrowth(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+
+        this.healthTask = new Task(plugin);
+        this.healthTask.start();
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.HEART.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "");
         this.healthInterval = cfg.getLong("Settings.Health.Interval", 100);
         this.healthAmount = new EnchantScaler(this, "Settings.Health.Amount");
-        this.healthTask = new Task(plugin);
-        this.healthTask.start();
     }
 
     @Override

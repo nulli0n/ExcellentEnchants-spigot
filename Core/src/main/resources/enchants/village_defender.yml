@@ -15,6 +15,13 @@ Tier: common
 Description:
 - '%enchantment_trigger_chance%% chance to inflict %enchantment_damage_amount% more
   damage on Pillagers.'
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts:
+  - bane_of_netherspawn
+  - sharpness
+  - smite
+  - bane_of_arthropods
 # Enchantment level settings.
 Level:
   # Minimal (start) enchantment level. Can not be smaller then 1.

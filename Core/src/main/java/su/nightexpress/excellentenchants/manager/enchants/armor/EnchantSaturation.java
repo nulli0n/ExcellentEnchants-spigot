@@ -21,8 +21,8 @@ import java.util.function.UnaryOperator;
 
 public class EnchantSaturation extends IEnchantChanceTemplate implements PassiveEnchant, ICleanable {
 
-    private final long saturationInterval;
-    private final Scaler saturationAmount;
+    private long saturationInterval;
+    private Scaler saturationAmount;
     private Task         saturationTask;
 
     public static final String ID = "saturation";
@@ -33,10 +33,15 @@ public class EnchantSaturation extends IEnchantChanceTemplate implements Passive
     public EnchantSaturation(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
 
-        this.saturationInterval = cfg.getLong("Settings.Saturation.Interval", 100);
-        this.saturationAmount = new EnchantScaler(this, "Settings.Saturation.Amount");
         this.saturationTask = new Task(plugin);
         this.saturationTask.start();
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
+        this.saturationInterval = cfg.getLong("Settings.Saturation.Interval", 100);
+        this.saturationAmount = new EnchantScaler(this, "Settings.Saturation.Amount");
     }
 
     @Override

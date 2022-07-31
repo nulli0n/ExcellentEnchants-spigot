@@ -28,8 +28,8 @@ import java.util.Set;
 
 public class EnchantReplanter extends IEnchantChanceTemplate implements InteractEnchant, BlockBreakEnchant {
 
-    private final boolean replantOnRightClick;
-    private final boolean replantOnPlantBreak;
+    private boolean replantOnRightClick;
+    private boolean replantOnPlantBreak;
 
     public static final String ID = "replanter";
 
@@ -39,7 +39,11 @@ public class EnchantReplanter extends IEnchantChanceTemplate implements Interact
 
     public EnchantReplanter(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.HIGH);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.replantOnRightClick = cfg.getBoolean("Settings.Replant.On_Right_Click");
         this.replantOnPlantBreak = cfg.getBoolean("Settings.Replant.On_Plant_Break");
     }

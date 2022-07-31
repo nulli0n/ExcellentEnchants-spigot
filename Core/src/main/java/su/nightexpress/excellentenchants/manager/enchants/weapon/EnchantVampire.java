@@ -23,17 +23,21 @@ import java.util.function.UnaryOperator;
 
 public class EnchantVampire extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private final String particleName;
-    private final String particleData;
-    private final Scaler healAmount;
-    private final boolean healMultiplier;
+    private String particleName;
+    private String particleData;
+    private Scaler healAmount;
+    private boolean healMultiplier;
 
     public static final String ID = "vampire";
     public static final String PLACEHOLDER_HEAL_AMOUNT = "%enchantment_heal_amount%";
 
     public EnchantVampire(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.LOWEST);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.HEART.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "");
         this.healAmount = new EnchantScaler(this, "Settings.Heal.Amount");

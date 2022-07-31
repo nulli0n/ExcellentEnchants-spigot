@@ -14,7 +14,6 @@ import su.nexmedia.engine.utils.LocationUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantBowTemplate;
-import su.nightexpress.excellentenchants.manager.EnchantRegister;
 
 public class EnchantElectrifiedArrows extends IEnchantBowTemplate {
 
@@ -22,16 +21,6 @@ public class EnchantElectrifiedArrows extends IEnchantBowTemplate {
 
     public EnchantElectrifiedArrows(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.CONFUSING_ARROWS);
-        this.addConflict(EnchantRegister.POISONED_ARROWS);
-        this.addConflict(EnchantRegister.EXPLOSIVE_ARROWS);
-        this.addConflict(EnchantRegister.WITHERED_ARROWS);
-        this.addConflict(EnchantRegister.DRAGONFIRE_ARROWS);
     }
 
     @Override

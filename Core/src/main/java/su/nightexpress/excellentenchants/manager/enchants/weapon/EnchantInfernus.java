@@ -22,14 +22,18 @@ import java.util.function.UnaryOperator;
 
 public class EnchantInfernus extends IEnchantChanceTemplate {
 
-    private final Scaler fireTicks;
+    private Scaler fireTicks;
 
     public static final String ID = "infernus";
     public static final String PLACEHOLDER_FIRE_DURATION = "%enchantment_fire_duration%";
 
     public EnchantInfernus(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.fireTicks = new EnchantScaler(this, "Settings.Fire_Ticks");
     }
 

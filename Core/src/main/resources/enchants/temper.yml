@@ -18,6 +18,9 @@ Description:
 - '%enchantment_trigger_chance%% chance to inflict %enchantment_damage_amount%% (max.
   %enchantment_damage_capacity%%) more damage for each %enchantment_health_point%
   hearts missing.'
+# List of the conflicting enchantments.
+# Conflicted enchantments can not be applied together on the same item.
+Conflicts: []
 # Enchantment level settings.
 Level:
   # Minimal (start) enchantment level. Can not be smaller then 1.

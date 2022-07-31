@@ -1,8 +1,10 @@
 package su.nightexpress.excellentenchants.manager.enchants.tool;
 
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockDropItemEvent;
@@ -16,7 +18,6 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 
 import java.util.HashMap;
@@ -26,14 +27,18 @@ public class EnchantSmelter extends IEnchantChanceTemplate implements BlockDropE
 
     public static final String ID = "smelter";
 
-    private final Sound                   sound;
-    private final String                  particleName;
-    private final String                  particleData;
-    private final Map<Material, Material> smeltingTable;
+    private Sound                   sound;
+    private String                  particleName;
+    private String                  particleData;
+    private Map<Material, Material> smeltingTable;
 
     public EnchantSmelter(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.sound = cfg.getEnum("Settings.Sound", Sound.class);
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.FLAME.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "");
@@ -70,12 +75,12 @@ public class EnchantSmelter extends IEnchantChanceTemplate implements BlockDropE
         return new FitItemType[]{FitItemType.PICKAXE, FitItemType.AXE, FitItemType.SHOVEL};
     }
 
-    @Override
+    /*@Override
     protected void addConflicts() {
         super.addConflicts();
         this.addConflict(Enchantment.SILK_TOUCH);
         this.addConflict(EnchantRegister.DIVINE_TOUCH);
-    }
+    }*/
 
     @Override
     @NotNull

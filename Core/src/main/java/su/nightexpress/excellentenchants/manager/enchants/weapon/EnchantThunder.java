@@ -13,13 +13,17 @@ import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 
 public class EnchantThunder extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private final boolean inThunderstormOnly;
+    private boolean inThunderstormOnly;
 
     public static final String ID = "thunder";
 
     public EnchantThunder(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
+    }
 
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.inThunderstormOnly = cfg.getBoolean("Settings.During_Thunderstorm_Only");
     }
 

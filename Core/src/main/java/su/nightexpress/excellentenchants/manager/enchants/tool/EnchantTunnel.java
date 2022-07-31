@@ -26,7 +26,7 @@ import java.util.Set;
 
 public class EnchantTunnel extends IEnchantChanceTemplate implements BlockBreakEnchant {
 
-    private final boolean disableOnSneak;
+    private boolean disableOnSneak;
 
     public static final String   ID                   = "tunnel";
     private static final String  META_BLOCK_TUNNEL    = ID + "_block_tunneled";
@@ -41,20 +41,17 @@ public class EnchantTunnel extends IEnchantChanceTemplate implements BlockBreakE
 
     public EnchantTunnel(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.HIGH);
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
         this.disableOnSneak = cfg.getBoolean("Settings.Ignore_When_Sneaking");
     }
 
     @Override
     protected void updateConfig() {
         super.updateConfig();
-    }
-
-    @Override
-    protected void addConflicts() {
-        super.addConflicts();
-        this.addConflict(EnchantRegister.VEINMINER);
-        this.addConflict(EnchantRegister.BLAST_MINING);
-
     }
 
     @Override
