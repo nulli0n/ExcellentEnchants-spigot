@@ -13,6 +13,7 @@ import su.nexmedia.engine.api.manager.IListener;
 import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.*;
+import su.nexmedia.engine.utils.data.Pair;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.config.Config;
@@ -63,6 +64,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
     protected     Scaler                  levelByEnchantCost;
     protected     Scaler                  anvilMergeCost;
     protected     Map<ObtainType, Double> obtainChance;
+    protected Map<ObtainType, Pair<Integer, Integer>> obtainLevelCap;
     protected ItemStack                   costItem;
     protected boolean                     costEnabled;
 
@@ -97,9 +99,14 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
         this.anvilMergeCost = new EnchantScaler(this, "Anvil.Merge_Cost");
 
         this.obtainChance = new HashMap<>();
+        this.obtainLevelCap = new HashMap<>();
         for (ObtainType obtainType : ObtainType.values()) {
             double obtainChance = cfg.getDouble(obtainType.getPathName() + ".Chance");
             this.obtainChance.put(obtainType, obtainChance);
+
+            int levelMin = cfg.getInt(obtainType.getPathName() + ".Level.Min", -1);
+            int levelMax = cfg.getInt(obtainType.getPathName() + ".Level.Max", -1);
+            this.obtainLevelCap.put(obtainType, Pair.of(levelMin, levelMax));
         }
 
         this.costEnabled = cfg.getBoolean("Settings.Cost.Enabled");
@@ -122,6 +129,14 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
 
         for (ObtainType obtainType : ObtainType.values()) {
             cfg.addMissing(obtainType.getPathName() + ".Chance", 25D);
+            cfg.addMissing(obtainType.getPathName() + ".Level.Min", -1);
+            cfg.addMissing(obtainType.getPathName() + ".Level.Max", -1);
+
+            /*cfg.setComments(obtainType.getPathName() + ".Level", Arrays.asList(
+                "Here you can set min. and max. level for enchantment generated via " + obtainType.getPathName().replace("_", " "),
+                "These levels can not be greater or smaller than the default enchantment min. and max levels.",
+                "Set min/max level to -1 to use the default enchantment min/max level value."
+            ));*/
         }
 
         /*String scalabe = "Scalable. Placeholder: " + PLACEHOLDER_LEVEL + ". See: http://77.222.60.131:8080/plugin/engine/config/formats";
@@ -308,6 +323,28 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
 
     public double getObtainChance(@NotNull ObtainType obtainType) {
         return this.obtainChance.getOrDefault(obtainType, 0D);
+    }
+
+    public int getObtainLevelMin(@NotNull ObtainType obtainType) {
+        return this.obtainLevelCap.getOrDefault(obtainType, Pair.of(-1, -1)).getFirst();
+    }
+
+    public int getObtainLevelMax(@NotNull ObtainType obtainType) {
+        return this.obtainLevelCap.getOrDefault(obtainType, Pair.of(-1, -1)).getSecond();
+    }
+
+    public int generateLevel() {
+        return Rnd.get(this.getStartLevel(), this.getMaxLevel());
+    }
+
+    public int generateLevel(@NotNull ObtainType obtainType) {
+        int levelCapMin = this.getObtainLevelMin(obtainType);
+        int levelCapMax = this.getObtainLevelMax(obtainType);
+
+        if (levelCapMin <= 0 || levelCapMin < this.getStartLevel()) levelCapMin = this.getStartLevel();
+        if (levelCapMax <= 0 || levelCapMax > this.getMaxLevel()) levelCapMax = this.getMaxLevel();
+
+        return Rnd.get(levelCapMin, levelCapMax);
     }
 
     public int getAnvilMergeCost(int level) {

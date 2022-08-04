@@ -113,7 +113,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
             ExcellentEnchant enchant = tier.getEnchant(obtainType, item);
             if (enchant == null) continue;
 
-            int level = Rnd.get(enchant.getStartLevel(), enchant.getMaxLevel());
+            int level = enchant.generateLevel(obtainType);
             EnchantManager.addEnchant(item, enchant, level, false);
         }
         EnchantManager.updateItemLoreEnchants(item);

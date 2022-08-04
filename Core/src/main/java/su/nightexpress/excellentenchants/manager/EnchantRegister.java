@@ -64,6 +64,8 @@ public class EnchantRegister {
     public static final EnchantVillageDefender   VILLAGE_DEFENDER;
     public static final EnchantRocket            ROCKET;
 
+    public static final EnchantElementalProtection ELEMENTAL_PROTECTION;
+    public static final EnchantFireShield      FIRE_SHIELD;
     public static final EnchantFlameWalker     FLAME_WALKER;
     public static final EnchantHardened        HARDENED;
     public static final EnchantColdSteel       COLD_STEEL;
@@ -136,6 +138,8 @@ public class EnchantRegister {
         AQUAMAN = init(EnchantAquaman.class, EnchantAquaman.ID);
         BUNNY_HOP = init(EnchantBunnyHop.class, EnchantBunnyHop.ID);
         COLD_STEEL = init(EnchantColdSteel.class, EnchantColdSteel.ID);
+        ELEMENTAL_PROTECTION = init(EnchantElementalProtection.class, EnchantElementalProtection.ID);
+        FIRE_SHIELD = init(EnchantFireShield.class, EnchantFireShield.ID);
         FLAME_WALKER = init(EnchantFlameWalker.class, EnchantFlameWalker.ID);
         HARDENED = init(EnchantHardened.class, EnchantHardened.ID);
         NIGHT_VISION = init(EnchantNightVision.class, EnchantNightVision.ID);
