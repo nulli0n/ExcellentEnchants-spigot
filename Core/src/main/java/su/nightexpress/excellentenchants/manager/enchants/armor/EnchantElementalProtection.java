@@ -28,7 +28,7 @@ public class EnchantElementalProtection extends IEnchantChanceTemplate {
     private static final EntityDamageEvent.DamageCause[] DAMAGE_CAUSES = new EntityDamageEvent.DamageCause[] {
         EntityDamageEvent.DamageCause.POISON, EntityDamageEvent.DamageCause.WITHER,
         EntityDamageEvent.DamageCause.MAGIC, EntityDamageEvent.DamageCause.FREEZE,
-        EntityDamageEvent.DamageCause.SONIC_BOOM, EntityDamageEvent.DamageCause.LIGHTNING,
+        /*EntityDamageEvent.DamageCause.SONIC_BOOM, */EntityDamageEvent.DamageCause.LIGHTNING,
     };
 
     private Scaler protectionAmount;
@@ -98,7 +98,7 @@ public class EnchantElementalProtection extends IEnchantChanceTemplate {
         }
 
         if (this.isProtectionAsModifier()) {
-            e.setDamage(Math.max(0, 1D - e.getDamage() * protectionAmount));
+            e.setDamage(Math.max(0, e.getDamage() * (1D - protectionAmount)));
         }
         else {
             e.setDamage(Math.max(0, e.getDamage() - protectionAmount));
