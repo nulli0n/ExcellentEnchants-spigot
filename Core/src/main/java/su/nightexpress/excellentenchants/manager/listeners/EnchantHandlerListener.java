@@ -46,6 +46,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         return projectile.hasMetadata(META_PROJECTILE_WEAPON) ? (ItemStack) projectile.getMetadata(META_PROJECTILE_WEAPON).get(0).value() : null;
     }
 
+    private void removeSourceWeapon(@NotNull Projectile projectile) {
+        projectile.removeMetadata(META_PROJECTILE_WEAPON, plugin);
+    }
+
     // ---------------------------------------------------------------
     // Combat Attacking Enchants
     // ---------------------------------------------------------------
@@ -150,6 +154,9 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         EnchantManager.getItemCustomEnchants(bow, BowEnchant.class).forEach((bowEnchant, level) -> {
             bowEnchant.use(e, projectile, bow, level);
         });
+
+        // Prevent to apply enchants multiple times on hits.
+        this.removeSourceWeapon(projectile);
     }
 
     // ---------------------------------------------------------------

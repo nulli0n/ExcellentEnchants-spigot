@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ExcellentEnchants</artifactId>
         <groupId>su.nightexpress.excellentenchants</groupId>
-        <version>3.2.5</version>
+        <version>3.2.6</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,6 +21,10 @@
             <id>md_5-releases</id>
             <url>https://repo.md-5.net/content/repositories/releases/</url>
         </repository>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -32,27 +36,33 @@
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>NMS</artifactId>
-            <version>3.2.5</version>
+            <version>3.2.6</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_17_R1</artifactId>
-            <version>3.2.5</version>
+            <version>3.2.6</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_18_R2</artifactId>
-            <version>3.2.5</version>
+            <version>3.2.6</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_19_R1</artifactId>
-            <version>3.2.5</version>
+            <version>3.2.6</version>
         </dependency>
         <dependency>
             <groupId>fr.neatmonster</groupId>
             <artifactId>nocheatplus</artifactId>
             <version>3.16.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-bukkit</artifactId>
+            <version>7.0.6</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -2,9 +2,9 @@ package su.nightexpress.excellentenchants.manager.enchants.bow;
 
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -24,24 +24,26 @@ public class EnchantElectrifiedArrows extends IEnchantBowTemplate {
     }
 
     @Override
+    public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+        if (!super.use(e, damager, victim, weapon, level)) return false;
+
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            victim.setNoDamageTicks(0);
+            victim.getWorld().strikeLightning(victim.getLocation());
+        });
+
+        return true;
+    }
+
+    @Override
     public boolean use(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         if (!super.use(e, projectile, bow, level)) return false;
+        if (e.getHitEntity() != null || e.getHitBlock() == null) return false;
 
-        Entity entity = e.getHitEntity();
         Block block = e.getHitBlock();
-
-        if (entity instanceof LivingEntity victim) {
-            plugin.getServer().getScheduler().runTask(plugin, () -> {
-                victim.setNoDamageTicks(0);
-                victim.getWorld().strikeLightning(victim.getLocation());
-            });
-        }
-        else if (block != null) {
-            block.getWorld().strikeLightning(block.getLocation());
-            EffectUtil.playEffect(LocationUtil.getCenter(block.getLocation()), Particle.BLOCK_CRACK, block.getType().name(), 1D, 1D, 1D, 0.05, 150);
-            EffectUtil.playEffect(LocationUtil.getCenter(block.getLocation()), Particle.FIREWORKS_SPARK, "", 1D, 1D, 1D, 0.05, 150);
-        }
-        else return false;
+        block.getWorld().strikeLightning(block.getLocation());
+        EffectUtil.playEffect(LocationUtil.getCenter(block.getLocation()), Particle.BLOCK_CRACK, block.getType().name(), 1D, 1D, 1D, 0.05, 150);
+        EffectUtil.playEffect(LocationUtil.getCenter(block.getLocation()), Particle.FIREWORKS_SPARK, "", 1D, 1D, 1D, 0.05, 150);
 
         return true;
     }
