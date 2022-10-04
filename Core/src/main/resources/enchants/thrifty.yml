@@ -101,5 +101,5 @@ Settings:
   # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html
   Ignored_Spawn_Reasons:
   - SPAWNER
-  - SPAWN_EGG
+  - SPAWNER_EGG
   - DISPENSE_EGG

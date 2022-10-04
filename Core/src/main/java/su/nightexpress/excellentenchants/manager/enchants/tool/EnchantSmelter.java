@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockDropItemEvent;
@@ -90,6 +91,7 @@ public class EnchantSmelter extends IEnchantChanceTemplate implements BlockDropE
 
     @Override
     public boolean use(@NotNull BlockDropItemEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
+        if (e.getBlockState() instanceof Container) return false;
         if (!this.isEnchantmentAvailable(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (e.getItems().stream().noneMatch(drop -> this.isSmeltable(drop.getItemStack().getType()))) return false;

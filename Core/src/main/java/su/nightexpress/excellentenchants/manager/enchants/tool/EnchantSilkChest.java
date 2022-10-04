@@ -125,7 +125,7 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDr
         if (!this.takeCostItem(player)) return;
 
         // Добавляем в сундук обратно предметы из дроп листа, кроме самого сундука.
-        parent.getItems().removeIf(drop -> drop.getItemStack().getType() == state.getType());
+        parent.getItems().removeIf(drop -> drop.getItemStack().getType() == state.getType() && drop.getItemStack().getAmount() == 1);
         chest.getBlockInventory().addItem(parent.getItems().stream().map(Item::getItemStack).toList().toArray(new ItemStack[0]));
 
         // Добавляем кастомный сундук в кастомный дроп лист.

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.Version;
 import su.nexmedia.engine.api.command.GeneralCommand;
+import su.nexmedia.engine.command.list.ReloadSubCommand;
 import su.nexmedia.engine.utils.Reflex;
 import su.nightexpress.excellentenchants.command.BookCommand;
 import su.nightexpress.excellentenchants.command.EnchantCommand;
@@ -85,11 +86,17 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
         mainCommand.addChildren(new EnchantCommand(this));
         mainCommand.addChildren(new ListCommand(this));
         mainCommand.addChildren(new TierbookCommand(this));
+        mainCommand.addChildren(new ReloadSubCommand<>(this, Perms.PREFIX + "admin"));
     }
 
     @Override
     public void registerHooks() {
 
+    }
+
+    @Override
+    public void registerPermissions() {
+        // TODO
     }
 
     @NotNull

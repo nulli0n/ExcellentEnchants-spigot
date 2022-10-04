@@ -156,7 +156,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         });
 
         // Prevent to apply enchants multiple times on hits.
-        this.removeSourceWeapon(projectile);
+        this.plugin.getScheduler().runTask(this.plugin, c -> this.removeSourceWeapon(projectile));
     }
 
     // ---------------------------------------------------------------
