@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -160,15 +161,24 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDr
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onSilkChestStore(InventoryClickEvent e) {
-        Inventory inv = e.getInventory();
-        if (inv.getType() == InventoryType.CRAFTING || inv.getType() == InventoryType.CREATIVE) return;
+        Inventory inventory = e.getInventory();
+        if (inventory.getType() == InventoryType.CRAFTING || inventory.getType() == InventoryType.CREATIVE) return;
 
-        ItemStack item = e.getCurrentItem();
-        if (item == null || item.getType().isAir()) return;
-
-        if (this.isSilkChest(item)) {
-            e.setCancelled(true);
+        Player player = (Player) e.getWhoClicked();
+        ItemStack item;
+        if (e.getHotbarButton() >= 0) {
+            item = player.getInventory().getItem(e.getHotbarButton());
         }
+        else item = e.getCurrentItem();
+
+        if (item == null || item.getType().isAir() || !this.isSilkChest(item)) return;
+
+        Inventory clicked = e.getClickedInventory();
+        if (e.getClick() != ClickType.NUMBER_KEY) {
+            if (clicked != null && clicked.equals(e.getView().getTopInventory())) return;
+        }
+
+        e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

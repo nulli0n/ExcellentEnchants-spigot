@@ -4,8 +4,6 @@ import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.ICleanable;
@@ -15,11 +13,13 @@ import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
+import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 import su.nightexpress.excellentenchants.manager.tasks.AbstractEnchantPassiveTask;
 
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
 public class EnchantRegrowth extends IEnchantChanceTemplate implements PassiveEnchant, ICleanable {
@@ -115,11 +115,8 @@ public class EnchantRegrowth extends IEnchantChanceTemplate implements PassiveEn
         }
 
         @Override
-        protected void apply(@NotNull LivingEntity entity, @NotNull ItemStack armor, @NotNull ItemMeta meta) {
-            int level = meta.getEnchantLevel(EnchantRegrowth.this);
-            if (level < 1) return;
-
-            use(entity, level);
+        protected void apply(@NotNull LivingEntity entity, @NotNull Map<ExcellentEnchant, Integer> enchants) {
+            use(entity, enchants.getOrDefault(EnchantRegrowth.this, 0));
         }
     }
 }

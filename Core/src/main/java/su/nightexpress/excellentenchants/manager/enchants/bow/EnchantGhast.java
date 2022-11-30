@@ -17,6 +17,7 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
@@ -93,7 +94,7 @@ public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         // Support for the 'Power' enchantment.
-        int power = weapon.getEnchantmentLevel(Enchantment.ARROW_DAMAGE);
+        int power = EnchantManager.getEnchantmentLevel(weapon, Enchantment.ARROW_DAMAGE);
         if (power < 1) return false;
 
         double damagePower = 0.5 + power * 0.5;

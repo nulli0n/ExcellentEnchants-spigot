@@ -72,8 +72,17 @@ public abstract class IEnchantPotionTemplate extends IEnchantChanceTemplate {
         return new PotionEffect(this.potionEffectType, duration, amplifier, false, this.potionParticles);
     }
 
+    public final boolean hasEffect(@NotNull LivingEntity entity) {
+        return EnchantManager.hasEnchantmentEffect(entity, this);
+    }
+
     public final boolean addEffect(@NotNull LivingEntity target, int level) {
-        EnchantManager.addPotionEffect(target, this.getEffect(level), true);
+        if (this instanceof PassiveEnchant) {
+            this.plugin.getEnchantNMS().addEnchantmentEffect(target, this, this.getEffect(level));
+        }
+        else {
+            target.addPotionEffect(this.getEffect(level));
+        }
         return true;
     }
 }

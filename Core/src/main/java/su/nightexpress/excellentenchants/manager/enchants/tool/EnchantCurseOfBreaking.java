@@ -13,6 +13,7 @@ import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 import java.util.function.UnaryOperator;
@@ -63,7 +64,7 @@ public class EnchantCurseOfBreaking extends IEnchantChanceTemplate {
         if (!this.isEnchantmentAvailable(player)) return;
 
         ItemStack item = e.getItem();
-        int level = item.getEnchantmentLevel(this);
+        int level = EnchantManager.getItemEnchantLevel(item, this);
 
         if (level < 1) return;
         if (!this.checkTriggerChance(level)) return;

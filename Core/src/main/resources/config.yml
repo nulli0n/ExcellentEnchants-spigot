@@ -20,9 +20,6 @@ General:
     Arrow_Trails:
       # Defines the ticks interval (20 ticks = 1 second) for the arrow particle effect spawning.
       Ticks_Interval: 1
-    Passive_Enchants:
-      # Defines the ticks interval (20 ticks = 1 second) for the passive enchantment effects to trigger.
-      Ticks_Interval: 100
   # Enchantment global settings.
   Enchantments:
     # List of disabled custom enchantments.

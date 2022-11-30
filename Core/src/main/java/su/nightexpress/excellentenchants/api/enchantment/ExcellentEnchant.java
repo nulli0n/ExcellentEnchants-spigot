@@ -316,9 +316,11 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
     }
 
     public int getLevelByEnchantCost(int expLevel) {
-        Optional<Map.Entry<Integer, Double>> opt = this.levelByEnchantCost.getValues().entrySet().stream()
-            .filter(en -> expLevel >= en.getValue().intValue()).max(Comparator.comparingInt(Map.Entry::getKey));
-        return opt.isPresent() ? opt.get().getKey() : Rnd.get(this.getStartLevel(), this.getMaxLevel());
+        int get = this.levelByEnchantCost.getValues().entrySet().stream()
+            .filter(en -> expLevel >= en.getValue().intValue()).max(Comparator.comparingInt(Map.Entry::getKey))
+            .map(Map.Entry::getKey).orElse(0);
+
+        return get != 0 ? this.fineLevel(get, ObtainType.ENCHANTING) : 0;
     }
 
     public double getObtainChance(@NotNull ObtainType obtainType) {
@@ -331,6 +333,16 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
 
     public int getObtainLevelMax(@NotNull ObtainType obtainType) {
         return this.obtainLevelCap.getOrDefault(obtainType, Pair.of(-1, -1)).getSecond();
+    }
+
+    public int fineLevel(int level, @NotNull ObtainType obtainType) {
+        int levelCapMin = this.getObtainLevelMin(obtainType);
+        int levelCapMax = this.getObtainLevelMax(obtainType);
+
+        if (levelCapMin > 0 && level < levelCapMin) level = levelCapMin;
+        if (levelCapMax > 0 && level > levelCapMax) level = levelCapMax;
+
+        return level;
     }
 
     public int generateLevel() {

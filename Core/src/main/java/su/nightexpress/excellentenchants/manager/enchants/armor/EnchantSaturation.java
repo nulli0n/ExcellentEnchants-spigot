@@ -3,8 +3,6 @@ package su.nightexpress.excellentenchants.manager.enchants.armor;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.ICleanable;
@@ -12,11 +10,13 @@ import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
+import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 import su.nightexpress.excellentenchants.manager.tasks.AbstractEnchantPassiveTask;
 
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
 public class EnchantSaturation extends IEnchantChanceTemplate implements PassiveEnchant, ICleanable {
@@ -86,8 +86,8 @@ public class EnchantSaturation extends IEnchantChanceTemplate implements Passive
     public boolean use(@NotNull LivingEntity entity, int level) {
         if (!this.isEnchantmentAvailable(entity)) return false;
         if (!(entity instanceof Player player)) return false;
-        if (!this.checkTriggerChance(level)) return false;
         if (player.getFoodLevel() >= 20) return false;
+        if (!this.checkTriggerChance(level)) return false;
         if (!this.takeCostItem(player)) return false;
 
         float amount = (float) this.getSaturationAmount(level);
@@ -103,11 +103,9 @@ public class EnchantSaturation extends IEnchantChanceTemplate implements Passive
         }
 
         @Override
-        protected void apply(@NotNull LivingEntity entity, @NotNull ItemStack armor, @NotNull ItemMeta meta) {
-            int level = meta.getEnchantLevel(EnchantSaturation.this);
-            if (level < 1) return;
-
-            use(entity, level);
+        protected void apply(@NotNull LivingEntity entity, @NotNull Map<ExcellentEnchant, Integer> enchants) {
+            // TODO Need to use SUM level and bypass the Scaler cap
+            use(entity, enchants.getOrDefault(EnchantSaturation.this, 0));
         }
     }
 }

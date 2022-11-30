@@ -6,7 +6,6 @@ import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.Version;
 import su.nexmedia.engine.api.command.GeneralCommand;
 import su.nexmedia.engine.command.list.ReloadSubCommand;
-import su.nexmedia.engine.utils.Reflex;
 import su.nightexpress.excellentenchants.command.BookCommand;
 import su.nightexpress.excellentenchants.command.EnchantCommand;
 import su.nightexpress.excellentenchants.command.ListCommand;
@@ -16,6 +15,9 @@ import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
+import su.nightexpress.excellentenchants.nms.v1_17_R1.V1_17_R1;
+import su.nightexpress.excellentenchants.nms.v1_18_R2.V1_18_R2;
+import su.nightexpress.excellentenchants.nms.v1_19_R1.V1_19_R1;
 
 public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
@@ -51,20 +53,12 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     }
 
     private boolean setNMS() {
-        Version current = Version.CURRENT;
-        if (current == null) return false;
-
-        String pack = EnchantNMS.class.getPackage().getName();
-        Class<?> clazz = Reflex.getClass(pack, current.name());
-        if (clazz == null) return false;
-
-        try {
-            this.enchantNMS = (EnchantNMS) clazz.getConstructor().newInstance();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return this.enchantNMS != null;
+        this.enchantNMS = switch (Version.CURRENT) {
+            case V1_17_R1 -> new V1_17_R1();
+            case V1_18_R2 -> new V1_18_R2();
+            case V1_19_R1 -> new V1_19_R1();
+        };
+        return true;
     }
 
     @Override

@@ -75,17 +75,17 @@ public class EnchantTelekinesis extends IEnchantChanceTemplate implements Custom
     }
 
     @Override
-    public void handleDrop(@NotNull EnchantDropContainer e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        BlockDropItemEvent parent = e.getParent();
-        Block block = parent.getBlockState().getBlock();
+    public void handleDrop(@NotNull EnchantDropContainer container, @NotNull Player player, @NotNull ItemStack item, int level) {
+        BlockDropItemEvent dropItemEvent = container.getParent();
+        Block block = dropItemEvent.getBlockState().getBlock();
 
         if (!this.isEnchantmentAvailable(player)) return;
         //if (block.getState() instanceof Container) return;
         if (!this.checkTriggerChance(level)) return;
 
         List<ItemStack> drops = new ArrayList<>();
-        drops.addAll(parent.getItems().stream().map(Item::getItemStack).toList());
-        drops.addAll(e.getDrop());
+        drops.addAll(dropItemEvent.getItems().stream().map(Item::getItemStack).toList());
+        drops.addAll(container.getDrop());
         drops.removeIf(Objects::isNull);
 
         StringBuilder builder = new StringBuilder();
@@ -99,7 +99,7 @@ public class EnchantTelekinesis extends IEnchantChanceTemplate implements Custom
         });
         this.messageDropReceived.replace("%items%", builder.toString()).send(player);
 
-        e.getDrop().clear();
-        parent.getItems().clear();
+        container.getDrop().clear();
+        dropItemEvent.getItems().clear();
     }
 }

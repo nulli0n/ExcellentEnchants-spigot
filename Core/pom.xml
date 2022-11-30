@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ExcellentEnchants</artifactId>
         <groupId>su.nightexpress.excellentenchants</groupId>
-        <version>3.2.7</version>
+        <version>3.2.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -36,22 +36,22 @@
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>NMS</artifactId>
-            <version>3.2.7</version>
+            <version>3.2.8</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_17_R1</artifactId>
-            <version>3.2.7</version>
+            <version>3.2.8</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_18_R2</artifactId>
-            <version>3.2.7</version>
+            <version>3.2.8</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_19_R1</artifactId>
-            <version>3.2.7</version>
+            <version>3.2.8</version>
         </dependency>
         <dependency>
             <groupId>fr.neatmonster</groupId>

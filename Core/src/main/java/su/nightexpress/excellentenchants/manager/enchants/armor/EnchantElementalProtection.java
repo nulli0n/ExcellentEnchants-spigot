@@ -15,6 +15,7 @@ import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 import java.util.function.UnaryOperator;
@@ -85,7 +86,7 @@ public class EnchantElementalProtection extends IEnchantChanceTemplate {
         for (ItemStack armor : EntityUtil.getArmor(victim)) {
             if (armor == null || armor.getType().isAir()) continue;
 
-            int level = armor.getEnchantmentLevel(this);
+            int level = EnchantManager.getItemEnchantLevel(armor, this);
             if (this.checkTriggerChance(level)) {
                 protectionAmount += this.getProtectionAmount(level);
             }

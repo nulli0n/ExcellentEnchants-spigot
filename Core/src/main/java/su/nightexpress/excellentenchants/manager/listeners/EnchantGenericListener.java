@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.manager.listeners;
 
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,19 +14,17 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.manager.AbstractListener;
-import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.config.ObtainSettings;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
-import su.nightexpress.excellentenchants.manager.object.EnchantTier;
 import su.nightexpress.excellentenchants.manager.type.ObtainType;
 
 import java.util.HashMap;
@@ -35,6 +34,16 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
 
     public EnchantGenericListener(@NotNull EnchantManager enchantManager) {
         super(enchantManager.plugin());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEnchantPotionEffectQuit(PlayerQuitEvent e) {
+        Player player = e.getPlayer();
+
+        player.getActivePotionEffects().stream()
+            .filter(effect -> EnchantManager.isEnchantmentEffect(player, effect)).forEach(effect -> {
+                player.removePotionEffect(effect.getType());
+        });
     }
 
     // ---------------------------------------------------------------
@@ -149,53 +158,32 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
     // ---------------------------------------------------------------
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onEnchantPopulateEnchantingTable(final EnchantItemEvent e) {
-        ObtainSettings settings = Config.getObtainSettings(ObtainType.ENCHANTING);
-        if (settings == null || Rnd.get(true) > settings.getEnchantsCustomGenerationChance()) return;
-
         ItemStack target = e.getItem();
-        boolean enchantAdded = false;
+        Map<Enchantment, Integer> enchantsPrepared = e.getEnchantsToAdd();
+        Map<Enchantment, Integer> enchantsToPopulate = EnchantManager.getEnchantsToPopulate(target, ObtainType.ENCHANTING, enchantsPrepared, enchant -> enchant.getLevelByEnchantCost(e.getExpLevelCost()));
 
-        int enchMax = settings.getEnchantsTotalMax();
-        int enchRoll = Rnd.get(settings.getEnchantsCustomMin(), settings.getEnchantsCustomMax());
+        enchantsPrepared.putAll(enchantsToPopulate);
 
-        for (int count = 0; (count < enchRoll && e.getEnchantsToAdd().size() < enchMax); count++) {
-            EnchantTier tier = EnchantManager.getTierByChance(ObtainType.ENCHANTING);
-            if (tier == null) continue;
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            ItemStack result = e.getInventory().getItem(0);
+            if (result == null) return;
 
-            ExcellentEnchant enchant = tier.getEnchant(ObtainType.ENCHANTING, target);
-            if (enchant == null) continue;
-            if (e.getEnchantsToAdd().keySet().stream().anyMatch(add -> add.conflictsWith(enchant) || enchant.conflictsWith(add)))
-                continue;
+            // Fix enchantments for Enchant Books.
+            // Enchants are not added on book because they do not exists in NMS.
+            // Server gets enchants from NMS to apply it on Book NBT tags.
+            ItemMeta meta = result.getItemMeta();
+            if (meta instanceof EnchantmentStorageMeta storageMeta) {
+                e.getEnchantsToAdd().forEach((enchantment, level) -> {
+                    if (!storageMeta.hasStoredEnchant(enchantment)) {
+                        storageMeta.addStoredEnchant(enchantment, level, true);
+                    }
+                });
+                result.setItemMeta(storageMeta);
+            }
 
-            int level = enchant.getLevelByEnchantCost(e.getExpLevelCost());
-            if (level < 1) continue;
-
-            e.getEnchantsToAdd().put(enchant, level);
-            enchantAdded = true;
-        }
-
-        if (enchantAdded) {
-            plugin.getServer().getScheduler().runTask(plugin, () -> {
-                ItemStack result = e.getInventory().getItem(0);
-                if (result == null) return;
-
-                // Fix enchantments for Enchant Books.
-                // Enchants are not added on book because they do not exists in NMS.
-                // Server gets enchants from NMS to apply it on Book NBT tags.
-                ItemMeta meta = result.getItemMeta();
-                if (meta instanceof EnchantmentStorageMeta meta2) {
-                    e.getEnchantsToAdd().forEach((en, lvl) -> {
-                        if (!meta2.hasStoredEnchant(en)) {
-                            meta2.addStoredEnchant(en, lvl, true);
-                        }
-                    });
-                    result.setItemMeta(meta2);
-                }
-
-                EnchantManager.updateItemLoreEnchants(result);
-                e.getInventory().setItem(0, result);
-            });
-        }
+            EnchantManager.updateItemLoreEnchants(result);
+            e.getInventory().setItem(0, result);
+        });
     }
 
     // ---------------------------------------------------------------

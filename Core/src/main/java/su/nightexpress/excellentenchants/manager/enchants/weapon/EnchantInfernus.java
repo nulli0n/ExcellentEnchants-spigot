@@ -16,6 +16,7 @@ import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 import java.util.function.UnaryOperator;
@@ -69,7 +70,7 @@ public class EnchantInfernus extends IEnchantChanceTemplate {
 
         ItemStack item = trident.getItem();
 
-        int level = item.getEnchantmentLevel(this);
+        int level = EnchantManager.getItemEnchantLevel(item, this);
         if (level <= 0) return;
 
         if (!this.checkTriggerChance(level)) return;
@@ -84,7 +85,7 @@ public class EnchantInfernus extends IEnchantChanceTemplate {
 
         ItemStack item = trident.getItem();
 
-        int level = item.getEnchantmentLevel(this);
+        int level = EnchantManager.getItemEnchantLevel(item, this);
         if (level <= 0 || trident.getFireTicks() <= 0) return;
 
         int ticks = this.getFireTicks(level);

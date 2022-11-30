@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.config;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.utils.Placeholders;
 import su.nexmedia.engine.utils.StringUtil;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 public class Config {
 
     public static long TASKS_ARROW_TRAIL_TICKS_INTERVAL;
-    public static long TASKS_PASSIVE_ENCHANTS_TICKS_INTERVAL;
+    public static final JOption<Integer> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("General.Tasks.Passive_Potion_Effects.Apply_Interval", "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them.\nThis setting does NOT refreshes currently active effects, but only attempts to add them if absent.", 150);
 
     public static  Set<String> ENCHANTMENTS_DISABLED;
     public static Map<String, Set<String>> ENCHANTMENTS_DISABLED_IN_WORLDS;
@@ -35,10 +36,10 @@ public class Config {
 
     public static void load(@NotNull ExcellentEnchants plugin) {
         JYML cfg = plugin.getConfig();
+        cfg.initializeOptions(Config.class);
 
         String path = "General.Tasks.";
         TASKS_ARROW_TRAIL_TICKS_INTERVAL = cfg.getLong(path + "Arrow_Trails.Ticks_Interval", 1);
-        TASKS_PASSIVE_ENCHANTS_TICKS_INTERVAL = cfg.getLong(path + "Passive_Enchants.Ticks_Interval", 100);
 
         path = "General.Enchantments.";
         cfg.addMissing(path + "Disabled_In_Worlds.my_world", Collections.singletonList(Placeholders.MASK_ANY));

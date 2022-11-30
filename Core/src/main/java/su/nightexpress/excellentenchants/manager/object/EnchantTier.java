@@ -4,7 +4,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.utils.StringUtil;
-import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.manager.type.ObtainType;
 
@@ -73,22 +72,10 @@ public class EnchantTier {
     @NotNull
     public Set<ExcellentEnchant> getEnchants(@NotNull ObtainType obtainType, @Nullable ItemStack item) {
         Set<ExcellentEnchant> set = this.getEnchants().stream()
-            .filter(en -> en.getObtainChance(obtainType) > 0)
-            .filter(en -> item == null || en.canEnchantItem(item)).collect(Collectors.toSet());
-        set.removeIf(en -> obtainType == ObtainType.ENCHANTING && en.isTreasure());
+            .filter(enchant -> enchant.getObtainChance(obtainType) > 0)
+            .filter(enchant -> item == null || enchant.canEnchantItem(item))
+            .collect(Collectors.toCollection(HashSet::new));
+        set.removeIf(enchant -> obtainType == ObtainType.ENCHANTING && enchant.isTreasure());
         return set;
-    }
-
-    @Nullable
-    public ExcellentEnchant getEnchant(@NotNull ObtainType obtainType) {
-        return getEnchant(obtainType, null);
-    }
-
-    @Nullable
-    public ExcellentEnchant getEnchant(@NotNull ObtainType obtainType, @Nullable ItemStack item) {
-        Map<ExcellentEnchant, Double> map = this.getEnchants(obtainType).stream()
-            .filter(en -> item == null || en.canEnchantItem(item))
-            .collect(Collectors.toMap(k -> k, v -> v.getObtainChance(obtainType)));
-        return map.isEmpty() ? null : Rnd.get(map);
     }
 }
