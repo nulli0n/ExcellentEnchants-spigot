@@ -372,7 +372,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
     public final boolean canEnchantItem(@Nullable ItemStack item) {
         if (item == null || item.getType().isAir()) return false;
         if (EnchantManager.getItemEnchants(item).keySet().stream().anyMatch(e -> e.conflictsWith(this) || this.conflictsWith(e))) return false;
-        if (!item.containsEnchantment(this) && EnchantManager.getItemCustomEnchantsAmount(item) >= Config.ENCHANTMENTS_ITEM_CUSTOM_MAX) {
+        if (EnchantManager.getEnchantmentLevel(item, this) <= 0 && EnchantManager.getItemCustomEnchantsAmount(item) >= Config.ENCHANTMENTS_ITEM_CUSTOM_MAX) {
             return false;
         }
         if (item.getType() == Material.BOOK || item.getType() == Material.ENCHANTED_BOOK) {

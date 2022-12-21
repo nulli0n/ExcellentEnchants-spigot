@@ -65,13 +65,13 @@ public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
         if (!this.isEnchantmentAvailable(shooter)) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!(e.getProjectile() instanceof Projectile projectile)) return false;
-        if (!bow.containsEnchantment(ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
+        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
 
         Fireball fireball;
 
         // Shoot small fireballs for the Multishot enchantment,
         // as large ones has a slow speed and punches each other on shoot.
-        if (bow.containsEnchantment(Enchantment.MULTISHOT)) {
+        if (EnchantManager.hasEnchantment(bow, Enchantment.MULTISHOT)) {
             fireball = shooter.launchProjectile(SmallFireball.class);
             fireball.setVelocity(projectile.getVelocity().normalize().multiply(0.5f));
         }

@@ -18,7 +18,10 @@ import java.util.stream.Collectors;
 public class Config {
 
     public static long TASKS_ARROW_TRAIL_TICKS_INTERVAL;
-    public static final JOption<Integer> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("General.Tasks.Passive_Potion_Effects.Apply_Interval", "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them.\nThis setting does NOT refreshes currently active effects, but only attempts to add them if absent.", 150);
+    public static final JOption<Integer> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("General.Tasks.Passive_Potion_Effects.Apply_Interval", 150,
+        "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them.",
+        "This setting does NOT refreshes currently active effects, but only attempts to add them if absent."
+    );
 
     public static  Set<String> ENCHANTMENTS_DISABLED;
     public static Map<String, Set<String>> ENCHANTMENTS_DISABLED_IN_WORLDS;
@@ -42,7 +45,7 @@ public class Config {
         TASKS_ARROW_TRAIL_TICKS_INTERVAL = cfg.getLong(path + "Arrow_Trails.Ticks_Interval", 1);
 
         path = "General.Enchantments.";
-        cfg.addMissing(path + "Disabled_In_Worlds.my_world", Collections.singletonList(Placeholders.MASK_ANY));
+        cfg.addMissing(path + "Disabled_In_Worlds.my_world", Collections.singletonList(Placeholders.WILDCARD));
         cfg.addMissing(path + "Disabled_In_Worlds.other_world", Arrays.asList("enchant_name", "another_enchant"));
 
         ENCHANTMENTS_DISABLED = cfg.getStringSet(path + "Disabled").stream().map(String::toLowerCase).collect(Collectors.toSet());
@@ -132,7 +135,7 @@ public class Config {
 
     public static boolean isEnchantmentDisabled(@NotNull ExcellentEnchant enchant, @NotNull String world) {
         Set<String> disabled = ENCHANTMENTS_DISABLED_IN_WORLDS.getOrDefault(world, Collections.emptySet());
-        return disabled.contains(enchant.getKey().getKey()) || disabled.contains(Placeholders.MASK_ANY);
+        return disabled.contains(enchant.getKey().getKey()) || disabled.contains(Placeholders.WILDCARD);
     }
 
     @Nullable

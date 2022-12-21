@@ -21,6 +21,7 @@ import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.hook.HookNCP;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
@@ -94,8 +95,8 @@ public class EnchantBlastMining extends IEnchantChanceTemplate implements BlockB
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isEnchantmentAvailable(player)) return false;
 
-        if (EnchantRegister.VEINMINER != null && item.containsEnchantment(EnchantRegister.VEINMINER)) return false;
-        if (EnchantRegister.TUNNEL != null && item.containsEnchantment(EnchantRegister.TUNNEL)) return false;
+        if (EnchantRegister.VEINMINER != null && EnchantManager.hasEnchantment(item, EnchantRegister.VEINMINER)) return false;
+        if (EnchantRegister.TUNNEL != null && EnchantManager.hasEnchantment(item, EnchantRegister.TUNNEL)) return false;
 
         Block block = e.getBlock();
         if (block.hasMetadata(META_EXPLOSION_MINED)) return false;

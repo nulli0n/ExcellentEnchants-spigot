@@ -124,7 +124,7 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
 
         Player player = e.getPlayer();
         ItemStack spawner = player.getInventory().getItem(e.getHand());
-        if (spawner.getType() != Material.SPAWNER || !(spawner.getItemMeta() instanceof BlockStateMeta meta)) return;
+        if (spawner == null || spawner.getType() != Material.SPAWNER || !(spawner.getItemMeta() instanceof BlockStateMeta meta)) return;
 
         CreatureSpawner spawnerItem = (CreatureSpawner) meta.getBlockState();
         CreatureSpawner spawnerBlock = (CreatureSpawner) block.getState();

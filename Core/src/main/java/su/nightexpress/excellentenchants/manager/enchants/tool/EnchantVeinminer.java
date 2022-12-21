@@ -19,6 +19,7 @@ import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.hook.HookNCP;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
@@ -115,8 +116,8 @@ public class EnchantVeinminer extends IEnchantChanceTemplate implements BlockBre
     @Override
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack tool, int level) {
         if (!this.isEnchantmentAvailable(player)) return false;
-        if (EnchantRegister.TUNNEL != null && tool.containsEnchantment(EnchantRegister.TUNNEL)) return false;
-        if (EnchantRegister.BLAST_MINING != null && tool.containsEnchantment(EnchantRegister.BLAST_MINING)) return false;
+        if (EnchantRegister.TUNNEL != null && EnchantManager.hasEnchantment(tool, EnchantRegister.TUNNEL)) return false;
+        if (EnchantRegister.BLAST_MINING != null && EnchantManager.hasEnchantment(tool, EnchantRegister.BLAST_MINING)) return false;
 
         Block block = e.getBlock();
         if (block.hasMetadata(META_BLOCK_VEINED)) return false;

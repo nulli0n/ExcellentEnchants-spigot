@@ -24,6 +24,17 @@ public class CustomEffectInstance extends MobEffectInstance {
         return enchantment;
     }
 
+    @Override
+    public boolean update(MobEffectInstance effect) {
+        /*if (effect instanceof CustomEffectInstance custom) {
+            return false;
+        }
+        if (effect.getAmplifier() > this.getAmplifier()) {
+
+        }*/
+        return false;
+    }
+
     public boolean tick(LivingEntity entity, Runnable runnable) {
         if (EnchantNMS.getEquippedEnchantLevel((org.bukkit.entity.LivingEntity) entity.getBukkitEntity(), this.getEnchantment()) <= 0) {
             return false;

@@ -14,6 +14,7 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 
 public class EnchantEnderBow extends IEnchantChanceTemplate implements BowEnchant {
 
@@ -34,7 +35,7 @@ public class EnchantEnderBow extends IEnchantChanceTemplate implements BowEnchan
         if (!this.isEnchantmentAvailable(shooter)) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!(e.getProjectile() instanceof Projectile projectile)) return false;
-        if (!bow.containsEnchantment(ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
+        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
 
         EnderPearl pearl = shooter.launchProjectile(EnderPearl.class);
         pearl.setVelocity(projectile.getVelocity());

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 
 public abstract class IEnchantBowPotionTemplate extends IEnchantPotionTemplate implements BowEnchant {
 
@@ -52,7 +53,7 @@ public abstract class IEnchantBowPotionTemplate extends IEnchantPotionTemplate i
         if (!this.isEnchantmentAvailable(shooter)) return false;
         if (!(e.getProjectile() instanceof Arrow arrow)) return false;
         if (!this.checkTriggerChance(level)) return false;
-        if (!bow.containsEnchantment(ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
+        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
 
         this.setThisArrow(arrow);
         arrow.addCustomEffect(this.getEffect(level), true);

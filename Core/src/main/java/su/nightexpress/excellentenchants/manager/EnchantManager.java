@@ -249,6 +249,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         return EnchantManager.getItemCustomEnchants(item).size();
     }
 
+    @Deprecated
     public static int getItemEnchantLevel(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
         return getItemEnchants(item).getOrDefault(enchantment, 0);
     }
@@ -263,6 +264,10 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
     public static int getItemEnchantsAmount(@NotNull ItemStack item) {
         return EnchantManager.getItemEnchants(item).size();
+    }
+
+    public static boolean hasEnchantment(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
+        return getEnchantmentLevel(item, enchantment) > 0;
     }
 
     public static int getEnchantmentLevel(@NotNull ItemStack item, @NotNull Enchantment enchant) {
@@ -304,6 +309,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
         Map<EquipmentSlot, ItemStack> equipment = EntityUtil.getEquippedItems(entity);
         equipment.entrySet().stream().filter(entry -> {
+            if (entry.getValue() == null) return false;
             if (entry.getValue().getType() == Material.ENCHANTED_BOOK) return false;
             if ((entry.getKey() == EquipmentSlot.HAND || entry.getKey() == EquipmentSlot.OFF_HAND) && ItemUtil.isArmor(entry.getValue())) return false;
             return true;

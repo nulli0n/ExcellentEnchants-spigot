@@ -16,6 +16,7 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 import java.util.function.UnaryOperator;
@@ -67,7 +68,7 @@ public class EnchantBomber extends IEnchantChanceTemplate implements BowEnchant 
         if (!this.isEnchantmentAvailable(shooter)) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!(e.getProjectile() instanceof Projectile projectile)) return false;
-        if (!bow.containsEnchantment(ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
+        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
 
         TNTPrimed primed = projectile.getWorld().spawn(projectile.getLocation(), TNTPrimed.class);
         primed.setVelocity(projectile.getVelocity().multiply(e.getForce() * 1.25));

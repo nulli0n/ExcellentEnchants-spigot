@@ -114,7 +114,7 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
         if (boots == null || boots.getType().isAir()) return;
 
         //int level = boots.getEnchantmentLevel(this);
-        int level = EnchantManager.getItemEnchants(boots).getOrDefault(this, 0);
+        int level = EnchantManager.getEnchantmentLevel(boots, this);
         if (level < 1) return;
 
         Block bTo = to.getBlock().getRelative(BlockFace.DOWN);
@@ -145,7 +145,7 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
         ItemStack boots = equipment.getBoots();
         if (boots == null || boots.getType().isAir()) return;
 
-        int level = EnchantManager.getItemEnchantLevel(boots, this);
+        int level = EnchantManager.getEnchantmentLevel(boots, this);
         if (level < 1) return;
         if (!this.checkTriggerChance(level)) return;
 

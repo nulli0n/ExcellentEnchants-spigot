@@ -18,6 +18,7 @@ import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.hook.HookNCP;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.EnchantRegister;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 
@@ -71,8 +72,8 @@ public class EnchantTunnel extends IEnchantChanceTemplate implements BlockBreakE
         Block block = e.getBlock();
         if (!this.isEnchantmentAvailable(player)) return false;
         if (this.disableOnSneak && player.isSneaking()) return false;
-        if (EnchantRegister.VEINMINER != null && item.containsEnchantment(EnchantRegister.VEINMINER)) return false;
-        if (EnchantRegister.BLAST_MINING != null && item.containsEnchantment(EnchantRegister.BLAST_MINING)) return false;
+        if (EnchantRegister.VEINMINER != null && EnchantManager.hasEnchantment(item, EnchantRegister.VEINMINER)) return false;
+        if (EnchantRegister.BLAST_MINING != null && EnchantManager.hasEnchantment(item, EnchantRegister.BLAST_MINING)) return false;
         if (block.hasMetadata(META_BLOCK_TUNNEL)) return false;
         if (block.getType().isInteractable() && !INTERACTABLE_BLOCKS.contains(block.getType())) return false;
         if (block.getDrops(item).isEmpty()) return false;

@@ -1,4 +1,4 @@
-package su.nightexpress.excellentenchants.nms.v1_17_R1;
+package su.nightexpress.excellentenchants.nms.v1_19_R2;
 
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;

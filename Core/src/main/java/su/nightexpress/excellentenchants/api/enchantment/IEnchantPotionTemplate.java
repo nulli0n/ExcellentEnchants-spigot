@@ -78,7 +78,9 @@ public abstract class IEnchantPotionTemplate extends IEnchantChanceTemplate {
 
     public final boolean addEffect(@NotNull LivingEntity target, int level) {
         if (this instanceof PassiveEnchant) {
-            this.plugin.getEnchantNMS().addEnchantmentEffect(target, this, this.getEffect(level));
+            if (!this.hasEffect(target)) {
+                this.plugin.getEnchantNMS().addEnchantmentEffect(target, this, this.getEffect(level));
+            }
         }
         else {
             target.addPotionEffect(this.getEffect(level));

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.utils.EntityUtil;
 
-import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
 
 public interface EnchantNMS {
@@ -28,7 +28,7 @@ public interface EnchantNMS {
     // TODO Move in 'API' module?
     @Deprecated
     static int getEquippedEnchantLevel(@NotNull LivingEntity entity, @NotNull Enchantment enchant) {
-        return Arrays.stream(EntityUtil.getEquipment(entity)).filter(enchant::canEnchantItem)
+        return EntityUtil.getEquippedItems(entity).values().stream().filter(Objects::nonNull).filter(enchant::canEnchantItem)
             .map(item -> getEnchantmentLevel(item, enchant)).max(Integer::compareTo).orElse(0);
     }
 
