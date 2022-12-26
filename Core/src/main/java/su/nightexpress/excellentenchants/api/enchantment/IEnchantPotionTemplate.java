@@ -6,8 +6,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.lang.LangManager;
-import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
@@ -21,7 +21,7 @@ public abstract class IEnchantPotionTemplate extends IEnchantChanceTemplate {
     public static final String PLACEHOLDER_POTION_DURATION = "%enchantment_potion_duration%";
     public static final String PLACEHOLDER_POTION_TYPE     = "%enchantment_potion_type%";
 
-    protected PotionEffectType potionEffectType;
+    protected       PotionEffectType potionEffectType;
     protected final boolean          potionParticles;
     protected       Scaler           potionDuration;
     protected       Scaler           potionLevel;

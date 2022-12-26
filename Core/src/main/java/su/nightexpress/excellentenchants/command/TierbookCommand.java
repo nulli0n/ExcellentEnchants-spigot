@@ -18,6 +18,7 @@ import su.nightexpress.excellentenchants.manager.object.EnchantTier;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
 
@@ -58,7 +59,7 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    public void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+    public void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, @NotNull Map<String, String> flags) {
         if (args.length != 4) {
             this.printUsage(sender);
             return;

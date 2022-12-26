@@ -9,11 +9,12 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
@@ -23,9 +24,9 @@ import java.util.function.UnaryOperator;
 
 public class EnchantVampire extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private String particleName;
-    private String particleData;
-    private Scaler healAmount;
+    private String  particleName;
+    private String  particleData;
+    private Scaler  healAmount;
     private boolean healMultiplier;
 
     public static final String ID = "vampire";
@@ -60,7 +61,7 @@ public class EnchantVampire extends IEnchantChanceTemplate implements CombatEnch
         cfg.remove("Settings.Heal_Of_Damage");
         cfg.addMissing("Settings.Particle.Name", Particle.HEART.name());
         cfg.addMissing("Settings.Particle.Data", "");
-        cfg.addMissing("Settings.Heal.Amount", "0.25 * " + PLACEHOLDER_LEVEL);
+        cfg.addMissing("Settings.Heal.Amount", "0.25 * " + Placeholders.ENCHANTMENT_LEVEL);
         cfg.addMissing("Settings.Heal.As_Multiplier", false);
     }
 

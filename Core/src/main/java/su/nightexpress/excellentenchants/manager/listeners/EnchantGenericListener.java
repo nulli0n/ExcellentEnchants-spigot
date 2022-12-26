@@ -102,7 +102,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         }
 
         if (!first.equals(result)) {
-            EnchantManager.updateItemLoreEnchants(result);
+            //EnchantManager.updateItemLoreEnchants(result);
             e.setResult(result);
 
             // NMS ContainerAnvil will set level cost to 0 right after calling the event
@@ -148,7 +148,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
             curses.forEach((excellentEnchant, level) -> {
                 EnchantManager.addEnchant(result, excellentEnchant, level, true);
             });
-            EnchantManager.updateItemLoreEnchants(result);
+            //EnchantManager.updateItemLoreEnchants(result);
         });
     }
 
@@ -181,7 +181,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
                 result.setItemMeta(storageMeta);
             }
 
-            EnchantManager.updateItemLoreEnchants(result);
+            //EnchantManager.updateItemLoreEnchants(result);
             e.getInventory().setItem(0, result);
         });
     }

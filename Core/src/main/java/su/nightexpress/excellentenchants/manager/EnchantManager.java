@@ -160,10 +160,11 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         return EnchantManager.getItemCustomEnchantsAmount(item) != enchantsHad;
     }
 
+    @Deprecated
     public static void updateItemLoreEnchants(@NotNull ItemStack item) {
         EnchantRegister.ENCHANT_LIST.forEach(ench -> {
-            ItemUtil.delLore(item, ench.getId());
-            ItemUtil.delLore(item, ench.getId() + "_info");
+            //ItemUtil.delLore(item, ench.getId());
+            //ItemUtil.delLore(item, ench.getId() + "_info");
         });
 
         // Filter custom enchants and define map order.
@@ -172,7 +173,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (has, add) -> add, LinkedHashMap::new));
 
         excellents.forEach((excellent, level) -> {
-            ItemUtil.addLore(item, excellent.getId(), excellent.getNameFormatted(level), 0);
+            //ItemUtil.addLore(item, excellent.getId(), excellent.getNameFormatted(level), 0);
         });
 
         // Add enchantment description at the end of item lore.
@@ -184,7 +185,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
                 List<String> desc = excellent.getDescription(excellents.get(excellent));
                 if (desc.isEmpty()) return;
 
-                ItemUtil.addLore(item, excellent.getId() + "_info", Config.formatDescription(desc), -1);
+                //ItemUtil.addLore(item, excellent.getId() + "_info", Config.formatDescription(desc), -1);
             });
         }
     }
@@ -194,9 +195,9 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
         EnchantManager.removeEnchant(item, enchantment);
 
-        if (enchantment instanceof ExcellentEnchant excellentEnchant) {
-            ItemUtil.addLore(item, excellentEnchant.getId(), excellentEnchant.getNameFormatted(level), 0);
-        }
+        //if (enchantment instanceof ExcellentEnchant excellentEnchant) {
+            //ItemUtil.addLore(item, excellentEnchant.getId(), excellentEnchant.getNameFormatted(level), 0);
+        //}
 
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return false;
@@ -213,9 +214,9 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     }
 
     public static void removeEnchant(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
-        if (enchantment instanceof ExcellentEnchant excellentEnchant) {
-            ItemUtil.delLore(item, excellentEnchant.getId());
-        }
+        //if (enchantment instanceof ExcellentEnchant excellentEnchant) {
+            //ItemUtil.delLore(item, excellentEnchant.getId());
+        //}
 
         ItemMeta meta = item.getItemMeta();
         if (meta instanceof EnchantmentStorageMeta storageMeta) {

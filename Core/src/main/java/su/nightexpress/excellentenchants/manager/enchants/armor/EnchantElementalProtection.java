@@ -8,10 +8,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.ArrayUtil;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
@@ -83,7 +83,7 @@ public class EnchantElementalProtection extends IEnchantChanceTemplate {
         if (!this.isEnchantmentAvailable(victim)) return;
 
         double protectionAmount = 0D;
-        for (ItemStack armor : EntityUtil.getArmor(victim)) {
+        for (ItemStack armor : EntityUtil.getEquippedArmor(victim).values()) {
             if (armor == null || armor.getType().isAir()) continue;
 
             int level = EnchantManager.getItemEnchantLevel(armor, this);

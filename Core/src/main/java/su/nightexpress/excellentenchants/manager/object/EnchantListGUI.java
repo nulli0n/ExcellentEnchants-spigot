@@ -13,6 +13,7 @@ import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.manager.EnchantRegister;
@@ -35,7 +36,7 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
         this.enchantIcon = cfg.getItem("Enchantments.Icon");
         this.enchantSlots = cfg.getIntArray("Enchantments.Slots");
 
-        IMenuClick click = (p, type, e) -> {
+        MenuClick click = (p, type, e) -> {
             if (type instanceof MenuItemType type2) {
                 switch (type2) {
                     case PAGE_NEXT -> this.open(p, this.getPage(p) + 1);
@@ -46,10 +47,10 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
         };
 
         for (String sId : cfg.getSection("Content")) {
-            IMenuItem menuItem = cfg.getMenuItem("Content." + sId);
+            MenuItem menuItem = cfg.getMenuItem("Content." + sId);
 
             if (menuItem.getType() != null) {
-                menuItem.setClick(click);
+                menuItem.setClickHandler(click);
             }
             this.addItem(menuItem);
         }
@@ -69,13 +70,13 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
             : enchant.getConflicts().stream().filter(Objects::nonNull)
                 .map(LangManager::getEnchantment).toList();
 
-        ItemUtil.replaceLore(icon, ExcellentEnchant.PLACEHOLDER_CONFLICTS, conflicts);
+        ItemUtil.replaceLore(icon, Placeholders.ENCHANTMENT_CONFLICTS, conflicts);
         ItemUtil.replace(icon, enchant.formatString(level));
         return icon;
     }
 
     @Override
-    public void onPrepare(@NotNull Player player, @NotNull Inventory inventory) {
+    public boolean onPrepare(@NotNull Player player, @NotNull Inventory inventory) {
         int page = this.getPage(player);
         int length = this.enchantSlots.length;
         List<ExcellentEnchant> list = new ArrayList<>(EnchantRegister.ENCHANT_LIST.stream().
@@ -91,7 +92,7 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
             ItemStack icon = this.getEnchantIcon(enchant, 1);
             PDCUtil.setData(icon, this.keyLevel, 1);
 
-            IMenuClick click = (p, type, e) -> {
+            MenuClick click = (p, type, e) -> {
                 if (!e.isLeftClick()) return;
 
                 ItemStack itemClick = e.getCurrentItem();
@@ -107,16 +108,12 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
                 e.setCurrentItem(itemClick);
             };
 
-            IMenuItem menuItem = new MenuItem(icon, this.enchantSlots[count++]);
-            menuItem.setClick(click);
+            MenuItem menuItem = new MenuItem(icon, this.enchantSlots[count++]);
+            menuItem.setClickHandler(click);
             this.addItem(player, menuItem);
         }
         this.setPage(player, page, pages);
-    }
-
-    @Override
-    public void onReady(@NotNull Player player, @NotNull Inventory inventory) {
-
+        return true;
     }
 
     @Override

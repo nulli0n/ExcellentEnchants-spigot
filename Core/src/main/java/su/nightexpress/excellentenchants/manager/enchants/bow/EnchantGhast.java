@@ -12,8 +12,9 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.manager.leveling.Scaler;
+import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
@@ -23,7 +24,7 @@ import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
 
     private boolean fireSpread;
-    private Scaler yield;
+    private Scaler  yield;
 
     public static final String ID = "ghast";
 
@@ -43,7 +44,7 @@ public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
         super.updateConfig();
 
         cfg.addMissing("Settings.Fire_Spread", true);
-        cfg.addMissing("Settings.Yield", "1.0 * " + PLACEHOLDER_LEVEL);
+        cfg.addMissing("Settings.Yield", "1.0 * " + Placeholders.ENCHANTMENT_LEVEL);
     }
 
     public boolean isFireSpread() {

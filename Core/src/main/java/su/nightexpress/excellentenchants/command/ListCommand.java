@@ -8,6 +8,8 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
 import su.nightexpress.excellentenchants.config.Lang;
 
+import java.util.Map;
+
 public class ListCommand extends AbstractCommand<ExcellentEnchants> {
 
     public ListCommand(@NotNull ExcellentEnchants plugin) {
@@ -32,7 +34,7 @@ public class ListCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    protected void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+    protected void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, @NotNull Map<String, String> flags) {
         plugin.getEnchantManager().getEnchantsListGUI().open((Player) sender, 1);
     }
 }

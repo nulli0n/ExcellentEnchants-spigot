@@ -15,7 +15,7 @@ public class CustomEffectInstance extends MobEffectInstance {
     private final Enchantment enchantment;
 
     public CustomEffectInstance(MobEffect effect, int amplifier, @NotNull Enchantment enchantment) {
-        super(effect, Integer.MAX_VALUE, amplifier);
+        super(effect, MIN * 2, amplifier);
         this.enchantment = enchantment;
     }
 

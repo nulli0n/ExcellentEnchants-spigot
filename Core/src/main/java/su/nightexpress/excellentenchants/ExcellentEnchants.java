@@ -6,12 +6,14 @@ import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.Version;
 import su.nexmedia.engine.api.command.GeneralCommand;
 import su.nexmedia.engine.command.list.ReloadSubCommand;
+import su.nexmedia.engine.hooks.Hooks;
 import su.nightexpress.excellentenchants.command.BookCommand;
 import su.nightexpress.excellentenchants.command.EnchantCommand;
 import su.nightexpress.excellentenchants.command.ListCommand;
 import su.nightexpress.excellentenchants.command.TierbookCommand;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Lang;
+import su.nightexpress.excellentenchants.hook.ProtocolHook;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
@@ -87,7 +89,12 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     @Override
     public void registerHooks() {
-
+        if (Hooks.hasPlugin("ProtocolLib")) {
+            ProtocolHook.setup();
+        }
+        else {
+            this.warn("ProtocolLib is not installed. Enchantments won't be displayed on items.");
+        }
     }
 
     @Override

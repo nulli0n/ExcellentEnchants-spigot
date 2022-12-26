@@ -4,7 +4,7 @@ name: ExcellentEnchants
 author: NightExpress
 desciption: Vanilla-like enchants for your server.
 depend: [ NexEngine ]
-softdepend: [ Towny, Residence, WorldGuard, GriefPrevention, Lands ]
+softdepend: [ ProtocolLib, Towny, Residence, WorldGuard, GriefPrevention, Lands ]
 api-version: 1.17
 load: STARTUP
 

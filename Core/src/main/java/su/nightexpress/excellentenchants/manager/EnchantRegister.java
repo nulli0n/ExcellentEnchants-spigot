@@ -90,7 +90,7 @@ public class EnchantRegister {
 
     static {
         PLUGIN = ExcellentEnchants.getPlugin(ExcellentEnchants.class);
-        PLUGIN.getConfigManager().extract("enchants");
+        PLUGIN.getConfigManager().extractResources("/enchants/");
         ENCHANT_LIST = new HashSet<>();
 
         // Tool enchants

@@ -14,10 +14,10 @@ import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
 import su.nightexpress.excellentenchants.config.Lang;
-import su.nightexpress.excellentenchants.manager.EnchantManager;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
 
@@ -55,7 +55,7 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    public void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+    public void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, @NotNull Map<String, String> flags) {
         if (args.length != 3) {
             this.printUsage(sender);
             return;
@@ -99,7 +99,7 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
             }
         }
         item.setItemMeta(meta);
-        EnchantManager.updateItemLoreEnchants(item);
+        //EnchantManager.updateItemLoreEnchants(item);
 
         plugin.getMessage(Lang.COMMAND_ENCHANT_DONE).send(sender);
     }

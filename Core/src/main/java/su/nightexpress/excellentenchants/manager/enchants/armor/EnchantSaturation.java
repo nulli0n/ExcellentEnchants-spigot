@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.ICleanable;
-import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
@@ -21,9 +21,9 @@ import java.util.function.UnaryOperator;
 
 public class EnchantSaturation extends IEnchantChanceTemplate implements PassiveEnchant, ICleanable {
 
-    private long saturationInterval;
+    private long   saturationInterval;
     private Scaler saturationAmount;
-    private Task         saturationTask;
+    private Task   saturationTask;
 
     public static final String ID = "saturation";
 

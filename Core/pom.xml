@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ExcellentEnchants</artifactId>
         <groupId>su.nightexpress.excellentenchants</groupId>
-        <version>3.2.11</version>
+        <version>3.2.13</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,6 +25,10 @@
             <id>sk89q-repo</id>
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/repository/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -34,29 +38,34 @@
             <version>1.19.3-R0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>su.nexmedia.playerblocktracker</groupId>
+            <artifactId>PlayerBlockTracker</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>NMS</artifactId>
-            <version>3.2.11</version>
+            <version>3.2.13</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_17_R1</artifactId>
-            <version>3.2.11</version>
+            <version>3.2.13</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_18_R2</artifactId>
-            <version>3.2.11</version>
+            <version>3.2.13</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_19_R1</artifactId>
-            <version>3.2.11</version>
+            <version>3.2.13</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_19_R2</artifactId>
-            <version>3.2.11</version>
+            <version>3.2.13</version>
         </dependency>
         <dependency>
             <groupId>fr.neatmonster</groupId>
@@ -69,6 +78,11 @@
             <artifactId>worldguard-bukkit</artifactId>
             <version>7.0.6</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>5.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -84,6 +98,19 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.4</version>
+                <!-- Java 16 Fix -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.ow2.asm</groupId>
+                        <artifactId>asm</artifactId>
+                        <version>9.2</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.ow2.asm</groupId>
+                        <artifactId>asm-commons</artifactId>
+                        <version>9.2</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -95,8 +122,15 @@
                             <artifactSet>
                                 <includes>
                                     <include>su.nightexpress.excellentenchants*</include>
+                                    <include>su.nexmedia.playerblocktracker:*</include>
                                 </includes>
                             </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>su.nexmedia.playerblocktracker.</pattern>
+                                    <shadedPattern>su.nightexpress.excellentenchants.playerblocktracker.</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>

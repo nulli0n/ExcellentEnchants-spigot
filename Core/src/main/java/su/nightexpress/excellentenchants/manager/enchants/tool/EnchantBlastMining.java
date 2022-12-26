@@ -14,9 +14,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
@@ -68,7 +69,7 @@ public class EnchantBlastMining extends IEnchantChanceTemplate implements BlockB
     protected void updateConfig() {
         super.updateConfig();
 
-        cfg.addMissing("Settings.Min_Block_Strength", "1.5 - " + PLACEHOLDER_LEVEL + " / 10.0");
+        cfg.addMissing("Settings.Min_Block_Strength", "1.5 - " + Placeholders.ENCHANTMENT_LEVEL + " / 10.0");
     }
 
     @Override

@@ -9,9 +9,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
@@ -23,10 +23,10 @@ import java.util.function.UnaryOperator;
 
 public class EnchantBaneOfNetherspawn extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private String  particleName;
-    private String particleData;
-    private boolean damageModifier;
-    private Scaler  damageFormula;
+    private       String          particleName;
+    private       String          particleData;
+    private       boolean         damageModifier;
+    private       Scaler          damageFormula;
     private final Set<EntityType> entityTypes;
 
     public static final String ID = "bane_of_netherspawn";

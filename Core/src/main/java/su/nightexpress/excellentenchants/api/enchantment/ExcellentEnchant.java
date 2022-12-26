@@ -11,9 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.IListener;
 import su.nexmedia.engine.lang.LangManager;
-import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.*;
-import su.nexmedia.engine.utils.data.Pair;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.config.Config;
@@ -23,6 +21,7 @@ import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 import su.nightexpress.excellentenchants.manager.object.EnchantTier;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 import su.nightexpress.excellentenchants.manager.type.ObtainType;
+import su.nightexpress.excellentenchants.Placeholders;
 
 import java.util.*;
 import java.util.function.UnaryOperator;
@@ -30,23 +29,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class ExcellentEnchant extends Enchantment implements IListener {
-
-    public static final String PLACEHOLDER_NAME           = "%enchantment_name%";
-    public static final String PLACEHOLDER_NAME_FORMATTED = "%enchantment_name_formatted%";
-    public static final String PLACEHOLDER_DESCRIPTION    = "%enchantment_description%";
-    public static final String PLACEHOLDER_LEVEL                         = "%enchantment_level%";
-    public static final String PLACEHOLDER_LEVEL_MIN                     = "%enchantment_level_min%";
-    public static final String PLACEHOLDER_LEVEL_MAX                     = "%enchantment_level_max%";
-    public static final String PLACEHOLDER_CONFLICTS                     = "%enchantment_conflicts%";
-    public static final String PLACEHOLDER_TARGET                        = "%enchantment_target%";
-    public static final String PLACEHOLDER_TIER                          = "%enchantment_tier%";
-    public static final String PLACEHOLDER_FIT_ITEM_TYPES                = "%enchantment_fit_item_types%";
-    public static final String PLACEHOLDER_OBTAIN_CHANCE_ENCHANTING      = "%enchantment_obtain_chance_enchanting%";
-    public static final String PLACEHOLDER_OBTAIN_CHANCE_VILLAGER        = "%enchantment_obtain_chance_villager%";
-    public static final String PLACEHOLDER_OBTAIN_CHANCE_LOOT_GENERATION = "%enchantment_obtain_chance_loot_generation%";
-    public static final String PLACEHOLDER_OBTAIN_CHANCE_FISHING = "%enchantment_obtain_chance_fishing%";
-    public static final String PLACEHOLDER_OBTAIN_CHANCE_MOB_SPAWNING = "%enchantment_obtain_chance_mob_spawning%";
-    public static final String PLACEHOLDER_COST_ITEM       = "%enchantment_cost_item%";
 
     protected final ExcellentEnchants plugin;
     protected final JYML              cfg;
@@ -113,6 +95,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
         this.costItem = cfg.getItem("Settings.Cost.Item");
     }
 
+    @Deprecated
     protected void updateConfig() {
         cfg.addMissing("Is_Treasure", false);
         cfg.addMissing("Conflicts", new ArrayList<String>());
@@ -192,28 +175,34 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
         String conflicts = this.getConflicts().isEmpty() ? plugin.getMessage(Lang.OTHER_NONE).getLocalized() : this.getConflicts().stream().filter(Objects::nonNull).map(LangManager::getEnchantment).collect(Collectors.joining("\n"));
 
         return str -> str
-            .replace(PLACEHOLDER_NAME, this.getDisplayName())
-            .replace(PLACEHOLDER_NAME_FORMATTED, this.getNameFormatted(level))
-            .replace(PLACEHOLDER_LEVEL, NumberUtil.toRoman(level))
-            .replace(PLACEHOLDER_LEVEL_MIN, String.valueOf(this.getStartLevel()))
-            .replace(PLACEHOLDER_LEVEL_MAX, String.valueOf(this.getMaxLevel()))
-            .replace(PLACEHOLDER_TARGET, plugin.getLangManager().getEnum(this.getItemTarget()))
-            .replace(PLACEHOLDER_TIER, this.getTier().getName())
-            .replace(PLACEHOLDER_CONFLICTS, conflicts)
-            .replace(PLACEHOLDER_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
-            .replace(PLACEHOLDER_OBTAIN_CHANCE_ENCHANTING, NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
-            .replace(PLACEHOLDER_OBTAIN_CHANCE_VILLAGER, NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
-            .replace(PLACEHOLDER_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
-            .replace(PLACEHOLDER_OBTAIN_CHANCE_FISHING, NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
-            .replace(PLACEHOLDER_OBTAIN_CHANCE_MOB_SPAWNING, NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
-            .replace(PLACEHOLDER_COST_ITEM, this.hasCostItem() ? ItemUtil.getItemName(this.costItem) : plugin.getMessage(Lang.OTHER_NONE).getLocalized())
+            .replace(Placeholders.ENCHANTMENT_NAME, this.getDisplayName())
+            .replace(Placeholders.ENCHANTMENT_NAME_FORMATTED, this.getNameFormatted(level))
+            .replace(Placeholders.ENCHANTMENT_LEVEL, NumberUtil.toRoman(level))
+            .replace(Placeholders.ENCHANTMENT_LEVEL_MIN, String.valueOf(this.getStartLevel()))
+            .replace(Placeholders.ENCHANTMENT_LEVEL_MAX, String.valueOf(this.getMaxLevel()))
+            .replace(Placeholders.ENCHANTMENT_TARGET, plugin.getLangManager().getEnum(this.getItemTarget()))
+            .replace(Placeholders.ENCHANTMENT_TIER, this.getTier().getName())
+            .replace(Placeholders.ENCHANTMENT_CONFLICTS, conflicts)
+            .replace(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_FISHING, NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING, NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
+            .replace(Placeholders.ENCHANTMENT_COST_ITEM, this.hasCostItem() ? ItemUtil.getItemName(this.costItem) : plugin.getMessage(Lang.OTHER_NONE).getLocalized())
             ;
+    }
+
+    @Override
+    public void registerListeners() {
+        this.addConflicts();
+        this.plugin.getPluginManager().registerEvents(this, plugin);
     }
 
     @NotNull
     public UnaryOperator<String> formatString(int level) {
         return str -> this.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_DESCRIPTION, String.join("\n", Config.formatDescription(this.getDescription())))
+            .replace(Placeholders.ENCHANTMENT_DESCRIPTION, String.join("\n", Config.formatDescription(this.getDescription())))
         );
     }
 
@@ -244,12 +233,6 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
 
     public boolean isEnchantmentAvailable(@NotNull LivingEntity entity) {
         return !Config.isEnchantmentDisabled(this, entity.getWorld().getName());
-    }
-
-    @Override
-    public void registerListeners() {
-        this.addConflicts();
-        this.plugin.getPluginManager().registerEvents(this, plugin);
     }
 
     @NotNull

@@ -13,11 +13,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.ICleanable;
-import su.nexmedia.engine.manager.player.blocktracker.PlayerBlockTracker;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.MessageUtil;
 import su.nexmedia.engine.utils.random.Rnd;
+import su.nexmedia.playerblocktracker.PlayerBlockTracker;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantDropContainer;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
@@ -42,7 +42,7 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDr
     public EnchantTreasures(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
 
-        PlayerBlockTracker.initialize();
+        PlayerBlockTracker.initialize(plugin);
         PlayerBlockTracker.BLOCK_FILTERS.add(this.blockTracker = (block) -> {
            return this.getTreasure(block.getType()) != null;
         });

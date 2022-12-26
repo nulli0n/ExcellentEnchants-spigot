@@ -7,10 +7,10 @@ import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.ICleanable;
-import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
@@ -30,7 +30,7 @@ public class EnchantRegrowth extends IEnchantChanceTemplate implements PassiveEn
     private String particleData;
     private long   healthInterval;
     private Scaler healthAmount;
-    private Task healthTask;
+    private Task   healthTask;
 
     private static final String PLACEHOLDER_HEALTH_AMOUNT   = "%enchantment_health_amount%";
     private static final String PLACEHOLDER_HEALTH_INTERVAL = "%enchantment_health_interval%";

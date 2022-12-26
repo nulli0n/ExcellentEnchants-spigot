@@ -19,10 +19,11 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.api.task.AbstractTask;
-import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.EffectUtil;
+import su.nexmedia.engine.utils.Scaler;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
 import su.nightexpress.excellentenchants.api.enchantment.type.MoveEnchant;
@@ -60,7 +61,7 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
     protected void updateConfig() {
         super.updateConfig();
 
-        cfg.addMissing("Settings.Block_Decay", "5.0 + " + PLACEHOLDER_LEVEL + " * 2");
+        cfg.addMissing("Settings.Block_Decay", "5.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 2");
     }
 
     @Override

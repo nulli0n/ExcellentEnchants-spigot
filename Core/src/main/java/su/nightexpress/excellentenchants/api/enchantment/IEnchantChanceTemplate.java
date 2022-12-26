@@ -2,10 +2,11 @@ package su.nightexpress.excellentenchants.api.enchantment;
 
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.manager.leveling.Scaler;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.Scaler;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 
 import java.util.function.UnaryOperator;
@@ -31,7 +32,7 @@ public abstract class IEnchantChanceTemplate extends ExcellentEnchant {
         super.updateConfig();
 
         if (cfg.contains("settings.enchant-trigger-chance")) {
-            String triggerChance = cfg.getString("settings.enchant-trigger-chance", "100").replace("%level%", PLACEHOLDER_LEVEL);
+            String triggerChance = cfg.getString("settings.enchant-trigger-chance", "100").replace("%level%", Placeholders.ENCHANTMENT_LEVEL);
 
             cfg.set("Settings.Trigger_Chance", triggerChance);
             cfg.set("settings.enchant-trigger-chance", null);

@@ -95,7 +95,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
 
         ItemStack weaponDamager = equipDamager.getItemInMainHand();
 
-        for (ItemStack armor : EntityUtil.getArmor(victim)) {
+        for (ItemStack armor : EntityUtil.getEquippedArmor(victim).values()) {
             if (armor == null || armor.getType().isAir()) continue;
 
             EnchantManager.getItemCustomEnchants(armor, CombatEnchant.class).forEach((combatEnchant, level) -> {
@@ -182,7 +182,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEnchantDeath(EntityDeathEvent e) {
         LivingEntity dead = e.getEntity();
-        for (ItemStack armor : EntityUtil.getArmor(dead)) {
+        for (ItemStack armor : EntityUtil.getEquippedArmor(dead).values()) {
             if (armor == null || armor.getType().isAir()) continue;
 
             EnchantManager.getItemCustomEnchants(armor, DeathEnchant.class).forEach((deathEnchant, level) -> {
