@@ -79,7 +79,7 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
     public boolean onPrepare(@NotNull Player player, @NotNull Inventory inventory) {
         int page = this.getPage(player);
         int length = this.enchantSlots.length;
-        List<ExcellentEnchant> list = new ArrayList<>(EnchantRegister.ENCHANT_LIST.stream().
+        List<ExcellentEnchant> list = new ArrayList<>(EnchantRegister.ENCHANT_REGISTRY.values().stream().
             sorted(Comparator.comparing(ExcellentEnchant::getName)).toList());
         List<List<ExcellentEnchant>> split = CollectionsUtil.split(list, length);
 

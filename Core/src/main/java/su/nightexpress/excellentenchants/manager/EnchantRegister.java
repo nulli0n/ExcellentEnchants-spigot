@@ -16,14 +16,13 @@ import su.nightexpress.excellentenchants.manager.enchants.tool.*;
 import su.nightexpress.excellentenchants.manager.enchants.weapon.*;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class EnchantRegister {
 
-    private static final ExcellentEnchants     PLUGIN;
-    public static final  Set<ExcellentEnchant> ENCHANT_LIST;
+    private static final ExcellentEnchants                   PLUGIN;
+    public static final Map<NamespacedKey, ExcellentEnchant> ENCHANT_REGISTRY;
 
     public static final EnchantBlastMining BLAST_MINING;
     public static final EnchantCurseOfBreaking CURSE_OF_BREAKING;
@@ -91,7 +90,7 @@ public class EnchantRegister {
     static {
         PLUGIN = ExcellentEnchants.getPlugin(ExcellentEnchants.class);
         PLUGIN.getConfigManager().extractResources("/enchants/");
-        ENCHANT_LIST = new HashSet<>();
+        ENCHANT_REGISTRY = new HashMap<>();
 
         // Tool enchants
         BLAST_MINING = init(EnchantBlastMining.class, EnchantBlastMining.ID);
@@ -165,7 +164,7 @@ public class EnchantRegister {
     public static void setup() {
         // Prevent to register enchantments during the runtime.
         if (ExcellentEnchants.isLoaded) {
-            ENCHANT_LIST.forEach(ExcellentEnchant::loadConfig);
+            ENCHANT_REGISTRY.values().forEach(ExcellentEnchant::loadConfig);
             return;
         }
 
@@ -186,7 +185,7 @@ public class EnchantRegister {
         }
 
         Enchantment.stopAcceptingRegistrations();
-        PLUGIN.info("Enchants Registered: " + ENCHANT_LIST.size());
+        PLUGIN.info("Enchants Registered: " + ENCHANT_REGISTRY.size());
         ExcellentEnchants.isLoaded = true;
     }
 
@@ -199,7 +198,7 @@ public class EnchantRegister {
 
         if (byKey == null || byName == null) return;
 
-        for (ExcellentEnchant enchant : ENCHANT_LIST) {
+        for (ExcellentEnchant enchant : ENCHANT_REGISTRY.values()) {
             if (enchant instanceof ICleanable cleanable) {
                 cleanable.clear();
             }
@@ -208,8 +207,13 @@ public class EnchantRegister {
             byName.remove(enchant.getName());
             enchant.unregisterListeners();
         }
-        ENCHANT_LIST.clear();
+        ENCHANT_REGISTRY.clear();
         PLUGIN.info("All enchants are unregistered.");
+    }
+
+    @Nullable
+    public static ExcellentEnchant get(@NotNull NamespacedKey key) {
+        return ENCHANT_REGISTRY.get(key);
     }
 
     @Nullable
@@ -231,7 +235,7 @@ public class EnchantRegister {
         if (enchant == null) return;
 
         Enchantment.registerEnchantment(enchant);
-        ENCHANT_LIST.add(enchant);
+        ENCHANT_REGISTRY.put(enchant.getKey(), enchant);
         enchant.registerListeners();
         PLUGIN.info("Registered enchantment: " + enchant.getId());
         //IRegistry.a(IRegistry.ENCHANTMENT, enchant.getId(), CraftEnchantment.getRaw(enchant));

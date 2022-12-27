@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.AbstractManager;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.ItemUtil;
+import su.nexmedia.engine.utils.Pair;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
@@ -162,7 +163,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
     @Deprecated
     public static void updateItemLoreEnchants(@NotNull ItemStack item) {
-        EnchantRegister.ENCHANT_LIST.forEach(ench -> {
+        EnchantRegister.ENCHANT_REGISTRY.values().forEach(ench -> {
             //ItemUtil.delLore(item, ench.getId());
             //ItemUtil.delLore(item, ench.getId() + "_info");
         });
@@ -228,7 +229,9 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         item.setItemMeta(meta);
     }
 
+    // Too expensive
     @NotNull
+    @Deprecated
     public static Map<ExcellentEnchant, Integer> getItemCustomEnchants(@NotNull ItemStack item) {
         return EnchantManager.getItemEnchants(item).entrySet().stream()
                 .filter(entry -> entry.getKey() instanceof ExcellentEnchant)
@@ -246,6 +249,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
                 .collect(Collectors.toMap(k -> (T) k.getKey(), Map.Entry::getValue, (old, nev) -> nev, LinkedHashMap::new));
     }
 
+    @Deprecated
     public static int getItemCustomEnchantsAmount(@NotNull ItemStack item) {
         return EnchantManager.getItemCustomEnchants(item).size();
     }
@@ -256,6 +260,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     }
 
     @NotNull
+    @Deprecated
     public static Map<Enchantment, Integer> getItemEnchants(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return Collections.emptyMap();
@@ -263,6 +268,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         return (meta instanceof EnchantmentStorageMeta meta2) ? meta2.getStoredEnchants() : meta.getEnchants();
     }
 
+    @Deprecated
     public static int getItemEnchantsAmount(@NotNull ItemStack item) {
         return EnchantManager.getItemEnchants(item).size();
     }
@@ -276,6 +282,16 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         if (meta == null) return 0;
 
         return meta.getEnchantLevel(enchant);
+    }
+
+    @NotNull
+    public static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull ItemStack item) {
+        return EnchantManager.getItemEnchants(item).entrySet().stream()
+            .map(entry -> {
+                ExcellentEnchant ex = EnchantRegister.get(entry.getKey().getKey());
+                return ex == null ? null : Pair.of(ex, entry.getValue());
+            }).filter(Objects::nonNull)
+            .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (old, nev) -> nev, LinkedHashMap::new));
     }
 
     @Nullable

@@ -10,12 +10,12 @@ import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.utils.ItemUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,13 +33,10 @@ public class ProtocolHook {
                 PacketContainer packet = event.getPacket();
 
                 ItemStack item = packet.getItemModifier().read(0);
-                boolean removeOld = event.getPlayer().getGameMode() == GameMode.CREATIVE;
-                if (removeOld) {
-                    packet.getItemModifier().write(0, remove(item));
-                }
-                else {
-                    packet.getItemModifier().write(0, update(item));
-                }
+                boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
+                //else {
+                    packet.getItemModifier().write(0, update(item, isCreative));
+                //}
             }
         });
 
@@ -49,15 +46,11 @@ public class ProtocolHook {
                 PacketContainer packet = event.getPacket();
 
                 List<ItemStack> items = packet.getItemListModifier().readSafely(0);
-                boolean removeOld = event.getPlayer().getGameMode() == GameMode.CREATIVE;
+                boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
 
                 for (int index = 0; index < items.size(); index++) {
-                    if (removeOld) {
-                        items.set(index, remove(items.get(index)));
-                    }
-                    else {
-                        items.set(index, update(items.get(index)));
-                    }
+                    ItemStack item = items.get(index);
+                    items.set(index, update(item, isCreative));
                 }
                 packet.getItemListModifier().write(0, items);
             }
@@ -67,20 +60,23 @@ public class ProtocolHook {
     }
 
     @Nullable
-    private static ItemStack update(@Nullable ItemStack item) {
+    private static ItemStack update(@Nullable ItemStack item, boolean isCreative) {
         if (item == null || item.getType().isAir()) return item;
 
         ItemStack copy = new ItemStack(item);
         ItemMeta meta = copy.getItemMeta();
         if (meta == null) return item;
 
-        List<String> lore = ItemUtil.getLore(copy);
-        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getItemCustomEnchants(item);
-        //if (enchants.keySet().stream().anyMatch(enchant -> ItemUtil.getLoreTag(item, enchant.getId()) != null)) {
-        //    return item;
-        //}
+        List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
+        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item);
 
-        if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED) {
+        enchants.keySet().forEach(enchant -> lore.removeIf(line -> line.contains(enchant.getDisplayName())));
+        if (isCreative) {
+            enchants.forEach((enchant, integer) -> {
+                lore.removeAll(Config.formatDescription(enchant.getDescription(integer)));
+            });
+        }
+        if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED && !isCreative) {
             enchants.forEach((enchant, integer) -> {
                 lore.addAll(0, Config.formatDescription(enchant.getDescription(integer)));
             });
@@ -92,24 +88,5 @@ public class ProtocolHook {
         meta.setLore(lore);
         copy.setItemMeta(meta);
         return copy;
-    }
-
-    @Nullable
-    private static ItemStack remove(@Nullable ItemStack item) {
-        if (item == null || item.getType().isAir()) return item;
-
-        List<String> from = ItemUtil.getLore(item);
-        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getItemCustomEnchants(item);
-        enchants.forEach((enchant, integer) -> {
-            from.removeIf(line -> line.equalsIgnoreCase(enchant.getNameFormatted(integer)));
-            from.removeAll(Config.formatDescription(enchant.getDescription(integer)));
-        });
-
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return item;
-
-        meta.setLore(from);
-        item.setItemMeta(meta);
-        return item;
     }
 }
