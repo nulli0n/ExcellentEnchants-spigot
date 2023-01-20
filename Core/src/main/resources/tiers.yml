@@ -1,0 +1,50 @@
+common:
+  Name: 'Common'
+  Color: 'WHITE'
+  Priority: 1
+  Obtain_Chance:
+    ENCHANTING: 80.0
+    VILLAGER: 80.0
+    LOOT_GENERATION: 80.0
+    FISHING: 80.0
+    MOB_SPAWNING: 80.0
+rare:
+  Name: 'Rare'
+  Color: 'GREEN'
+  Priority: 2
+  Obtain_Chance:
+    ENCHANTING: 50.0
+    VILLAGER: 50.0
+    LOOT_GENERATION: 50.0
+    FISHING: 50.0
+    MOB_SPAWNING: 50.0
+exotic:
+  Name: 'Exotic'
+  Color: 'YELLOW'
+  Priority: 3
+  Obtain_Chance:
+    ENCHANTING: 25.0
+    VILLAGER: 25.0
+    LOOT_GENERATION: 25.0
+    FISHING: 25.0
+    MOB_SPAWNING: 25.0
+legendary:
+  Name: 'Legendary'
+  Color: 'GOLD'
+  Priority: 4
+  Obtain_Chance:
+    ENCHANTING: 10.0
+    VILLAGER: 10.0
+    LOOT_GENERATION: 10.0
+    FISHING: 10.0
+    MOB_SPAWNING: 10.0
+cursed:
+  Name: 'Cursed'
+  Color: 'RED'
+  Priority: 0
+  Obtain_Chance:
+    ENCHANTING: 0.0
+    VILLAGER: 5.0
+    LOOT_GENERATION: 7.0
+    FISHING: 12.0
+    MOB_SPAWNING: 0.0

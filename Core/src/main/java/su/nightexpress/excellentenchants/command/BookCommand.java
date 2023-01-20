@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
 import su.nexmedia.engine.lang.LangManager;
@@ -15,7 +14,9 @@ import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.config.Lang;
+import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -84,17 +85,12 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
         }
 
         ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
-        EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
-        if (meta == null) return;
-
-        meta.addStoredEnchant(enchantment, level, true);
-        item.setItemMeta(meta);
-
-        //EnchantManager.updateItemLoreEnchants(item);
+        EnchantManager.addEnchantment(item, enchantment, level, true);
         PlayerUtil.addItem(player, item);
 
         plugin.getMessage(Lang.COMMAND_BOOK_DONE)
-            .replace("%enchant%", LangManager.getEnchantment(enchantment))
-            .replace("%player%", player.getName()).send(sender);
+            .replace(Placeholders.GENERIC_ENCHANT, LangManager.getEnchantment(enchantment))
+            .replace(Placeholders.Player.replacer(player))
+            .send(sender);
     }
 }

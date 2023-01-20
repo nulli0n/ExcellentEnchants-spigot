@@ -1,171 +1,103 @@
 package su.nightexpress.excellentenchants.config;
 
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.utils.Placeholders;
 import su.nexmedia.engine.utils.StringUtil;
-import su.nexmedia.engine.utils.random.Rnd;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
-import su.nightexpress.excellentenchants.manager.object.EnchantTier;
-import su.nightexpress.excellentenchants.manager.type.ObtainType;
+import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Config {
 
-    public static long TASKS_ARROW_TRAIL_TICKS_INTERVAL;
-    public static final JOption<Integer> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("General.Tasks.Passive_Potion_Effects.Apply_Interval", 150,
+    public static final JOption<Long> TASKS_ARROW_TRAIL_TICKS_INTERVAL = JOption.create("Tasks.Arrow_Trail.Tick_Interval", 1L,
+        "Sets how often (in ticks) arrow trail particle effects will be spawned behind the arrow.");
+    public static final JOption<Long> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("Tasks.Passive_Potion_Effects.Apply_Interval", 150L,
         "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them.",
         "This setting does NOT refreshes currently active effects, but only attempts to add them if absent."
     );
 
-    public static  Set<String> ENCHANTMENTS_DISABLED;
-    public static Map<String, Set<String>> ENCHANTMENTS_DISABLED_IN_WORLDS;
-    public static  boolean     ENCHANTMENTS_DESCRIPTION_ENABLED;
-    private static String      ENCHANTMENTS_DESCRIPTION_FORMAT;
+    public static final JOption<Boolean> ENCHANTMENTS_CHARGES_ENABLED = JOption.create("Enchantments.Charges.Enabled", false,
+        "Enables the enchantment Charges feature."); // TODO Wiki link
 
-    public static int     ENCHANTMENTS_ITEM_CUSTOM_MAX;
-    public static boolean ENCHANTMENTS_ITEM_AXES_AS_SWORDS;
-    public static boolean ENCHANTMENTS_ITEM_CROSSBOWS_AS_BOWS;
-    public static boolean ENCHANTMENTS_ITEM_ELYTRA_AS_CHESTPLATE;
-    public static boolean ENCHANTMENTS_ENTITY_PASSIVE_FOR_MOBS;
+    public static final JOption<TreeMap<Double, String>> ENCHANTMENTS_CHARGES_FORMAT = new JOption<TreeMap<Double, String>>("Enchantments.Charges.Format",
+        (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(k -> StringUtil.getDouble(k, 0), v -> StringUtil.color(cfg.getString(path + "." + v, "")), (o,n) -> n, TreeMap::new)),
+        () -> {
+            TreeMap<Double, String> map = new TreeMap<>();
+            map.put(0D, "#ff9a9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            map.put(25D, "#ffc39a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            map.put(50D, "#f6ff9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            map.put(75D, "#bcff9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            return map;
+        },
+        "Enchantment charges format depends on amount of charges left (in percent).",
+        "If you don't want to display charges, leave only keys with negative values.",
+        "Use '" + Placeholders.GENERIC_AMOUNT + "' placeholder for amount of charges.")
+        .setWriter((cfg, path, map) -> map.forEach((perc, str) -> cfg.set(path + "." + perc, str)));
 
-    private static Map<ObtainType, ObtainSettings> OBTAIN_SETTINGS;
-    private static Map<String, EnchantTier>        TIERS;
+    public static final JOption<ItemStack> ENCHANTMENTS_CHARGES_FUEL_ITEM = JOption.create("Enchantments.Charges.Fuel_Item",
+        new ItemStack(Material.LAPIS_LAZULI),
+        "Default item used to recharge item's enchantments on anvils.",
+        "If you want different item for certain enchantments, you can do it in that enchantment configs.",
+        "Item Options: " + Placeholders.URL_ENGINE_SCALER)
+        .setWriter(JYML::setItem);
 
-    public static void load(@NotNull ExcellentEnchants plugin) {
-        JYML cfg = plugin.getConfig();
-        cfg.initializeOptions(Config.class);
+    public static final JOption<Set<String>> ENCHANTMENTS_DISABLED = JOption.create("Enchantments.Disabled",
+        Set.of("enchant_name", "other_enchant"),
+        "A list of enchantments, that will be disabled and removed from the game (server).",
+        "Enchantment names are the same as enchantment file name in /enchants/ folder. ! Must be in lower_case !",
+        "Example: To disable 'Explosive Arrows' you need to add 'explosive_arrows' here.");
 
-        String path = "General.Tasks.";
-        TASKS_ARROW_TRAIL_TICKS_INTERVAL = cfg.getLong(path + "Arrow_Trails.Ticks_Interval", 1);
+    public static final JOption<Map<String, Set<String>>> ENCHANTMENTS_DISABLED_IN_WORLDS = new JOption<Map<String, Set<String>>>("Enchantments.Disabled_In_Worlds",
+        (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(k -> k, worldName -> cfg.getStringSet(path + "." + worldName))),
+        () -> Map.of("your_world_name", Set.of("enchantment_name", "ice_aspect")),
+        "Here you can disable certain enchantments in certain worlds.",
+        "Enchantment names are the same as enchantment file name in /enchants/ folder. ! Must be in lower_case !",
+        "To disable all enchantments for a world, use '" + Placeholders.WILDCARD + "' instead of enchantment names.")
+        .setWriter((cfg, path, map) -> map.forEach((world, enchants) -> cfg.set(path + "." + world, enchants)));
 
-        path = "General.Enchantments.";
-        cfg.addMissing(path + "Disabled_In_Worlds.my_world", Collections.singletonList(Placeholders.WILDCARD));
-        cfg.addMissing(path + "Disabled_In_Worlds.other_world", Arrays.asList("enchant_name", "another_enchant"));
+    public static final JOption<Boolean> ENCHANTMENTS_DESCRIPTION_ENABLED = JOption.create("Enchantments.Description.Enabled", true,
+        "When 'true', adds the enchantment description to item lore under enchantment names.",
+        "Note #1: You must have ProtocolLib installed for this feature to work (as well as for enchantments name display).",
+        "Note #2: Description is not shown while you're in Creative gamemode.");
 
-        ENCHANTMENTS_DISABLED = cfg.getStringSet(path + "Disabled").stream().map(String::toLowerCase).collect(Collectors.toSet());
-        ENCHANTMENTS_DISABLED_IN_WORLDS = new HashMap<>();
-        for (String worldName : cfg.getSection(path + "Disabled_In_Worlds")) {
-            ENCHANTMENTS_DISABLED_IN_WORLDS.put(worldName, cfg.getStringSet(path + "Disabled_In_Worlds." + worldName)
-                .stream().map(String::toLowerCase).collect(Collectors.toSet()));
-        }
+    public static final JOption<String> ENCHANTMENTS_DESCRIPTION_FORMAT = JOption.create("Enchantments.Description.Format",
+        "&8▸ " + Placeholders.GENERIC_DESCRIPTION,
+        "Sets the global enchantment description format.");
 
-        ENCHANTMENTS_DESCRIPTION_ENABLED = cfg.getBoolean(path + "Description.Enabled");
-        ENCHANTMENTS_DESCRIPTION_FORMAT = StringUtil.color(cfg.getString(path + "Description.Format", ""));
+    public static final JOption<Integer> ENCHANTMENTS_ITEM_CUSTOM_MAX = JOption.create("Enchantments.Item.Max_Custom_Enchants", 3,
+        "How many of custom enchantments the item can contain at the same time?");
 
-        path = "General.Enchantments.Item.";
-        ENCHANTMENTS_ITEM_CUSTOM_MAX = cfg.getInt(path + "Max_Custom_Enchants", 3);
-        ENCHANTMENTS_ITEM_AXES_AS_SWORDS = cfg.getBoolean(path + "Axes_As_Swords");
-        ENCHANTMENTS_ITEM_CROSSBOWS_AS_BOWS = cfg.getBoolean(path + "Crossbows_As_Bows");
-        ENCHANTMENTS_ITEM_ELYTRA_AS_CHESTPLATE = cfg.getBoolean(path + "Elytra_As_Chestplate");
+    public static final JOption<Boolean> ENCHANTMENTS_ITEM_SWORD_ENCHANTS_TO_AXES = JOption.create("Enchantments.Item.Sword_Enchants_To_Axes", true,
+        "Set this to 'true' to allow Sword enchantments for Axes.");
 
-        path = "General.Enchantments.Entity.";
-        ENCHANTMENTS_ENTITY_PASSIVE_FOR_MOBS = cfg.getBoolean(path + "Passive_Enchants_Applied_To_Mobs");
+    public static final JOption<Boolean> ENCHANTMENTS_ITEM_BOW_ENCHANTS_TO_CROSSBOW = JOption.create("Enchantments.Item.Bow_Enchants_To_Crossbows", true,
+        "Set this to 'true' to allow Bow enchantments for Crossbows.");
 
-        OBTAIN_SETTINGS = new HashMap<>();
-        for (ObtainType obtainType : ObtainType.values()) {
-            String path2 = "General." + obtainType.getPathName() + ".";
+    public static final JOption<Boolean> ENCHANTMENTS_ITEM_CHESTPLATE_ENCHANTS_TO_ELYTRA = JOption.create("Enchantments.Item.Chestplate_Enchants_To_Elytra", false,
+        "Set this to 'true' to allow Chestplate enchantments for Elytras.");
 
-            cfg.addMissing(path2 + "Enabled", true);
-            cfg.addMissing(path2 + "Enchantments.Total_Maximum", 4);
-            cfg.addMissing(path2 + "Enchantments.Custom_Generation_Chance", 50D);
-            cfg.addMissing(path2 + "Enchantments.Custom_Minimum", 0);
-            cfg.addMissing(path2 + "Enchantments.Custom_Maximum", 2);
+    public static final JOption<Boolean> ENCHANTMENTS_ENTITY_PASSIVE_FOR_MOBS = JOption.create("Enchantments.Entity.Apply_Passive_Enchants_To_Mobs", true,
+        "When enabled, passive enchantments (permanent potion effects, regeneration, etc.) will be applied to mobs as well.",
+        "Disable this if you're experiencing performance issues.");
 
-            if (!cfg.getBoolean(path2 + "Enabled")) continue;
-
-            int enchantsTotalMax = cfg.getInt(path2 + "Enchantments.Total_Maximum", 4);
-            double enchantsCustomGenerationChance = cfg.getDouble(path2 + "Enchantments.Custom_Generation_Chance", 50D);
-            int enchantsCustomMin = cfg.getInt(path2 + "Enchantments.Custom_Minimum", 0);
-            int enchantsCustomMax = cfg.getInt(path2 + "Enchantments.Custom_Maximum", 2);
-
-            ObtainSettings settings = new ObtainSettings(enchantsTotalMax, enchantsCustomGenerationChance, enchantsCustomMin, enchantsCustomMax);
-            OBTAIN_SETTINGS.put(obtainType, settings);
-        }
-
-        setupTiers(plugin);
-    }
-
-    private static void setupTiers(@NotNull ExcellentEnchants plugin) {
-        // Reloading tiers will reset their lists with enchants = break the plugin mechanics
-        if (ExcellentEnchants.isLoaded) return;
-
-        JYML cfg = plugin.getConfig();
-        TIERS = new HashMap<>();
-
-        // No tiers defined, setup a default one.
-        // Every enchantment must have a tier.
-        if (cfg.getSection("Tiers").isEmpty()) {
-            plugin.info("No tiers defined! Creating a default one for you...");
-            cfg.set("Tiers.default.Name", "&7Default");
-            cfg.set("Tiers.default.Color", "&7");
-            for (ObtainType obtainType : ObtainType.values()) {
-                cfg.set("Tiers.default.Obtain_Chance." + obtainType.name(), 100D);
-            }
-        }
-
-        // Load existing tiers.
-        for (String sId : cfg.getSection("Tiers")) {
-            String path = "Tiers." + sId + ".";
-            cfg.addMissing(path + "Priority", 0);
-
-            int priority = cfg.getInt(path + "Priority");
-            String name = cfg.getString(path + "Name", sId);
-            String color = cfg.getString(path + "Color", "&f");
-            Map<ObtainType, Double> chance = new HashMap<>();
-
-            for (ObtainType obtainType : ObtainType.values()) {
-                cfg.addMissing(path + "Obtain_Chance." + obtainType.name(), 50D);
-
-                double chanceType = cfg.getDouble(path + "Obtain_Chance." + obtainType.name());
-                chance.put(obtainType, chanceType);
-            }
-
-            EnchantTier tier = new EnchantTier(sId, priority, name, color, chance);
-            TIERS.put(tier.getId(), tier);
-        }
-
-        plugin.info("Tiers Loaded: " + TIERS.size());
-    }
-
-    public static boolean isEnchantmentDisabled(@NotNull ExcellentEnchant enchant, @NotNull String world) {
-        Set<String> disabled = ENCHANTMENTS_DISABLED_IN_WORLDS.getOrDefault(world, Collections.emptySet());
-        return disabled.contains(enchant.getKey().getKey()) || disabled.contains(Placeholders.WILDCARD);
-    }
-
-    @Nullable
-    public static EnchantTier getTierById(@NotNull String id) {
-        return TIERS.get(id.toLowerCase());
-    }
+    private static final JOption<Map<ObtainType, ObtainSettings>> OBTAIN_SETTINGS = new JOption<Map<ObtainType, ObtainSettings>>("Enchantments.Obtaining",
+        (cfg, path, def) -> Stream.of(ObtainType.values()).collect(Collectors.toMap(k -> k, v -> ObtainSettings.read(cfg, path + "." + v.getPathName()))),
+        () -> Stream.of(ObtainType.values()).collect(Collectors.toMap(k -> k, v -> new ObtainSettings(true, 4, 80D, 0, 2))),
+        "Settings for the different ways of obtaining enchantments.")
+        .setWriter((cfg, path, map) -> map.forEach((type, settings) -> ObtainSettings.write(cfg, path + "." + type.getPathName(), settings)));
 
     @NotNull
-    public static Collection<EnchantTier> getTiers() {
-        return TIERS.values();
-    }
-
-    @NotNull
-    public static List<String> getTierIds() {
-        return new ArrayList<>(TIERS.keySet());
-    }
-
-    @Nullable
-    public static EnchantTier getTierByChance(@NotNull ObtainType obtainType) {
-        Map<EnchantTier, Double> map = getTiers().stream().collect(Collectors.toMap(k -> k, v -> v.getChance(obtainType)));
-        return Rnd.get(map);
-    }
-
-    @Nullable
-    public static ObtainSettings getObtainSettings(@NotNull ObtainType obtainType) {
-        return OBTAIN_SETTINGS.get(obtainType);
-    }
-
-    @NotNull
-    public static List<String> formatDescription(@NotNull List<String> description) {
-        return new ArrayList<>(description.stream().map(line -> ENCHANTMENTS_DESCRIPTION_FORMAT.replace("%description%", line)).toList());
+    public static Optional<ObtainSettings> getObtainSettings(@NotNull ObtainType obtainType) {
+        ObtainSettings settings = OBTAIN_SETTINGS.get().get(obtainType);
+        return settings == null || !settings.isEnabled() ? Optional.empty() : Optional.of(settings);
     }
 }

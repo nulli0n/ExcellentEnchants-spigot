@@ -1,20 +1,7 @@
-# Additional placeholders:
-# - %enchantment_trigger_chance%: Enchantment Trigger Chance
-
-# Defines if this enchantment is a treasure enchantment.
-# Treasure enchantments can only be received via looting, trading, or fishing.
-Is_Treasure: false
-# Enchantment display name. This name will be displayed in item lore and in enchantments list GUI.
 Name: Ender Bow
-# Enchantment tier. Must be a valid tier from the 'config.yml'. Enchantments with invalid tier won't be loaded.
 Tier: legendary
-# Enchantment description. Will be displayed in item lore (if not disabled in the main config.yml) and in enchantments list GUI.
-# You can use multiple lines here.
-# You can use 'Enchantment' placeholders: http://77.222.60.131:8080/plugin/excellentenchants/utils/placeholders
 Description:
-- '%enchantment_trigger_chance%% chance to shoot Ender Pearl instead of arrows.'
-# List of the conflicting enchantments.
-# Conflicted enchantments can not be applied together on the same item.
+- 'Shoots ender pearls instead of arrows.'
 Conflicts:
 - bomber
 - ghast
@@ -27,79 +14,7 @@ Conflicts:
 - flame
 - power
 - punch
-# Enchantment level settings.
+- hover
 Level:
-  # Minimal (start) enchantment level. Can not be smaller then 1.
   Min: 1
-  # Maximal (final) enchantment level.
-  # Keep in mind that while you can enchant items with bypass max. enchantment level, all enchantment 'Scalable' option values will not exceed the max. enchantment level.
   Max: 1
-# Enchantment settings for Anvil.
-Anvil:
-  # Defines the exp cost to merge this enchantment on other items on anvil.
-  # Scalable. Placeholder: %enchantment_level%. See: http://77.222.60.131:8080/plugin/engine/config/formats
-  Merge_Cost: '%enchantment_level%'
-Fishing:
-  # A chance that this enchantment will be populated on items received from fishing.
-  Chance: 5.0
-  # Here you can set min. and max. level for enchantment generated via Fishing
-  # These levels can not be greater or smaller than the default enchantment min. and max levels.
-  # Set min/max level to -1 to use the default enchantment min/max level value.
-  Level:
-    Min: -1
-    Max: -1
-# Enchantment settings for Enchanting Table.
-Enchanting_Table:
-  # Defines which enchantment level will be generated in Enchanting Table depends on the enchanting cost.
-  # Example: expression '9 * %enchantment_level%' for enchantment levels 1-3 will result in I = 9+ Levels, II = 18+ Levels, III = 27+ Levels.
-  # Scalable. Placeholder: %enchantment_level%. See: http://77.222.60.131:8080/plugin/engine/config/formats
-  Level_By_Exp_Cost: '30'
-  # A chance that this enchantment will be appeared in Enchanting Table.
-  Chance: 5.0
-  # Here you can set min. and max. level for enchantment generated via Enchanting Table
-  # These levels can not be greater or smaller than the default enchantment min. and max levels.
-  # Set min/max level to -1 to use the default enchantment min/max level value.
-  Level:
-    Min: -1
-    Max: -1
-Villagers:
-  # A chance that this enchantment will be populated on items in Villager trades.
-  Chance: 3.0
-  # Here you can set min. and max. level for enchantment generated via Villagers
-  # These levels can not be greater or smaller than the default enchantment min. and max levels.
-  # Set min/max level to -1 to use the default enchantment min/max level value.
-  Level:
-    Min: -1
-    Max: -1
-Loot_Generation:
-  # A chance that this enchantment will be populated on items in cave/dungeon/castle chests/minecarts and other containers.
-  Chance: 10.0
-  # Here you can set min. and max. level for enchantment generated via Loot Generation
-  # These levels can not be greater or smaller than the default enchantment min. and max levels.
-  # Set min/max level to -1 to use the default enchantment min/max level value.
-  Level:
-    Min: -1
-    Max: -1
-Mob_Spawning:
-  # A chance that this enchantment will be populated on items equipped on mob on spawning.
-  Chance: 0.0
-  # Here you can set min. and max. level for enchantment generated via Mob Spawning
-  # These levels can not be greater or smaller than the default enchantment min. and max levels.
-  # Set min/max level to -1 to use the default enchantment min/max level value.
-  Level:
-    Min: -1
-    Max: -1
-# Individual enchantment settings.
-Settings:
-  # A chance that this enchantment will be triggered.
-  # Scalable. Placeholder: %enchantment_level%. See: http://77.222.60.131:8080/plugin/engine/config/formats
-  Trigger_Chance: '100.0'
-  # A cost a player will have to pay to have this enchantment triggered.
-  Cost:
-    # Enables/Disables cost feature.
-    Enabled: false
-    # A (custom) item that player must have in his inventory, that will be consumed to trigger the enchantment effect.
-    # See http://77.222.60.131:8080/plugin/engine/config/formats for item options.
-    Item:
-      Material: ENDER_PEARL
-      Amount: 1

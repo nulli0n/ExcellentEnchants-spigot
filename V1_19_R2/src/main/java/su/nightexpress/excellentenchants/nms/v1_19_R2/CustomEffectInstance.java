@@ -15,7 +15,7 @@ public class CustomEffectInstance extends MobEffectInstance {
     private final Enchantment enchantment;
 
     public CustomEffectInstance(MobEffect effect, int amplifier, @NotNull Enchantment enchantment) {
-        super(effect, MIN * 2, amplifier);
+        super(effect, EnchantNMS.EFFECT_DURATION_MAX, amplifier);
         this.enchantment = enchantment;
     }
 
@@ -40,8 +40,8 @@ public class CustomEffectInstance extends MobEffectInstance {
             return false;
         }
         if (super.tick(entity, runnable)) {
-            if (this.getDuration() <= MIN) {
-                Reflex.setFieldValue(this, "c", Integer.MAX_VALUE);
+            if (this.getDuration() <= EnchantNMS.EFFECT_DURATION_MIN) {
+                Reflex.setFieldValue(this, "c", EnchantNMS.EFFECT_DURATION_MAX);
             }
             return true;
         }

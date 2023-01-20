@@ -1,0 +1,71 @@
+Title: '        #a267f3&lCustom Enchants'
+Size: 36
+Use_Mini_Message: false
+
+Enchantments:
+  Icon:
+    Material: ENCHANTED_BOOK
+    Name: '%enchantment_name_formatted%'
+    Lore:
+      - '#aeb6bf%enchantment_description%'
+      - ''
+      - '#bcff9a&lInfo:'
+      - '#bcff9a▪ #ddeceeTier: #bcff9a%enchantment_tier%'
+      - '#bcff9a▪ #ddeceeApplies to: #bcff9a%enchantment_fit_item_types%'
+      - '#bcff9a▪ #ddeceeLevels: #bcff9a%enchantment_level_min% #ddecee- #bcff9a%enchantment_level_max%'
+      - '%conflicts%'
+      - '%charges%'
+      - '%obtaining%'
+      - ''
+      - '#a5ff9a&lActions:'
+      - '#a5ff9a▪ #ddeceeLeft-Click: #a5ff9aSwitch Level'
+  Lore:
+    Conflicts:
+      - ''
+      - '#ff9a9a[!] #ddeceeCan not be used together with:'
+      - '#ff9a9a▸ %enchantment_name%'
+    Charges:
+      - ''
+      - '#d39aff&lCharges:'
+      - '#d39aff◈ #ddeceeMaximum: #d39aff%enchantment_charges_max_amount%⚡'
+      - '#d39aff◈ #ddeceePer Use: #d39aff-%enchantment_charges_consume_amount%⚡'
+      - '#d39aff◈ #ddeceePer Recharge: #d39aff+%enchantment_charges_recharge_amount%⚡'
+      - '#d39aff◈ #ddeceeFuel Item: #d39aff%enchantment_charges_fuel_item%'
+    Obtaining:
+      - ''
+      - '#9af7ff&lObtain Chance:'
+      - '#9af7ff┃ #ddeceeEnchanting Table: #9af7ff%enchantment_obtain_chance_enchanting%%'
+      - '#9af7ff┃ #ddeceeVillager Trade: #9af7ff%enchantment_obtain_chance_villager%%'
+      - '#9af7ff┃ #ddeceeLoot Generation: #9af7ff%enchantment_obtain_chance_loot_generation%%'
+      - '#9af7ff┃ #ddeceeFishing: #9af7ff%enchantment_obtain_chance_fishing%%'
+      - '#9af7ff┃ #ddeceeMob Spawning: #9af7ff%enchantment_obtain_chance_mob_spawning%%'
+  Slots: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26
+
+Content:
+  return:
+    Priority: 5
+    Item:
+      Material: PLAYER_HEAD
+      Head_Texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmU5YWU3YTRiZTY1ZmNiYWVlNjUxODEzODlhMmY3ZDQ3ZTJlMzI2ZGI1OWVhM2ViNzg5YTkyYzg1ZWE0NiJ9fX0=
+      Name: '#ffee9a(↓) &fClose Menu'
+      Lore: []
+    Slots: 31
+    Type: CLOSE
+
+  page_next:
+    Slots: 35
+    Type: PAGE_NEXT
+    Item:
+      Material: PLAYER_HEAD
+      Head_Texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=
+      Name: '#ffee9a(→) &fNext Page'
+    Priority: 5
+
+  page_previous:
+    Slots: 27
+    Type: PAGE_PREVIOUS
+    Item:
+      Material: PLAYER_HEAD
+      Head_Texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODY5NzFkZDg4MWRiYWY0ZmQ2YmNhYTkzNjE0NDkzYzYxMmY4Njk2NDFlZDU5ZDFjOTM2M2EzNjY2YTVmYTYifX19
+      Name: '#ffee9a(←) &fPrevious Page'
+    Priority: 5

@@ -5,8 +5,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
 import su.nexmedia.engine.utils.StringUtil;
@@ -14,6 +12,7 @@ import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
 import su.nightexpress.excellentenchants.config.Lang;
+import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -79,27 +78,10 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
             level = Rnd.get(enchantment.getStartLevel(), enchantment.getMaxLevel());
         }
 
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return;
-
-        if (meta instanceof EnchantmentStorageMeta storageMeta) {
-            if (level == 0) {
-                storageMeta.removeStoredEnchant(enchantment);
-            }
-            else {
-                storageMeta.addStoredEnchant(enchantment, level, true);
-            }
+        if (level > 0) {
+            EnchantManager.addEnchantment(item, enchantment, level, true);
         }
-        else {
-            if (level == 0) {
-                meta.removeEnchant(enchantment);
-            }
-            else {
-                meta.addEnchant(enchantment, level, true);
-            }
-        }
-        item.setItemMeta(meta);
-        //EnchantManager.updateItemLoreEnchants(item);
+        else EnchantManager.removeEnchantment(item, enchantment);
 
         plugin.getMessage(Lang.COMMAND_ENCHANT_DONE).send(sender);
     }

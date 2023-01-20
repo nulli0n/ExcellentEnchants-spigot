@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants;
 
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.Version;
@@ -13,14 +12,16 @@ import su.nightexpress.excellentenchants.command.ListCommand;
 import su.nightexpress.excellentenchants.command.TierbookCommand;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Lang;
-import su.nightexpress.excellentenchants.hook.ProtocolHook;
-import su.nightexpress.excellentenchants.manager.EnchantManager;
-import su.nightexpress.excellentenchants.manager.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.hook.HookId;
+import su.nightexpress.excellentenchants.hook.impl.ProtocolHook;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 import su.nightexpress.excellentenchants.nms.v1_17_R1.V1_17_R1;
 import su.nightexpress.excellentenchants.nms.v1_18_R2.V1_18_R2;
 import su.nightexpress.excellentenchants.nms.v1_19_R1.V1_19_R1;
 import su.nightexpress.excellentenchants.nms.v1_19_R2.V1_19_R2;
+import su.nightexpress.excellentenchants.tier.TierManager;
 
 public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
@@ -28,6 +29,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     private EnchantNMS     enchantNMS;
     private EnchantManager enchantManager;
+    private TierManager tierManager;
 
     @Override
     @NotNull
@@ -43,6 +45,9 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
             return;
         }
 
+        this.tierManager = new TierManager(this);
+        this.tierManager.setup();
+
         this.enchantManager = new EnchantManager(this);
         this.enchantManager.setup();
     }
@@ -52,6 +57,10 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
         if (this.enchantManager != null) {
             this.enchantManager.shutdown();
             this.enchantManager = null;
+        }
+        if (this.tierManager != null) {
+            this.tierManager.shutdown();
+            this.tierManager = null;
         }
     }
 
@@ -67,13 +76,12 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     @Override
     public void loadConfig() {
-        Config.load(this);
+        this.getConfig().initializeOptions(Config.class);
     }
 
     @Override
     public void loadLang() {
         this.getLangManager().loadMissing(Lang.class);
-        this.getLangManager().setupEnum(EnchantmentTarget.class);
         this.getLangManager().setupEnum(FitItemType.class);
         this.getLang().saveChanges();
     }
@@ -84,22 +92,27 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
         mainCommand.addChildren(new EnchantCommand(this));
         mainCommand.addChildren(new ListCommand(this));
         mainCommand.addChildren(new TierbookCommand(this));
-        mainCommand.addChildren(new ReloadSubCommand<>(this, Perms.PREFIX + "admin"));
+        mainCommand.addChildren(new ReloadSubCommand<>(this, Perms.COMMAND_RELOAD));
     }
 
     @Override
     public void registerHooks() {
-        if (Hooks.hasPlugin("ProtocolLib")) {
+        if (Hooks.hasPlugin(HookId.PROTOCOL_LIB)) {
             ProtocolHook.setup();
         }
         else {
-            this.warn("ProtocolLib is not installed. Enchantments won't be displayed on items.");
+            this.warn(HookId.PROTOCOL_LIB + " is not installed. Enchantments won't be displayed on items.");
         }
     }
 
     @Override
     public void registerPermissions() {
-        // TODO
+        this.registerPermissions(Perms.class);
+    }
+
+    @NotNull
+    public TierManager getTierManager() {
+        return tierManager;
     }
 
     @NotNull
