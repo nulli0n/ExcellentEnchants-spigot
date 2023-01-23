@@ -32,19 +32,26 @@ import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEnchant {
 
     public static final String ID = "silk_chest";
 
-    private       String        chestName;
-    private       List<String>  chestLore;
-    private final NamespacedKey keyChest;
+    private       String                      chestName;
+    private       List<String>                chestLore;
+    private final NamespacedKey               keyChest;
+    @Deprecated private final Map<Integer, NamespacedKey> keyItems;
 
     public EnchantSilkChest(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
         this.keyChest = new NamespacedKey(plugin, ID + ".item");
+        this.keyItems = new TreeMap<>();
+        for (int pos = 0; pos < 27; pos++) {
+            this.getItemKey(pos);
+        }
     }
 
     @Override
@@ -56,6 +63,11 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         this.chestLore = JOption.create("Settings.Chest_Item.Lore", new ArrayList<>(),
             "Chest item lore.",
             "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(cfg);
+    }
+
+    @Deprecated
+    private NamespacedKey getItemKey(int pos) {
+        return this.keyItems.computeIfAbsent(pos, key -> new NamespacedKey(plugin, "silkchest_item_" + pos));
     }
 
     @Override
@@ -71,7 +83,7 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     }
 
     public boolean isSilkChest(@NotNull ItemStack item) {
-        return PDCUtil.getBooleanData(item, this.keyChest);
+        return PDCUtil.getBooleanData(item, this.keyChest) || PDCUtil.getStringData(item, this.getItemKey(0)) != null;
     }
 
     @NotNull
@@ -158,14 +170,14 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         chest.setCustomName(null);
         chest.update(true);
 
-        //Inventory inventory = chest.getBlockInventory();
-        /*for (int pos = 0; pos < inventory.getSize(); pos++) {
+        Inventory inventory = chest.getBlockInventory();
+        for (int pos = 0; pos < inventory.getSize(); pos++) {
             String data = PDCUtil.getStringData(item, this.getItemKey(pos));
             if (data == null) continue;
 
             ItemStack itemInv = ItemUtil.fromBase64(data);
             inventory.setItem(pos, itemInv);
-        }*/
+        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

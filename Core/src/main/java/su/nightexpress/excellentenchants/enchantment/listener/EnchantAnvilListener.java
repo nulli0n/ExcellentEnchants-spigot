@@ -97,7 +97,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         // Merge only if it's Item + Item, Item + Enchanted book or Enchanted Book + Enchanted Book
         if (second.getType() == Material.ENCHANTED_BOOK || second.getType() == first.getType()) {
             EnchantManager.getExcellentEnchantments(second).forEach((enchant, level) -> {
-                enchantments.merge(enchant, level, (oldLvl, newLvl) -> (oldLvl.equals(newLvl)) ? (oldLvl + 1) : (Math.max(oldLvl, newLvl)));
+                enchantments.merge(enchant, level, (oldLvl, newLvl) -> (oldLvl.equals(newLvl)) ? (Math.min(enchant.getMaxLevel(), oldLvl + 1)) : (Math.max(oldLvl, newLvl)));
             });
         }
 

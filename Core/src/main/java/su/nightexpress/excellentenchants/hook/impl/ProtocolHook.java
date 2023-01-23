@@ -16,9 +16,8 @@ import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProtocolHook {
 
@@ -94,6 +93,10 @@ public class ProtocolHook {
                 lore.removeAll(enchant.formatDescription(level));
             });
         }
+
+        enchants = enchants.entrySet().stream()
+            .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old,nev) -> nev, LinkedHashMap::new));
         if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get() && !isCreative) {
             enchants.forEach((enchant, level) -> {
                 lore.addAll(0, enchant.formatDescription(level));

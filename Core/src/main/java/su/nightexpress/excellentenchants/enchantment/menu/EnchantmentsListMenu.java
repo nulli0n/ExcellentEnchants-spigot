@@ -101,7 +101,7 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
             if (itemClick == null) return;
 
             int levelHas = PDCUtil.getIntData(itemClick, this.keyLevel);
-            if (levelHas == 0) return;
+            if (levelHas == 0) levelHas = enchant.getStartLevel();
 
             if (++levelHas > enchant.getMaxLevel()) levelHas = enchant.getStartLevel();
             itemClick = this.getEnchantIcon(enchant, levelHas);
