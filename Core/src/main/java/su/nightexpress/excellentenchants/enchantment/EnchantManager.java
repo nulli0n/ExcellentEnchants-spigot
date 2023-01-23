@@ -344,6 +344,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         EnchantManager.getEquippedEnchants(entity, PassiveEnchant.class).forEach((item, enchants) -> {
             enchants.forEach((enchant, level) -> {
                 if (enchant instanceof Potioned potioned) {
+                    if (enchant.isOutOfCharges(item)) return;
                     if (enchant.onTrigger(entity, item, level)) {
                         enchant.consumeCharges(item);
                     }
