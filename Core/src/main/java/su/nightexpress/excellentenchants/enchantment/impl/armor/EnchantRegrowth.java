@@ -40,25 +40,30 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
     public EnchantRegrowth(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
 
-        this.task = new Task(plugin);
-        this.task.start();
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
         this.healInterval = JOption.create("Settings.Heal.Interval", 100,
-            "How often (in seconds) enchantment will have effect?").read(cfg);
+            "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(cfg);
         this.healMinHealth = EnchantScaler.read(this, "Settings.Heal.Min_Health", "0.5",
             "Minimal entity health for the enchantment to have effect.");
         this.healMaxHealth = EnchantScaler.read(this, "Settings.Heal.Max_Health", "20.0",
             "Maximal entity health when the enchantment will not heal anymore.");
         this.healAmount = EnchantScaler.read(this, "Settings.Heal.Amount", "0.25",
             "Amount of hearts to be restored.");
+
+        this.task = new Task(plugin);
+        this.task.start();
     }
 
     @Override
     public void clear() {
+        this.stopTask();
+    }
+
+    private void stopTask() {
         if (this.task != null) {
             this.task.stop();
             this.task = null;
