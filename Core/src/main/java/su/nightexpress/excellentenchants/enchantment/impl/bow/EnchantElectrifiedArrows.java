@@ -3,12 +3,16 @@ package su.nightexpress.excellentenchants.enchantment.impl.bow;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
@@ -24,6 +28,8 @@ import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementat
 public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chanced, Arrowed, BowEnchant {
 
     public static final String ID = "electrified_arrows";
+
+    private static final String META_NO_ITEM_DAMAGE = "itemNoDamage";
 
     private ArrowImplementation arrowImplementation;
     private ChanceImplementation chanceImplementation;
@@ -70,7 +76,7 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
         if (e.getHitEntity() != null || e.getHitBlock() == null) return false;
 
         Block block = e.getHitBlock();
-        block.getWorld().strikeLightning(block.getLocation());
+        block.getWorld().strikeLightning(block.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(plugin, true));
         if (this.hasVisualEffects()) {
             EffectUtil.playEffect(LocationUtil.getCenter(block.getLocation()), Particle.BLOCK_CRACK, block.getType().name(), 1D, 1D, 1D, 0.05, 150);
             EffectUtil.playEffect(LocationUtil.getCenter(block.getLocation()), Particle.FIREWORKS_SPARK, "", 1D, 1D, 1D, 0.05, 150);
@@ -83,10 +89,20 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
         if (!this.isOurProjectile(projectile)) return false;
 
         plugin.getServer().getScheduler().runTask(plugin, () -> {
+            if (victim.isDead()) return;
             victim.setNoDamageTicks(0);
-            victim.getWorld().strikeLightning(victim.getLocation());
+            victim.getWorld().strikeLightning(victim.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(plugin, true));
         });
 
         return true;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onItemDamage(EntityDamageByEntityEvent e) {
+        if (!e.getDamager().hasMetadata(META_NO_ITEM_DAMAGE)) return;
+        if (!(e.getEntity() instanceof Item item)) return;
+
+        e.setCancelled(true);
+        item.setFireTicks(0);
     }
 }
