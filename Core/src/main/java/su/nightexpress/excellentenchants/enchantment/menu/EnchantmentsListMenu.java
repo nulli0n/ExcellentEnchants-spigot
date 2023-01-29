@@ -139,7 +139,7 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
         meta.setLore(lore);
         icon.setItemMeta(meta);
 
-        ItemUtil.replace(icon, enchant.replacePlaceholders(level));
+        ItemUtil.replace(icon, enchant.replaceAllPlaceholders(level));
         return icon;
     }
 

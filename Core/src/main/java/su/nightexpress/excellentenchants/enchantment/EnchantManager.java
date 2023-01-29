@@ -275,7 +275,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
                 return enchant == null ? null : Pair.of(enchant, entry.getValue());
             })
             .filter(Objects::nonNull)
-            .sorted(Comparator.comparing(p -> p.getFirst().getPriority(), Comparator.reverseOrder()))
+            //.sorted(Comparator.comparing(p -> p.getFirst().getPriority(), Comparator.reverseOrder()))
             .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (old, nev) -> nev, LinkedHashMap::new));
     }
 

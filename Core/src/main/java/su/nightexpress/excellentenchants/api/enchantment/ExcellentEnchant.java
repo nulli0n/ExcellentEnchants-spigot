@@ -24,11 +24,11 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.*;
@@ -155,6 +155,28 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     @NotNull
+    public UnaryOperator<String> replaceAllPlaceholders(int level) {
+        return str -> this.replacePlaceholders(level).apply(str)
+            .replace(Placeholders.ENCHANTMENT_NAME, this.getDisplayName())
+            .replace(Placeholders.ENCHANTMENT_NAME_FORMATTED, this.getNameFormatted(level))
+            .replace(Placeholders.ENCHANTMENT_LEVEL, NumberUtil.toRoman(level))
+            .replace(Placeholders.ENCHANTMENT_LEVEL_MIN, String.valueOf(this.getStartLevel()))
+            .replace(Placeholders.ENCHANTMENT_LEVEL_MAX, String.valueOf(this.getMaxLevel()))
+            .replace(Placeholders.ENCHANTMENT_TIER, this.getTier().getName())
+            .replace(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_FISHING, NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING, NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
+            .replace(Placeholders.ENCHANTMENT_CHARGES_MAX_AMOUNT, String.valueOf(this.getChargesMax(level)))
+            .replace(Placeholders.ENCHANTMENT_CHARGES_CONSUME_AMOUNT, String.valueOf(this.getChargesConsumeAmount(level)))
+            .replace(Placeholders.ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, String.valueOf(this.getChargesRechargeAmount(level)))
+            .replace(Placeholders.ENCHANTMENT_CHARGES_FUEL_ITEM, ItemUtil.getItemName(this.getChargesFuel()))
+            ;
+    }
+
+    @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
         return str -> {
             str = str.replace(Placeholders.ENCHANTMENT_DESCRIPTION, String.join("\n", this.getDescription()));
@@ -168,24 +190,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
                     .replace(PotionImplementation.PLACEHOLDER_POTION_DURATION, NumberUtil.format((double) potioned.getEffectDuration(level) / 20D))
                     .replace(PotionImplementation.PLACEHOLDER_POTION_TYPE, LangManager.getPotionType(potioned.getEffectType()));
             }
-            return str
-                .replace(Placeholders.ENCHANTMENT_NAME, this.getDisplayName())
-                .replace(Placeholders.ENCHANTMENT_NAME_FORMATTED, this.getNameFormatted(level))
-                .replace(Placeholders.ENCHANTMENT_LEVEL, NumberUtil.toRoman(level))
-                .replace(Placeholders.ENCHANTMENT_LEVEL_MIN, String.valueOf(this.getStartLevel()))
-                .replace(Placeholders.ENCHANTMENT_LEVEL_MAX, String.valueOf(this.getMaxLevel()))
-                .replace(Placeholders.ENCHANTMENT_TIER, this.getTier().getName())
-                .replace(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
-                .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
-                .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
-                .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
-                .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_FISHING, NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
-                .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING, NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
-                .replace(Placeholders.ENCHANTMENT_CHARGES_MAX_AMOUNT, String.valueOf(this.getChargesMax(level)))
-                .replace(Placeholders.ENCHANTMENT_CHARGES_CONSUME_AMOUNT, String.valueOf(this.getChargesConsumeAmount(level)))
-                .replace(Placeholders.ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, String.valueOf(this.getChargesRechargeAmount(level)))
-                .replace(Placeholders.ENCHANTMENT_CHARGES_FUEL_ITEM, ItemUtil.getItemName(this.getChargesFuel()))
-            ;
+            return str;
         };
     }
 

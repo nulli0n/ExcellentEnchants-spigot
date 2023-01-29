@@ -84,20 +84,21 @@ public class ProtocolHook {
         ItemMeta meta = copy.getItemMeta();
         if (meta == null) return item;
 
-        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item);
+        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item)
+            .entrySet().stream()
+            .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old,nev) -> nev, LinkedHashMap::new));
         if (enchants.isEmpty()) return item;
 
         List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
-        enchants.keySet().forEach(enchant -> lore.removeIf(line -> line.contains(enchant.getDisplayName())));
-        if (isCreative) {
-            enchants.forEach((enchant, level) -> {
-                lore.removeAll(enchant.formatDescription(level));
-            });
+        if (!lore.isEmpty()) {
+            enchants.keySet().forEach(enchant -> lore.removeIf(line -> line.contains(enchant.getDisplayName())));
+            if (isCreative) {
+                enchants.forEach((enchant, level) -> {
+                    lore.removeAll(enchant.formatDescription(level));
+                });
+            }
         }
-
-        enchants = enchants.entrySet().stream()
-            .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old,nev) -> nev, LinkedHashMap::new));
         if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get() && !isCreative) {
             enchants.forEach((enchant, level) -> {
                 lore.addAll(0, enchant.formatDescription(level));
