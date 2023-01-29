@@ -70,6 +70,8 @@ public interface IEnchantment {
 
     boolean isChargesFuel(@NotNull ItemStack item);
 
+    int getCharges(@NotNull ItemStack item);
+
     boolean isFullOfCharges(@NotNull ItemStack item);
 
     boolean isOutOfCharges(@NotNull ItemStack item);

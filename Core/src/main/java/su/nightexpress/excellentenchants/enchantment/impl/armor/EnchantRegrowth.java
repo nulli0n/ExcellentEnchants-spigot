@@ -131,7 +131,11 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
         public void action() {
             for (LivingEntity entity : this.getEntities()) {
                 EnchantManager.getEquippedEnchants(entity, EnchantRegrowth.class).forEach((item, enchants) -> {
-                    enchants.forEach((enchant, level) -> enchant.onTrigger(entity, item, level));
+                    enchants.forEach((enchant, level) -> {
+                        if (enchant.onTrigger(entity, item, level)) {
+                            enchant.consumeCharges(item);
+                        }
+                    });
                 });
             }
         }

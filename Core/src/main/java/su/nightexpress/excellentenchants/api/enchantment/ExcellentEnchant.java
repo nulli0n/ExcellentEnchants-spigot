@@ -421,6 +421,11 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     @Override
+    public int getCharges(@NotNull ItemStack item) {
+        return EnchantManager.getEnchantmentCharges(item, this);
+    }
+
+    @Override
     public void consumeCharges(@NotNull ItemStack item) {
         EnchantManager.consumeEnchantmentCharges(item, this);
     }

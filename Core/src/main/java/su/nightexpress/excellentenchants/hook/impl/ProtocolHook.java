@@ -84,9 +84,10 @@ public class ProtocolHook {
         ItemMeta meta = copy.getItemMeta();
         if (meta == null) return item;
 
-        List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
         Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item);
+        if (enchants.isEmpty()) return item;
 
+        List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
         enchants.keySet().forEach(enchant -> lore.removeIf(line -> line.contains(enchant.getDisplayName())));
         if (isCreative) {
             enchants.forEach((enchant, level) -> {
