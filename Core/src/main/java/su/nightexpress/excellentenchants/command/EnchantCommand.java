@@ -83,6 +83,7 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
         }
         else EnchantManager.removeEnchantment(item, enchantment);
 
+        EnchantManager.updateEnchantmentsDisplay(item);
         plugin.getMessage(Lang.COMMAND_ENCHANT_DONE).send(sender);
     }
 }

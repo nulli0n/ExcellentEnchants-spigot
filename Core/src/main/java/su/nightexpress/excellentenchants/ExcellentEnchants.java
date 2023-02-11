@@ -97,11 +97,14 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     @Override
     public void registerHooks() {
-        if (Hooks.hasPlugin(HookId.PROTOCOL_LIB)) {
-            ProtocolHook.setup();
-        }
-        else {
-            this.warn(HookId.PROTOCOL_LIB + " is not installed. Enchantments won't be displayed on items.");
+        if (Config.ENCHANTMENTS_DISPLAY_MODE.get() == 2) {
+            if (Hooks.hasPlugin(HookId.PROTOCOL_LIB)) {
+                ProtocolHook.setup();
+            }
+            else {
+                this.warn(HookId.PROTOCOL_LIB + " is not installed. Set display mode to Plain lore.");
+                Config.ENCHANTMENTS_DISPLAY_MODE.set(1);
+            }
         }
     }
 

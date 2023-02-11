@@ -113,7 +113,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
         e.setExpToDrop(0);
         e.setDropItems(true);
         block.setMetadata(META_HANDLE, new FixedMetadataValue(this.plugin, true));
-        return true;
+        return false; // Do not consume charges
     }
 
     // Update spawner type of the placed spawner mined by Divine Touch.

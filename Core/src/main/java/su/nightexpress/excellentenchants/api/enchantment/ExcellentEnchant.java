@@ -247,7 +247,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     @NotNull
     public String getNameFormatted(int level, int charges) {
-        if (!this.isChargesEnabled()) return this.getNameFormatted(level);
+        if (!this.isChargesEnabled() || charges < 0) return this.getNameFormatted(level);
 
         int chargesMax = this.getChargesMax(level);
         double percent = (double) charges / (double) chargesMax * 100D;

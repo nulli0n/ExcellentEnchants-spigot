@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -19,6 +20,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.manager.AbstractListener;
+import su.nexmedia.engine.hooks.Hooks;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
@@ -80,9 +82,20 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
             curses.forEach((excellentEnchant, level) -> {
                 EnchantManager.addEnchantment(result, excellentEnchant, level, true);
             });
+            EnchantManager.updateEnchantmentsDisplay(result);
         });
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEnchantUpdatePickup(EntityPickupItemEvent e) {
+        if (!(e.getEntity() instanceof Player player)) return;
+
+        Item item = e.getItem();
+        ItemStack itemStack = item.getItemStack();
+        if (EnchantManager.updateEnchantmentsDisplay(itemStack)) {
+            item.setItemStack(itemStack);
+        }
+    }
 
     // ---------------------------------------------------------------
     // Handle Enchanting Table
@@ -117,6 +130,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
                     EnchantManager.restoreEnchantmentCharges(result, enchant);
                 }
             });
+            EnchantManager.updateEnchantmentsDisplay(result);
 
             e.getInventory().setItem(0, result);
         });
@@ -177,6 +191,8 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         if (Config.getObtainSettings(ObtainType.MOB_SPAWNING).isEmpty()) return;
 
         LivingEntity entity = e.getEntity();
+        if (Hooks.isMythicMob(entity)) return;
+
         EntityEquipment equipment = entity.getEquipment();
         if (equipment == null) return;
 
@@ -184,6 +200,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
             ItemStack item = equipment.getItem(slot);
             if (EnchantManager.isEnchantable(item)) {
                 EnchantManager.populateEnchantments(item, ObtainType.MOB_SPAWNING);
+                EnchantManager.getExcellentEnchantments(item).keySet().forEach(enchant -> EnchantManager.restoreEnchantmentCharges(item, enchant));
                 equipment.setItem(slot, item);
             }
         }

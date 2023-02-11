@@ -7,6 +7,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.GameMode;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -82,9 +83,9 @@ public class ProtocolHook {
 
         ItemStack copy = new ItemStack(item);
         ItemMeta meta = copy.getItemMeta();
-        if (meta == null) return item;
+        if (meta == null || meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) return item;
 
-        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item)
+        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(meta)
             .entrySet().stream()
             .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old,nev) -> nev, LinkedHashMap::new));
@@ -105,7 +106,7 @@ public class ProtocolHook {
             });
         }
         enchants.forEach((enchant, level) -> {
-            int charges = EnchantManager.getEnchantmentCharges(item, enchant);
+            int charges = EnchantManager.getEnchantmentCharges(meta, enchant);
             lore.add(0, enchant.getNameFormatted(level, charges));
         });
 

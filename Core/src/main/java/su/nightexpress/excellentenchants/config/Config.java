@@ -26,7 +26,8 @@ public class Config {
     );
 
     public static final JOption<Boolean> ENCHANTMENTS_CHARGES_ENABLED = JOption.create("Enchantments.Charges.Enabled", false,
-        "Enables the enchantment Charges feature."); // TODO Wiki link
+        "Enables the enchantment Charges feature.",
+        Placeholders.URL_WIKI + "Charges-System");
 
     public static final JOption<TreeMap<Double, String>> ENCHANTMENTS_CHARGES_FORMAT = new JOption<TreeMap<Double, String>>("Enchantments.Charges.Format",
         (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(k -> StringUtil.getDouble(k, 0), v -> StringUtil.color(cfg.getString(path + "." + v, "")), (o,n) -> n, TreeMap::new)),
@@ -63,6 +64,13 @@ public class Config {
         "Enchantment names are the same as enchantment file name in /enchants/ folder. ! Must be in lower_case !",
         "To disable all enchantments for a world, use '" + Placeholders.WILDCARD + "' instead of enchantment names.")
         .setWriter((cfg, path, map) -> map.forEach((world, enchants) -> cfg.set(path + "." + world, enchants)));
+
+    public static final JOption<Integer> ENCHANTMENTS_DISPLAY_MODE = JOption.create("Enchantments.Display.Mode", 1,
+        "Sets how enchantment names and descriptions will be handled on items.",
+        "1 = Plain modification of item's lore (lore changes are real and persistent).",
+        "2 = Packet modification of item's lore (no real changes are made to the items). Requires ProtocolLib.",
+        "Plain mode is faster, but may not reflect all changes immediately.",
+        "Packet mode is slower, but instantly reflect all changes. In creative mode, there is a chance for lore duplication.");
 
     public static final JOption<Boolean> ENCHANTMENTS_DESCRIPTION_ENABLED = JOption.create("Enchantments.Description.Enabled", true,
         "When 'true', adds the enchantment description to item lore under enchantment names.",

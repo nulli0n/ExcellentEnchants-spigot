@@ -113,7 +113,11 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
         public void action() {
             for (LivingEntity entity : this.getEntities()) {
                 EnchantManager.getEquippedEnchants(entity, EnchantSaturation.class).forEach((item, enchants) -> {
-                    enchants.forEach((enchant, level) -> enchant.onTrigger(entity, item, level));
+                    enchants.forEach((enchant, level) -> {
+                        if (enchant.onTrigger(entity, item, level)) {
+                            enchant.consumeCharges(item);
+                        }
+                    });
                 });
             }
         }

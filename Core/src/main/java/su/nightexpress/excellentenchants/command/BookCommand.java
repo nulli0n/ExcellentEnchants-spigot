@@ -86,6 +86,7 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
 
         ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
         EnchantManager.addEnchantment(item, enchantment, level, true);
+        EnchantManager.updateEnchantmentsDisplay(item);
         PlayerUtil.addItem(player, item);
 
         plugin.getMessage(Lang.COMMAND_BOOK_DONE)

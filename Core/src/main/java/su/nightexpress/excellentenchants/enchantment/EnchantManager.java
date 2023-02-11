@@ -1,10 +1,12 @@
 package su.nightexpress.excellentenchants.enchantment;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -114,8 +116,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         // Класс для исключения неудачных попыток.
         EnchantPopulator populator = new EnchantPopulator(obtainType, item);
 
-        // Херачим до талого, пока нужное количество не будет добавлено
-        // или не закончатся чары и/или тиры.
+        // Добавляем сколько можем, пока нужное количество не будет добавлено или не закончатся чары и/или тиры.
         while (!populator.isEmpty() && enchRoll > 0) {
             // Достигнут максимум чар (любых) для итема, заканчиваем.
             if (enchantsToAdd.size() >= enchMax) break;
@@ -159,6 +160,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         EnchantManager.getEnchantsToPopulate(item, obtainType).forEach((enchantment, level) -> {
             EnchantManager.addEnchantment(item, enchantment, level, false);
         });
+        EnchantManager.updateEnchantmentsDisplay(item);
 
         return EnchantManager.getEnchantmentsAmount(item) != enchantsHad;
     }
@@ -193,11 +195,52 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         item.setItemMeta(meta);
     }
 
+    public static final NamespacedKey KEY_LORE_SIZE = new NamespacedKey(ExcellentEnchantsAPI.PLUGIN, "lore_size");
+
+    public static boolean updateEnchantmentsDisplay(@NotNull ItemStack item) {
+        if (Config.ENCHANTMENTS_DISPLAY_MODE.get() != 1) return false;
+
+        if (!isEnchantable(item)) {
+            PDCUtil.remove(item, KEY_LORE_SIZE);
+            return false;
+        }
+
+        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item);
+
+        int sizeHas = PDCUtil.getInt(item, KEY_LORE_SIZE).orElse(0);
+        int sizeReal = enchants.size() + enchants.keySet().stream().map(ExcellentEnchant::getDescription).mapToInt(List::size).sum();
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return false;
+
+        List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
+        for (int index = 0; index < sizeHas && !lore.isEmpty(); index++) {
+            lore.remove(0);
+        }
+
+        if (!meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
+            enchants.forEach((enchant, level) -> {
+                lore.addAll(0, enchant.formatDescription(level));
+            });
+            enchants.forEach((enchant, level) -> {
+                lore.add(0, enchant.getNameFormatted(level, getEnchantmentCharges(meta, enchant)));
+            });
+        }
+
+        meta.setLore(lore);
+        PDCUtil.set(meta, KEY_LORE_SIZE, sizeReal);
+        item.setItemMeta(meta);
+        return true;
+    }
+
     @NotNull
     public static Map<Enchantment, Integer> getEnchantments(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        if (meta == null) return Collections.emptyMap();
+        return meta == null ? Collections.emptyMap() : getEnchantments(meta);
+    }
 
+    @NotNull
+    public static Map<Enchantment, Integer> getEnchantments(@NotNull ItemMeta meta) {
         return (meta instanceof EnchantmentStorageMeta meta2) ? meta2.getStoredEnchants() : meta.getEnchants();
     }
 
@@ -214,7 +257,11 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     }
 
     public static int getEnchantmentCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
-        return PDCUtil.getIntData(item, enchant.getChargesKey());
+        return enchant.isChargesEnabled() ? PDCUtil.getIntData(item, enchant.getChargesKey()) : -1;
+    }
+
+    public static int getEnchantmentCharges(@NotNull ItemMeta meta, @NotNull ExcellentEnchant enchant) {
+        return enchant.isChargesEnabled() ? PDCUtil.getIntData(meta, enchant.getChargesKey()) : -1;
     }
 
     public static boolean isEnchantmentOutOfCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
@@ -269,7 +316,17 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
     @NotNull
     public static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull ItemStack item) {
-        return EnchantManager.getEnchantments(item).entrySet().stream()
+        return getExcellentEnchantments(EnchantManager.getEnchantments(item));
+    }
+
+    @NotNull
+    public static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull ItemMeta meta) {
+        return getExcellentEnchantments(EnchantManager.getEnchantments(meta));
+    }
+
+    @NotNull
+    private static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull Map<Enchantment, Integer> enchants) {
+        return enchants.entrySet().stream()
             .map(entry -> {
                 ExcellentEnchant enchant = EnchantRegister.get(entry.getKey().getKey());
                 return enchant == null ? null : Pair.of(enchant, entry.getValue());

@@ -64,6 +64,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         EnchantManager.getExcellentEnchantments(first).forEach((hasEnch, hasLevel) -> {
             EnchantManager.addEnchantment(result2, hasEnch, hasLevel, true);
         });
+        EnchantManager.updateEnchantmentsDisplay(result2);
         e.setResult(result2);
         return true;
     }
@@ -86,6 +87,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         }
 
         PDCUtil.setData(result2, RECHARGED, count);
+        EnchantManager.updateEnchantmentsDisplay(result2);
         e.setResult(result2);
         this.plugin.runTask(c -> e.getInventory().setRepairCost(chargeables.size()), false);
         return true;
@@ -120,6 +122,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
 
         if (first.equals(result2)) return false;
 
+        EnchantManager.updateEnchantmentsDisplay(result2);
         e.setResult(result2);
 
         // NMS ContainerAnvil will set level cost to 0 right after calling the event, need 1 tick delay.
