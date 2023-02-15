@@ -5,6 +5,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.EffectUtil;
@@ -45,15 +46,12 @@ public class EnchantSurprise extends PotionEnchant implements Chanced, CombatEnc
     }
 
     @Override
-    public PotionEffectType getEffectType() {
-        return Rnd.get(PotionEffectType.values());
-    }
-
-    @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!this.isAvailableToUse(damager)) return false;
         if (!this.checkTriggerChance(level)) return false;
-        if (!this.addEffect(victim, level)) return false;
+
+        PotionEffect effect = new PotionEffect(Rnd.get(PotionEffectType.values()), this.getEffectDuration(level), Math.max(0, this.getEffectAmplifier(level) - 1), false, false);
+        if (!victim.addPotionEffect(effect)) return false;
 
         if (this.hasVisualEffects()) {
             EffectUtil.playEffect(victim.getEyeLocation(), Particle.SPELL_WITCH, "", 0.25, 0.25, 0.25, 0.1f, 30);

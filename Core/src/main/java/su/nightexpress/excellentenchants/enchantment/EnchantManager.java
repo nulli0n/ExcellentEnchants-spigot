@@ -226,6 +226,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
                 lore.add(0, enchant.getNameFormatted(level, getEnchantmentCharges(meta, enchant)));
             });
         }
+        else sizeReal = 0;
 
         meta.setLore(lore);
         PDCUtil.set(meta, KEY_LORE_SIZE, sizeReal);
