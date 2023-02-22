@@ -1,6 +1,7 @@
 package su.nightexpress.excellentenchants.enchantment.impl.bow;
 
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -61,6 +62,7 @@ public class EnchantWitheredArrows extends PotionEnchant implements Chanced, Arr
         if (!(e.getProjectile() instanceof Arrow arrow)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
+        arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         return arrow.addCustomEffect(this.createEffect(level), true);
     }
 

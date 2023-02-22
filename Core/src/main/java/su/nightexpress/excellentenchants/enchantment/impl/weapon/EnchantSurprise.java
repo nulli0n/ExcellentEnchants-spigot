@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.impl.weapon;
 
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
@@ -8,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.EffectUtil;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -54,7 +55,9 @@ public class EnchantSurprise extends PotionEnchant implements Chanced, CombatEnc
         if (!victim.addPotionEffect(effect)) return false;
 
         if (this.hasVisualEffects()) {
-            EffectUtil.playEffect(victim.getEyeLocation(), Particle.SPELL_WITCH, "", 0.25, 0.25, 0.25, 0.1f, 30);
+            Color color = Color.fromRGB(Rnd.nextInt(256), Rnd.nextInt(256), Rnd.nextInt(256));
+            Particle.DustOptions dustOptions = new Particle.DustOptions(color, 2f);
+            SimpleParticle.of(Particle.REDSTONE, dustOptions).play(victim.getEyeLocation(), 0.25, 0.1, 25);
         }
         return true;
     }

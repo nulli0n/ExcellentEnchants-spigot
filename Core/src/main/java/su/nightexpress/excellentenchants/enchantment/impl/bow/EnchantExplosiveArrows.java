@@ -2,10 +2,7 @@ package su.nightexpress.excellentenchants.enchantment.impl.bow;
 
 import org.bukkit.World;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -138,8 +135,9 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
         if (e.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) return;
         if (this.explosionDamageItems) return;
         if (!e.getDamager().hasMetadata(META_EXPLOSION_SOURCE)) return;
-        if (!(e.getEntity() instanceof Item item)) return;
 
-        e.setCancelled(true);
+        if (e.getEntity() instanceof Item || e.getEntity() instanceof ItemFrame) {
+            e.setCancelled(true);
+        }
     }
 }

@@ -13,15 +13,17 @@ import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.task.AbstractEnchantmentTask;
 
 import java.util.function.UnaryOperator;
 
-public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant, ICleanable {
+public class EnchantRegrowth extends ExcellentEnchant implements Chanced, PassiveEnchant, ICleanable {
 
     public static final String ID = "regrowth";
 
@@ -35,6 +37,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
     private EnchantScaler healMaxHealth;
     private EnchantScaler healAmount;
 
+    private ChanceImplementation chanceImplementation;
     private Task task;
 
     public EnchantRegrowth(@NotNull ExcellentEnchants plugin) {
@@ -45,6 +48,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
     @Override
     public void loadConfig() {
         super.loadConfig();
+        this.chanceImplementation = ChanceImplementation.create(this);
         this.healInterval = JOption.create("Settings.Heal.Interval", 100,
             "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(cfg);
         this.healMinHealth = EnchantScaler.read(this, "Settings.Heal.Min_Health", "0.5",
@@ -83,6 +87,12 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
 
     @NotNull
     @Override
+    public ChanceImplementation getChanceImplementation() {
+        return chanceImplementation;
+    }
+
+    @NotNull
+    @Override
     public EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.ARMOR_TORSO;
     }
@@ -106,6 +116,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
     @Override
     public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
         if (!this.isAvailableToUse(entity)) return false;
+        if (!this.checkTriggerChance(level)) return false;
 
         double healthMax = EntityUtil.getAttribute(entity, Attribute.GENERIC_MAX_HEALTH);
         double healthHas = entity.getHealth();

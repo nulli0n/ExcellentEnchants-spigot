@@ -4,6 +4,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -100,9 +101,9 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onItemDamage(EntityDamageByEntityEvent e) {
         if (!e.getDamager().hasMetadata(META_NO_ITEM_DAMAGE)) return;
-        if (!(e.getEntity() instanceof Item item)) return;
-
-        e.setCancelled(true);
-        item.setFireTicks(0);
+        if (e.getEntity() instanceof Item || e.getEntity() instanceof ItemFrame) {
+            e.setCancelled(true);
+            e.getEntity().setFireTicks(0);
+        }
     }
 }

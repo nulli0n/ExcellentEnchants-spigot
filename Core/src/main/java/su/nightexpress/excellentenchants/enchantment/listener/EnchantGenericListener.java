@@ -188,21 +188,24 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEnchantPopulateSpawn(CreatureSpawnEvent e) {
-        if (Config.getObtainSettings(ObtainType.MOB_SPAWNING).isEmpty()) return;
-
+        //if (Config.getObtainSettings(ObtainType.MOB_SPAWNING).isEmpty()) return;
         LivingEntity entity = e.getEntity();
-        if (Hooks.isMythicMob(entity)) return;
 
-        EntityEquipment equipment = entity.getEquipment();
-        if (equipment == null) return;
+        this.plugin.runTaskLater(task -> {
+            EntityEquipment equipment = entity.getEquipment();
+            if (equipment == null) return;
 
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            ItemStack item = equipment.getItem(slot);
-            if (EnchantManager.isEnchantable(item)) {
-                EnchantManager.populateEnchantments(item, ObtainType.MOB_SPAWNING);
-                EnchantManager.getExcellentEnchantments(item).keySet().forEach(enchant -> EnchantManager.restoreEnchantmentCharges(item, enchant));
-                equipment.setItem(slot, item);
+            boolean isMythic = Hooks.isMythicMob(entity);
+            boolean doPopulation = Config.getObtainSettings(ObtainType.MOB_SPAWNING).isPresent() && !isMythic;
+
+            for (EquipmentSlot slot : EquipmentSlot.values()) {
+                ItemStack item = equipment.getItem(slot);
+                if (EnchantManager.isEnchantable(item)) {
+                    if (doPopulation) EnchantManager.populateEnchantments(item, ObtainType.MOB_SPAWNING);
+                    EnchantManager.getExcellentEnchantments(item).keySet().forEach(enchant -> EnchantManager.restoreEnchantmentCharges(item, enchant));
+                    equipment.setItem(slot, item);
+                }
             }
-        }
+        }, 40L);
     }
 }

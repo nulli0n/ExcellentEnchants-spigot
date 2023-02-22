@@ -4,41 +4,6 @@ name: ExcellentEnchants
 author: NightExpress
 desciption: Vanilla-like enchants for your server.
 depend: [ NexEngine ]
-softdepend: [ ProtocolLib, NoCheatPlus ]
+softdepend: [ ProtocolLib, NoCheatPlus, PlaceholderAPI ]
 api-version: 1.17
 load: STARTUP
-
-permissions:
-  excellentenchants.admin:
-    description: Grants access to all plugin functions.
-    default: op
-    children:
-      excellentenchants.user: true
-      excellentenchants.command: true
-
-  excellentenchants.user:
-    description: Grants access to basic player plugin functions.
-    default: true
-
-  excellentenchants.command:
-    description: Grants access to all the plugin commands.
-    default: op
-    children:
-      excellentenchants.command.book: true
-      excellentenchants.command.enchant: true
-      excellentenchants.command.list: true
-      excellentenchants.command.tierbook: true
-
-  excellentenchants.command.book:
-    description: Grants access to /eenchants book command.
-    default: op
-  excellentenchants.command.enchant:
-    description: Grants access to /eenchants enchant command.
-    default: op
-  excellentenchants.command.list:
-    description: Grants access to /eenchants list command.
-    default: true
-  excellentenchants.command.tierbook:
-    description: Grants access to /eenchants tierbook command.
-    default: op
-

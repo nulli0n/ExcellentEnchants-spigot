@@ -208,7 +208,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item);
 
         int sizeHas = PDCUtil.getInt(item, KEY_LORE_SIZE).orElse(0);
-        int sizeReal = enchants.size() + enchants.keySet().stream().map(ExcellentEnchant::getDescription).mapToInt(List::size).sum();
+        int sizeReal = enchants.size();
 
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return false;
@@ -219,9 +219,12 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         }
 
         if (!meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
-            enchants.forEach((enchant, level) -> {
-                lore.addAll(0, enchant.formatDescription(level));
-            });
+            if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get()) {
+                enchants.forEach((enchant, level) -> {
+                    lore.addAll(0, enchant.formatDescription(level));
+                });
+                sizeReal += enchants.keySet().stream().map(ExcellentEnchant::getDescription).mapToInt(List::size).sum();
+            }
             enchants.forEach((enchant, level) -> {
                 lore.add(0, enchant.getNameFormatted(level, getEnchantmentCharges(meta, enchant)));
             });

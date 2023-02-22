@@ -15,6 +15,7 @@ import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 import su.nightexpress.excellentenchants.hook.HookId;
+import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
 import su.nightexpress.excellentenchants.hook.impl.ProtocolHook;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 import su.nightexpress.excellentenchants.nms.v1_17_R1.V1_17_R1;
@@ -62,6 +63,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
             this.tierManager.shutdown();
             this.tierManager = null;
         }
+        PlaceholderHook.shutdown();
     }
 
     private boolean setNMS() {
@@ -105,6 +107,9 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
                 this.warn(HookId.PROTOCOL_LIB + " is not installed. Set display mode to Plain lore.");
                 Config.ENCHANTMENTS_DISPLAY_MODE.set(1);
             }
+        }
+        if (Hooks.hasPlaceholderAPI()) {
+            PlaceholderHook.setup();
         }
     }
 

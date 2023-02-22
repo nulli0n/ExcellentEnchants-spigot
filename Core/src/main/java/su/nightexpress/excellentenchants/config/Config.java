@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
+import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
@@ -30,7 +31,7 @@ public class Config {
         Placeholders.URL_WIKI + "Charges-System");
 
     public static final JOption<TreeMap<Double, String>> ENCHANTMENTS_CHARGES_FORMAT = new JOption<TreeMap<Double, String>>("Enchantments.Charges.Format",
-        (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(k -> StringUtil.getDouble(k, 0), v -> StringUtil.color(cfg.getString(path + "." + v, "")), (o,n) -> n, TreeMap::new)),
+        (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(k -> StringUtil.getDouble(k, 0), v -> Colorizer.apply(cfg.getString(path + "." + v, "")), (o,n) -> n, TreeMap::new)),
         () -> {
             TreeMap<Double, String> map = new TreeMap<>();
             map.put(0D, "#ff9a9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");

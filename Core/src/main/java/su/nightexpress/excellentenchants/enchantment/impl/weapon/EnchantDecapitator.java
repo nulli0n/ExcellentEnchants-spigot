@@ -2,18 +2,27 @@ package su.nightexpress.excellentenchants.enchantment.impl.weapon;
 
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.block.Skull;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
+import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.ItemUtil;
+import su.nexmedia.engine.utils.PDCUtil;
+import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
@@ -37,8 +46,11 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
     private Map<String, String> headTextures;
     private ChanceImplementation chanceImplementation;
 
+    private final NamespacedKey skullKey;
+
     public EnchantDecapitator(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.skullKey = new NamespacedKey(plugin, this.getId() + ".entity_type");
     }
 
     @Override
@@ -132,6 +144,7 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
             meta.setDisplayName(entityName);
             item.setItemMeta(meta);
         }
+        PDCUtil.set(item, this.skullKey, entityType.name());
 
         entity.getWorld().dropItemNaturally(entity.getLocation(), item);
 
@@ -139,5 +152,42 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
             EffectUtil.playEffect(entity.getEyeLocation(), Particle.BLOCK_CRACK, Material.REDSTONE_BLOCK.name(), 0.2f, 0.15f, 0.2f, 0.15f, 40);
         }
         return true;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent e) {
+        if (!(e.getBlock().getState() instanceof Skull skull)) return;
+
+        ItemStack skullItem = e.getItemInHand();
+        PDCUtil.getString(skullItem, this.skullKey).ifPresent(type -> {
+            PDCUtil.set(skull, this.skullKey, type);
+            skull.update(true);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockPlace(BlockDropItemEvent e) {
+        if (!(e.getBlockState() instanceof Skull skull)) return;
+
+        PDCUtil.getString(skull, this.skullKey).ifPresent(type -> {
+            String texture = this.headTextures.get(type);
+            if (texture == null) return;
+
+            EntityType entityType = StringUtil.getEnum(type, EntityType.class).orElse(null);
+            if (entityType == null) return;
+
+            e.getItems().forEach(item -> {
+                ItemStack drop = item.getItemStack();
+                if (drop.getType() == Material.PLAYER_HEAD) {
+                    ItemUtil.setSkullTexture(drop, texture);
+                    ItemUtil.mapMeta(drop, meta -> {
+                        String name = this.headName.replace(Placeholders.GENERIC_TYPE, LangManager.getEntityType(entityType));
+                        meta.setDisplayName(name);
+                        PDCUtil.set(meta, this.skullKey, type);
+                    });
+                }
+                item.setItemStack(drop);
+            });
+        });
     }
 }

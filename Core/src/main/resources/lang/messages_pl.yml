@@ -1,18 +1,37 @@
-# Przetłumaczone przez nitolar play
-# Tłumaczenie utworzono: 06.11.2020
 Command:
+  List:
+    Desc: Lista wszystkich customowych enchantów.
   Enchant:
-    Usage: <zaklęcie> <poziom>
-    Desc: Zaklnij przedmiot w swojej ręce.
-    Done: '&aSukcesywnie Zaklnięto!'
+    Usage: <enchant> <poziomXP>
+    Desc: Zaklina przedmiot trzymany w łapce.
+    Done: '&aPomyślnie zaklęto!'
   Book:
-    Usage: <gracz> <zaklęcie> <poziom>
-    Desc: Dodaje niestandardowo zaklniętą książke.
-    Done: Dodano zaklniętą ksiązke z zaklęciem &6%enchant%&7 do gracza &6%player%&7.
+    Usage: <gracz> <enchant> <poziomXP>
+    Desc: Daje książkę z customowym enchantem.
+    Done: Przyznano zaklętą książkę &6%enchant%&7 dla &6%player_display_name%&7.
   TierBook:
-    Usage: <gracz> <żadkość> <poziom>
-    Desc: Dodaje zaklniętą książke.
-    Error: '&cZły poziom żadkości!'
-    Done: Dodano zaklniętą ksiązke z zaklęciem &6%enchant%&7 do gracza &6%player%&7.
+    Usage: <gracz> <poziom> <poziomXP>
+    Desc: Daje książkę z enchantem.
+    Error: '&cZły poziom!'
+    Done: Przyznano zaklętą książkę &6%tier_name%&7 dla &6%player_display_name%&7.
 Error:
-  NoEnchant: '&cNie ma takiego zaklęcia.'
+  NoEnchant: '&cNiepoprawny enchant.'
+FitItemType:
+  HELMET: Hełm
+  CHESTPLATE: Napierśnik
+  LEGGINGS: Spodnie
+  BOOTS: Buty
+  ELYTRA: Elytra
+  WEAPON: Broń
+  TOOL: Narzędzie
+  ARMOR: Zbroja
+  UNIVERSAL: Uniwersalny
+  SWORD: Miecz
+  TRIDENT: Trójząb
+  AXE: Siekiera
+  BOW: Łuk
+  CROSSBOW: Kusza
+  HOE: Motyka
+  PICKAXE: Kilof
+  SHOVEL: Łopata
+  FISHING_ROD: Wędka
