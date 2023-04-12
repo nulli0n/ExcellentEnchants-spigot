@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
+import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -59,10 +60,10 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         super.loadConfig();
         this.chestName = JOption.create("Settings.Chest_Item.Name", "Chest &7(" + Placeholders.GENERIC_AMOUNT + " items)",
             "Chest item display name.",
-            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(cfg);
+            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").mapReader(Colorizer::apply).read(cfg);
         this.chestLore = JOption.create("Settings.Chest_Item.Lore", new ArrayList<>(),
             "Chest item lore.",
-            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(cfg);
+            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").mapReader(Colorizer::apply).read(cfg);
     }
 
     @Deprecated
@@ -83,7 +84,7 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     }
 
     public boolean isSilkChest(@NotNull ItemStack item) {
-        return PDCUtil.getBooleanData(item, this.keyChest) || PDCUtil.getStringData(item, this.getItemKey(0)) != null;
+        return PDCUtil.getBoolean(item, this.keyChest).orElse(false) || PDCUtil.getString(item, this.getItemKey(0)).orElse(null) != null;
     }
 
     @NotNull
@@ -105,7 +106,7 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         chestStack.setItemMeta(stateMeta);
 
         ItemUtil.replace(chestStack, str -> str.replace(Placeholders.GENERIC_AMOUNT, String.valueOf(amount)));
-        PDCUtil.setData(chestStack, this.keyChest, true);
+        PDCUtil.set(chestStack, this.keyChest, true);
         return chestStack;
 
         // Store and count chest items.
@@ -172,7 +173,7 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
 
         Inventory inventory = chest.getBlockInventory();
         for (int pos = 0; pos < inventory.getSize(); pos++) {
-            String data = PDCUtil.getStringData(item, this.getItemKey(pos));
+            String data = PDCUtil.getString(item, this.getItemKey(pos)).orElse(null);
             if (data == null) continue;
 
             ItemStack itemInv = ItemUtil.fromBase64(data);

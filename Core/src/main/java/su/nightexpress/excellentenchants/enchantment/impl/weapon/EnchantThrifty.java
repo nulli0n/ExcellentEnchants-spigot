@@ -80,7 +80,7 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
         if (!this.isAvailableToUse(entity)) return false;
 
         if (this.ignoredEntityTypes.contains(entity.getType())) return false;
-        if (PDCUtil.getBooleanData(entity, this.keyEntityIgnored)) return false;
+        if (PDCUtil.getBoolean(entity, this.keyEntityIgnored).orElse(false)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         Material material = Material.getMaterial(entity.getType().name() + "_SPAWN_EGG");
@@ -105,6 +105,6 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
     public void onCreatureSpawn(CreatureSpawnEvent e) {
         if (!this.ignoredSpawnReasons.contains(e.getSpawnReason())) return;
 
-        PDCUtil.setData(e.getEntity(), this.keyEntityIgnored, true);
+        PDCUtil.set(e.getEntity(), this.keyEntityIgnored, true);
     }
 }

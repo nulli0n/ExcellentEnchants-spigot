@@ -114,7 +114,8 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
             EffectUtil.playEffect(LocationUtil.getCenter(ore.getLocation()), Particle.BLOCK_CRACK.name(), ore.getType().name(), 0.2, 0.2, 0.2, 0.1, 20);
 
             ore.setMetadata(META_BLOCK_VEINED, new FixedMetadataValue(plugin, true));
-            plugin.getNMS().breakBlock(player, ore);
+            //plugin.getNMS().breakBlock(player, ore);
+            player.breakBlock(ore);
             ore.removeMetadata(META_BLOCK_VEINED, plugin);
         });
     }

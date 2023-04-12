@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
+import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -49,7 +50,8 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
         this.chanceImplementation = ChanceImplementation.create(this);
         this.spawnerName = JOption.create("Settings.Spawner_Item.Name", "&aMob Spawner &7(" + Placeholders.GENERIC_TYPE + ")",
             "Spawner item display name.",
-            "Placeholder '" + Placeholders.GENERIC_TYPE + "' for the mob type.").read(cfg);
+            "Placeholder '" + Placeholders.GENERIC_TYPE + "' for the mob type.")
+            .mapReader(Colorizer::apply).read(cfg);
     }
 
     @NotNull

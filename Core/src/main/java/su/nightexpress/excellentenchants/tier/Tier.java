@@ -5,7 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.IPlaceholder;
-import su.nexmedia.engine.utils.StringUtil;
+import su.nexmedia.engine.utils.Colorizer;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
@@ -38,7 +38,7 @@ public class Tier implements IPlaceholder {
                 @NotNull Map<ObtainType, Double> chance) {
         this.id = id.toLowerCase();
         this.priority = priority;
-        this.name = StringUtil.color(name);
+        this.name = Colorizer.apply(name);
         this.color = color;
         this.chance = chance;
         this.enchants = new HashSet<>();

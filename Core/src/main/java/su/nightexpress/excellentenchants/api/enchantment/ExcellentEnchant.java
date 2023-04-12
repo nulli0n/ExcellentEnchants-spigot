@@ -12,10 +12,7 @@ import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.IListener;
 import su.nexmedia.engine.lang.LangManager;
-import su.nexmedia.engine.utils.ItemUtil;
-import su.nexmedia.engine.utils.NumberUtil;
-import su.nexmedia.engine.utils.Scaler;
-import su.nexmedia.engine.utils.StringUtil;
+import su.nexmedia.engine.utils.*;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
@@ -77,7 +74,8 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         this.cfg.reload();
 
         this.displayName = JOption.create("Name", StringUtil.capitalizeFully(this.getId().replace("_", " ")),
-            "Enchantment display name. It will be shown in item lore.").read(cfg);
+            "Enchantment display name. It will be shown in item lore.")
+            .mapReader(Colorizer::apply).read(cfg);
 
         this.tier = plugin.getTierManager().getTierById(JOption.create("Tier", Placeholders.DEFAULT,
             "Enchantment tier. Must be a valid tier identifier from the 'tiers.yml'.").read(cfg));
@@ -88,7 +86,8 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
         this.description = JOption.create("Description", new ArrayList<>(),
             "Enchantment description. It will be shown in item lore under enchantment name.",
-            "You can use 'Enchantment' placeholders: " + Placeholders.URL_PLACEHOLDERS).read(cfg);
+            "You can use 'Enchantment' placeholders: " + Placeholders.URL_PLACEHOLDERS)
+            .mapReader(Colorizer::apply).read(cfg);
 
         this.isTreasure = JOption.create("Is_Treasure", false,
             "Sets whether this enchantment is a treasure enchantment.",
@@ -250,8 +249,8 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         if (!this.isChargesEnabled() || charges < 0) return this.getNameFormatted(level);
 
         int chargesMax = this.getChargesMax(level);
-        double percent = (double) charges / (double) chargesMax * 100D;
-        Map.Entry<Double, String> entry = Config.ENCHANTMENTS_CHARGES_FORMAT.get().floorEntry(percent);
+        int percent = (int) Math.ceil((double) charges / (double) chargesMax * 100D);
+        Map.Entry<Integer, String> entry = Config.ENCHANTMENTS_CHARGES_FORMAT.get().floorEntry(percent);
         if (entry == null) return this.getNameFormatted(level);
 
         String format = entry.getValue().replace(Placeholders.GENERIC_AMOUNT, String.valueOf(charges));

@@ -13,7 +13,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerFishEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -34,16 +33,6 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
 
     public EnchantGenericListener(@NotNull EnchantManager enchantManager) {
         super(enchantManager.plugin());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onEnchantPotionEffectQuit(PlayerQuitEvent e) {
-        Player player = e.getPlayer();
-
-        player.getActivePotionEffects().stream()
-            .filter(effect -> EnchantManager.isEnchantmentEffect(player, effect)).forEach(effect -> {
-                player.removePotionEffect(effect.getType());
-        });
     }
 
     // ---------------------------------------------------------------
@@ -190,6 +179,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
     public void onEnchantPopulateSpawn(CreatureSpawnEvent e) {
         //if (Config.getObtainSettings(ObtainType.MOB_SPAWNING).isEmpty()) return;
         LivingEntity entity = e.getEntity();
+        if (entity.getType() == EntityType.ARMOR_STAND) return;
 
         this.plugin.runTaskLater(task -> {
             EntityEquipment equipment = entity.getEquipment();

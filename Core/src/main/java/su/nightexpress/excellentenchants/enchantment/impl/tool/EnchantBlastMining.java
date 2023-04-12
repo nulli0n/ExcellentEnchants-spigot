@@ -74,7 +74,7 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
     }
 
     private boolean isBlockHardEnough(@NotNull Block block, int level) {
-        float strength = plugin.getNMS().getBlockStrength(block);
+        float strength = block.getType().getHardness();//plugin.getNMS().getBlockStrength(block);
         return (strength >= this.getMinBlockStrength(level));
     }
 
@@ -136,7 +136,8 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
         // Break all 'exploded' blocks by a player, adding metadata to them to prevent trigger enchantment in a loop.
         blockList.forEach(block -> {
             block.setMetadata(META_EXPLOSION_MINED, new FixedMetadataValue(plugin, true));
-            plugin.getNMS().breakBlock(player, block);
+            //plugin.getNMS().breakBlock(player, block);
+            player.breakBlock(block);
             block.removeMetadata(META_EXPLOSION_MINED, plugin);
         });
 

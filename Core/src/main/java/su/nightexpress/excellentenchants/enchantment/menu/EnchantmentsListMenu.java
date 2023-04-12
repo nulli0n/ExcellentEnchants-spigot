@@ -13,6 +13,7 @@ import su.nexmedia.engine.api.menu.MenuClick;
 import su.nexmedia.engine.api.menu.MenuItem;
 import su.nexmedia.engine.api.menu.MenuItemType;
 import su.nexmedia.engine.lang.LangManager;
+import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nexmedia.engine.utils.StringUtil;
@@ -46,9 +47,9 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
         this.iconCache = new HashMap<>();
 
         this.enchantIcon = cfg.getItem("Enchantments.Icon");
-        this.enchantLoreConflicts = StringUtil.color(cfg.getStringList("Enchantments.Lore.Conflicts"));
-        this.enchantLoreCharges = StringUtil.color(cfg.getStringList("Enchantments.Lore.Charges"));
-        this.enchantLoreObtaining = StringUtil.color(cfg.getStringList("Enchantments.Lore.Obtaining"));
+        this.enchantLoreConflicts = Colorizer.apply(cfg.getStringList("Enchantments.Lore.Conflicts"));
+        this.enchantLoreCharges = Colorizer.apply(cfg.getStringList("Enchantments.Lore.Charges"));
+        this.enchantLoreObtaining = Colorizer.apply(cfg.getStringList("Enchantments.Lore.Obtaining"));
         this.enchantSlots = cfg.getIntArray("Enchantments.Slots");
 
         MenuClick click = (player, type, e) -> {
@@ -100,12 +101,12 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
             ItemStack itemClick = e.getCurrentItem();
             if (itemClick == null) return;
 
-            int levelHas = PDCUtil.getIntData(itemClick, this.keyLevel);
+            int levelHas = PDCUtil.getInt(itemClick, this.keyLevel).orElse(0);
             if (levelHas == 0) levelHas = enchant.getStartLevel();
 
             if (++levelHas > enchant.getMaxLevel()) levelHas = enchant.getStartLevel();
             itemClick = this.getEnchantIcon(enchant, levelHas);
-            PDCUtil.setData(itemClick, this.keyLevel, levelHas);
+            PDCUtil.set(itemClick, this.keyLevel, levelHas);
 
             e.setCurrentItem(itemClick);
         };

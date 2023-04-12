@@ -10,14 +10,12 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.AbstractManager;
+import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
-import su.nexmedia.engine.utils.Pair;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
@@ -38,7 +36,6 @@ import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EnchantManager extends AbstractManager<ExcellentEnchants> {
@@ -217,6 +214,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         for (int index = 0; index < sizeHas && !lore.isEmpty(); index++) {
             lore.remove(0);
         }
+        //lore.removeIf(str -> enchants.keySet().stream().anyMatch(enchant -> str.contains(enchant.getDisplayName())));
 
         if (!meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
             if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get()) {
@@ -232,7 +230,9 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         else sizeReal = 0;
 
         meta.setLore(lore);
-        PDCUtil.set(meta, KEY_LORE_SIZE, sizeReal);
+        if (sizeReal > 0) {
+            PDCUtil.set(meta, KEY_LORE_SIZE, sizeReal);
+        }
         item.setItemMeta(meta);
         return true;
     }
@@ -261,11 +261,11 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     }
 
     public static int getEnchantmentCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
-        return enchant.isChargesEnabled() ? PDCUtil.getIntData(item, enchant.getChargesKey()) : -1;
+        return enchant.isChargesEnabled() ? PDCUtil.getInt(item, enchant.getChargesKey()).orElse(-0) : -1;
     }
 
     public static int getEnchantmentCharges(@NotNull ItemMeta meta, @NotNull ExcellentEnchant enchant) {
-        return enchant.isChargesEnabled() ? PDCUtil.getIntData(meta, enchant.getChargesKey()) : -1;
+        return enchant.isChargesEnabled() ? PDCUtil.getInt(meta, enchant.getChargesKey()).orElse(0) : -1;
     }
 
     public static boolean isEnchantmentOutOfCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
@@ -311,7 +311,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
         int level = getEnchantmentLevel(item, enchant);
         int max = enchant.getChargesMax(level);
-        PDCUtil.setData(item, enchant.getChargesKey(), Math.max(0, Math.min(charges, max)));
+        PDCUtil.set(item, enchant.getChargesKey(), Math.max(0, Math.min(charges, max)));
     }
 
     public static int getExcellentEnchantmentsAmount(@NotNull ItemStack item) {
@@ -330,44 +330,26 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
     @NotNull
     private static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull Map<Enchantment, Integer> enchants) {
-        return enchants.entrySet().stream()
-            .map(entry -> {
-                ExcellentEnchant enchant = EnchantRegister.get(entry.getKey().getKey());
-                return enchant == null ? null : Pair.of(enchant, entry.getValue());
-            })
-            .filter(Objects::nonNull)
-            //.sorted(Comparator.comparing(p -> p.getFirst().getPriority(), Comparator.reverseOrder()))
-            .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (old, nev) -> nev, LinkedHashMap::new));
+        Map<ExcellentEnchant, Integer> map = new HashMap<>();
+        enchants.forEach((enchantment, level) -> {
+            ExcellentEnchant excellent = EnchantRegister.get(enchantment.getKey());
+            if (excellent != null) {
+                map.put(excellent, level);
+            }
+        });
+        return map;
     }
 
-    @SuppressWarnings("unchecked")
     @NotNull
     public static <T extends IEnchantment> Map<T, Integer> getExcellentEnchantments(@NotNull ItemStack item, @NotNull Class<T> clazz) {
-        return EnchantManager.getEnchantments(item).entrySet().stream()
-            .map(entry -> {
-                ExcellentEnchant enchant = EnchantRegister.get(entry.getKey().getKey());
-                if (enchant == null || !clazz.isAssignableFrom(enchant.getClass())) return null;
-                return Pair.of((T) enchant, entry.getValue());
-            })
-            .filter(Objects::nonNull)
-            .sorted(Comparator.comparing(p -> p.getFirst().getPriority(), Comparator.reverseOrder()))
-            .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (old, nev) -> nev, LinkedHashMap::new));
-    }
+        Map<T, Integer> map = new HashMap<>();
+        EnchantManager.getEnchantments(item).forEach((enchantment, level) -> {
+            ExcellentEnchant excellent = EnchantRegister.get(enchantment.getKey());
+            if (excellent == null || !clazz.isAssignableFrom(excellent.getClass())) return;
 
-    @Nullable
-    public static ExcellentEnchant getEnchantmentByEffect(@NotNull LivingEntity entity, @NotNull PotionEffect effect) {
-        Enchantment enchantment = ExcellentEnchantsAPI.PLUGIN.getEnchantNMS().getEnchantmentByEffect(entity, effect);
-        if (enchantment instanceof ExcellentEnchant enchant) return enchant;
-
-        return null;
-    }
-
-    public static boolean isEnchantmentEffect(@NotNull LivingEntity entity, @NotNull PotionEffect effect) {
-        return getEnchantmentByEffect(entity, effect) != null;
-    }
-
-    public static boolean hasEnchantmentEffect(@NotNull LivingEntity entity, @NotNull ExcellentEnchant enchant) {
-        return entity.getActivePotionEffects().stream().anyMatch(effect -> enchant.equals(getEnchantmentByEffect(entity, effect)));
+            map.put(clazz.cast(excellent), level);
+        });
+        return CollectionsUtil.sort(map, Comparator.comparing(p -> p.getKey().getPriority(), Comparator.reverseOrder()));
     }
 
     @NotNull

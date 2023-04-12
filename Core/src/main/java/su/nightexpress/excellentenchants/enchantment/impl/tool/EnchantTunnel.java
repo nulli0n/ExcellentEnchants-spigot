@@ -117,7 +117,8 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
 
             // Add metadata to prevent enchantment triggering in a loop.
             blockAdd.setMetadata(META_BLOCK_TUNNEL, new FixedMetadataValue(plugin, true));
-            plugin.getNMS().breakBlock(player, blockAdd);
+            //plugin.getNMS().breakBlock(player, blockAdd);
+            player.breakBlock(blockAdd);
             blockAdd.removeMetadata(META_BLOCK_TUNNEL, plugin);
         }
 

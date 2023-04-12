@@ -1,4 +1,4 @@
-package su.nightexpress.excellentenchants.nms.v1_18_R2;
+package su.nightexpress.excellentenchants.nms.v1_19_R3;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
@@ -10,10 +10,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_18_R2.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ import su.nightexpress.excellentenchants.nms.EnchantNMS;
 import java.util.HashSet;
 import java.util.Set;
 
-public class V1_18_R2 implements EnchantNMS {
+public class V1_19_R3 implements EnchantNMS {
 
     @Override
     public void sendAttackPacket(@NotNull Player player, int id) {
@@ -36,15 +36,15 @@ public class V1_18_R2 implements EnchantNMS {
     @NotNull
     public Set<Block> handleFlameWalker(@NotNull LivingEntity bukkitEntity, @NotNull Location location, int level) {
         Entity entity = ((CraftLivingEntity) bukkitEntity).getHandle();
-        BlockPos pos = new BlockPos(location.getX(), location.getY(), location.getZ());
+        BlockPos pos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         ServerLevel world = ((CraftWorld) bukkitEntity.getWorld()).getHandle();
 
-        float radius = Math.min(16F, 2F + level);
+        int radius = Math.min(16, 2 + level);
         BlockState bStone = Blocks.MAGMA_BLOCK.defaultBlockState();
         BlockPos.MutableBlockPos posAbove = new BlockPos.MutableBlockPos();
 
         Set<Block> blocks = new HashSet<>();
-        for (BlockPos posNear : BlockPos.betweenClosed(pos.offset(-radius, -1.0, -radius), pos.offset(radius, -1.0, radius))) {
+        for (BlockPos posNear : BlockPos.betweenClosed(pos.offset(-radius, -1, -radius), pos.offset(radius, -1, radius))) {
             if (!posNear.closerThan(entity.blockPosition(), radius)) continue;
 
             posAbove.set(posNear.getX(), posNear.getY() + 1, posNear.getZ());

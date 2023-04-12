@@ -81,12 +81,12 @@ public final class ArrowImplementation implements Arrowed {
 
     @Override
     public void addData(@NotNull Projectile projectile) {
-        PDCUtil.setData(projectile, this.getProjectileKey(), this.enchant.getId());
+        PDCUtil.set(projectile, this.getProjectileKey(), this.enchant.getId());
     }
 
     @Override
     public boolean isOurProjectile(@NotNull Projectile projectile) {
-        String enchantId = PDCUtil.getStringData(projectile, this.getProjectileKey());
+        String enchantId = PDCUtil.getString(projectile, this.getProjectileKey()).orElse(null);
         return this.enchant.getId().equalsIgnoreCase(enchantId);
     }
 }

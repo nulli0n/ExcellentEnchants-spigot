@@ -21,23 +21,34 @@ public class Config {
 
     public static final JOption<Long> TASKS_ARROW_TRAIL_TICKS_INTERVAL = JOption.create("Tasks.Arrow_Trail.Tick_Interval", 1L,
         "Sets how often (in ticks) arrow trail particle effects will be spawned behind the arrow.");
-    public static final JOption<Long> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("Tasks.Passive_Potion_Effects.Apply_Interval", 150L,
-        "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them.",
-        "This setting does NOT refreshes currently active effects, but only attempts to add them if absent."
+    public static final JOption<Long> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("Tasks.Passive_Potion_Effects.Apply_Interval", 100L,
+        "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them."
     );
 
     public static final JOption<Boolean> ENCHANTMENTS_CHARGES_ENABLED = JOption.create("Enchantments.Charges.Enabled", false,
         "Enables the enchantment Charges feature.",
         Placeholders.URL_WIKI + "Charges-System");
 
-    public static final JOption<TreeMap<Double, String>> ENCHANTMENTS_CHARGES_FORMAT = new JOption<TreeMap<Double, String>>("Enchantments.Charges.Format",
-        (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(k -> StringUtil.getDouble(k, 0), v -> Colorizer.apply(cfg.getString(path + "." + v, "")), (o,n) -> n, TreeMap::new)),
+    public static final JOption<TreeMap<Integer, String>> ENCHANTMENTS_CHARGES_FORMAT = new JOption<TreeMap<Integer, String>>("Enchantments.Charges.Format",
+        (cfg, path, def) -> {
+            TreeMap<Integer, String> map = new TreeMap<>();
+            for (String raw : cfg.getSection(path)) {
+                int percent = StringUtil.getInteger(raw, -1);
+                if (percent < 0) continue;
+
+                String format = Colorizer.apply(cfg.getString(path + "." + raw, ""));
+                if (format.isEmpty()) continue;
+
+                map.put(percent, format);
+            }
+            return map;
+        },
         () -> {
-            TreeMap<Double, String> map = new TreeMap<>();
-            map.put(0D, "#ff9a9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
-            map.put(25D, "#ffc39a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
-            map.put(50D, "#f6ff9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
-            map.put(75D, "#bcff9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            TreeMap<Integer, String> map = new TreeMap<>();
+            map.put(0, "#ff9a9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            map.put(25, "#ffc39a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            map.put(50, "#f6ff9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            map.put(75, "#bcff9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
             return map;
         },
         "Enchantment charges format depends on amount of charges left (in percent).",
@@ -76,12 +87,11 @@ public class Config {
 
     public static final JOption<Boolean> ENCHANTMENTS_DESCRIPTION_ENABLED = JOption.create("Enchantments.Description.Enabled", true,
         "When 'true', adds the enchantment description to item lore under enchantment names.",
-        "Note #1: You must have ProtocolLib installed for this feature to work (as well as for enchantments name display).",
-        "Note #2: Description is not shown while you're in Creative gamemode.");
+        "For Display-Mode = 2 description is not shown while you're in Creative gamemode.");
 
     public static final JOption<String> ENCHANTMENTS_DESCRIPTION_FORMAT = JOption.create("Enchantments.Description.Format",
         "&8▸ " + Placeholders.GENERIC_DESCRIPTION,
-        "Sets the global enchantment description format.");
+        "Sets the global enchantment description format.").mapReader(Colorizer::apply);
 
     public static final JOption<Integer> ENCHANTMENTS_ITEM_CUSTOM_MAX = JOption.create("Enchantments.Item.Max_Custom_Enchants", 3,
         "How many of custom enchantments the item can contain at the same time?");

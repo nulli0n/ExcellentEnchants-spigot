@@ -9,11 +9,6 @@ public interface Potioned {
 
     @NotNull Potioned getPotionImplementation();
 
-    /*@NotNull
-    default UnaryOperator<String> replacePlaceholders(int level) {
-        return this.getPotionImplementation().replacePlaceholders(level);
-    }*/
-
     default boolean isPermanent() {
         return this.getPotionImplementation().isPermanent();
     }
@@ -32,10 +27,6 @@ public interface Potioned {
 
     default PotionEffect createEffect(int level) {
         return this.getPotionImplementation().createEffect(level);
-    }
-
-    default boolean hasEffect(@NotNull LivingEntity target) {
-        return this.getPotionImplementation().hasEffect(target);
     }
 
     default boolean addEffect(@NotNull LivingEntity target, int level) {

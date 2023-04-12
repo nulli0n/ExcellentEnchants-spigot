@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
 import su.nexmedia.engine.lang.LangManager;
+import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.PlayerUtil;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
@@ -49,7 +50,7 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
     @NotNull
     public List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
         if (arg == 1) {
-            return PlayerUtil.getPlayerNames();
+            return CollectionsUtil.playerNames(player);
         }
         if (arg == 2) {
             return Arrays.stream(Enchantment.values()).map(e -> e.getKey().getKey()).toList();

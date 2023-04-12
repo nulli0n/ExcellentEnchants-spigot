@@ -18,19 +18,23 @@ import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.utils.MessageUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.InteractEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 
 import java.util.Set;
 
-public class EnchantReplanter extends ExcellentEnchant implements InteractEnchant, BlockBreakEnchant {
+public class EnchantReplanter extends ExcellentEnchant implements Chanced, InteractEnchant, BlockBreakEnchant {
 
     public static final String ID = "replanter";
 
     private boolean replantOnRightClick;
     private boolean replantOnPlantBreak;
+
+    private ChanceImplementation chanceImplementation;
 
     private static final Set<Material> CROPS = Set.of(
         Material.WHEAT_SEEDS, Material.BEETROOT_SEEDS,
@@ -44,10 +48,17 @@ public class EnchantReplanter extends ExcellentEnchant implements InteractEnchan
     @Override
     public void loadConfig() {
         super.loadConfig();
+        this.chanceImplementation = ChanceImplementation.create(this);
         this.replantOnRightClick = JOption.create("Settings.Replant.On_Right_Click", true,
             "When 'true', player will be able to replant crops when right-clicking farmland blocks.").read(cfg);
         this.replantOnPlantBreak = JOption.create("Settings.Replant.On_Plant_Break", true,
             "When 'true', crops will be automatically replanted when player break plants with enchanted tool in hand.").read(cfg);
+    }
+
+    @NotNull
+    @Override
+    public ChanceImplementation getChanceImplementation() {
+        return chanceImplementation;
     }
 
     public boolean isReplantOnPlantBreak() {
@@ -107,8 +118,9 @@ public class EnchantReplanter extends ExcellentEnchant implements InteractEnchan
 
     @Override
     public boolean onInteract(@NotNull PlayerInteractEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (!this.isAvailableToUse(player)) return false;
         if (!this.isReplantOnRightClick()) return false;
+        if (!this.isAvailableToUse(player)) return false;
+        if (!this.checkTriggerChance(level)) return false;
 
         // Check for a event hand. We dont want to trigger it twice.
         if (e.getHand() != EquipmentSlot.HAND) return false;
@@ -133,7 +145,7 @@ public class EnchantReplanter extends ExcellentEnchant implements InteractEnchan
                 || seed != Material.NETHER_WART && blockGround.getType() == Material.FARMLAND) {
                 if (this.takeSeeds(player, seed)) {
                     MessageUtil.sound(player, seed == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT);
-                    plugin.getNMS().sendAttackPacket(player, 0);
+                    plugin.getEnchantNMS().sendAttackPacket(player, 0);
                     blockPlant.setType(this.fineSeedsToBlock(seed));
                     break;
                 }
@@ -144,8 +156,9 @@ public class EnchantReplanter extends ExcellentEnchant implements InteractEnchan
 
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (!this.isAvailableToUse(player)) return false;
         if (!this.isReplantOnPlantBreak()) return false;
+        if (!this.isAvailableToUse(player)) return false;
+        if (!this.checkTriggerChance(level)) return false;
 
         Block blockPlant = e.getBlock();
         //if (EnchantTelekinesis.isDropHandled(blockPlant)) return false;

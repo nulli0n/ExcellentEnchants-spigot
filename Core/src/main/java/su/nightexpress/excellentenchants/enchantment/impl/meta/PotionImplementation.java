@@ -5,11 +5,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.Scaler;
-import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 
 public final class PotionImplementation implements Potioned {
@@ -18,14 +17,14 @@ public final class PotionImplementation implements Potioned {
     public static final String PLACEHOLDER_POTION_DURATION = "%enchantment_potion_duration%";
     public static final String PLACEHOLDER_POTION_TYPE     = "%enchantment_potion_type%";
 
-    private final ExcellentEnchant enchant;
+    //private final ExcellentEnchant enchant;
     private final PotionEffectType effectType;
     private final Scaler  duration;
     private final Scaler  amplifier;
     private final boolean isPermanent;
 
     private PotionImplementation(@NotNull ExcellentEnchant enchant, @NotNull PotionEffectType effectType, boolean isPermanent) {
-        this.enchant = enchant;
+        //this.enchant = enchant;
         this.effectType = effectType;
         this.duration = EnchantScaler.read(enchant, "Settings.Potion_Effect.Duration", "5.0 * " + Placeholders.ENCHANTMENT_LEVEL,
             "Potion effect duration (in seconds). This setting is useless for 'permanent' effects.");
@@ -55,6 +54,13 @@ public final class PotionImplementation implements Potioned {
     }
 
     public int getEffectDuration(int level) {
+        if (this.isPermanent()) {
+            int duration = Config.TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL.get().intValue() + 30;
+            if (this.getEffectType().getName().equalsIgnoreCase(PotionEffectType.NIGHT_VISION.getName())) {
+                duration += 30 * 20;
+            }
+            return duration;
+        }
         return (int) (this.duration.getValue(level) * 20);
     }
 
@@ -70,17 +76,8 @@ public final class PotionImplementation implements Potioned {
         return new PotionEffect(this.getEffectType(), duration, amplifier, false, false);
     }
 
-    public boolean hasEffect(@NotNull LivingEntity entity) {
-        return EnchantManager.hasEnchantmentEffect(entity, this.enchant);
-    }
-
     public boolean addEffect(@NotNull LivingEntity target, int level) {
-        if (this.isPermanent()) {
-            ExcellentEnchantsAPI.PLUGIN.getEnchantNMS().addEnchantmentEffect(target, this.enchant, this.createEffect(level));
-        }
-        else {
-            target.addPotionEffect(this.createEffect(level));
-        }
+        target.addPotionEffect(this.createEffect(level));
         return true;
     }
 }
