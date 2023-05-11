@@ -7,38 +7,23 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
-import su.nexmedia.engine.utils.StringUtil;
+import su.nexmedia.engine.api.command.CommandResult;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
 import su.nightexpress.excellentenchants.config.Lang;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
 
     public EnchantCommand(@NotNull ExcellentEnchants plugin) {
         super(plugin, new String[]{"enchant"}, Perms.COMMAND_ENCHANT);
-    }
-
-    @Override
-    @NotNull
-    public String getDescription() {
-        return plugin.getMessage(Lang.COMMAND_ENCHANT_DESC).getLocalized();
-    }
-
-    @Override
-    @NotNull
-    public String getUsage() {
-        return plugin.getMessage(Lang.COMMAND_ENCHANT_USAGE).getLocalized();
-    }
-
-    @Override
-    public boolean isPlayerOnly() {
-        return true;
+        this.setDescription(plugin.getMessage(Lang.COMMAND_ENCHANT_DESC));
+        this.setUsage(plugin.getMessage(Lang.COMMAND_ENCHANT_USAGE));
+        this.setPlayerOnly(true);
     }
 
     @Override
@@ -54,8 +39,8 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    public void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, @NotNull Map<String, String> flags) {
-        if (args.length != 3) {
+    protected void onExecute(@NotNull CommandSender sender, @NotNull CommandResult result) {
+        if (result.length() < 3) {
             this.printUsage(sender);
             return;
         }
@@ -67,23 +52,23 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
             return;
         }
 
-        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(args[1].toLowerCase()));
+        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(result.getArg(1).toLowerCase()));
         if (enchantment == null) {
             plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
             return;
         }
 
-        int level = StringUtil.getInteger(args[2], -1, true);
+        int level = result.getInt(2, -1);
         if (level < 0) {
             level = Rnd.get(enchantment.getStartLevel(), enchantment.getMaxLevel());
         }
 
         if (level > 0) {
-            EnchantManager.addEnchantment(item, enchantment, level, true);
+            EnchantUtils.add(item, enchantment, level, true);
         }
-        else EnchantManager.removeEnchantment(item, enchantment);
+        else EnchantUtils.remove(item, enchantment);
 
-        EnchantManager.updateEnchantmentsDisplay(item);
+        EnchantUtils.updateDisplay(item);
         plugin.getMessage(Lang.COMMAND_ENCHANT_DONE).send(sender);
     }
 }

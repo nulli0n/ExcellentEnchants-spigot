@@ -7,10 +7,10 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.PlayerUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 
 public class EnchantNimble extends ExcellentEnchant implements Chanced, DeathEnchant {
@@ -21,6 +21,9 @@ public class EnchantNimble extends ExcellentEnchant implements Chanced, DeathEnc
 
     public EnchantNimble(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.LOWEST);
+        this.getDefaults().setDescription("Moves all mob's loot directly to your inventory.");
+        this.getDefaults().setLevelMax(1);
+        this.getDefaults().setTier(0.4);
     }
 
     @Override

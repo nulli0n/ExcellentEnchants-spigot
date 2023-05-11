@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.impl.bow;
 
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.LivingEntity;
@@ -10,10 +11,10 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 
 public class EnchantEnderBow extends ExcellentEnchant implements BowEnchant, Chanced {
@@ -24,12 +25,25 @@ public class EnchantEnderBow extends ExcellentEnchant implements BowEnchant, Cha
 
     public EnchantEnderBow(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGHEST);
+        this.getDefaults().setDescription("Shoots ender pearls instead of arrows.");
+        this.getDefaults().setLevelMax(1);
+        this.getDefaults().setTier(1.0);
+
+        this.getDefaults().setConflicts(
+            EnchantBomber.ID, EnchantGhast.ID,
+            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+            EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID,
+            EnchantHover.ID,
+            Enchantment.ARROW_FIRE.getKey().getKey(),
+            Enchantment.ARROW_KNOCKBACK.getKey().getKey(),
+            Enchantment.ARROW_DAMAGE.getKey().getKey()
+        );
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+        this.chanceImplementation = ChanceImplementation.create(this, "100");
     }
 
     @NotNull

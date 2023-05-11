@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.impl.bow;
 
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -12,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 
@@ -31,13 +32,27 @@ public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEncha
 
     public EnchantBomber(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGHEST);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch TNT that explodes in " + PLACEHOLDER_FUSE_TICKS + "s.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.7);
+        this.getDefaults().setConflicts(
+            EnchantEnderBow.ID, EnchantGhast.ID,
+            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+            EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID,
+            EnchantHover.ID,
+            Enchantment.ARROW_FIRE.getKey().getKey(),
+            Enchantment.ARROW_KNOCKBACK.getKey().getKey(),
+            Enchantment.ARROW_DAMAGE.getKey().getKey()
+        );
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.fuseTicks = EnchantScaler.read(this, "Settings.Fuse_Ticks", "100 - " + Placeholders.ENCHANTMENT_LEVEL + " * 10",
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "5.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+        this.fuseTicks = EnchantScaler.read(this, "Settings.Fuse_Ticks",
+            "100 - " + Placeholders.ENCHANTMENT_LEVEL + " * 10",
             "Sets fuse ticks (before it will explode) for the launched TNT.");
     }
 

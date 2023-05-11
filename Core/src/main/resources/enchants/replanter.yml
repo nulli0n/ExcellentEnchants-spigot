@@ -1,7 +1,0 @@
-Name: Replanter
-Tier: common
-Description:
-- Automatically replant crops on right click and when harvest.
-Level:
-  Min: 1
-  Max: 1

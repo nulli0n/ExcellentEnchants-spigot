@@ -11,10 +11,10 @@ import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.Set;
 import java.util.function.UnaryOperator;
@@ -36,6 +36,9 @@ public class EnchantElementalProtection extends ExcellentEnchant {
 
     public EnchantElementalProtection(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription("Reduces Poison, Magic, Wither, Lightning, Freeze damage by " + PLACEHOLDER_PROTECTION_AMOUNT + ".");
+        this.getDefaults().setLevelMax(5);
+        this.getDefaults().setTier(0.2);
     }
 
     @Override
@@ -51,7 +54,8 @@ public class EnchantElementalProtection extends ExcellentEnchant {
     public void loadConfig() {
         super.loadConfig();
 
-        this.protectionAmount = EnchantScaler.read(this, "Settings.Protection.Amount", "0.05 * " + Placeholders.ENCHANTMENT_LEVEL,
+        this.protectionAmount = EnchantScaler.read(this, "Settings.Protection.Amount",
+            "0.05 * " + Placeholders.ENCHANTMENT_LEVEL,
             "How protection the enchantment will have?");
         this.protectionCapacity = JOption.create("Settings.Protection.Capacity", 1D,
             "Maximal possible protection value from all armor pieces together.").read(cfg);
@@ -85,8 +89,8 @@ public class EnchantElementalProtection extends ExcellentEnchant {
         if (!this.isAvailableToUse(entity)) return;
 
         double protectionAmount = 0D;
-        for (ItemStack armor : EnchantManager.getEquipmentEnchanted(entity).values()) {
-            int level = EnchantManager.getEnchantmentLevel(armor, this);
+        for (ItemStack armor : EnchantUtils.getEnchantedEquipment(entity).values()) {
+            int level = EnchantUtils.getLevel(armor, this);
             if (level <= 0) continue;
 
             protectionAmount += this.getProtectionAmount(level);

@@ -10,12 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.function.UnaryOperator;
 
@@ -29,13 +29,18 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
 
     public EnchantCurseOfBreaking(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to consume extra " + PLACEHOLDER_DURABILITY_AMOUNT + " durability points.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0D);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.durabilityAmount = EnchantScaler.read(this, "Settings.Durability_Amount", Placeholders.ENCHANTMENT_LEVEL,
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "10.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+        this.durabilityAmount = EnchantScaler.read(this, "Settings.Durability_Amount",
+            Placeholders.ENCHANTMENT_LEVEL,
             "Amount of durability points to be taken from the item.");
     }
 
@@ -73,7 +78,7 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
         if (!this.isAvailableToUse(player)) return;
 
         ItemStack item = e.getItem();
-        int level = EnchantManager.getEnchantmentLevel(item, this);
+        int level = EnchantUtils.getLevel(item, this);
 
         if (level < 1) return;
         if (!this.checkTriggerChance(level)) return;

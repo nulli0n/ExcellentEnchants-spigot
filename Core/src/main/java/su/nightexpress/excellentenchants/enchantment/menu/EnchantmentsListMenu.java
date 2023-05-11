@@ -3,15 +3,17 @@ package su.nightexpress.excellentenchants.enchantment.menu;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.api.menu.AbstractMenuAuto;
-import su.nexmedia.engine.api.menu.MenuClick;
-import su.nexmedia.engine.api.menu.MenuItem;
+import su.nexmedia.engine.api.menu.AutoPaged;
 import su.nexmedia.engine.api.menu.MenuItemType;
+import su.nexmedia.engine.api.menu.click.ClickHandler;
+import su.nexmedia.engine.api.menu.click.ItemClick;
+import su.nexmedia.engine.api.menu.impl.ConfigMenu;
+import su.nexmedia.engine.api.menu.impl.MenuOptions;
+import su.nexmedia.engine.api.menu.impl.MenuViewer;
 import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.ItemUtil;
@@ -19,30 +21,30 @@ import su.nexmedia.engine.utils.PDCUtil;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.EnchantRegister;
+import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 
 import java.util.*;
 
-public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, ExcellentEnchant> {
+public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implements AutoPaged<ExcellentEnchant> {
 
     private static final String PATH = "/menu/enchants_list.yml";
 
     private static final String PLACEHOLDER_CONFLICTS = "%conflicts%";
-    private static final String PLACEHOLDER_CHARGES = "%charges%";
+    private static final String PLACEHOLDER_CHARGES   = "%charges%";
     private static final String PLACEHOLDER_OBTAINING = "%obtaining%";
 
-    private final ItemStack enchantIcon;
+    private final ItemStack    enchantIcon;
     private final List<String> enchantLoreConflicts;
     private final List<String> enchantLoreCharges;
     private final List<String> enchantLoreObtaining;
-    private final int[]     enchantSlots;
+    private final int[]        enchantSlots;
 
     private final NamespacedKey                        keyLevel;
     private final Map<String, Map<Integer, ItemStack>> iconCache;
 
     public EnchantmentsListMenu(@NotNull ExcellentEnchants plugin) {
-        super(plugin, JYML.loadOrExtract(plugin, PATH), "");
+        super(plugin, JYML.loadOrExtract(plugin, PATH));
         this.keyLevel = new NamespacedKey(plugin, "list_display_level");
         this.iconCache = new HashMap<>();
 
@@ -52,20 +54,12 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
         this.enchantLoreObtaining = Colorizer.apply(cfg.getStringList("Enchantments.Lore.Obtaining"));
         this.enchantSlots = cfg.getIntArray("Enchantments.Slots");
 
-        MenuClick click = (player, type, e) -> {
-            if (type instanceof MenuItemType type2) {
-                this.onItemClickDefault(player, type2);
-            }
-        };
+        this.registerHandler(MenuItemType.class)
+            .addClick(MenuItemType.CLOSE, (viewer, event) -> plugin.runTask(task -> viewer.getPlayer().closeInventory()))
+            .addClick(MenuItemType.PAGE_NEXT, ClickHandler.forNextPage(this))
+            .addClick(MenuItemType.PAGE_PREVIOUS, ClickHandler.forPreviousPage(this));
 
-        for (String sId : cfg.getSection("Content")) {
-            MenuItem menuItem = cfg.getMenuItem("Content." + sId);
-
-            if (menuItem.getType() != null) {
-                menuItem.setClickHandler(click);
-            }
-            this.addItem(menuItem);
-        }
+        this.load();
     }
 
     @Override
@@ -75,30 +69,42 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
     }
 
     @Override
-    protected int[] getObjectSlots() {
+    public void onPrepare(@NotNull MenuViewer viewer, @NotNull MenuOptions options) {
+        super.onPrepare(viewer, options);
+        this.getItemsForPage(viewer).forEach(this::addItem);
+    }
+
+    @Override
+    public int[] getObjectSlots() {
         return this.enchantSlots;
     }
 
     @Override
     @NotNull
-    protected List<ExcellentEnchant> getObjects(@NotNull Player player) {
-        return new ArrayList<>(EnchantRegister.ENCHANT_REGISTRY.values().stream()
+    public Comparator<ExcellentEnchant> getObjectSorter() {
+        return (o1, o2) -> 0;
+    }
+
+    @Override
+    @NotNull
+    public List<ExcellentEnchant> getObjects(@NotNull Player player) {
+        return new ArrayList<>(EnchantRegistry.getRegistered().stream()
             .sorted(Comparator.comparing(ExcellentEnchant::getName)).toList());
     }
 
     @Override
     @NotNull
-    protected ItemStack getObjectStack(@NotNull Player player, @NotNull ExcellentEnchant enchant) {
+    public ItemStack getObjectStack(@NotNull Player player, @NotNull ExcellentEnchant enchant) {
         return this.getEnchantIcon(enchant, 1);
     }
 
     @Override
     @NotNull
-    protected MenuClick getObjectClick(@NotNull Player player, @NotNull ExcellentEnchant enchant) {
-        return (player1, type, e) -> {
-            if (!e.isLeftClick()) return;
+    public ItemClick getObjectClick(@NotNull ExcellentEnchant enchant) {
+        return (viewer, event) -> {
+            if (!event.isLeftClick()) return;
 
-            ItemStack itemClick = e.getCurrentItem();
+            ItemStack itemClick = event.getCurrentItem();
             if (itemClick == null) return;
 
             int levelHas = PDCUtil.getInt(itemClick, this.keyLevel).orElse(0);
@@ -108,7 +114,7 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
             itemClick = this.getEnchantIcon(enchant, levelHas);
             PDCUtil.set(itemClick, this.keyLevel, levelHas);
 
-            e.setCurrentItem(itemClick);
+            event.setCurrentItem(itemClick);
         };
     }
 
@@ -142,10 +148,5 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
 
         ItemUtil.replace(icon, enchant.replaceAllPlaceholders(level));
         return icon;
-    }
-
-    @Override
-    public boolean cancelClick(@NotNull InventoryClickEvent e, @NotNull SlotType slotType) {
-        return true;
     }
 }

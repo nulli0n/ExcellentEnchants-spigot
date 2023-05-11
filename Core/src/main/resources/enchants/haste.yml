@@ -1,8 +1,0 @@
-Name: Haste
-Tier: rare
-Description:
-- 'Grants permanent %enchantment_potion_type% %enchantment_potion_level% effect.'
-Conflicts: []
-Level:
-  Min: 1
-  Max: 3

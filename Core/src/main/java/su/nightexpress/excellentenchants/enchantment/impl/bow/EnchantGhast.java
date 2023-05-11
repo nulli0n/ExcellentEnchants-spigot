@@ -14,13 +14,13 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chanced {
 
@@ -32,12 +32,25 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chance
 
     public EnchantGhast(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGHEST);
+        this.getDefaults().setDescription("Shoots fireballs instead of arrows.");
+        this.getDefaults().setLevelMax(1);
+        this.getDefaults().setTier(0.3);
+
+        this.getDefaults().setConflicts(
+            EnchantEnderBow.ID, EnchantBomber.ID,
+            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+            EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID,
+            EnchantHover.ID,
+            Enchantment.ARROW_FIRE.getKey().getKey(),
+            Enchantment.ARROW_KNOCKBACK.getKey().getKey(),
+            Enchantment.ARROW_DAMAGE.getKey().getKey()
+        );
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+        this.chanceImplementation = ChanceImplementation.create(this, "100");
         this.fireSpread = JOption.create("Settings.Fire_Spread", true,
             "When 'true' creates fire on nearby blocks.").read(cfg);
         this.yield = EnchantScaler.read(this, "Settings.Yield", "1.0 + " + Placeholders.ENCHANTMENT_LEVEL,
@@ -74,7 +87,7 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chance
 
         // Shoot small fireballs for the Multishot enchantment,
         // as large ones has a slow speed and punches each other on shoot.
-        if (EnchantManager.hasEnchantment(bow, Enchantment.MULTISHOT)) {
+        if (EnchantUtils.contains(bow, Enchantment.MULTISHOT)) {
             fireball = shooter.launchProjectile(SmallFireball.class);
             fireball.setVelocity(projectile.getVelocity().normalize().multiply(0.5f));
         }

@@ -7,9 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
 import su.nightexpress.excellentenchants.enchantment.task.ArrowTrailsTask;
 
@@ -20,29 +21,30 @@ public final class ArrowImplementation implements Arrowed {
     private final ExcellentEnchant enchant;
     private final NamespacedKey projectileKey;
 
-    private final Particle trailParticle;
-    private final String   trailData;
+    private final SimpleParticle trailParticle;
 
-    private ArrowImplementation(@NotNull ExcellentEnchant enchant,
-                                @Nullable Particle trailParticle, @Nullable String  trailData) {
+    private ArrowImplementation(@NotNull ExcellentEnchant enchant, @Nullable SimpleParticle trailParticle) {
         this.enchant = enchant;
         this.projectileKey = new NamespacedKey(ExcellentEnchantsAPI.PLUGIN, "arrow.enchant_id");
-
         this.trailParticle = trailParticle;
-        this.trailData = trailData;
     }
 
     @NotNull
     public static ArrowImplementation create(@NotNull ExcellentEnchant enchant) {
-        JYML cfg = enchant.getConfig();
-        Particle trailParticle = JOption.create("Settings.Arrow.Trail_Effect.Name", Particle.class, Particle.REDSTONE,
-            "Particle name for the arrow trail effect.",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Particle.html").read(cfg);
-        String trailData = JOption.create("Settings.Arrow.Trail_Effect.Data", "",
-            "Particle data for the particle effect.",
-            "This is required for certain particles only.").read(cfg);
+        return create(enchant, SimpleParticle.of(Particle.REDSTONE));
+    }
 
-        return new ArrowImplementation(enchant, trailParticle, trailData);
+    @NotNull
+    public static ArrowImplementation create(@NotNull ExcellentEnchant enchant, @NotNull SimpleParticle particle) {
+        JYML cfg = enchant.getConfig();
+
+        SimpleParticle effect = new JOption<>("Settings.Arrow.Trail_Effect",
+            (cfg1, path, def) -> SimpleParticle.read(cfg1, path),
+            particle,
+            "Sets particle effect for the arrow trail of this enchantment."
+        ).setWriter((cfg1, path, particle1) -> SimpleParticle.write(particle1, cfg1, path)).read(cfg);
+
+        return new ArrowImplementation(enchant, effect);
     }
 
     @Override
@@ -56,22 +58,15 @@ public final class ArrowImplementation implements Arrowed {
         if (!this.enchant.hasVisualEffects()) return;
         if (this.getTrailParticle().isEmpty()) return;
 
-        Particle particle = this.getTrailParticle().get();
-        String data = this.getTrailData().orElse("");
-
-        ArrowTrailsTask.add(projectile, particle, data);
+        this.getTrailParticle().ifPresent(particle -> {
+            ArrowTrailsTask.add(projectile, particle);
+        });
     }
 
     @NotNull
     @Override
-    public Optional<Particle> getTrailParticle() {
+    public Optional<SimpleParticle> getTrailParticle() {
         return trailParticle == null ? Optional.empty() : Optional.of(trailParticle);
-    }
-
-    @NotNull
-    @Override
-    public Optional<String> getTrailData() {
-        return trailData == null ? Optional.empty() : Optional.of(trailData);
     }
 
     @NotNull

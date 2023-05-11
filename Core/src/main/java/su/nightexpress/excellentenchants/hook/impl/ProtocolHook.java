@@ -13,9 +13,9 @@ import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -85,7 +85,7 @@ public class ProtocolHook {
         ItemMeta meta = copy.getItemMeta();
         if (meta == null || meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) return item;
 
-        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(meta)
+        Map<ExcellentEnchant, Integer> enchants = EnchantUtils.getExcellents(meta)
             .entrySet().stream()
             .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old,nev) -> nev, LinkedHashMap::new));
@@ -106,7 +106,7 @@ public class ProtocolHook {
             });
         }
         enchants.forEach((enchant, level) -> {
-            int charges = EnchantManager.getEnchantmentCharges(meta, enchant);
+            int charges = EnchantUtils.getCharges(meta, enchant);
             lore.add(0, enchant.getNameFormatted(level, charges));
         });
 

@@ -1,8 +1,0 @@
-Name: Elemental Protection
-Tier: common
-Description:
-- 'Reduces Poison, Magic, Wither, Lightning, Freeze damage by %enchantment_protection_amount%.'
-Conflicts: []
-Level:
-  Min: 1
-  Max: 5

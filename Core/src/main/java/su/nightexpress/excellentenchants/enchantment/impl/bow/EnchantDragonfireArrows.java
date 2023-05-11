@@ -16,14 +16,15 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
@@ -45,16 +46,28 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
 
     public EnchantDragonfireArrows(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an dragonfire arrow (R=" + PLACEHOLDER_FIRE_RADIUS + ", " + PLACEHOLDER_FIRE_DURATION + "s).");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.7);
+
+        this.getDefaults().setConflicts(
+            EnchantEnderBow.ID, EnchantGhast.ID, EnchantHover.ID,
+            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+            EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID
+        );
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.arrowImplementation = ArrowImplementation.create(this);
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.fireDuration = EnchantScaler.read(this, "Settings.Fire.Duration", "100 * " + Placeholders.ENCHANTMENT_LEVEL,
+        this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.DRAGON_BREATH));
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
+        this.fireDuration = EnchantScaler.read(this, "Settings.Fire.Duration",
+            "100 * " + Placeholders.ENCHANTMENT_LEVEL,
             "Sets the dragonfire cloud effect duration (in ticks). 20 ticks = 1 second.");
-        this.fireRadius = EnchantScaler.read(this, "Settings.Fire.Radius", "2.0 + " + Placeholders.ENCHANTMENT_LEVEL,
+        this.fireRadius = EnchantScaler.read(this, "Settings.Fire.Radius",
+            "2.0 + " + Placeholders.ENCHANTMENT_LEVEL,
             "Sets the dragonfire cloud effect radius.");
     }
 

@@ -24,10 +24,11 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.AbstractListener;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantDropContainer;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> {
 
@@ -89,7 +90,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         ItemStack weapon = equipment.getItemInMainHand();
         if (weapon.getType().isAir() || weapon.getType() == Material.ENCHANTED_BOOK) return;
 
-        EnchantManager.getExcellentEnchantments(weapon, CombatEnchant.class).forEach((combatEnchant, level) -> {
+        EnchantUtils.getExcellents(weapon, CombatEnchant.class).forEach((combatEnchant, level) -> {
             if (combatEnchant.isOutOfCharges(weapon)) return;
             if (combatEnchant.onAttack(e, damager, victim, weapon, level)) {
                 combatEnchant.consumeCharges(weapon);
@@ -107,7 +108,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         for (ItemStack armor : EntityUtil.getEquippedArmor(victim).values()) {
             if (armor == null || armor.getType().isAir()) continue;
 
-            EnchantManager.getExcellentEnchantments(armor, CombatEnchant.class).forEach((combatEnchant, level) -> {
+            EnchantUtils.getExcellents(armor, CombatEnchant.class).forEach((combatEnchant, level) -> {
                 if (combatEnchant.isOutOfCharges(armor)) return;
                 if (combatEnchant.onProtect(e, damager, victim, weaponDamager, level)) {
                     combatEnchant.consumeCharges(armor);
@@ -117,7 +118,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     }
 
     private void handleArmorEnchants(@NotNull EntityDamageEvent e, @NotNull LivingEntity entity) {
-        EnchantManager.getEquippedEnchants(entity, DamageEnchant.class).forEach((item, enchants) -> {
+        EnchantUtils.getEquipped(entity, DamageEnchant.class).forEach((item, enchants) -> {
             enchants.forEach((enchant, level) -> {
                 if (enchant.isOutOfCharges(item)) return;
                 if (enchant.onDamage(e, entity, item, level)) {
@@ -134,7 +135,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         ItemStack bow = this.getSourceWeapon(projectile);
         if (bow == null || bow.getType().isAir() || bow.getType() == Material.ENCHANTED_BOOK) return;
 
-        EnchantManager.getExcellentEnchantments(bow, BowEnchant.class).forEach((bowEnchant, level) -> {
+        EnchantUtils.getExcellents(bow, BowEnchant.class).forEach((bowEnchant, level) -> {
             bowEnchant.onDamage(e, projectile, shooter, victim, bow, level);
         });
     }
@@ -150,7 +151,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         ItemStack bow = e.getBow();
         if (bow == null || bow.getType().isAir() || bow.getType() == Material.ENCHANTED_BOOK) return;
 
-        EnchantManager.getExcellentEnchantments(bow, BowEnchant.class).forEach((bowEnchant, level) -> {
+        EnchantUtils.getExcellents(bow, BowEnchant.class).forEach((bowEnchant, level) -> {
             if (bowEnchant.isOutOfCharges(bow)) return;
             if (bowEnchant.onShoot(e, shooter, bow, level)) {
                 if (bowEnchant instanceof Arrowed arrowed && e.getProjectile() instanceof Projectile projectile) {
@@ -176,7 +177,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         ItemStack bow = this.getSourceWeapon(projectile);
         if (bow == null || bow.getType().isAir() || bow.getType() == Material.ENCHANTED_BOOK) return;
 
-        EnchantManager.getExcellentEnchantments(bow, BowEnchant.class).forEach((bowEnchant, level) -> {
+        EnchantUtils.getExcellents(bow, BowEnchant.class).forEach((bowEnchant, level) -> {
             bowEnchant.onHit(e, projectile, bow, level);
         });
 
@@ -196,7 +197,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         if (item == null || item.getType().isAir() || item.getType() == Material.ENCHANTED_BOOK) return;
 
         Player player = e.getPlayer();
-        EnchantManager.getExcellentEnchantments(item, InteractEnchant.class).forEach((interEnchant, level) -> {
+        EnchantUtils.getExcellents(item, InteractEnchant.class).forEach((interEnchant, level) -> {
             if (interEnchant.isOutOfCharges(item)) return;
             if (interEnchant.onInteract(e, player, item, level)) {
                 interEnchant.consumeCharges(item);
@@ -211,7 +212,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     public void onEnchantDeath(EntityDeathEvent e) {
         LivingEntity entity = e.getEntity();
 
-        EnchantManager.getEquippedEnchants(entity, DeathEnchant.class).forEach((item, enchants) -> {
+        EnchantUtils.getEquipped(entity, DeathEnchant.class).forEach((item, enchants) -> {
             enchants.forEach(((deathEnchant, level) -> {
                 if (deathEnchant.isOutOfCharges(item)) return;
                 if (deathEnchant.onDeath(e, entity, level)) {
@@ -226,7 +227,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         ItemStack weapon = killer.getInventory().getItemInMainHand();
         if (weapon.getType().isAir() || weapon.getType() == Material.ENCHANTED_BOOK) return;
 
-        EnchantManager.getExcellentEnchantments(weapon, DeathEnchant.class).forEach((deathEnchant, level) -> {
+        EnchantUtils.getExcellents(weapon, DeathEnchant.class).forEach((deathEnchant, level) -> {
             if (deathEnchant.isOutOfCharges(weapon)) return;
             if (deathEnchant.onKill(e, entity, killer, level)) {
                 deathEnchant.consumeCharges(weapon);
@@ -243,7 +244,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         ItemStack tool = player.getInventory().getItemInMainHand();
         if (tool.getType().isAir() || tool.getType() == Material.ENCHANTED_BOOK) return;
 
-        EnchantManager.getExcellentEnchantments(tool, BlockBreakEnchant.class).forEach((blockEnchant, level) -> {
+        EnchantUtils.getExcellents(tool, BlockBreakEnchant.class).forEach((blockEnchant, level) -> {
             if (blockEnchant.isOutOfCharges(tool)) return;
             if (blockEnchant.onBreak(e, player, tool, level)) {
                 blockEnchant.consumeCharges(tool);
@@ -260,7 +261,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         if (tool.getType().isAir() || tool.getType() == Material.ENCHANTED_BOOK) return;
 
         EnchantDropContainer dropContainer = new EnchantDropContainer(e);
-        EnchantManager.getExcellentEnchantments(tool, BlockDropEnchant.class).forEach((enchant, level) -> {
+        EnchantUtils.getExcellents(tool, BlockDropEnchant.class).forEach((enchant, level) -> {
             if (enchant.isOutOfCharges(tool)) return;
             if (enchant.onDrop(e, dropContainer, player, tool, level)) {
                 enchant.consumeCharges(tool);

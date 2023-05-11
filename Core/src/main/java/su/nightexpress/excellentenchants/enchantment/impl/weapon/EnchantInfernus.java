@@ -13,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.function.UnaryOperator;
 
@@ -29,12 +29,16 @@ public class EnchantInfernus extends ExcellentEnchant {
 
     public EnchantInfernus(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription("Launched trident will ignite the enemy for " + PLACEHOLDER_FIRE_DURATION + "s. on hit.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.1);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.fireTicks = EnchantScaler.read(this, "Settings.Fire_Ticks", "60 + " + Placeholders.ENCHANTMENT_LEVEL + " * 20",
+        this.fireTicks = EnchantScaler.read(this, "Settings.Fire_Ticks",
+            "60 + " + Placeholders.ENCHANTMENT_LEVEL + " * 20",
             "Sets for how long (in ticks) entity will be ignited on hit. 20 ticks = 1 second.");
     }
 
@@ -65,7 +69,7 @@ public class EnchantInfernus extends ExcellentEnchant {
 
         ItemStack item = trident.getItem();
 
-        int level = EnchantManager.getEnchantmentLevel(item, this);
+        int level = EnchantUtils.getLevel(item, this);
         if (level <= 0) return;
 
         trident.setFireTicks(Integer.MAX_VALUE);
@@ -78,7 +82,7 @@ public class EnchantInfernus extends ExcellentEnchant {
 
         ItemStack item = trident.getItem();
 
-        int level = EnchantManager.getEnchantmentLevel(item, this);
+        int level = EnchantUtils.getLevel(item, this);
         if (level <= 0 || trident.getFireTicks() <= 0) return;
 
         int ticks = this.getFireTicks(level);

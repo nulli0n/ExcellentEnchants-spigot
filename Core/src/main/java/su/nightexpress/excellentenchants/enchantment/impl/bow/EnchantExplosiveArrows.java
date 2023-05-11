@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.impl.bow;
 
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.*;
@@ -13,14 +14,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
@@ -44,20 +46,31 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
 
     public EnchantExplosiveArrows(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an explosive arrow.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.7);
+
+        this.getDefaults().setConflicts(
+            EnchantEnderBow.ID, EnchantGhast.ID, EnchantHover.ID,
+            EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+            EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID
+        );
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.arrowImplementation = ArrowImplementation.create(this);
-        this.chanceImplementation = ChanceImplementation.create(this);
+        this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.SMOKE_NORMAL));
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
         this.explosionFireSpread = JOption.create("Settings.Explosion.Fire_Spread", true,
             "When 'true' creates fire on nearby blocks.").read(cfg);
         this.explosionDamageItems = JOption.create("Settings.Explosion.Damage_Items", false,
             "When 'true' inflicts damage to items on the ground.").read(cfg);
         this.explosionDamageBlocks = JOption.create("Settings.Explosion.Damage_Blocks", false,
             "When 'true' allows to break blocks by explosion.").read(cfg);
-        this.explosionSize = EnchantScaler.read(this, "Settings.Explosion.Size", "2.0 + " + Placeholders.ENCHANTMENT_LEVEL,
+        this.explosionSize = EnchantScaler.read(this, "Settings.Explosion.Size",
+            "2.0 + " + Placeholders.ENCHANTMENT_LEVEL,
             "Sets the explosion size. The more size - the bigger explosion.");
     }
 

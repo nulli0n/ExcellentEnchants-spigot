@@ -8,42 +8,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
+import su.nexmedia.engine.api.command.CommandResult;
 import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.PlayerUtil;
-import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.config.Lang;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class BookCommand extends AbstractCommand<ExcellentEnchants> {
 
     public BookCommand(@NotNull ExcellentEnchants plugin) {
         super(plugin, new String[]{"book"}, Perms.COMMAND_BOOK);
-    }
-
-    @Override
-    @NotNull
-    public String getDescription() {
-        return plugin.getMessage(Lang.COMMAND_BOOK_DESC).getLocalized();
-    }
-
-    @Override
-    @NotNull
-    public String getUsage() {
-        return plugin.getMessage(Lang.COMMAND_BOOK_USAGE).getLocalized();
-    }
-
-    @Override
-    public boolean isPlayerOnly() {
-        return false;
+        this.setDescription(plugin.getMessage(Lang.COMMAND_BOOK_DESC));
+        this.setUsage(plugin.getMessage(Lang.COMMAND_BOOK_USAGE));
     }
 
     @Override
@@ -62,32 +46,32 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    public void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, @NotNull Map<String, String> flags) {
-        if (args.length != 4) {
+    protected void onExecute(@NotNull CommandSender sender, @NotNull CommandResult result) {
+        if (result.length() < 4) {
             this.printUsage(sender);
             return;
         }
 
-        Player player = plugin.getServer().getPlayer(args[1]);
+        Player player = plugin.getServer().getPlayer(result.getArg(1));
         if (player == null) {
             this.errorPlayer(sender);
             return;
         }
 
-        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(args[2].toLowerCase()));
+        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(result.getArg(2).toLowerCase()));
         if (enchantment == null) {
             plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
             return;
         }
 
-        int level = StringUtil.getInteger(args[3], -1, true);
+        int level = result.getInt(3, -1);
         if (level < 1) {
             level = Rnd.get(enchantment.getStartLevel(), enchantment.getMaxLevel());
         }
 
         ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
-        EnchantManager.addEnchantment(item, enchantment, level, true);
-        EnchantManager.updateEnchantmentsDisplay(item);
+        EnchantUtils.add(item, enchantment, level, true);
+        EnchantUtils.updateDisplay(item);
         PlayerUtil.addItem(player, item);
 
         plugin.getMessage(Lang.COMMAND_BOOK_DONE)

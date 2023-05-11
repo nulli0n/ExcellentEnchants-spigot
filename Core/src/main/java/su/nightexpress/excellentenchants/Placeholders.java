@@ -12,6 +12,11 @@ public class Placeholders extends su.nexmedia.engine.utils.Placeholders {
     public static final String GENERIC_DESCRIPTION = "%description%";
     public static final String GENERIC_ENCHANT     = "%enchant%";
 
+    public static final String ENCHANTMENT_CHANCE          = "%enchantment_trigger_chance%";
+    public static final String ENCHANTMENT_POTION_LEVEL    = "%enchantment_potion_level%";
+    public static final String ENCHANTMENT_POTION_DURATION = "%enchantment_potion_duration%";
+    public static final String ENCHANTMENT_POTION_TYPE     = "%enchantment_potion_type%";
+
     public static final String ENCHANTMENT_NAME                          = "%enchantment_name%";
     public static final String ENCHANTMENT_NAME_FORMATTED                = "%enchantment_name_formatted%";
     public static final String ENCHANTMENT_DESCRIPTION                   = "%enchantment_description%";
@@ -31,5 +36,7 @@ public class Placeholders extends su.nexmedia.engine.utils.Placeholders {
     public static final String ENCHANTMENT_CHARGES_FUEL_ITEM             = "%enchantment_charges_fuel_item%";
 
     public static final String TIER_ID   = "%tier_id%";
-    public static final String TIER_NAME = "%tier_name%";
+    public static final String TIER_NAME          = "%tier_name%";
+
+
 }

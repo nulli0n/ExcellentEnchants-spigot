@@ -1,8 +1,0 @@
-Name: Saturation
-Tier: rare
-Description:
-- Restores %enchantment_saturation_amount% food points every %enchantment_saturation_interval%s.
-Conflicts: []
-Level:
-  Min: 1
-  Max: 3

@@ -2,7 +2,7 @@ package su.nightexpress.excellentenchants.enchantment.task;
 
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.task.AbstractTask;
+import su.nexmedia.engine.api.server.AbstractTask;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.config.Config;
 

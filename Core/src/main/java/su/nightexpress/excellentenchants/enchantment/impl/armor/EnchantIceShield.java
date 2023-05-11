@@ -8,28 +8,38 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.EffectUtil;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
-import su.nightexpress.excellentenchants.api.enchantment.template.PotionEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-public class EnchantIceShield extends PotionEnchant implements Chanced, CombatEnchant {
+public class EnchantIceShield extends ExcellentEnchant implements Chanced, Potioned, CombatEnchant {
 
     public static final String ID = "ice_shield";
 
     private ChanceImplementation chanceImplementation;
+    private PotionImplementation potionImplementation;
 
     public EnchantIceShield(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM, PotionEffectType.SLOW, false);
+        super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to freeze and apply " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.) on attacker.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.1);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+        this.chanceImplementation = ChanceImplementation.create(this, "25.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+        this.potionImplementation = PotionImplementation.create(this, PotionEffectType.SLOW, false,
+            "3.0 + " + Placeholders.ENCHANTMENT_LEVEL,
+            Placeholders.ENCHANTMENT_LEVEL);
     }
 
     @NotNull
@@ -42,6 +52,12 @@ public class EnchantIceShield extends PotionEnchant implements Chanced, CombatEn
     @NotNull
     public Chanced getChanceImplementation() {
         return this.chanceImplementation;
+    }
+
+    @NotNull
+    @Override
+    public PotionImplementation getPotionImplementation() {
+        return potionImplementation;
     }
 
     @Override
@@ -58,7 +74,8 @@ public class EnchantIceShield extends PotionEnchant implements Chanced, CombatEn
         damager.setFreezeTicks(damager.getMaxFreezeTicks());
 
         if (this.hasVisualEffects()) {
-            EffectUtil.playEffect(damager.getEyeLocation(), Particle.BLOCK_CRACK, Material.ICE.name(), 0.25, 0.25, 0.25, 0.1f, 15);
+            SimpleParticle.of(Particle.BLOCK_CRACK, Material.ICE)
+                .play(damager.getEyeLocation(), 0.25, 0.1, 20);
         }
         return true;
     }

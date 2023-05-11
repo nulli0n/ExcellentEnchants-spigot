@@ -1,8 +1,0 @@
-Name: Temper
-Tier: rare
-Description:
-- 'Inflicts %enchantment_damage_amount%% (max. %enchantment_damage_capacity%%) more damage for each %enchantment_health_point% hearts missing.'
-Conflicts: []
-Level:
-  Min: 1
-  Max: 5

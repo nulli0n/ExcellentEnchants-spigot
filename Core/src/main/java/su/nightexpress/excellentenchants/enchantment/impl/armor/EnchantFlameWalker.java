@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -17,14 +18,14 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.manager.ICleanable;
-import su.nexmedia.engine.api.task.AbstractTask;
-import su.nexmedia.engine.utils.EffectUtil;
+import su.nexmedia.engine.api.particle.SimpleParticle;
+import su.nexmedia.engine.api.server.AbstractTask;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,6 +43,10 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
 
     public EnchantFlameWalker(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription("Ability to walk on lava and magma blocks without getting damage.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.7);
+        this.getDefaults().getConflicts().add(Enchantment.FROST_WALKER.getKey().getKey());
 
         this.blockTickTask = new BlockTickTask(plugin);
         this.blockTickTask.start();
@@ -91,7 +96,7 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
         ItemStack boots = player.getInventory().getBoots();
         if (boots == null || boots.getType().isAir()) return;
 
-        int level = EnchantManager.getEnchantmentLevel(boots, this);
+        int level = EnchantUtils.getLevel(boots, this);
         if (level <= 0) return;
 
         Block bTo = to.getBlock().getRelative(BlockFace.DOWN);
@@ -124,7 +129,7 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
         ItemStack boots = equipment.getBoots();
         if (boots == null || boots.getType().isAir()) return;
 
-        int level = EnchantManager.getEnchantmentLevel(boots, this);
+        int level = EnchantUtils.getLevel(boots, this);
         if (level <= 0) return;
 
         e.setCancelled(true);
@@ -146,7 +151,8 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
                 long time = BLOCKS_TO_DESTROY.get(block);
                 if (now >= time) {
                     block.setType(Material.LAVA);
-                    EffectUtil.playEffect(block.getLocation(), Particle.BLOCK_CRACK, Material.MAGMA_BLOCK.name(), 0.5, 0.7, 0.5, 0.03, 50);
+                    SimpleParticle.of(Particle.BLOCK_CRACK, Material.MAGMA_BLOCK)
+                        .play(block.getLocation(), 0.5, 0.7, 0.5, 0.03, 30);
                     return true;
                 }
                 return false;

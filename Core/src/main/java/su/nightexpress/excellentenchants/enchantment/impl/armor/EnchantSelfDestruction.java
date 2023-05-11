@@ -13,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 
@@ -34,13 +34,18 @@ public class EnchantSelfDestruction extends ExcellentEnchant implements Chanced,
 
     public EnchantSelfDestruction(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription("%enchantment_trigger_chance%% chance to create an explosion on death.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.3);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.explosionSize = EnchantScaler.read(this, "Settings.Explosion.Size", "1.0" + Placeholders.ENCHANTMENT_LEVEL,
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "20.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 10");
+        this.explosionSize = EnchantScaler.read(this, "Settings.Explosion.Size",
+            "1.0" + Placeholders.ENCHANTMENT_LEVEL,
             "A size of the explosion. The more size - the bigger the damage.");
     }
 

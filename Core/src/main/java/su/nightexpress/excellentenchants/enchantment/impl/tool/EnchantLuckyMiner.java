@@ -8,10 +8,10 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
@@ -28,13 +28,18 @@ public class EnchantLuckyMiner extends ExcellentEnchant implements Chanced, Bloc
 
     public EnchantLuckyMiner(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to gain " + PLACEHOLDER_EXP_MODIFIER + "% more exp from ores.");
+        this.getDefaults().setLevelMax(5);
+        this.getDefaults().setTier(0.1);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.expModifier = EnchantScaler.read(this, "Settings.Exp_Modifier", "1.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 0.5",
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "30.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 7.0");
+        this.expModifier = EnchantScaler.read(this, "Settings.Exp_Modifier",
+            "1.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 0.5",
             "Exp modifier value. The original exp amount will be multiplied on this value.");
     }
 

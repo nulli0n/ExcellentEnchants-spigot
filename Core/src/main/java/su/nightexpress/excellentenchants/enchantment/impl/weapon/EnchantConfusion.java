@@ -8,34 +8,51 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.EffectUtil;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
-import su.nightexpress.excellentenchants.api.enchantment.template.PotionEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-public class EnchantConfusion extends PotionEnchant implements Chanced, CombatEnchant {
+public class EnchantConfusion extends ExcellentEnchant implements Chanced, Potioned, CombatEnchant {
 
     public static final String ID = "confusion";
 
     private ChanceImplementation chanceImplementation;
+    private PotionImplementation potionImplementation;
 
     public EnchantConfusion(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM, PotionEffectType.CONFUSION, false);
+        super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to apply " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.) on hit.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.1);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "15.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+        this.potionImplementation = PotionImplementation.create(this, PotionEffectType.CONFUSION, false,
+            "5.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 1.5",
+            Placeholders.ENCHANTMENT_LEVEL);
     }
 
     @NotNull
     @Override
     public ChanceImplementation getChanceImplementation() {
         return chanceImplementation;
+    }
+
+    @NotNull
+    @Override
+    public PotionImplementation getPotionImplementation() {
+        return potionImplementation;
     }
 
     @NotNull
@@ -51,7 +68,8 @@ public class EnchantConfusion extends PotionEnchant implements Chanced, CombatEn
         if (!this.addEffect(victim, level)) return false;
 
         if (this.hasVisualEffects()) {
-            EffectUtil.playEffect(victim.getEyeLocation(), Particle.ITEM_CRACK, Material.ROTTEN_FLESH.name(), 0.25, 0.25, 0.25, 0.1f, 30);
+            SimpleParticle.of(Particle.ITEM_CRACK, Material.ROTTEN_FLESH)
+                .play(victim.getEyeLocation(), 0.25, 0.1, 30);
         }
         return true;
     }

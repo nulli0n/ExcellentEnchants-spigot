@@ -1,7 +1,0 @@
-Name: Night Vision
-Tier: rare
-Description:
-- 'Grants permanent %enchantment_potion_type% %enchantment_potion_level% effect.'
-Level:
-  Min: 1
-  Max: 1

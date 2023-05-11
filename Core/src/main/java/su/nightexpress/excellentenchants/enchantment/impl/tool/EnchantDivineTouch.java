@@ -18,19 +18,19 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.Colorizer;
-import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantDropContainer;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, BlockBreakEnchant, BlockDropEnchant {
 
@@ -42,13 +42,19 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
 
     public EnchantDivineTouch(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to mine spawner.");
+        this.getDefaults().setLevelMax(5);
+        this.getDefaults().setTier(1.0);
+        this.getDefaults().setConflicts(EnchantSmelter.ID);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.spawnerName = JOption.create("Settings.Spawner_Item.Name", "&aMob Spawner &7(" + Placeholders.GENERIC_TYPE + ")",
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "15.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+        this.spawnerName = JOption.create("Settings.Spawner_Item.Name",
+            "&aMob Spawner &7(" + Placeholders.GENERIC_TYPE + ")",
             "Spawner item display name.",
             "Placeholder '" + Placeholders.GENERIC_TYPE + "' for the mob type.")
             .mapReader(Colorizer::apply).read(cfg);
@@ -99,7 +105,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
 
         Location location = LocationUtil.getCenter(block.getLocation());
         if (this.hasVisualEffects()) {
-            EffectUtil.playEffect(location, Particle.VILLAGER_HAPPY, "", 0.3f, 0.3f, 0.3f, 0.15f, 30);
+            SimpleParticle.of(Particle.VILLAGER_HAPPY).play(location, 0.3, 0.15, 30);
         }
         block.removeMetadata(META_HANDLE, this.plugin);
         return true;

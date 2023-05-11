@@ -11,10 +11,11 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 
 public class EnchantThunder extends ExcellentEnchant implements Chanced, CombatEnchant {
@@ -28,12 +29,16 @@ public class EnchantThunder extends ExcellentEnchant implements Chanced, CombatE
 
     public EnchantThunder(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to summon lightning to enemy on hit.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.3);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "10.0 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.inThunderstormOnly = JOption.create("Settings.During_Thunderstorm_Only", false,
             "When 'true' the enchantment will be triggered only if there is an active thunderstorm in the world.").read(cfg);
     }

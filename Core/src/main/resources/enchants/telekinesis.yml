@@ -1,8 +1,0 @@
-Name: Telekinesis
-Tier: exotic
-Description:
-- Moves all blocks loot directly to your inventory.
-Conflicts: []
-Level:
-  Min: 1
-  Max: 1

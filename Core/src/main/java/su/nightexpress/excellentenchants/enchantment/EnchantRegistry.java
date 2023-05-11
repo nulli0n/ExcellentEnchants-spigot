@@ -7,22 +7,23 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.utils.Reflex;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.armor.*;
 import su.nightexpress.excellentenchants.enchantment.impl.bow.*;
 import su.nightexpress.excellentenchants.enchantment.impl.tool.*;
 import su.nightexpress.excellentenchants.enchantment.impl.universal.EnchantCurseOfFragility;
 import su.nightexpress.excellentenchants.enchantment.impl.weapon.*;
+import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class EnchantRegister {
+public class EnchantRegistry {
 
     private static final ExcellentEnchants                   PLUGIN;
-    public static final Map<NamespacedKey, ExcellentEnchant> ENCHANT_REGISTRY;
+    public static final Map<NamespacedKey, ExcellentEnchant> REGISTRY_MAP;
 
     public static final EnchantBlastMining       BLAST_MINING;
     public static final EnchantCurseOfBreaking   CURSE_OF_BREAKING;
@@ -92,8 +93,7 @@ public class EnchantRegister {
 
     static {
         PLUGIN = ExcellentEnchants.getPlugin(ExcellentEnchants.class);
-        PLUGIN.getConfigManager().extractResources("/enchants/");
-        ENCHANT_REGISTRY = new HashMap<>();
+        REGISTRY_MAP = new HashMap<>();
 
         // Tool enchants
         BLAST_MINING = init(EnchantBlastMining.class, EnchantBlastMining.ID);
@@ -170,17 +170,17 @@ public class EnchantRegister {
     public static void setup() {
         // Prevent to register enchantments during the runtime.
         if (ExcellentEnchants.isLoaded) {
-            ENCHANT_REGISTRY.values().forEach(ExcellentEnchant::loadConfig);
+            REGISTRY_MAP.values().forEach(ExcellentEnchant::loadConfig);
             return;
         }
 
         Reflex.setFieldValue(Enchantment.class, "acceptingNew", true);
-        for (Field field : EnchantRegister.class.getFields()) {
+        for (Field field : EnchantRegistry.class.getFields()) {
             if (!ExcellentEnchant.class.isAssignableFrom(field.getType())) continue;
 
             try {
                 ExcellentEnchant enchant = (ExcellentEnchant) field.get(null);
-                EnchantRegister.register(enchant);
+                EnchantRegistry.register(enchant);
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -188,7 +188,7 @@ public class EnchantRegister {
         }
 
         Enchantment.stopAcceptingRegistrations();
-        PLUGIN.info("Enchantments Registered: " + ENCHANT_REGISTRY.size());
+        PLUGIN.info("Enchantments Registered: " + REGISTRY_MAP.size());
         ExcellentEnchants.isLoaded = true;
     }
 
@@ -201,7 +201,7 @@ public class EnchantRegister {
 
         if (byKey == null || byName == null) return;
 
-        for (ExcellentEnchant enchant : ENCHANT_REGISTRY.values()) {
+        for (ExcellentEnchant enchant : REGISTRY_MAP.values()) {
             if (enchant instanceof ICleanable cleanable) {
                 cleanable.clear();
             }
@@ -210,13 +210,8 @@ public class EnchantRegister {
             byName.remove(enchant.getName());
             enchant.unregisterListeners();
         }
-        ENCHANT_REGISTRY.clear();
+        REGISTRY_MAP.clear();
         PLUGIN.info("All enchants are unregistered.");
-    }
-
-    @Nullable
-    public static ExcellentEnchant get(@NotNull NamespacedKey key) {
-        return ENCHANT_REGISTRY.get(key);
     }
 
     @Nullable
@@ -236,10 +231,27 @@ public class EnchantRegister {
         if (enchant == null) return;
 
         Enchantment.registerEnchantment(enchant);
-        ENCHANT_REGISTRY.put(enchant.getKey(), enchant);
+        REGISTRY_MAP.put(enchant.getKey(), enchant);
         enchant.loadConfig();
         enchant.getConfig().saveChanges();
         enchant.registerListeners();
         PLUGIN.info("Registered enchantment: " + enchant.getId());
     }
+
+    @Nullable
+    public static ExcellentEnchant get(@NotNull NamespacedKey key) {
+        return REGISTRY_MAP.get(key);
+    }
+
+    @NotNull
+    public static Collection<ExcellentEnchant> getRegistered() {
+        return REGISTRY_MAP.values();
+    }
+
+    @NotNull
+    public static Set<ExcellentEnchant> getOfTier(@NotNull Tier tier) {
+        return getRegistered().stream().filter(enchant -> enchant.getTier() == tier)
+            .collect(Collectors.toCollection(HashSet::new));
+    }
+
 }

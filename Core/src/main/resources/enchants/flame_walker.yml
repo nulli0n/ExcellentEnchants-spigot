@@ -1,9 +1,0 @@
-Name: 'Flame Walker'
-Tier: 'exotic'
-Description:
-- 'Ability to walk on lava and magma blocks without getting damage.'
-Conflicts:
-- 'frost_walker'
-Level:
-  Min: 1
-  Max: 3

@@ -7,34 +7,51 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.EffectUtil;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
-import su.nightexpress.excellentenchants.api.enchantment.template.PotionEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-public class EnchantRage extends PotionEnchant implements Chanced, CombatEnchant {
+public class EnchantRage extends ExcellentEnchant implements Chanced, Potioned, CombatEnchant {
 
     public static final String ID = "rage";
 
     private ChanceImplementation chanceImplementation;
+    private PotionImplementation potionImplementation;
 
     public EnchantRage(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM, PotionEffectType.INCREASE_DAMAGE, false);
+        super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to get " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.) on hit.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.5);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "7.0 + " + Placeholders.ENCHANTMENT_LEVEL);
+        this.potionImplementation = PotionImplementation.create(this, PotionEffectType.INCREASE_DAMAGE, false,
+            "3.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 0.5",
+            Placeholders.ENCHANTMENT_LEVEL);
     }
 
     @NotNull
     @Override
     public ChanceImplementation getChanceImplementation() {
         return chanceImplementation;
+    }
+
+    @NotNull
+    @Override
+    public PotionImplementation getPotionImplementation() {
+        return potionImplementation;
     }
 
     @NotNull
@@ -50,7 +67,7 @@ public class EnchantRage extends PotionEnchant implements Chanced, CombatEnchant
         if (!this.addEffect(damager, level)) return false;
 
         if (this.hasVisualEffects()) {
-            EffectUtil.playEffect(damager.getEyeLocation(), Particle.LAVA, "", 0.25, 0.25, 0.25, 0.1f, 30);
+            SimpleParticle.of(Particle.LAVA).play(damager.getEyeLocation(), 0.25, 0.1, 30);
         }
         return true;
     }

@@ -1,4 +1,4 @@
-package su.nightexpress.excellentenchants.api.enchantment.util;
+package su.nightexpress.excellentenchants.enchantment.util;
 
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;

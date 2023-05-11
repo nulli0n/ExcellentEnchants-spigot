@@ -10,12 +10,12 @@ import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.task.AbstractEnchantmentTask;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.function.UnaryOperator;
 
@@ -35,6 +35,9 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
 
     public EnchantSaturation(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription("Restores " + PLACEHOLDER_SATURATION_AMOUNT + " food points every " + PLACEHOLDER_SATURATION_INTERVAL + "s.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.5);
     }
 
     @Override
@@ -112,7 +115,7 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
         @Override
         public void action() {
             for (LivingEntity entity : this.getEntities()) {
-                EnchantManager.getEquippedEnchants(entity, EnchantSaturation.class).forEach((item, enchants) -> {
+                EnchantUtils.getEquipped(entity, EnchantSaturation.class).forEach((item, enchants) -> {
                     enchants.forEach((enchant, level) -> {
                         if (enchant.isOutOfCharges(item)) return;
                         if (enchant.onTrigger(entity, item, level)) {

@@ -12,9 +12,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class EnchantCurseOfFragility extends ExcellentEnchant {
 
@@ -22,6 +22,9 @@ public class EnchantCurseOfFragility extends ExcellentEnchant {
 
     public EnchantCurseOfFragility(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription("Prevents an item from being grindstoned or anviled.");
+        this.getDefaults().setLevelMax(1);
+        this.getDefaults().setTier(0D);
     }
 
     @NotNull
@@ -36,8 +39,8 @@ public class EnchantCurseOfFragility extends ExcellentEnchant {
         ItemStack first = inventory.getItem(0);
         ItemStack second = inventory.getItem(1);
 
-        boolean cursedFirst = (first != null && EnchantManager.getEnchantmentLevel(first, this) >= 1);
-        boolean cursedSecond = (second != null && EnchantManager.getEnchantmentLevel(second, this) >= 1);
+        boolean cursedFirst = (first != null && EnchantUtils.getLevel(first, this) >= 1);
+        boolean cursedSecond = (second != null && EnchantUtils.getLevel(second, this) >= 1);
 
         if (cursedFirst || cursedSecond) {
             e.setResult(null);
@@ -65,8 +68,8 @@ public class EnchantCurseOfFragility extends ExcellentEnchant {
             ItemStack first = inventory.getItem(0);
             ItemStack second = inventory.getItem(1);
 
-            boolean cursedFirst = (first != null && EnchantManager.getEnchantmentLevel(first, this) >= 1);
-            boolean cursedSecond = (second != null && EnchantManager.getEnchantmentLevel(second, this) >= 1);
+            boolean cursedFirst = (first != null && EnchantUtils.getLevel(first, this) >= 1);
+            boolean cursedSecond = (second != null && EnchantUtils.getLevel(second, this) >= 1);
 
             if (cursedFirst || cursedSecond) {
                 inventory.setItem(2, null);

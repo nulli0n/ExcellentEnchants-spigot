@@ -41,11 +41,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     @Override
     public void enable() {
-        if (!this.setNMS()) {
-            this.error("Could not setup internal NMS handler!");
-            this.getPluginManager().disablePlugin(this);
-            return;
-        }
+        this.setNMS();
 
         this.tierManager = new TierManager(this);
         this.tierManager.setup();
@@ -67,7 +63,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
         PlaceholderHook.shutdown();
     }
 
-    private boolean setNMS() {
+    private void setNMS() {
         this.enchantNMS = switch (Version.CURRENT) {
             case V1_17_R1 -> new V1_17_R1();
             case V1_18_R2 -> new V1_18_R2();
@@ -75,7 +71,6 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
             case V1_19_R2 -> new V1_19_R2();
             case V1_19_R3 -> new V1_19_R3();
         };
-        return true;
     }
 
     @Override

@@ -5,8 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.HashMap;
@@ -24,8 +25,12 @@ public class EnchantPopulator {
     public EnchantPopulator(@NotNull ObtainType obtainType, @NotNull ItemStack item) {
         this.obtainType = obtainType;
         this.item = item;
-        this.enchants = ExcellentEnchantsAPI.getTierManager().getTiers().stream()
-            .collect(Collectors.toMap(k -> k, v -> v.getEnchants(obtainType, item), (prev, add) -> add, HashMap::new));
+        this.enchants = new HashMap<>();
+
+        ExcellentEnchantsAPI.getTierManager().getTiers().forEach(tier -> {
+            Set<ExcellentEnchant> enchants = EnchantRegistry.getOfTier(tier);
+            this.enchants.put(tier, EnchantUtils.populateFilter(enchants, obtainType, item));
+        });
     }
 
     public boolean isEmpty() {
@@ -67,15 +72,14 @@ public class EnchantPopulator {
 
     @Nullable
     public Tier getTierByChance() {
-        Map<Tier, Double> map = this.getEnchants().keySet().stream()
-            .collect(Collectors.toMap(k -> k, v -> v.getChance(this.getObtainType())));
-        return Rnd.get(map);
+        if (this.getEnchants().keySet().isEmpty()) return null;
+        return ExcellentEnchantsAPI.getTierManager().getTierByChance(this.getObtainType());
     }
 
     @Nullable
     public ExcellentEnchant getEnchantByChance(@NotNull Tier tier) {
         Map<ExcellentEnchant, Double> map = this.getEnchants(tier).stream()
             .collect(Collectors.toMap(k -> k, v -> v.getObtainChance(this.getObtainType())));
-        return map.isEmpty() ? null : Rnd.get(map);
+        return map.isEmpty() ? null : Rnd.getByWeight(map);
     }
 }

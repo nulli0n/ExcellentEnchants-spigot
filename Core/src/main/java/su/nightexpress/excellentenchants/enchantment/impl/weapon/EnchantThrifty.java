@@ -13,14 +13,15 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.PDCUtil;
+import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Objects;
 import java.util.Set;
@@ -38,19 +39,24 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
 
     public EnchantThrifty(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to obtain mob spawn egg on kill.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.75);
+
         this.keyEntityIgnored = new NamespacedKey(plugin, ID + "_ignored");
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "5.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 3");
 
         this.ignoredEntityTypes = JOption.create("Settings.Ignored_Entity_Types",
             Set.of(EntityType.WITHER.name(), EntityType.ENDER_DRAGON.name()),
             "List of entity types, that will not drop spawn eggs.",
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html")
-            .read(cfg).stream().map(e -> CollectionsUtil.getEnum(e, EntityType.class))
+            .read(cfg).stream().map(e -> StringUtil.getEnum(e, EntityType.class).orElse(null))
             .filter(Objects::nonNull).collect(Collectors.toSet());
 
         this.ignoredSpawnReasons = JOption.create("Settings.Ignored_Spawn_Reasons",
@@ -59,7 +65,7 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
                 CreatureSpawnEvent.SpawnReason.DISPENSE_EGG.name()),
             "Entities will not drop spawn eggs if they were spawned by one of the reasons below.",
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html")
-            .read(cfg).stream().map(e -> CollectionsUtil.getEnum(e, CreatureSpawnEvent.SpawnReason.class))
+            .read(cfg).stream().map(e -> StringUtil.getEnum(e, CreatureSpawnEvent.SpawnReason.class).orElse(null))
             .filter(Objects::nonNull).collect(Collectors.toSet());
     }
 

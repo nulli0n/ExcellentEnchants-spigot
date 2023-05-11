@@ -1,9 +1,0 @@
-Name: Thunder
-Tier: rare
-Description:
-- '%enchantment_trigger_chance%% chance to summon lightning to enemy on hit.'
-Level:
-  Min: 1
-  Max: 3
-Settings:
-  Trigger_Chance: 10.0 * %enchantment_level%

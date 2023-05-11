@@ -1,4 +1,4 @@
-package su.nightexpress.excellentenchants.api.enchantment;
+package su.nightexpress.excellentenchants.enchantment.impl;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -8,24 +8,23 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.IListener;
 import su.nexmedia.engine.lang.LangManager;
-import su.nexmedia.engine.utils.*;
+import su.nexmedia.engine.utils.ItemUtil;
+import su.nexmedia.engine.utils.NumberUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.config.EnchantDefaults;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.*;
@@ -37,120 +36,23 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     protected final ExcellentEnchants plugin;
     protected final JYML              cfg;
     protected final String            id;
-    protected final EnchantPriority   priority;
-
-    protected String       displayName;
-    protected Tier         tier;
-    protected List<String> description;
-    protected boolean                 isTreasure;
-    protected int                     levelMin;
-    protected int                     levelMax;
-    protected Scaler                  levelByEnchantCost;
-    protected Scaler                  anvilMergeCost;
-    protected Map<ObtainType, Double> obtainChance;
-    protected Set<String>             conflicts;
-    protected Map<ObtainType, int[]> obtainLevelCap;
-    protected boolean                hasVisualEffects;
-
-    protected boolean chargesEnabled;
-    protected boolean chargesCustomFuel;
-    protected EnchantScaler chargesMax;
-    protected EnchantScaler chargesConsumeAmount;
-    protected EnchantScaler chargesRechargeAmount;
-    protected ItemStack     chargesFuel;
-    protected final NamespacedKey chargesKey;
+    protected final EnchantPriority priority;
+    protected final EnchantDefaults defaults;
+    protected final NamespacedKey   chargesKey;
 
     public ExcellentEnchant(@NotNull ExcellentEnchants plugin, @NotNull String id, @NotNull EnchantPriority priority) {
         super(NamespacedKey.minecraft(id.toLowerCase()));
         this.plugin = plugin;
         this.id = this.getKey().getKey();
-        this.cfg = JYML.loadOrExtract(plugin, "/enchants/" + id + ".yml");
+        this.cfg = new JYML(plugin.getDataFolder() + "/enchants/", id + ".yml");
         this.priority = priority;
-        this.conflicts = new HashSet<>();
         this.chargesKey = new NamespacedKey(plugin, this.getId() + ".charges");
+        this.defaults = new EnchantDefaults(this);
     }
 
     public void loadConfig() {
         this.cfg.reload();
-
-        this.displayName = JOption.create("Name", StringUtil.capitalizeFully(this.getId().replace("_", " ")),
-            "Enchantment display name. It will be shown in item lore.")
-            .mapReader(Colorizer::apply).read(cfg);
-
-        this.tier = plugin.getTierManager().getTierById(JOption.create("Tier", Placeholders.DEFAULT,
-            "Enchantment tier. Must be a valid tier identifier from the 'tiers.yml'.").read(cfg));
-        if (this.tier == null) {
-            this.tier = Tier.DEFAULT;
-        }
-        this.tier.getEnchants().add(this);
-
-        this.description = JOption.create("Description", new ArrayList<>(),
-            "Enchantment description. It will be shown in item lore under enchantment name.",
-            "You can use 'Enchantment' placeholders: " + Placeholders.URL_PLACEHOLDERS)
-            .mapReader(Colorizer::apply).read(cfg);
-
-        this.isTreasure = JOption.create("Is_Treasure", false,
-            "Sets whether this enchantment is a treasure enchantment.",
-            "Treasure enchantments can only be received via looting, trading, or fishing.").read(cfg);
-
-        this.levelMin = Math.max(1, JOption.create("Level.Min", 1,
-            "Sets the minimal (start) enchantment level. Can not be less than 1.").read(cfg));
-
-        this.levelMax = JOption.create("Level.Max", 3,
-            "Sets the maximal enchantment level. Can not be less than min. level.",
-            "Note: While you can 'bypass' this value by enchant commands, all level-dependant enchantment",
-            "settings will have a limit up to this setting.").read(cfg);
-
-        this.levelByEnchantCost = EnchantScaler.read(this, ObtainType.ENCHANTING.getPathName() + ".Level_By_Exp_Cost",
-            (int)(30D / this.levelMax) + " * " + Placeholders.ENCHANTMENT_LEVEL,
-            "Sets how much XP levels must be used in enchanting table to obtain this enchantment.",
-            "With a default formula '9 * %enchantment_level%' it will be [9, 18, 27] XP levels for [1, 2, 3] enchantment levels.");
-
-        this.anvilMergeCost = EnchantScaler.read(this, "Anvil.Merge_Cost", Placeholders.ENCHANTMENT_LEVEL,
-            "Sets how much XP levels will be added to the anvil cost when combining custom enchantments.");
-
-        this.obtainChance = new HashMap<>();
-        this.obtainLevelCap = new HashMap<>();
-        for (ObtainType obtainType : ObtainType.values()) {
-            double obtainChance = JOption.create(obtainType.getPathName() + ".Chance", 50D,
-                "Chance for this enchantment to be obtained via " + obtainType.getPathName()).read(cfg);
-            this.obtainChance.put(obtainType, obtainChance);
-
-            int levelMin = JOption.create(obtainType.getPathName() + ".Level.Min", -1,
-                "Minimal level when obtained via " + obtainType.getPathName(),
-                "Can not be less than enchantment min. level. Set -1 to use enchantment min. level.").read(cfg);
-            int levelMax = JOption.create(obtainType.getPathName() + ".Level.Max", -1,
-                "Maximal level when obtained via " + obtainType.getPathName(),
-                "Can not be greater than enchantment max. level. Set -1 to use enchantment max. level.").read(cfg);
-            this.obtainLevelCap.put(obtainType, new int[]{levelMin, levelMax});
-        }
-
-
-        this.conflicts = JOption.create("Conflicts", new HashSet<>(),
-            "A list of conflicting enchantment names.",
-            "Conflicting enchantments can not be combined on anvils and obtained together on the same item.").read(cfg);
-
-        this.hasVisualEffects = JOption.create("Settings.Visual_Effects", true,
-            "Enables/Disables enchantment visual effects, such as particles.").read(cfg);
-
-
-        if (Config.ENCHANTMENTS_CHARGES_ENABLED.get()) {
-            this.chargesEnabled = JOption.create("Settings.Charges.Enabled", false,
-                "When 'true' enables the Charges system for this enchantment.",
-                "When enchanted the first time on enchanting table, it will have maximum charges amount.").read(cfg);
-            this.chargesCustomFuel = JOption.create("Settings.Charges.Custom_Fuel", false,
-                "When 'true' uses different (non-default) fuel item (from the 'Fuel_Item' setting) to recharge.").read(cfg);
-            this.chargesMax = EnchantScaler.read(this, "Settings.Charges.Maximum", "100",
-                "Maximum amount of charges for the enchantment.");
-            this.chargesConsumeAmount = EnchantScaler.read(this, "Settings.Charges.Consume_Amount", "1",
-                "How many charges will be consumed when enchantment is triggered?");
-            this.chargesRechargeAmount = EnchantScaler.read(this, "Settings.Charges.Recharge_Amount", "25",
-                "How many charges will be restored when using 'Fuel Item' in anvil?");
-            this.chargesFuel = JOption.create("Settings.Charges.Fuel_Item", new ItemStack(Material.LAPIS_LAZULI),
-                "An item, that will be used to restore enchantment charges on anvils.",
-                "Item Options:" + Placeholders.URL_ENGINE_ITEMS)
-                .setWriter(JYML::setItem).read(cfg);
-        }
+        this.getDefaults().load(this);
     }
 
     @NotNull
@@ -181,13 +83,13 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
             str = str.replace(Placeholders.ENCHANTMENT_DESCRIPTION, String.join("\n", this.getDescription()));
 
             if (this instanceof Chanced chanced) {
-                str = str.replace(ChanceImplementation.PLACEHOLDER_CHANCE, NumberUtil.format(chanced.getTriggerChance(level)));
+                str = str.replace(Placeholders.ENCHANTMENT_CHANCE, NumberUtil.format(chanced.getTriggerChance(level)));
             }
             if (this instanceof Potioned potioned) {
                 str = str
-                    .replace(PotionImplementation.PLACEHOLDER_POTION_LEVEL, NumberUtil.toRoman(potioned.getEffectAmplifier(level)))
-                    .replace(PotionImplementation.PLACEHOLDER_POTION_DURATION, NumberUtil.format((double) potioned.getEffectDuration(level) / 20D))
-                    .replace(PotionImplementation.PLACEHOLDER_POTION_TYPE, LangManager.getPotionType(potioned.getEffectType()));
+                    .replace(Placeholders.ENCHANTMENT_POTION_LEVEL, NumberUtil.toRoman(potioned.getEffectAmplifier(level)))
+                    .replace(Placeholders.ENCHANTMENT_POTION_DURATION, NumberUtil.format((double) potioned.getEffectDuration(level) / 20D))
+                    .replace(Placeholders.ENCHANTMENT_POTION_TYPE, LangManager.getPotionType(potioned.getEffectType()));
             }
             return str;
         };
@@ -229,6 +131,11 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     @NotNull
+    public EnchantDefaults getDefaults() {
+        return defaults;
+    }
+
+    @NotNull
     @Override
     public String getName() {
         return getId().toUpperCase();
@@ -236,7 +143,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     @NotNull
     public String getDisplayName() {
-        return this.displayName;
+        return this.getDefaults().getDisplayName();
     }
 
     @NotNull
@@ -259,12 +166,12 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     @NotNull
     public List<String> getDescription() {
-        return this.description;
+        return this.getDefaults().getDescription();
     }
 
     @NotNull
     public List<String> getDescription(int level) {
-        List<String> description = new ArrayList<>(this.description);
+        List<String> description = new ArrayList<>(this.getDescription());
         description.replaceAll(this.replacePlaceholders(level));
         return description;
     }
@@ -278,26 +185,26 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     @NotNull
     public Set<String> getConflicts() {
-        return conflicts;
+        return this.getDefaults().getConflicts();
     }
 
     @NotNull
     public Tier getTier() {
-        return this.tier;
+        return this.getDefaults().getTier();
     }
 
     @Override
     public int getMaxLevel() {
-        return this.levelMax;
+        return this.getDefaults().getLevelMax();
     }
 
     @Override
     public int getStartLevel() {
-        return this.levelMin;
+        return this.getDefaults().getLevelMin();
     }
 
     public int getLevelByEnchantCost(int expLevel) {
-        int get = this.levelByEnchantCost.getValues().entrySet().stream()
+        int get = this.getDefaults().getLevelByEnchantCost().getValues().entrySet().stream()
             .filter(en -> expLevel >= en.getValue().intValue()).max(Comparator.comparingInt(Map.Entry::getKey))
             .map(Map.Entry::getKey).orElse(0);
 
@@ -305,15 +212,15 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     public double getObtainChance(@NotNull ObtainType obtainType) {
-        return this.obtainChance.getOrDefault(obtainType, 0D);
+        return this.getDefaults().getObtainChance().getOrDefault(obtainType, 0D);
     }
 
     public int getObtainLevelMin(@NotNull ObtainType obtainType) {
-        return this.obtainLevelCap.getOrDefault(obtainType, new int[]{-1, -1})[0];
+        return this.getDefaults().getObtainLevelCap().getOrDefault(obtainType, new int[]{-1, -1})[0];
     }
 
     public int getObtainLevelMax(@NotNull ObtainType obtainType) {
-        return this.obtainLevelCap.getOrDefault(obtainType, new int[]{-1, -1})[1];
+        return this.getDefaults().getObtainLevelCap().getOrDefault(obtainType, new int[]{-1, -1})[1];
     }
 
     public int fineLevel(int level, @NotNull ObtainType obtainType) {
@@ -341,19 +248,19 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     public int getAnvilMergeCost(int level) {
-        return (int) this.anvilMergeCost.getValue(level);
+        return (int) this.getDefaults().getAnvilMergeCost().getValue(level);
     }
 
     @Override
     public final boolean conflictsWith(@NotNull Enchantment enchantment) {
-        return this.conflicts.contains(enchantment.getKey().getKey());
+        return this.getConflicts().contains(enchantment.getKey().getKey());
     }
 
     @Override
     public final boolean canEnchantItem(@Nullable ItemStack item) {
         if (item == null || item.getType().isAir()) return false;
-        if (EnchantManager.getEnchantments(item).keySet().stream().anyMatch(e -> e.conflictsWith(this) || this.conflictsWith(e))) return false;
-        if (EnchantManager.getEnchantmentLevel(item, this) <= 0 && EnchantManager.getExcellentEnchantmentsAmount(item) >= Config.ENCHANTMENTS_ITEM_CUSTOM_MAX.get()) {
+        if (EnchantUtils.getAll(item).keySet().stream().anyMatch(e -> e.conflictsWith(this) || this.conflictsWith(e))) return false;
+        if (EnchantUtils.getLevel(item, this) <= 0 && EnchantUtils.getExcellentAmount(item) >= Config.ENCHANTMENTS_ITEM_CUSTOM_MAX.get()) {
             return false;
         }
         if (item.getType() == Material.BOOK || item.getType() == Material.ENCHANTED_BOOK) {
@@ -369,36 +276,36 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     @Override
     public final boolean isTreasure() {
-        return this.isTreasure;
+        return this.getDefaults().isTreasure();
     }
 
     public boolean hasVisualEffects() {
-        return this.hasVisualEffects;
+        return this.getDefaults().isVisualEffects();
     }
 
     public boolean isChargesEnabled() {
-        return Config.ENCHANTMENTS_CHARGES_ENABLED.get() && this.chargesEnabled;
+        return Config.ENCHANTMENTS_CHARGES_ENABLED.get() && this.getDefaults().isChargesEnabled();
     }
 
     public boolean isChargesCustomFuel() {
-        return chargesCustomFuel;
+        return this.getDefaults().isChargesCustomFuel();
     }
 
     public int getChargesMax(int level) {
-        return this.isChargesEnabled() ? (int) this.chargesMax.getValue(level) : 0;
+        return this.isChargesEnabled() ? (int) this.getDefaults().getChargesMax().getValue(level) : 0;
     }
 
     public int getChargesConsumeAmount(int level) {
-        return this.isChargesEnabled() ? (int) this.chargesConsumeAmount.getValue(level) : 0;
+        return this.isChargesEnabled() ? (int) this.getDefaults().getChargesConsumeAmount().getValue(level) : 0;
     }
 
     public int getChargesRechargeAmount(int level) {
-        return this.isChargesEnabled() ? (int) this.chargesRechargeAmount.getValue(level) : 0;
+        return this.isChargesEnabled() ? (int) this.getDefaults().getChargesRechargeAmount().getValue(level) : 0;
     }
 
     @NotNull
     public ItemStack getChargesFuel() {
-        ItemStack fuelHas = this.chargesFuel;
+        ItemStack fuelHas = this.getDefaults().getChargesFuel();
         if (!this.isChargesCustomFuel() || fuelHas == null || fuelHas.getType().isAir()) {
             return Config.ENCHANTMENTS_CHARGES_FUEL_ITEM.get();
         }
@@ -416,22 +323,22 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     @Override
     public boolean isOutOfCharges(@NotNull ItemStack item) {
-        return EnchantManager.isEnchantmentOutOfCharges(item, this);
+        return EnchantUtils.isOutOfCharges(item, this);
     }
 
     @Override
     public boolean isFullOfCharges(@NotNull ItemStack item) {
-        return EnchantManager.isEnchantmentFullOfCharges(item, this);
+        return EnchantUtils.isFullOfCharges(item, this);
     }
 
     @Override
     public int getCharges(@NotNull ItemStack item) {
-        return EnchantManager.getEnchantmentCharges(item, this);
+        return EnchantUtils.getCharges(item, this);
     }
 
     @Override
     public void consumeCharges(@NotNull ItemStack item) {
-        EnchantManager.consumeEnchantmentCharges(item, this);
-        EnchantManager.updateEnchantmentsDisplay(item);
+        EnchantUtils.consumeCharges(item, this);
+        EnchantUtils.updateDisplay(item);
     }
 }

@@ -19,13 +19,17 @@ import java.util.stream.Stream;
 
 public class Config {
 
-    public static final JOption<Long> TASKS_ARROW_TRAIL_TICKS_INTERVAL = JOption.create("Tasks.Arrow_Trail.Tick_Interval", 1L,
-        "Sets how often (in ticks) arrow trail particle effects will be spawned behind the arrow.");
-    public static final JOption<Long> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("Tasks.Passive_Potion_Effects.Apply_Interval", 100L,
+    public static final JOption<Long> TASKS_ARROW_TRAIL_TICKS_INTERVAL = JOption.create("Tasks.Arrow_Trail.Tick_Interval",
+        1L,
+        "Sets how often (in ticks) arrow trail particle effects will be spawned behind the arrow."
+    );
+    public static final JOption<Long> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("Tasks.Passive_Potion_Effects.Apply_Interval",
+        100L,
         "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them."
     );
 
-    public static final JOption<Boolean> ENCHANTMENTS_CHARGES_ENABLED = JOption.create("Enchantments.Charges.Enabled", false,
+    public static final JOption<Boolean> ENCHANTMENTS_CHARGES_ENABLED = JOption.create("Enchantments.Charges.Enabled",
+        false,
         "Enables the enchantment Charges feature.",
         Placeholders.URL_WIKI + "Charges-System");
 

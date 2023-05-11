@@ -10,9 +10,9 @@ import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 
 import java.util.function.UnaryOperator;
@@ -30,12 +30,16 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
 
     public EnchantTemper(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription("Inflicts " + PLACEHOLDER_DAMAGE_AMOUNT + "% (max. " + PLACEHOLDER_DAMAGE_CAPACITY + "%) more damage for each " + PLACEHOLDER_HEALTH_POINT + " hearts missing.");
+        this.getDefaults().setLevelMax(5);
+        this.getDefaults().setTier(0.3);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.damageAmount = EnchantScaler.read(this, "Settings.Damage.Amount", "0.01 * " + Placeholders.ENCHANTMENT_LEVEL,
+        this.damageAmount = EnchantScaler.read(this, "Settings.Damage.Amount",
+            "0.01 * " + Placeholders.ENCHANTMENT_LEVEL,
             "On how much (in percent) the damage will be increased per each Health Point?");
         this.damageCapacity = EnchantScaler.read(this, "Settings.Damage.Capacity", "2.0",
             "Maximal possible value for the Damage.Amount.");

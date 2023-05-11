@@ -6,16 +6,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 
 public final class PotionImplementation implements Potioned {
-
-    public static final String PLACEHOLDER_POTION_LEVEL    = "%enchantment_potion_level%";
-    public static final String PLACEHOLDER_POTION_DURATION = "%enchantment_potion_duration%";
-    public static final String PLACEHOLDER_POTION_TYPE     = "%enchantment_potion_type%";
 
     //private final ExcellentEnchant enchant;
     private final PotionEffectType effectType;
@@ -23,13 +19,13 @@ public final class PotionImplementation implements Potioned {
     private final Scaler  amplifier;
     private final boolean isPermanent;
 
-    private PotionImplementation(@NotNull ExcellentEnchant enchant, @NotNull PotionEffectType effectType, boolean isPermanent) {
+    private PotionImplementation(@NotNull ExcellentEnchant enchant,
+                                 @NotNull PotionEffectType effectType, boolean isPermanent,
+                                 @NotNull EnchantScaler duration, @NotNull EnchantScaler amplifier) {
         //this.enchant = enchant;
         this.effectType = effectType;
-        this.duration = EnchantScaler.read(enchant, "Settings.Potion_Effect.Duration", "5.0 * " + Placeholders.ENCHANTMENT_LEVEL,
-            "Potion effect duration (in seconds). This setting is useless for 'permanent' effects.");
-        this.amplifier = EnchantScaler.read(enchant, "Settings.Potion_Effect.Level", Placeholders.ENCHANTMENT_LEVEL,
-            "Potion effect level.");
+        this.duration = duration;
+        this.amplifier = amplifier;
         this.isPermanent = isPermanent;
     }
 
@@ -40,7 +36,20 @@ public final class PotionImplementation implements Potioned {
     }
 
     public static PotionImplementation create(@NotNull ExcellentEnchant enchant, @NotNull PotionEffectType type, boolean isPermanent) {
-        return new PotionImplementation(enchant, type, isPermanent);
+        return create(enchant, type, isPermanent, "5 * " + Placeholders.ENCHANTMENT_LEVEL, Placeholders.ENCHANTMENT_LEVEL);
+    }
+
+    public static PotionImplementation create(@NotNull ExcellentEnchant enchant,
+                                              @NotNull PotionEffectType type, boolean isPermanent,
+                                              @NotNull String duration, @NotNull String amplifier) {
+
+        EnchantScaler durationScale = EnchantScaler.read(enchant, "Settings.Potion_Effect.Duration", duration,
+            "Potion effect duration (in seconds). This setting is useless for 'permanent' effects.");
+
+        EnchantScaler amplifierScale = EnchantScaler.read(enchant, "Settings.Potion_Effect.Level", amplifier,
+            "Potion effect level.");
+
+        return new PotionImplementation(enchant, type, isPermanent, durationScale, amplifierScale);
     }
 
     @Override

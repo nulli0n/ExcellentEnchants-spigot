@@ -1,23 +1,24 @@
 package su.nightexpress.excellentenchants.enchantment.impl.weapon;
 
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.MessageUtil;
+import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantRocket extends ExcellentEnchant implements Chanced, CombatEnchant {
 
@@ -28,13 +29,18 @@ public class EnchantRocket extends ExcellentEnchant implements Chanced, CombatEn
 
     public EnchantRocket(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch your enemy into the space.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.5);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.fireworkPower = EnchantScaler.read(this, "Settings.Firework_Power", Placeholders.ENCHANTMENT_LEVEL + " * 0.25",
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "4.0 + " + Placeholders.ENCHANTMENT_LEVEL);
+        this.fireworkPower = EnchantScaler.read(this, "Settings.Firework_Power",
+            Placeholders.ENCHANTMENT_LEVEL + " * 0.25",
             "Firework power. The more power = the higher fly distance.");
     }
 
@@ -63,14 +69,30 @@ public class EnchantRocket extends ExcellentEnchant implements Chanced, CombatEn
             victim.leaveVehicle();
         }
 
-        Firework firework = EntityUtil.spawnRandomFirework(victim.getLocation());
-        FireworkMeta meta = firework.getFireworkMeta();
-        meta.setPower((int) this.getFireworkPower(level));
-        firework.setFireworkMeta(meta);
+        Firework firework = this.createRocket(victim.getLocation(), level);
         firework.addPassenger(victim);
 
         MessageUtil.sound(victim.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH);
         return true;
+    }
+
+    @NotNull
+    private Firework createRocket(@NotNull Location location, int level) {
+        World world = location.getWorld();
+        if (world == null) {
+            throw new IllegalStateException("World is null!");
+        }
+
+        Firework firework = (Firework) world.spawnEntity(location, EntityType.FIREWORK);
+        FireworkMeta meta = firework.getFireworkMeta();
+        FireworkEffect.Type type = Rnd.get(FireworkEffect.Type.values());
+        Color color = Color.fromBGR(Rnd.nextInt(255), Rnd.nextInt(255), Rnd.nextInt(255));
+        Color fade = Color.fromBGR(Rnd.nextInt(255), Rnd.nextInt(255), Rnd.nextInt(255));
+        FireworkEffect effect = FireworkEffect.builder().flicker(Rnd.nextBoolean()).withColor(color).withFade(fade).with(type).trail(Rnd.nextBoolean()).build();
+        meta.addEffect(effect);
+        meta.setPower((int) this.getFireworkPower(level));
+        firework.setFireworkMeta(meta);
+        return firework;
     }
 
     @Override

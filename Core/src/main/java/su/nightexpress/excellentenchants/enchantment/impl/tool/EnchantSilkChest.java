@@ -25,10 +25,10 @@ import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantDropContainer;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 
 import java.util.ArrayList;
@@ -48,6 +48,10 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
 
     public EnchantSilkChest(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
+        this.getDefaults().setDescription("Drop chests and saves all its content.");
+        this.getDefaults().setLevelMax(1);
+        this.getDefaults().setTier(0.5);
+
         this.keyChest = new NamespacedKey(plugin, ID + ".item");
         this.keyItems = new TreeMap<>();
         for (int pos = 0; pos < 27; pos++) {

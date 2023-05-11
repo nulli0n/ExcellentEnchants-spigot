@@ -1,7 +1,7 @@
 package su.nightexpress.excellentenchants.enchantment.impl.tool;
 
 import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -11,22 +11,19 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.EffectUtil;
-import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
-import su.nightexpress.excellentenchants.enchantment.EnchantRegister;
+import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -45,19 +42,39 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
 
     public EnchantVeinminer(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
+        this.getDefaults().setDescription("Mines up to " + PLACEHOLDER_BLOCK_LIMIT + " blocks of the ore vein at once.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.3);
+        this.getDefaults().setConflicts(EnchantBlastMining.ID, EnchantTunnel.ID);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
 
-        this.blocksLimit = EnchantScaler.read(this, "Settings.Blocks.Max_At_Once", "6 + " + Placeholders.ENCHANTMENT_LEVEL,
+        this.blocksLimit = EnchantScaler.read(this, "Settings.Blocks.Max_At_Once",
+            "6 + " + Placeholders.ENCHANTMENT_LEVEL,
             "How much amount of blocks can be destroted at single use?");
 
-        this.blocksAffected = JOption.create("Settings.Blocks.Affected", new HashSet<>(),
+        this.blocksAffected = JOption.forSet("Settings.Blocks.Affected",
+            str -> Material.getMaterial(str.toUpperCase()),
+            () -> {
+                Set<Material> set = new HashSet<>();
+                set.addAll(Tag.COAL_ORES.getValues());
+                set.addAll(Tag.COPPER_ORES.getValues());
+                set.addAll(Tag.DIAMOND_ORES.getValues());
+                set.addAll(Tag.EMERALD_ORES.getValues());
+                set.addAll(Tag.GOLD_ORES.getValues());
+                set.addAll(Tag.IRON_ORES.getValues());
+                set.addAll(Tag.LAPIS_ORES.getValues());
+                set.addAll(Tag.REDSTONE_ORES.getValues());
+                set.add(Material.NETHER_GOLD_ORE);
+                set.add(Material.NETHER_QUARTZ_ORE);
+                return set;
+            },
             "List of blocks, that will be affected by this enchantment.",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html").read(cfg).stream()
-            .map(type -> Material.getMaterial(type.toUpperCase())).filter(Objects::nonNull).collect(Collectors.toSet());
+            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html"
+        ).setWriter((cfg, path, set) -> cfg.set(path, set.stream().map(Enum::name).toList())).read(cfg);
     }
 
     @NotNull
@@ -111,7 +128,7 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
         ores.remove(source);
         ores.forEach(ore -> {
             // Play block break particles before the block broken.
-            EffectUtil.playEffect(LocationUtil.getCenter(ore.getLocation()), Particle.BLOCK_CRACK.name(), ore.getType().name(), 0.2, 0.2, 0.2, 0.1, 20);
+            //EffectUtil.playEffect(LocationUtil.getCenter(ore.getLocation()), Particle.BLOCK_CRACK.name(), ore.getType().name(), 0.2, 0.2, 0.2, 0.1, 20);
 
             ore.setMetadata(META_BLOCK_VEINED, new FixedMetadataValue(plugin, true));
             //plugin.getNMS().breakBlock(player, ore);
@@ -123,8 +140,8 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack tool, int level) {
         if (!this.isAvailableToUse(player)) return false;
-        if (EnchantRegister.TUNNEL != null && EnchantManager.hasEnchantment(tool, EnchantRegister.TUNNEL)) return false;
-        if (EnchantRegister.BLAST_MINING != null && EnchantManager.hasEnchantment(tool, EnchantRegister.BLAST_MINING)) return false;
+        if (EnchantRegistry.TUNNEL != null && EnchantUtils.contains(tool, EnchantRegistry.TUNNEL)) return false;
+        if (EnchantRegistry.BLAST_MINING != null && EnchantUtils.contains(tool, EnchantRegistry.BLAST_MINING)) return false;
 
         Block block = e.getBlock();
         if (block.hasMetadata(META_BLOCK_VEINED)) return false;

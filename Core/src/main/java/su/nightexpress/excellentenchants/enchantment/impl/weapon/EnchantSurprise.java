@@ -12,32 +12,49 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
-import su.nightexpress.excellentenchants.api.enchantment.template.PotionEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
 
-public class EnchantSurprise extends PotionEnchant implements Chanced, CombatEnchant {
+public class EnchantSurprise extends ExcellentEnchant implements Chanced, Potioned, CombatEnchant {
 
     public static final String ID = "surprise";
 
     private ChanceImplementation chanceImplementation;
+    private PotionImplementation potionImplementation;
 
     public EnchantSurprise(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM, PotionEffectType.BLINDNESS, false);
+        super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to apply random potion effect to enemy on hit.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.75);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "2.25 * " + Placeholders.ENCHANTMENT_LEVEL);
+        this.potionImplementation = PotionImplementation.create(this, PotionEffectType.BLINDNESS, false,
+            "3.0 + " + Placeholders.ENCHANTMENT_LEVEL,
+            Placeholders.ENCHANTMENT_LEVEL);
     }
 
     @NotNull
     @Override
     public ChanceImplementation getChanceImplementation() {
         return chanceImplementation;
+    }
+
+    @NotNull
+    @Override
+    public PotionImplementation getPotionImplementation() {
+        return potionImplementation;
     }
 
     @NotNull

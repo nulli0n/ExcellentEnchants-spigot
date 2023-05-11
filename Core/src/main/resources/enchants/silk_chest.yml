@@ -1,8 +1,0 @@
-Name: Silk Chest
-Tier: rare
-Description:
-- Drop chests and saves all its content.
-Conflicts: []
-Level:
-  Min: 1
-  Max: 1

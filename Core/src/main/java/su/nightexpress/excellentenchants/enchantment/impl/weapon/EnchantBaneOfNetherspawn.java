@@ -8,14 +8,14 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.EffectUtil;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Set;
 import java.util.function.UnaryOperator;
@@ -38,6 +38,9 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
 
     public EnchantBaneOfNetherspawn(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription("Inflicts " + PLACEHOLDER_DAMAGE + " more damage to nether mobs.");
+        this.getDefaults().setLevelMax(5);
+        this.getDefaults().setTier(0.1);
     }
 
     @Override
@@ -45,7 +48,8 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
         super.loadConfig();
         this.damageModifier = JOption.create("Settings.Damage.As_Modifier", false,
             "When 'true' multiplies the damage. When 'false' sums plain values.").read(cfg);
-        this.damageFormula = EnchantScaler.read(this, "Settings.Damage.Amount", "0.5 * " + Placeholders.ENCHANTMENT_LEVEL,
+        this.damageFormula = EnchantScaler.read(this, "Settings.Damage.Amount",
+            "0.5 * " + Placeholders.ENCHANTMENT_LEVEL,
             "Amount of additional damage.");
     }
 
@@ -75,7 +79,7 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
         double damageAdd = this.getDamageModifier(level);
         e.setDamage(this.damageModifier ? damageEvent * damageAdd : damageEvent + damageAdd);
         if (this.hasVisualEffects()) {
-            EffectUtil.playEffect(victim.getEyeLocation(), Particle.SMOKE_NORMAL, "", 0.25, 0.25, 0.25, 0.1f, 30);
+            SimpleParticle.of(Particle.SMOKE_NORMAL).play(victim.getEyeLocation(), 0.25, 0.1, 30);
         }
         return true;
     }

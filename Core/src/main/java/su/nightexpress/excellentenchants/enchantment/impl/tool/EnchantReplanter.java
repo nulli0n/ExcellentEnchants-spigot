@@ -17,11 +17,11 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.utils.MessageUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.InteractEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 
@@ -43,12 +43,15 @@ public class EnchantReplanter extends ExcellentEnchant implements Chanced, Inter
 
     public EnchantReplanter(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
+        this.getDefaults().setDescription("Automatically replant crops on right click and when harvest.");
+        this.getDefaults().setLevelMax(1);
+        this.getDefaults().setTier(0.3);
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+        this.chanceImplementation = ChanceImplementation.create(this, "100");
         this.replantOnRightClick = JOption.create("Settings.Replant.On_Right_Click", true,
             "When 'true', player will be able to replant crops when right-clicking farmland blocks.").read(cfg);
         this.replantOnPlantBreak = JOption.create("Settings.Replant.On_Plant_Break", true,

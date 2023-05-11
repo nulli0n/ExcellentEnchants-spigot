@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ExcellentEnchants</artifactId>
         <groupId>su.nightexpress.excellentenchants</groupId>
-        <version>3.3.3</version>
+        <version>3.3.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -38,6 +38,23 @@
         <repository>
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>lumine-repo</id>
+            <url>https://mvn.lumine.io/repository/maven-public/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>lumine-snapshot</id>
+            <url>http://mvn.lumine.io/repository/maven-snapshots/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -45,7 +62,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19.3-R0.1-SNAPSHOT</version>
+            <version>1.19.4-R0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>su.nexmedia.playerblocktracker</groupId>
@@ -55,32 +72,32 @@
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>NMS</artifactId>
-            <version>3.3.3</version>
-        </dependency>
-        <dependency>
-            <groupId>su.nightexpress.excellentenchants</groupId>
-            <artifactId>V1_17_R1</artifactId>
-            <version>3.3.3</version>
-        </dependency>
-        <dependency>
-            <groupId>su.nightexpress.excellentenchants</groupId>
-            <artifactId>V1_18_R2</artifactId>
-            <version>3.3.3</version>
-        </dependency>
-        <dependency>
-            <groupId>su.nightexpress.excellentenchants</groupId>
-            <artifactId>V1_19_R1</artifactId>
-            <version>3.3.3</version>
-        </dependency>
-        <dependency>
-            <groupId>su.nightexpress.excellentenchants</groupId>
-            <artifactId>V1_19_R2</artifactId>
-            <version>3.3.3</version>
+            <version>3.3.4</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_19_R3</artifactId>
-            <version>3.3.3</version>
+            <version>3.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>su.nightexpress.excellentenchants</groupId>
+            <artifactId>V1_19_R2</artifactId>
+            <version>3.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>su.nightexpress.excellentenchants</groupId>
+            <artifactId>V1_19_R1</artifactId>
+            <version>3.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>su.nightexpress.excellentenchants</groupId>
+            <artifactId>V1_18_R2</artifactId>
+            <version>3.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>su.nightexpress.excellentenchants</groupId>
+            <artifactId>V1_17_R1</artifactId>
+            <version>3.3.4</version>
         </dependency>
         <dependency>
             <groupId>fr.neatmonster</groupId>
@@ -89,9 +106,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.sk89q.worldguard</groupId>
-            <artifactId>worldguard-bukkit</artifactId>
-            <version>7.0.6</version>
+            <groupId>io.lumine</groupId>
+            <artifactId>Mythic-Dist</artifactId>
+            <version>5.0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -4,7 +4,7 @@ import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class PotionEffectsTask extends AbstractEnchantmentTask {
 
@@ -15,7 +15,7 @@ public class PotionEffectsTask extends AbstractEnchantmentTask {
     @Override
     public void action() {
         for (LivingEntity entity : this.getEntities()) {
-            EnchantManager.updateEquippedEnchantEffects(entity);
+            EnchantUtils.updateEquippedEffects(entity);
         }
     }
 }
