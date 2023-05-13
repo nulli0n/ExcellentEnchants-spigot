@@ -51,8 +51,8 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.FIREWORKS_SPARK));
         this.chanceImplementation = ChanceImplementation.create(this,
             "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");

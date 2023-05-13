@@ -13,14 +13,12 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantSelfDestruction extends ExcellentEnchant implements Chanced, DeathEnchant {
 
@@ -40,21 +38,15 @@ public class EnchantSelfDestruction extends ExcellentEnchant implements Chanced,
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "20.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 10");
         this.explosionSize = EnchantScaler.read(this, "Settings.Explosion.Size",
             "1.0" + Placeholders.ENCHANTMENT_LEVEL,
             "A size of the explosion. The more size - the bigger the damage.");
-    }
 
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionSize(level)))
-        ;
+        this.addPlaceholder(PLACEHOLDER_EXPLOSION_POWER, level -> NumberUtil.format(this.getExplosionSize(level)));
     }
 
     @NotNull

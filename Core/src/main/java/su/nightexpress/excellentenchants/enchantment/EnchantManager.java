@@ -25,8 +25,6 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
     @Override
     protected void onLoad() {
-        EnchantRegistry.setup();
-
         this.enchantmentsListMenu = new EnchantmentsListMenu(this.plugin);
         this.addListener(new EnchantHandlerListener(this));
         this.addListener(new EnchantGenericListener(this));
@@ -53,7 +51,6 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
             this.potionEffectsTask.stop();
             this.potionEffectsTask = null;
         }
-        EnchantRegistry.shutdown();
     }
 
     @NotNull

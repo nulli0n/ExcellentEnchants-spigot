@@ -13,14 +13,12 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEnchant {
 
@@ -47,20 +45,15 @@ public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEncha
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "5.0 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.fuseTicks = EnchantScaler.read(this, "Settings.Fuse_Ticks",
             "100 - " + Placeholders.ENCHANTMENT_LEVEL + " * 10",
             "Sets fuse ticks (before it will explode) for the launched TNT.");
-    }
 
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_FUSE_TICKS, NumberUtil.format((double) this.getFuseTicks(level) / 20D));
+        this.addPlaceholder(PLACEHOLDER_FUSE_TICKS, level -> NumberUtil.format((double) this.getFuseTicks(level) / 20D));
     }
 
     @NotNull

@@ -8,7 +8,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.particle.SimpleParticle;
-import su.nexmedia.engine.utils.EffectUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -34,8 +33,8 @@ public class EnchantWither extends ExcellentEnchant implements Chanced, Potioned
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.WITHER, false,

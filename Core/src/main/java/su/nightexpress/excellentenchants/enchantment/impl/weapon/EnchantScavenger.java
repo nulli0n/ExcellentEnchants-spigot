@@ -38,8 +38,8 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "15.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 10");
 

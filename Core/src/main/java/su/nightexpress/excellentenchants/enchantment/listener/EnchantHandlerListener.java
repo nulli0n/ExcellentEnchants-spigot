@@ -15,8 +15,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
@@ -201,6 +203,25 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
             if (interEnchant.isOutOfCharges(item)) return;
             if (interEnchant.onInteract(e, player, item, level)) {
                 interEnchant.consumeCharges(item);
+            }
+        });
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onEnchantFishing(PlayerFishEvent event) {
+        Player player = event.getPlayer();
+
+        ItemStack item;
+        ItemStack main = player.getInventory().getItem(EquipmentSlot.HAND);
+        ItemStack off = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
+        if (main != null && main.getType() == Material.FISHING_ROD) item = main;
+        else if (off != null && off.getType() == Material.FISHING_ROD) item = off;
+        else return;
+
+        EnchantUtils.getExcellents(item, FishingEnchant.class).forEach((enchant, level) -> {
+            if (enchant.isOutOfCharges(item)) return;
+            if (enchant.onFishing(event, item, level)) {
+                enchant.consumeCharges(item);
             }
         });
     }

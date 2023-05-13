@@ -15,7 +15,6 @@ import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
@@ -25,7 +24,6 @@ import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,8 +47,8 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
 
         this.blocksLimit = EnchantScaler.read(this, "Settings.Blocks.Max_At_Once",
             "6 + " + Placeholders.ENCHANTMENT_LEVEL,
@@ -75,6 +73,8 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
             "List of blocks, that will be affected by this enchantment.",
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html"
         ).setWriter((cfg, path, set) -> cfg.set(path, set.stream().map(Enum::name).toList())).read(cfg);
+
+        this.addPlaceholder(PLACEHOLDER_BLOCK_LIMIT, level -> String.valueOf(this.getBlocksLimit(level)));
     }
 
     @NotNull
@@ -84,14 +84,6 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
 
     public int getBlocksLimit(int level) {
         return (int) this.blocksLimit.getValue(level);
-    }
-
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_BLOCK_LIMIT, String.valueOf(this.getBlocksLimit(level)))
-        ;
     }
 
     @Override
@@ -140,8 +132,8 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack tool, int level) {
         if (!this.isAvailableToUse(player)) return false;
-        if (EnchantRegistry.TUNNEL != null && EnchantUtils.contains(tool, EnchantRegistry.TUNNEL)) return false;
-        if (EnchantRegistry.BLAST_MINING != null && EnchantUtils.contains(tool, EnchantRegistry.BLAST_MINING)) return false;
+        if (EnchantUtils.contains(tool, EnchantBlastMining.ID)) return false;
+        if (EnchantUtils.contains(tool, EnchantTunnel.ID)) return false;
 
         Block block = e.getBlock();
         if (block.hasMetadata(META_BLOCK_VEINED)) return false;

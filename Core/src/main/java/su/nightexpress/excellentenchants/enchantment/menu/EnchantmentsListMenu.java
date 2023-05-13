@@ -4,7 +4,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.menu.AutoPaged;
@@ -125,28 +124,27 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
     @NotNull
     private ItemStack buildEnchantIcon(@NotNull ExcellentEnchant enchant, int level) {
         ItemStack icon = new ItemStack(this.enchantIcon);
-        ItemMeta meta = icon.getItemMeta();
-        if (meta == null) return icon;
+        ItemUtil.mapMeta(icon, meta -> {
+            List<String> lore = meta.getLore();
+            if (lore == null) lore = new ArrayList<>();
 
-        List<String> lore = meta.getLore();
-        if (lore == null) lore = new ArrayList<>();
+            List<String> conflicts = enchant.getConflicts().isEmpty() ? Collections.emptyList() : new ArrayList<>(this.enchantLoreConflicts);
+            List<String> conflictNames = enchant.getConflicts().stream().map(key -> Enchantment.getByKey(NamespacedKey.minecraft(key)))
+                .filter(Objects::nonNull).map(LangManager::getEnchantment).toList();
+            conflicts = StringUtil.replace(conflicts, Placeholders.ENCHANTMENT_NAME, true, conflictNames);
 
-        List<String> conflicts = enchant.getConflicts().isEmpty() ? Collections.emptyList() : new ArrayList<>(this.enchantLoreConflicts);
-        List<String> conflictNames = enchant.getConflicts().stream().map(key -> Enchantment.getByKey(NamespacedKey.minecraft(key)))
-            .filter(Objects::nonNull).map(LangManager::getEnchantment).toList();
-        conflicts = StringUtil.replace(conflicts, Placeholders.ENCHANTMENT_NAME, true, conflictNames);
+            List<String> charges = enchant.isChargesEnabled() ? new ArrayList<>(this.enchantLoreCharges) : Collections.emptyList();
+            List<String> obtaining = new ArrayList<>(this.enchantLoreObtaining);
 
-        List<String> charges = enchant.isChargesEnabled() ? new ArrayList<>(this.enchantLoreCharges) : Collections.emptyList();
-        List<String> obtaining = new ArrayList<>(this.enchantLoreObtaining);
+            lore = StringUtil.replace(lore, PLACEHOLDER_CONFLICTS, false, conflicts);
+            lore = StringUtil.replace(lore, PLACEHOLDER_CHARGES, false, charges);
+            lore = StringUtil.replace(lore, PLACEHOLDER_OBTAINING, false, obtaining);
+            lore = StringUtil.replace(lore, Placeholders.ENCHANTMENT_DESCRIPTION, true, enchant.getDescription());
 
-        lore = StringUtil.replace(lore, PLACEHOLDER_CONFLICTS, false, conflicts);
-        lore = StringUtil.replace(lore, PLACEHOLDER_CHARGES, false, charges);
-        lore = StringUtil.replace(lore, PLACEHOLDER_OBTAINING, false, obtaining);
+            meta.setLore(lore);
+            ItemUtil.replace(meta, enchant.getPlaceholders(level).replacer());
+        });
 
-        meta.setLore(lore);
-        icon.setItemMeta(meta);
-
-        ItemUtil.replace(icon, enchant.replaceAllPlaceholders(level));
         return icon;
     }
 }

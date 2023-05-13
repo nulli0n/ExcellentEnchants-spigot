@@ -35,8 +35,8 @@ public class EnchantRocket extends ExcellentEnchant implements Chanced, CombatEn
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "4.0 + " + Placeholders.ENCHANTMENT_LEVEL);
         this.fireworkPower = EnchantScaler.read(this, "Settings.Firework_Power",

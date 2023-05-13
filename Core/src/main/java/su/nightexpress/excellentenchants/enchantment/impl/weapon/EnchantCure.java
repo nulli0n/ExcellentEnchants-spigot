@@ -34,8 +34,8 @@ public class EnchantCure extends ExcellentEnchant implements Chanced, CombatEnch
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "20.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 8");
     }

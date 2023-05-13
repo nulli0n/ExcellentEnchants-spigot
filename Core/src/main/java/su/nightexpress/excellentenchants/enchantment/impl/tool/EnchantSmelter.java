@@ -27,7 +27,6 @@ import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Map;
-import java.util.Objects;
 
 public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDropEnchant {
 
@@ -49,8 +48,8 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "25.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 10");
 
@@ -59,8 +58,8 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html").read(cfg);
 
         this.smeltingTable = JOption.forMap("Settings.Smelting_Table",
-            str -> Material.getMaterial(str.toLowerCase()),
-            (cfg, path, id) -> Material.getMaterial(cfg.getString(path + "." + id, "").toUpperCase()),
+            key -> Material.getMaterial(key.toUpperCase()),
+            (cfg, path, key) -> Material.getMaterial(cfg.getString(path + "." + key, "").toUpperCase()),
             Map.of(
                 Material.RAW_IRON, Material.IRON_INGOT,
                 Material.RAW_GOLD, Material.GOLD_INGOT
@@ -70,8 +69,6 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
             "Note: Material source is material name of the dropped item, not the broken block!",
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html"
         ).setWriter((cfg, path, map) -> map.forEach((src, to) -> cfg.set(path + "." + src.name(), to.name()))).read(cfg);
-        this.smeltingTable.keySet().removeIf(Objects::isNull);
-        this.smeltingTable.values().removeIf(Objects::isNull);
     }
 
     @NotNull

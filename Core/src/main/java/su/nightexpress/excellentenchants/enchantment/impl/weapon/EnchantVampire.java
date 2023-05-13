@@ -21,8 +21,6 @@ import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-import java.util.function.UnaryOperator;
-
 public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatEnchant {
 
     public static final String ID = "vampire";
@@ -40,8 +38,8 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "25.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5.0");
 
@@ -50,6 +48,8 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
             "Amount of health to be restored for attacker.");
         this.healMultiplier = JOption.create("Settings.Heal.As_Multiplier", false,
             "When 'true', the option above will work as a multiplier of the inflicted damage.").read(cfg);
+
+        this.addPlaceholder(PLACEHOLDER_HEAL_AMOUNT, level -> NumberUtil.format(this.isHealMultiplier() ? getHealAmount(level) * 100D : getHealAmount(level)));
     }
 
     @NotNull
@@ -70,16 +70,6 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
     @NotNull
     public EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
-    }
-
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        double healAmount = this.getHealAmount(level);
-
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_HEAL_AMOUNT, NumberUtil.format(this.isHealMultiplier() ? healAmount * 100D : healAmount))
-        ;
     }
 
     @Override

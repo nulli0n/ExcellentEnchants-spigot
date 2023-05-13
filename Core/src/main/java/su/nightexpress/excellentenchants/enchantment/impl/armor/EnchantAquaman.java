@@ -27,8 +27,8 @@ public class EnchantAquaman extends ExcellentEnchant implements Potioned, Passiv
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.WATER_BREATHING, true);
     }
 

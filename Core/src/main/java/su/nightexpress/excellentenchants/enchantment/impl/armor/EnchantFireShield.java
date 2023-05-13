@@ -8,14 +8,12 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantFireShield extends ExcellentEnchant implements Chanced, CombatEnchant {
 
@@ -33,16 +31,8 @@ public class EnchantFireShield extends ExcellentEnchant implements Chanced, Comb
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format(this.getFireDuration(level)))
-        ;
-    }
-
-    @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
 
         this.chanceImplementation = ChanceImplementation.create(this,
             Placeholders.ENCHANTMENT_LEVEL + " * 15.0");
@@ -51,6 +41,8 @@ public class EnchantFireShield extends ExcellentEnchant implements Chanced, Comb
             "Sets the fire duration (in seconds).",
             "If entity's current fire ticks amount is less than this value, it will be set to this value.",
             "If entity's current fire ticks amount is greater than this value, it won't be changed.");
+
+        this.addPlaceholder(PLACEHOLDER_FIRE_DURATION, level -> NumberUtil.format(this.getFireDuration(level)));
     }
 
     @NotNull

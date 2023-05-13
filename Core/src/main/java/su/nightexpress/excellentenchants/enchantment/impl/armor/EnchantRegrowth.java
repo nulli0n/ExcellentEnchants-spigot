@@ -22,8 +22,6 @@ import su.nightexpress.excellentenchants.enchantment.task.AbstractEnchantmentTas
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
-import java.util.function.UnaryOperator;
-
 public class EnchantRegrowth extends ExcellentEnchant implements Chanced, PassiveEnchant, ICleanable {
 
     public static final String ID = "regrowth";
@@ -49,8 +47,8 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "20.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
         this.healInterval = JOption.create("Settings.Heal.Interval", 100,
@@ -61,6 +59,11 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
             "Maximal entity health when the enchantment will not heal anymore.");
         this.healAmount = EnchantScaler.read(this, "Settings.Heal.Amount", "0.25",
             "Amount of hearts to be restored.");
+
+        this.addPlaceholder(PLACEHOLDER_HEAL_AMOUNT, level -> NumberUtil.format(this.getHealAmount(level)));
+        this.addPlaceholder(PLACEHOLDER_HEAL_MIN_HEALTH, level -> NumberUtil.format(this.getHealMaxHealth(level)));
+        this.addPlaceholder(PLACEHOLDER_HEAL_MAX_HEALTH, level -> NumberUtil.format(this.getHealMaxHealth(level)));
+        this.addPlaceholder(PLACEHOLDER_HEAL_INTERVAL, level -> NumberUtil.format((double) this.healInterval / 20D));
 
         this.task = new Task(plugin);
         this.task.start();
@@ -76,17 +79,6 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
             this.task.stop();
             this.task = null;
         }
-    }
-
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_HEAL_AMOUNT, NumberUtil.format(this.getHealAmount(level)))
-            .replace(PLACEHOLDER_HEAL_MIN_HEALTH, NumberUtil.format(this.getHealMaxHealth(level)))
-            .replace(PLACEHOLDER_HEAL_MAX_HEALTH, NumberUtil.format(this.getHealMaxHealth(level)))
-            .replace(PLACEHOLDER_HEAL_INTERVAL, NumberUtil.format((double) this.healInterval / 20D))
-        ;
     }
 
     @NotNull

@@ -47,8 +47,8 @@ public class EnchantPoisonedArrows extends ExcellentEnchant implements Chanced, 
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.SLIME));
         this.chanceImplementation = ChanceImplementation.create(this,
             "25.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");

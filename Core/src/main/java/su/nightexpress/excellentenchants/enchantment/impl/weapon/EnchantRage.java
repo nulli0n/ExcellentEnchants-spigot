@@ -33,8 +33,8 @@ public class EnchantRage extends ExcellentEnchant implements Chanced, Potioned, 
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "7.0 + " + Placeholders.ENCHANTMENT_LEVEL);
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.INCREASE_DAMAGE, false,

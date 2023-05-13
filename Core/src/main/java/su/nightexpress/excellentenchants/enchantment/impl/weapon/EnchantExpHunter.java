@@ -8,12 +8,10 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantExpHunter extends ExcellentEnchant implements DeathEnchant {
 
@@ -30,23 +28,17 @@ public class EnchantExpHunter extends ExcellentEnchant implements DeathEnchant {
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.expModifier = EnchantScaler.read(this, "Settings.Exp_Modifier",
             "1.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 0.5",
             "Exp modifier value. The original exp amount will be multiplied on this value.");
+
+        this.addPlaceholder(PLACEHOLDER_EXP_MODIFIER, level -> NumberUtil.format(this.getExpModifier(level) * 100D - 100D));
     }
 
     public final double getExpModifier(int level) {
         return this.expModifier.getValue(level);
-    }
-
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_EXP_MODIFIER, NumberUtil.format(this.getExpModifier(level) * 100D - 100D))
-        ;
     }
 
     @Override

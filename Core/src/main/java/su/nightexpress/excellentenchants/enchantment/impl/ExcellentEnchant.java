@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.IListener;
+import su.nexmedia.engine.api.placeholder.PlaceholderMap;
 import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.NumberUtil;
@@ -19,16 +20,17 @@ import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantDefaults;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.config.Config;
+import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.config.EnchantDefaults;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.*;
-import java.util.function.UnaryOperator;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public abstract class ExcellentEnchant extends Enchantment implements IEnchantment, IListener {
@@ -39,60 +41,69 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     protected final EnchantPriority priority;
     protected final EnchantDefaults defaults;
     protected final NamespacedKey   chargesKey;
+    protected final Map<Integer, PlaceholderMap> placeholdersMap;
 
     public ExcellentEnchant(@NotNull ExcellentEnchants plugin, @NotNull String id, @NotNull EnchantPriority priority) {
         super(NamespacedKey.minecraft(id.toLowerCase()));
         this.plugin = plugin;
         this.id = this.getKey().getKey();
-        this.cfg = new JYML(plugin.getDataFolder() + "/enchants/", id + ".yml");
+        this.cfg = new JYML(plugin.getDataFolder() + EnchantManager.DIR_ENCHANTS, id + ".yml");
         this.priority = priority;
         this.chargesKey = new NamespacedKey(plugin, this.getId() + ".charges");
         this.defaults = new EnchantDefaults(this);
+        this.placeholdersMap = new HashMap<>();
     }
 
-    public void loadConfig() {
+    public void loadSettings() {
         this.cfg.reload();
+        this.placeholdersMap.clear();
+
         this.getDefaults().load(this);
-    }
 
-    @NotNull
-    public UnaryOperator<String> replaceAllPlaceholders(int level) {
-        return str -> this.replacePlaceholders(level).apply(str)
-            .replace(Placeholders.ENCHANTMENT_NAME, this.getDisplayName())
-            .replace(Placeholders.ENCHANTMENT_NAME_FORMATTED, this.getNameFormatted(level))
-            .replace(Placeholders.ENCHANTMENT_LEVEL, NumberUtil.toRoman(level))
-            .replace(Placeholders.ENCHANTMENT_LEVEL_MIN, String.valueOf(this.getStartLevel()))
-            .replace(Placeholders.ENCHANTMENT_LEVEL_MAX, String.valueOf(this.getMaxLevel()))
-            .replace(Placeholders.ENCHANTMENT_TIER, this.getTier().getName())
-            .replace(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
-            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
-            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
-            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
-            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_FISHING, NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
-            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING, NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
-            .replace(Placeholders.ENCHANTMENT_CHARGES_MAX_AMOUNT, String.valueOf(this.getChargesMax(level)))
-            .replace(Placeholders.ENCHANTMENT_CHARGES_CONSUME_AMOUNT, String.valueOf(this.getChargesConsumeAmount(level)))
-            .replace(Placeholders.ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, String.valueOf(this.getChargesRechargeAmount(level)))
-            .replace(Placeholders.ENCHANTMENT_CHARGES_FUEL_ITEM, ItemUtil.getItemName(this.getChargesFuel()))
-            ;
-    }
+        for (int i = this.getStartLevel(); i < this.getMaxLevel() + 1; i++) {
+            int level = i;
 
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> {
-            str = str.replace(Placeholders.ENCHANTMENT_DESCRIPTION, String.join("\n", this.getDescription()));
+            PlaceholderMap map = new PlaceholderMap()
+                .add(Placeholders.ENCHANTMENT_DESCRIPTION, () -> String.join("\n", this.getDescription()))
+                .add(Placeholders.ENCHANTMENT_NAME, this::getDisplayName)
+                .add(Placeholders.ENCHANTMENT_NAME_FORMATTED, () -> this.getNameFormatted(level))
+                .add(Placeholders.ENCHANTMENT_LEVEL, () -> NumberUtil.toRoman(level))
+                .add(Placeholders.ENCHANTMENT_LEVEL_MIN, () -> String.valueOf(this.getStartLevel()))
+                .add(Placeholders.ENCHANTMENT_LEVEL_MAX, () -> String.valueOf(this.getMaxLevel()))
+                .add(Placeholders.ENCHANTMENT_TIER, () -> this.getTier().getName())
+                .add(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, () -> String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
+                .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, () -> NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
+                .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, () -> NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
+                .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, () -> NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
+                .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_FISHING, () -> NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
+                .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING, () -> NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
+                .add(Placeholders.ENCHANTMENT_CHARGES_MAX_AMOUNT, () -> NumberUtil.format(this.getChargesMax(level)))
+                .add(Placeholders.ENCHANTMENT_CHARGES_CONSUME_AMOUNT, () -> NumberUtil.format(this.getChargesConsumeAmount(level)))
+                .add(Placeholders.ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, () -> NumberUtil.format(this.getChargesRechargeAmount(level)))
+                .add(Placeholders.ENCHANTMENT_CHARGES_FUEL_ITEM, () -> ItemUtil.getItemName(this.getChargesFuel()));
 
             if (this instanceof Chanced chanced) {
-                str = str.replace(Placeholders.ENCHANTMENT_CHANCE, NumberUtil.format(chanced.getTriggerChance(level)));
+                map.add(Placeholders.ENCHANTMENT_CHANCE, () -> NumberUtil.format(chanced.getTriggerChance(level)));
             }
             if (this instanceof Potioned potioned) {
-                str = str
-                    .replace(Placeholders.ENCHANTMENT_POTION_LEVEL, NumberUtil.toRoman(potioned.getEffectAmplifier(level)))
-                    .replace(Placeholders.ENCHANTMENT_POTION_DURATION, NumberUtil.format((double) potioned.getEffectDuration(level) / 20D))
-                    .replace(Placeholders.ENCHANTMENT_POTION_TYPE, LangManager.getPotionType(potioned.getEffectType()));
+                map.add(Placeholders.ENCHANTMENT_POTION_LEVEL, () -> NumberUtil.toRoman(potioned.getEffectAmplifier(level)));
+                map.add(Placeholders.ENCHANTMENT_POTION_DURATION, () -> NumberUtil.format(potioned.getEffectDuration(level) / 20D));
+                map.add(Placeholders.ENCHANTMENT_POTION_TYPE, () -> LangManager.getPotionType(potioned.getEffectType()));
             }
-            return str;
-        };
+
+            this.placeholdersMap.put(level, map);
+        }
+    }
+
+    @NotNull
+    public PlaceholderMap getPlaceholders(int level) {
+        return this.placeholdersMap.get(level);
+    }
+
+    public void addPlaceholder(@NotNull String key, @NotNull Function<Integer, String> replacer) {
+        for (int level = this.getStartLevel(); level < this.getMaxLevel() + 1; level++) {
+            this.getPlaceholders(level).add(key, replacer.apply(level));
+        }
     }
 
     @Override
@@ -172,7 +183,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     @NotNull
     public List<String> getDescription(int level) {
         List<String> description = new ArrayList<>(this.getDescription());
-        description.replaceAll(this.replacePlaceholders(level));
+        description.replaceAll(this.getPlaceholders(level).replacer());
         return description;
     }
 

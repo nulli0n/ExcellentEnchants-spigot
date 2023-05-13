@@ -46,8 +46,8 @@ public class EnchantHover extends ExcellentEnchant implements Chanced, Arrowed, 
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.BUBBLE_POP));
         this.chanceImplementation = ChanceImplementation.create(this,
             "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");

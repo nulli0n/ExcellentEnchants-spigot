@@ -16,19 +16,17 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
-import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 public class EnchantBlastMining extends ExcellentEnchant implements Chanced, BlockBreakEnchant {
 
@@ -52,8 +50,8 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "20.0 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.explosionPower = EnchantScaler.read(this, "Settings.Explosion.Power",
@@ -64,6 +62,8 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
             "Minimal block strength value for the enchantment to have effect.",
             "Block strength value is how long it takes to break the block by a hand.",
             "For example, a Stone has 3.0 strength.");
+
+        this.addPlaceholder(PLACEHOLDER_EXPLOSION_POWER, level -> NumberUtil.format(this.getExplosionPower(level)));
     }
 
     @NotNull
@@ -87,13 +87,6 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
 
     @Override
     @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionPower(level)));
-    }
-
-    @Override
-    @NotNull
     public FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.PICKAXE};
     }
@@ -108,8 +101,8 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
     public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isAvailableToUse(player)) return false;
 
-        if (EnchantRegistry.VEINMINER != null && EnchantUtils.contains(item, EnchantRegistry.VEINMINER)) return false;
-        if (EnchantRegistry.TUNNEL != null && EnchantUtils.contains(item, EnchantRegistry.TUNNEL)) return false;
+        if (EnchantUtils.contains(item, EnchantVeinminer.ID)) return false;
+        if (EnchantUtils.contains(item, EnchantTunnel.ID)) return false;
 
         Block block = e.getBlock();
         if (block.hasMetadata(META_EXPLOSION_MINED)) return false;

@@ -13,7 +13,6 @@ import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
@@ -47,8 +46,8 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.disableOnSneak = JOption.create("Settings.Ignore_When_Sneaking", true,
             "When 'true' the enchantment won't be triggered when sneaking.").read(cfg);
     }
@@ -70,8 +69,8 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
         Block block = e.getBlock();
         if (!this.isAvailableToUse(player)) return false;
         if (this.disableOnSneak && player.isSneaking()) return false;
-        if (EnchantRegistry.VEINMINER != null && EnchantUtils.contains(item, EnchantRegistry.VEINMINER)) return false;
-        if (EnchantRegistry.BLAST_MINING != null && EnchantUtils.contains(item, EnchantRegistry.BLAST_MINING)) return false;
+        if (EnchantUtils.contains(item, EnchantVeinminer.ID)) return false;
+        if (EnchantUtils.contains(item, EnchantBlastMining.ID)) return false;
         if (block.hasMetadata(META_BLOCK_TUNNEL)) return false;
         if (block.getType().isInteractable() && !INTERACTABLE_BLOCKS.contains(block.getType())) return false;
         if (block.getDrops(item).isEmpty()) return false;

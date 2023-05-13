@@ -34,8 +34,8 @@ public class EnchantConfusion extends ExcellentEnchant implements Chanced, Potio
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "15.0 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.CONFUSION, false,

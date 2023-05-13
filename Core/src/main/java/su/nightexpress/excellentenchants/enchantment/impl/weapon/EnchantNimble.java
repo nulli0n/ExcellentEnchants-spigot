@@ -27,8 +27,8 @@ public class EnchantNimble extends ExcellentEnchant implements Chanced, DeathEnc
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this);
     }
 

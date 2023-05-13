@@ -34,8 +34,8 @@ public class EnchantIceAspect extends ExcellentEnchant implements Chanced, Potio
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this, "100");
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.SLOW, false,
             "3.0 + " + Placeholders.ENCHANTMENT_LEVEL,

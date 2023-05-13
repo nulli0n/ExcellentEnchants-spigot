@@ -10,12 +10,10 @@ import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
 
@@ -36,8 +34,8 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.damageAmount = EnchantScaler.read(this, "Settings.Damage.Amount",
             "0.01 * " + Placeholders.ENCHANTMENT_LEVEL,
             "On how much (in percent) the damage will be increased per each Health Point?");
@@ -45,6 +43,10 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
             "Maximal possible value for the Damage.Amount.");
         this.healthPoint = EnchantScaler.read(this, "Settings.Health.Point", "0.5",
             "For how much every missing hearts damage will be increased?");
+
+        this.addPlaceholder(PLACEHOLDER_DAMAGE_AMOUNT, level -> NumberUtil.format(this.getDamageAmount(level) * 100D));
+        this.addPlaceholder(PLACEHOLDER_DAMAGE_CAPACITY, level -> NumberUtil.format(this.getDamageCapacity(level) * 100D));
+        this.addPlaceholder(PLACEHOLDER_HEALTH_POINT, level -> NumberUtil.format(this.getHealthPoint(level)));
     }
 
     public double getDamageAmount(int level) {
@@ -57,16 +59,6 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
 
     public double getHealthPoint(int level) {
         return this.healthPoint.getValue(level);
-    }
-
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_DAMAGE_AMOUNT, NumberUtil.format(this.getDamageAmount(level) * 100D))
-            .replace(PLACEHOLDER_DAMAGE_CAPACITY, NumberUtil.format(this.getDamageCapacity(level) * 100D))
-            .replace(PLACEHOLDER_HEALTH_POINT, NumberUtil.format(this.getHealthPoint(level)))
-        ;
     }
 
     @NotNull

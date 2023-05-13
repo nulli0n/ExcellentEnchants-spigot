@@ -41,8 +41,8 @@ public class EnchantEnderBow extends ExcellentEnchant implements BowEnchant, Cha
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this, "100");
     }
 

@@ -27,8 +27,8 @@ public class EnchantHaste extends ExcellentEnchant implements Potioned, PassiveE
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.FAST_DIGGING, true);
     }
 

@@ -49,8 +49,8 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "15.0 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.spawnerName = JOption.create("Settings.Spawner_Item.Name",

@@ -18,16 +18,14 @@ import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced, Arrowed, BowEnchant {
 
@@ -58,8 +56,8 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.SMOKE_NORMAL));
         this.chanceImplementation = ChanceImplementation.create(this,
             "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
@@ -72,14 +70,8 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
         this.explosionSize = EnchantScaler.read(this, "Settings.Explosion.Size",
             "2.0 + " + Placeholders.ENCHANTMENT_LEVEL,
             "Sets the explosion size. The more size - the bigger explosion.");
-    }
 
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionSize(level)))
-        ;
+        this.addPlaceholder(PLACEHOLDER_EXPLOSION_POWER, level -> NumberUtil.format(this.getExplosionSize(level)));
     }
 
     @NotNull

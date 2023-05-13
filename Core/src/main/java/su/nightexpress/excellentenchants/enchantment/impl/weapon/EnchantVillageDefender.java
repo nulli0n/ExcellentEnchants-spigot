@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.particle.SimpleParticle;
-import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
@@ -17,8 +16,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
-
-import java.util.function.UnaryOperator;
 
 public class EnchantVillageDefender extends ExcellentEnchant implements CombatEnchant {
 
@@ -36,8 +33,8 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
 
         this.damageAmount = EnchantScaler.read(this, "Settings.Damage.Formula",
             "0.5 * " + Placeholders.ENCHANTMENT_LEVEL,
@@ -45,6 +42,8 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
 
         this.damageMultiplier = JOption.create("Settings.Damage.As_Modifier", false,
             "When 'true' the 'Damage.Formula' will work as a multiplier to the original damage.").read(cfg);
+
+        this.addPlaceholder(PLACEHOLDER_DAMAGE_AMOUNT, level -> NumberUtil.format(this.getDamageAddict(level)));
     }
 
     public double getDamageAddict(int level) {
@@ -53,14 +52,6 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
 
     public boolean isDamageMultiplier() {
         return damageMultiplier;
-    }
-
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_DAMAGE_AMOUNT, NumberUtil.format(this.getDamageAddict(level)))
-        ;
     }
 
     @Override

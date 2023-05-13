@@ -38,8 +38,8 @@ public class EnchantCurseOfMisfortune extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "20.0 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.dropExp = JOption.create("Settings.Drop_Exp", false,

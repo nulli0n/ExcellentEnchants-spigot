@@ -38,6 +38,11 @@ public class EnchantUtils {
 
     public static final NamespacedKey KEY_LORE_SIZE = new NamespacedKey(ExcellentEnchantsAPI.PLUGIN, "lore_size");
 
+    @NotNull
+    public static NamespacedKey createKey(@NotNull String id) {
+        return NamespacedKey.minecraft(id.toLowerCase());
+    }
+
     public static boolean isEnchantable(@NotNull ItemStack item) {
         if (item.getType().isAir()) return false;
 
@@ -212,6 +217,13 @@ public class EnchantUtils {
         return getAll(item).size();
     }
 
+    public static boolean contains(@NotNull ItemStack item, @NotNull String id) {
+        ExcellentEnchant enchant = EnchantRegistry.getById(id);
+        if (enchant == null) return false;
+
+        return contains(item, enchant);
+    }
+
     public static boolean contains(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
         return getLevel(item, enchantment) > 0;
     }
@@ -292,7 +304,7 @@ public class EnchantUtils {
     private static Map<ExcellentEnchant, Integer> getExcellents(@NotNull Map<Enchantment, Integer> enchants) {
         Map<ExcellentEnchant, Integer> map = new HashMap<>();
         enchants.forEach((enchantment, level) -> {
-            ExcellentEnchant excellent = EnchantRegistry.get(enchantment.getKey());
+            ExcellentEnchant excellent = EnchantRegistry.getByKey(enchantment.getKey());
             if (excellent != null) {
                 map.put(excellent, level);
             }
@@ -304,7 +316,7 @@ public class EnchantUtils {
     public static <T extends IEnchantment> Map<T, Integer> getExcellents(@NotNull ItemStack item, @NotNull Class<T> clazz) {
         Map<T, Integer> map = new HashMap<>();
         getAll(item).forEach((enchantment, level) -> {
-            ExcellentEnchant excellent = EnchantRegistry.get(enchantment.getKey());
+            ExcellentEnchant excellent = EnchantRegistry.getByKey(enchantment.getKey());
             if (excellent == null || !clazz.isAssignableFrom(excellent.getClass())) return;
 
             map.put(clazz.cast(excellent), level);

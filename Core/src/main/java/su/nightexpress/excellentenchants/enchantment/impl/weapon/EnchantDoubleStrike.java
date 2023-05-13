@@ -31,8 +31,8 @@ public class EnchantDoubleStrike extends ExcellentEnchant implements Chanced, Co
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "4.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 0.8");
     }

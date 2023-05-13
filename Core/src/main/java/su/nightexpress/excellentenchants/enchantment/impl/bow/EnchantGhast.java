@@ -48,8 +48,8 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chance
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this, "100");
         this.fireSpread = JOption.create("Settings.Fire_Spread", true,
             "When 'true' creates fire on nearby blocks.").read(cfg);

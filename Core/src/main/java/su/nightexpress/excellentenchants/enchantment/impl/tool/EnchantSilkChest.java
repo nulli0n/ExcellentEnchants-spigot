@@ -60,8 +60,8 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chestName = JOption.create("Settings.Chest_Item.Name", "Chest &7(" + Placeholders.GENERIC_AMOUNT + " items)",
             "Chest item display name.",
             "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").mapReader(Colorizer::apply).read(cfg);

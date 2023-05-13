@@ -27,8 +27,8 @@ public class EnchantBunnyHop extends ExcellentEnchant implements Potioned, Passi
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.JUMP, true);
     }
 

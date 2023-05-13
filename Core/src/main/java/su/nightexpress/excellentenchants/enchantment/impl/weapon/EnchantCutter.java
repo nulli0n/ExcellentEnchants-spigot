@@ -24,8 +24,6 @@ import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-import java.util.function.UnaryOperator;
-
 public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEnchant {
 
     public static final String ID = "cutter";
@@ -42,13 +40,15 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "1.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 0.6");
         this.durabilityReduction = EnchantScaler.read(this, "Settings.Item.Durability_Reduction",
             Placeholders.ENCHANTMENT_LEVEL + " / 100",
             "Amount (in percent) of how much item durability will be reduced.");
+
+        this.addPlaceholder(PLACEHOLDER_DURABILITY_DAMAGE, level -> NumberUtil.format(this.getDurabilityReduction(level) * 100D));
     }
 
     @NotNull
@@ -59,13 +59,6 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
 
     public final double getDurabilityReduction(int level) {
         return this.durabilityReduction.getValue(level);
-    }
-
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_DURABILITY_DAMAGE, NumberUtil.format(this.getDurabilityReduction(level) * 100D));
     }
 
     @Override

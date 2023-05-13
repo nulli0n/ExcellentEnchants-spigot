@@ -27,8 +27,8 @@ public class EnchantNightVision extends ExcellentEnchant implements Potioned, Pa
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.NIGHT_VISION, true);
     }
 

@@ -33,8 +33,8 @@ public class EnchantVenom extends ExcellentEnchant implements Chanced, Potioned,
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "30.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 10.0");
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.POISON, false,

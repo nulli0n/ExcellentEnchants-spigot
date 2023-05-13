@@ -47,8 +47,8 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "5.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 3");
 

@@ -18,7 +18,6 @@ import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Set;
-import java.util.function.UnaryOperator;
 
 public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements CombatEnchant {
 
@@ -44,24 +43,19 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.damageModifier = JOption.create("Settings.Damage.As_Modifier", false,
             "When 'true' multiplies the damage. When 'false' sums plain values.").read(cfg);
         this.damageFormula = EnchantScaler.read(this, "Settings.Damage.Amount",
             "0.5 * " + Placeholders.ENCHANTMENT_LEVEL,
             "Amount of additional damage.");
+
+        this.addPlaceholder(PLACEHOLDER_DAMAGE, level -> NumberUtil.format(this.getDamageModifier(level)));
     }
 
     public double getDamageModifier(int level) {
         return this.damageFormula.getValue(level);
-    }
-
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_DAMAGE, NumberUtil.format(this.getDamageModifier(level)));
     }
 
     @Override

@@ -34,8 +34,8 @@ public class EnchantExhaust extends ExcellentEnchant implements Chanced, Potione
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "20.0 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.HUNGER, false,

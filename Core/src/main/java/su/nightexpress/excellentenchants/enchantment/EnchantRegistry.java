@@ -4,197 +4,125 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.utils.Reflex;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.armor.*;
 import su.nightexpress.excellentenchants.enchantment.impl.bow.*;
+import su.nightexpress.excellentenchants.enchantment.impl.fishing.AutoFishEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.tool.*;
 import su.nightexpress.excellentenchants.enchantment.impl.universal.EnchantCurseOfFragility;
 import su.nightexpress.excellentenchants.enchantment.impl.weapon.*;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.tier.Tier;
 
-import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class EnchantRegistry {
 
-    private static final ExcellentEnchants                   PLUGIN;
-    public static final Map<NamespacedKey, ExcellentEnchant> REGISTRY_MAP;
+    public static final Map<NamespacedKey, ExcellentEnchant> REGISTRY_MAP = new HashMap<>();
 
-    public static final EnchantBlastMining       BLAST_MINING;
-    public static final EnchantCurseOfBreaking   CURSE_OF_BREAKING;
-    public static final EnchantCurseOfMisfortune CURSE_OF_MISFORTUNE;
-    public static final EnchantDivineTouch       DIVINE_TOUCH;
-    public static final EnchantHaste             HASTE;
-    public static final EnchantLuckyMiner        LUCKY_MINER;
-    public static final EnchantReplanter         REPLANTER;
-    public static final EnchantSilkChest         SILK_CHEST;
-    public static final EnchantSmelter           SMELTER;
-    public static final EnchantTelekinesis       TELEKINESIS;
-    public static final EnchantTreasures         TREASURES;
-    public static final EnchantTunnel            TUNNEL;
-    public static final EnchantVeinminer         VEINMINER;
+    private final ExcellentEnchants plugin;
+    private boolean isLocked;
 
-    public static final EnchantBaneOfNetherspawn BANE_OF_NETHERSPAWN;
-    public static final EnchantIceAspect         ICE_ASPECT;
-    public static final EnchantInfernus          INFERNUS;
-    public static final EnchantVenom             VENOM;
-    public static final EnchantExhaust           EXHAUST;
-    public static final EnchantWither            WITHER;
-    public static final EnchantParalyze          PARALYZE;
-    public static final EnchantExpHunter         EXP_HUNTER;
-    public static final EnchantDecapitator       DECAPITATOR;
-    public static final EnchantCutter            CUTTER;
-    public static final EnchantConfusion         CONFUSION;
-    public static final EnchantDoubleStrike      DOUBLE_STRIKE;
-    public static final EnchantNimble            NIMBLE;
-    public static final EnchantBlindness         BLINDNESS;
-    public static final EnchantVampire           VAMPIRE;
-    public static final EnchantCure              CURE;
-    public static final EnchantRage              RAGE;
-    public static final EnchantScavenger         SCAVENGER;
-    public static final EnchantSurprise          SURPRISE;
-    public static final EnchantTemper            TEMPER;
-    public static final EnchantThrifty           THRIFTY;
-    public static final EnchantThunder           THUNDER;
-    public static final EnchantVillageDefender   VILLAGE_DEFENDER;
-    public static final EnchantRocket            ROCKET;
-
-    public static final EnchantElementalProtection ELEMENTAL_PROTECTION;
-    public static final EnchantFireShield          FIRE_SHIELD;
-    public static final EnchantFlameWalker         FLAME_WALKER;
-    public static final EnchantHardened            HARDENED;
-    public static final EnchantIceShield           ICE_SHIELD;
-    public static final EnchantColdSteel           COLD_STEEL;
-    public static final EnchantSelfDestruction     SELF_DESTRUCTION;
-    public static final EnchantSaturation          SATURATION;
-    public static final EnchantAquaman             AQUAMAN;
-    public static final EnchantNightVision         NIGHT_VISION;
-    public static final EnchantBunnyHop            BUNNY_HOP;
-    public static final EnchantSonic               SONIC;
-    public static final EnchantRegrowth            REGROWTH;
-
-    public static final EnchantBomber            BOMBER;
-    public static final EnchantConfusingArrows   CONFUSING_ARROWS;
-    public static final EnchantDragonfireArrows  DRAGONFIRE_ARROWS;
-    public static final EnchantElectrifiedArrows ELECTRIFIED_ARROWS;
-    public static final EnchantEnderBow          ENDER_BOW;
-    public static final EnchantGhast             GHAST;
-    public static final EnchantHover             HOVER;
-    public static final EnchantPoisonedArrows    POISONED_ARROWS;
-    public static final EnchantWitheredArrows    WITHERED_ARROWS;
-    public static final EnchantExplosiveArrows   EXPLOSIVE_ARROWS;
-
-    public static final EnchantCurseOfFragility CURSE_OF_FRAGILITY;
-
-    static {
-        PLUGIN = ExcellentEnchants.getPlugin(ExcellentEnchants.class);
-        REGISTRY_MAP = new HashMap<>();
-
-        // Tool enchants
-        BLAST_MINING = init(EnchantBlastMining.class, EnchantBlastMining.ID);
-        CURSE_OF_BREAKING = init(EnchantCurseOfBreaking.class, EnchantCurseOfBreaking.ID);
-        CURSE_OF_MISFORTUNE = init(EnchantCurseOfMisfortune.class, EnchantCurseOfMisfortune.ID);
-        DIVINE_TOUCH = init(EnchantDivineTouch.class, EnchantDivineTouch.ID);
-        HASTE = init(EnchantHaste.class, EnchantHaste.ID);
-        LUCKY_MINER = init(EnchantLuckyMiner.class, EnchantLuckyMiner.ID);
-        REPLANTER = init(EnchantReplanter.class, EnchantReplanter.ID);
-        SILK_CHEST = init(EnchantSilkChest.class, EnchantSilkChest.ID);
-        SMELTER = init(EnchantSmelter.class, EnchantSmelter.ID);
-        TELEKINESIS = init(EnchantTelekinesis.class, EnchantTelekinesis.ID);
-        TREASURES = init(EnchantTreasures.class, EnchantTreasures.ID);
-        TUNNEL = init(EnchantTunnel.class, EnchantTunnel.ID);
-        VEINMINER = init(EnchantVeinminer.class, EnchantVeinminer.ID);
-
-        // Weapon enchants
-        BANE_OF_NETHERSPAWN = init(EnchantBaneOfNetherspawn.class, EnchantBaneOfNetherspawn.ID);
-        BLINDNESS = init(EnchantBlindness.class, EnchantBlindness.ID);
-        CONFUSION = init(EnchantConfusion.class, EnchantConfusion.ID);
-        CUTTER = init(EnchantCutter.class, EnchantCutter.ID);
-        DECAPITATOR = init(EnchantDecapitator.class, EnchantDecapitator.ID);
-        DOUBLE_STRIKE = init(EnchantDoubleStrike.class, EnchantDoubleStrike.ID);
-        EXHAUST = init(EnchantExhaust.class, EnchantExhaust.ID);
-        EXP_HUNTER = init(EnchantExpHunter.class, EnchantExpHunter.ID);
-        ICE_ASPECT = init(EnchantIceAspect.class, EnchantIceAspect.ID);
-        INFERNUS = init(EnchantInfernus.class, EnchantInfernus.ID);
-        NIMBLE = init(EnchantNimble.class, EnchantNimble.ID);
-        PARALYZE = init(EnchantParalyze.class, EnchantParalyze.ID);
-        CURE = init(EnchantCure.class, EnchantCure.ID);
-        RAGE = init(EnchantRage.class, EnchantRage.ID);
-        ROCKET = init(EnchantRocket.class, EnchantRocket.ID);
-        SCAVENGER = init(EnchantScavenger.class, EnchantScavenger.ID);
-        SURPRISE = init(EnchantSurprise.class, EnchantSurprise.ID);
-        TEMPER = init(EnchantTemper.class, EnchantTemper.ID);
-        THRIFTY = init(EnchantThrifty.class, EnchantThrifty.ID);
-        THUNDER = init(EnchantThunder.class, EnchantThunder.ID);
-        VAMPIRE = init(EnchantVampire.class, EnchantVampire.ID);
-        VENOM = init(EnchantVenom.class, EnchantVenom.ID);
-        VILLAGE_DEFENDER = init(EnchantVillageDefender.class, EnchantVillageDefender.ID);
-        WITHER = init(EnchantWither.class, EnchantWither.ID);
-
-        // Armor enchants
-        AQUAMAN = init(EnchantAquaman.class, EnchantAquaman.ID);
-        BUNNY_HOP = init(EnchantBunnyHop.class, EnchantBunnyHop.ID);
-        COLD_STEEL = init(EnchantColdSteel.class, EnchantColdSteel.ID);
-        ICE_SHIELD = init(EnchantIceShield.class, EnchantIceShield.ID);
-        ELEMENTAL_PROTECTION = init(EnchantElementalProtection.class, EnchantElementalProtection.ID);
-        FIRE_SHIELD = init(EnchantFireShield.class, EnchantFireShield.ID);
-        FLAME_WALKER = init(EnchantFlameWalker.class, EnchantFlameWalker.ID);
-        HARDENED = init(EnchantHardened.class, EnchantHardened.ID);
-        NIGHT_VISION = init(EnchantNightVision.class, EnchantNightVision.ID);
-        REGROWTH = init(EnchantRegrowth.class, EnchantRegrowth.ID);
-        SATURATION = init(EnchantSaturation.class, EnchantSaturation.ID);
-        SELF_DESTRUCTION = init(EnchantSelfDestruction.class, EnchantSelfDestruction.ID);
-        SONIC = init(EnchantSonic.class, EnchantSonic.ID);
-
-        // Bow enchants
-        BOMBER = init(EnchantBomber.class, EnchantBomber.ID);
-        CONFUSING_ARROWS = init(EnchantConfusingArrows.class, EnchantConfusingArrows.ID);
-        DRAGONFIRE_ARROWS = init(EnchantDragonfireArrows.class, EnchantDragonfireArrows.ID);
-        ELECTRIFIED_ARROWS = init(EnchantElectrifiedArrows.class, EnchantElectrifiedArrows.ID);
-        ENDER_BOW = init(EnchantEnderBow.class, EnchantEnderBow.ID);
-        EXPLOSIVE_ARROWS = init(EnchantExplosiveArrows.class, EnchantExplosiveArrows.ID);
-        GHAST = init(EnchantGhast.class, EnchantGhast.ID);
-        HOVER = init(EnchantHover.class, EnchantHover.ID);
-        POISONED_ARROWS = init(EnchantPoisonedArrows.class, EnchantPoisonedArrows.ID);
-        WITHERED_ARROWS = init(EnchantWitheredArrows.class, EnchantWitheredArrows.ID);
-
-        // Universal
-        CURSE_OF_FRAGILITY = init(EnchantCurseOfFragility.class, EnchantCurseOfFragility.ID);
+    public EnchantRegistry(@NotNull ExcellentEnchants plugin) {
+        this.plugin = plugin;
     }
 
-    public static void setup() {
+    public void setup() {
         // Prevent to register enchantments during the runtime.
-        if (ExcellentEnchants.isLoaded) {
-            REGISTRY_MAP.values().forEach(ExcellentEnchant::loadConfig);
+        if (this.isLocked) {
+            REGISTRY_MAP.values().forEach(ExcellentEnchant::loadSettings);
             return;
         }
 
         Reflex.setFieldValue(Enchantment.class, "acceptingNew", true);
-        for (Field field : EnchantRegistry.class.getFields()) {
-            if (!ExcellentEnchant.class.isAssignableFrom(field.getType())) continue;
 
-            try {
-                ExcellentEnchant enchant = (ExcellentEnchant) field.get(null);
-                EnchantRegistry.register(enchant);
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        // Fising Enchants
+        this.register(AutoFishEnchant.ID,() -> new AutoFishEnchant(plugin));
+
+        // Tool enchants
+        this.register(EnchantBlastMining.ID, () -> new EnchantBlastMining(plugin));
+        this.register(EnchantCurseOfBreaking.ID, () -> new EnchantCurseOfBreaking(plugin));
+        this.register(EnchantCurseOfMisfortune.ID, () -> new EnchantCurseOfMisfortune(plugin));
+        this.register(EnchantDivineTouch.ID, () -> new EnchantDivineTouch(plugin));
+        this.register(EnchantHaste.ID, () -> new EnchantHaste(plugin));
+        this.register(EnchantLuckyMiner.ID, () -> new EnchantLuckyMiner(plugin));
+        this.register(EnchantReplanter.ID, () -> new EnchantReplanter(plugin));
+        this.register(EnchantSilkChest.ID, () -> new EnchantSilkChest(plugin));
+        this.register(EnchantSmelter.ID, () -> new EnchantSmelter(plugin));
+        this.register(EnchantTelekinesis.ID, () -> new EnchantTelekinesis(plugin));
+        this.register(EnchantTreasures.ID, () -> new EnchantTreasures(plugin));
+        this.register(EnchantTunnel.ID, () -> new EnchantTunnel(plugin));
+        this.register(EnchantVeinminer.ID, () -> new EnchantVeinminer(plugin));
+
+        // Weapon enchants
+        this.register(EnchantBaneOfNetherspawn.ID, () -> new EnchantBaneOfNetherspawn(plugin));
+        this.register(EnchantBlindness.ID, () -> new EnchantBlindness(plugin));
+        this.register(EnchantConfusion.ID, () -> new EnchantConfusion(plugin));
+        this.register(EnchantCutter.ID, () -> new EnchantCutter(plugin));
+        this.register(EnchantDecapitator.ID, () -> new EnchantDecapitator(plugin));
+        this.register(EnchantDoubleStrike.ID, () -> new EnchantDoubleStrike(plugin));
+        this.register(EnchantExhaust.ID, () -> new EnchantExhaust(plugin));
+        this.register(EnchantExpHunter.ID, () -> new EnchantExpHunter(plugin));
+        this.register(EnchantIceAspect.ID, () -> new EnchantIceAspect(plugin));
+        this.register(EnchantInfernus.ID, () -> new EnchantInfernus(plugin));
+        this.register(EnchantNimble.ID, () -> new EnchantNimble(plugin));
+        this.register(EnchantParalyze.ID, () -> new EnchantParalyze(plugin));
+        this.register(EnchantCure.ID, () -> new EnchantCure(plugin));
+        this.register(EnchantRage.ID, () -> new EnchantRage(plugin));
+        this.register(EnchantRocket.ID, () -> new EnchantRocket(plugin));
+        this.register(EnchantScavenger.ID, () -> new EnchantScavenger(plugin));
+        this.register(EnchantSurprise.ID, () -> new EnchantSurprise(plugin));
+        this.register(EnchantTemper.ID, () -> new EnchantTemper(plugin));
+        this.register(EnchantThrifty.ID, () -> new EnchantThrifty(plugin));
+        this.register(EnchantThunder.ID, () -> new EnchantThunder(plugin));
+        this.register(EnchantVampire.ID, () -> new EnchantVampire(plugin));
+        this.register(EnchantVenom.ID, () -> new EnchantVenom(plugin));
+        this.register(EnchantVillageDefender.ID, () -> new EnchantVillageDefender(plugin));
+        this.register(EnchantWither.ID, () -> new EnchantWither(plugin));
+
+        // Armor enchants
+        this.register(EnchantAquaman.ID, () -> new EnchantAquaman(plugin));
+        this.register(EnchantBunnyHop.ID, () -> new EnchantBunnyHop(plugin));
+        this.register(EnchantColdSteel.ID, () -> new EnchantColdSteel(plugin));
+        this.register(EnchantIceShield.ID, () -> new EnchantIceShield(plugin));
+        this.register(EnchantElementalProtection.ID, () -> new EnchantElementalProtection(plugin));
+        this.register(EnchantFireShield.ID, () -> new EnchantFireShield(plugin));
+        this.register(EnchantFlameWalker.ID, () -> new EnchantFlameWalker(plugin));
+        this.register(EnchantHardened.ID, () -> new EnchantHardened(plugin));
+        this.register(EnchantNightVision.ID, () -> new EnchantNightVision(plugin));
+        this.register(EnchantRegrowth.ID, () -> new EnchantRegrowth(plugin));
+        this.register(EnchantSaturation.ID, () -> new EnchantSaturation(plugin));
+        this.register(EnchantSelfDestruction.ID, () -> new EnchantSelfDestruction(plugin));
+        this.register(EnchantSonic.ID, () -> new EnchantSonic(plugin));
+
+        // Bow enchants
+        this.register(EnchantBomber.ID, () -> new EnchantBomber(plugin));
+        this.register(EnchantConfusingArrows.ID, () -> new EnchantConfusingArrows(plugin));
+        this.register(EnchantDragonfireArrows.ID, () -> new EnchantDragonfireArrows(plugin));
+        this.register(EnchantElectrifiedArrows.ID, () -> new EnchantElectrifiedArrows(plugin));
+        this.register(EnchantEnderBow.ID, () -> new EnchantEnderBow(plugin));
+        this.register(EnchantExplosiveArrows.ID, () -> new EnchantExplosiveArrows(plugin));
+        this.register(EnchantGhast.ID, () -> new EnchantGhast(plugin));
+        this.register(EnchantHover.ID, () -> new EnchantHover(plugin));
+        this.register(EnchantPoisonedArrows.ID, () -> new EnchantPoisonedArrows(plugin));
+        this.register(EnchantWitheredArrows.ID, () -> new EnchantWitheredArrows(plugin));
+
+        // Universal
+        this.register(EnchantCurseOfFragility.ID, () -> new EnchantCurseOfFragility(plugin));
 
         Enchantment.stopAcceptingRegistrations();
-        PLUGIN.info("Enchantments Registered: " + REGISTRY_MAP.size());
-        ExcellentEnchants.isLoaded = true;
+        this.plugin.info("Enchantments Registered: " + getRegistered().size());
+        this.isLocked = true;
     }
 
-    @SuppressWarnings("unchecked")
-    public static void shutdown() {
-        if (PLUGIN.isEnabled()) return; // Prevent to unregister enchantments during the runtime.
+    /*@SuppressWarnings("unchecked")
+    public void shutdown() {
+        if (this.plugin.isEnabled()) return; // Prevent to unregister enchantments during the runtime.
 
         Map<NamespacedKey, Enchantment> byKey = (Map<NamespacedKey, Enchantment>) Reflex.getFieldValue(Enchantment.class, "byKey");
         Map<String, Enchantment> byName = (Map<String, Enchantment>) Reflex.getFieldValue(Enchantment.class, "byName");
@@ -211,35 +139,28 @@ public class EnchantRegistry {
             enchant.unregisterListeners();
         }
         REGISTRY_MAP.clear();
-        PLUGIN.info("All enchants are unregistered.");
-    }
+        this.plugin.info("All enchants are unregistered.");
+    }*/
 
-    @Nullable
-    private static <T extends ExcellentEnchant> T init(@NotNull Class<T> clazz, @NotNull String id) {
-        if (Config.ENCHANTMENTS_DISABLED.get().contains(id)) return null;
+    private void register(@NotNull String id, @NotNull Supplier<ExcellentEnchant> supplier) {
+        if (Config.ENCHANTMENTS_DISABLED.get().contains(id)) return;
 
-        try {
-            return clazz.getConstructor(ExcellentEnchants.class).newInstance(PLUGIN);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    private static void register(@Nullable ExcellentEnchant enchant) {
-        if (enchant == null) return;
-
+        ExcellentEnchant enchant = supplier.get();
         Enchantment.registerEnchantment(enchant);
         REGISTRY_MAP.put(enchant.getKey(), enchant);
-        enchant.loadConfig();
+        enchant.loadSettings();
         enchant.getConfig().saveChanges();
         enchant.registerListeners();
-        PLUGIN.info("Registered enchantment: " + enchant.getId());
+        this.plugin.info("Registered enchantment: " + enchant.getId());
     }
 
     @Nullable
-    public static ExcellentEnchant get(@NotNull NamespacedKey key) {
+    public static ExcellentEnchant getById(@NotNull String id) {
+        return getByKey(EnchantUtils.createKey(id));
+    }
+
+    @Nullable
+    public static ExcellentEnchant getByKey(@NotNull NamespacedKey key) {
         return REGISTRY_MAP.get(key);
     }
 

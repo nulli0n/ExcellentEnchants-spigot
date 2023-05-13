@@ -53,8 +53,8 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.blockDecayTime = EnchantScaler.read(this, "Settings.Block_Decay", "12.0",
             "Sets up to how long (in seconds) blocks will stay before turn back to lava.");
     }

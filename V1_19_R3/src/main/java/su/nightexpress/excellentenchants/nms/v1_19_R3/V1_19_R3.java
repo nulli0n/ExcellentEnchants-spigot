@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -11,11 +12,15 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftFishHook;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
+import org.bukkit.entity.FishHook;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 
@@ -30,6 +35,13 @@ public class V1_19_R3 implements EnchantNMS {
         Entity entity = craftPlayer.getHandle();
         ClientboundAnimatePacket packet = new ClientboundAnimatePacket(entity, id);
         craftPlayer.getHandle().connection.send(packet);
+    }
+
+    @Override
+    public void retrieveHook(@NotNull FishHook hook, @NotNull ItemStack item) {
+        CraftFishHook craftFishHook = (CraftFishHook) hook;
+        FishingHook handle = craftFishHook.getHandle();
+        handle.retrieve(CraftItemStack.asNMSCopy(item));
     }
 
     @Override

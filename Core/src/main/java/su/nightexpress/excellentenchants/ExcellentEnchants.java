@@ -13,6 +13,7 @@ import su.nightexpress.excellentenchants.command.TierbookCommand;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 import su.nightexpress.excellentenchants.hook.HookId;
 import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
@@ -27,10 +28,9 @@ import su.nightexpress.excellentenchants.tier.TierManager;
 
 public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
-    public static boolean isLoaded = false;
-
-    private EnchantNMS     enchantNMS;
+    private EnchantRegistry enchantRegistry;
     private EnchantManager enchantManager;
+    private EnchantNMS     enchantNMS;
     private TierManager tierManager;
 
     @Override
@@ -40,11 +40,19 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        this.enchantRegistry = new EnchantRegistry(this);
+    }
+
+    @Override
     public void enable() {
         this.setNMS();
 
         this.tierManager = new TierManager(this);
         this.tierManager.setup();
+
+        this.enchantRegistry.setup();
 
         this.enchantManager = new EnchantManager(this);
         this.enchantManager.setup();
@@ -61,6 +69,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
             this.tierManager = null;
         }
         PlaceholderHook.shutdown();
+        //this.enchantRegistry.shutdown(); Do we ever need this at all?
     }
 
     private void setNMS() {
@@ -118,6 +127,11 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     @NotNull
     public TierManager getTierManager() {
         return tierManager;
+    }
+
+    @NotNull
+    public EnchantRegistry getEnchantRegistry() {
+        return this.enchantRegistry;
     }
 
     @NotNull

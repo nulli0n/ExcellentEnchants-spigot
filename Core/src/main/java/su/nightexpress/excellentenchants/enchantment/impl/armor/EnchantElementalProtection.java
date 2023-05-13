@@ -11,13 +11,12 @@ import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.Set;
-import java.util.function.UnaryOperator;
 
 public class EnchantElementalProtection extends ExcellentEnchant {
 
@@ -42,17 +41,8 @@ public class EnchantElementalProtection extends ExcellentEnchant {
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_PROTECTION_AMOUNT, NumberUtil.format(this.getProtectionAmount(level)))
-            .replace(PLACEHOLDER_PROTECTION_CAPACITY, NumberUtil.format(this.getProtectionCapacity()))
-        ;
-    }
-
-    @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
 
         this.protectionAmount = EnchantScaler.read(this, "Settings.Protection.Amount",
             "0.05 * " + Placeholders.ENCHANTMENT_LEVEL,
@@ -62,6 +52,9 @@ public class EnchantElementalProtection extends ExcellentEnchant {
         this.protectionAsModifier = JOption.create("Settings.Protection.As_Modifier", false,
             "When 'true' damage will be reduced by a percent of protection value.",
             "When 'false' damage will be reduced by a plain protection value.").read(cfg);
+
+        this.addPlaceholder(PLACEHOLDER_PROTECTION_AMOUNT, level -> NumberUtil.format(this.getProtectionAmount(level)));
+        this.addPlaceholder(PLACEHOLDER_PROTECTION_CAPACITY, level -> NumberUtil.format(this.getProtectionCapacity()));
     }
 
     @NotNull

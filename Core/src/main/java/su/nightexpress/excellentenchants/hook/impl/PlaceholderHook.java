@@ -63,7 +63,7 @@ public class PlaceholderHook {
                 ItemStack item = player.getInventory().getItem(slot);
                 if (item == null || item.getType().isAir()) return "-";
 
-                ExcellentEnchant enchant = EnchantRegistry.get(NamespacedKey.minecraft(chargesSplit[1].toLowerCase()));
+                ExcellentEnchant enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[1].toLowerCase()));
                 if (enchant == null) return null;
 
                 return String.valueOf(enchant.getCharges(item));
@@ -72,7 +72,7 @@ public class PlaceholderHook {
                 String[] chargesSplit = params.substring("charges_maximum_".length()).split(":");
                 if (chargesSplit.length < 2) return null;
 
-                ExcellentEnchant enchant = EnchantRegistry.get(NamespacedKey.minecraft(chargesSplit[0].toLowerCase()));
+                ExcellentEnchant enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[0].toLowerCase()));
                 if (enchant == null) return null;
 
                 int level = StringUtil.getInteger(chargesSplit[1], 1);

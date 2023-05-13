@@ -32,8 +32,8 @@ public class EnchantColdSteel extends ExcellentEnchant implements Chanced, Potio
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
 
         this.chanceImplementation = ChanceImplementation.create(this,
             "60 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");

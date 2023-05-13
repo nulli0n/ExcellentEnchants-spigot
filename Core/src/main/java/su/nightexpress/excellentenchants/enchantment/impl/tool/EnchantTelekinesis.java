@@ -34,8 +34,8 @@ public class EnchantTelekinesis extends ExcellentEnchant implements Chanced, Blo
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this, "100");
     }
 

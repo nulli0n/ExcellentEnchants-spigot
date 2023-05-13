@@ -36,8 +36,8 @@ public class EnchantSurprise extends ExcellentEnchant implements Chanced, Potion
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "2.25 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.BLINDNESS, false,

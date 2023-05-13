@@ -49,8 +49,8 @@ public class EnchantReplanter extends ExcellentEnchant implements Chanced, Inter
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this, "100");
         this.replantOnRightClick = JOption.create("Settings.Replant.On_Right_Click", true,
             "When 'true', player will be able to replant crops when right-clicking farmland blocks.").read(cfg);

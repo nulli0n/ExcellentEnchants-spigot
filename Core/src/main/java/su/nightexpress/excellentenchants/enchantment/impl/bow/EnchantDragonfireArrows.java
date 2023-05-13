@@ -20,16 +20,14 @@ import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced, Arrowed, BowEnchant {
 
@@ -58,8 +56,8 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.DRAGON_BREATH));
         this.chanceImplementation = ChanceImplementation.create(this,
             "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
@@ -69,15 +67,9 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
         this.fireRadius = EnchantScaler.read(this, "Settings.Fire.Radius",
             "2.0 + " + Placeholders.ENCHANTMENT_LEVEL,
             "Sets the dragonfire cloud effect radius.");
-    }
 
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format(this.getFireDuration(level) / 20D))
-            .replace(PLACEHOLDER_FIRE_RADIUS, NumberUtil.format(this.getFireRadius(level)))
-        ;
+        this.addPlaceholder(PLACEHOLDER_FIRE_DURATION, level -> NumberUtil.format(this.getFireDuration(level) / 20D));
+        this.addPlaceholder(PLACEHOLDER_FIRE_RADIUS, level -> NumberUtil.format(this.getFireRadius(level)));
     }
 
     @NotNull

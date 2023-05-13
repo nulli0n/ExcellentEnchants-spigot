@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.lang.LangManager;
-import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nexmedia.engine.utils.StringUtil;
@@ -58,8 +57,8 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "5.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 1.75");
 

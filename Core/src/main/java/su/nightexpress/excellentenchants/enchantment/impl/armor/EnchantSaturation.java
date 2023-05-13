@@ -10,14 +10,12 @@ import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.task.AbstractEnchantmentTask;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
-
-import java.util.function.UnaryOperator;
 
 public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchant, ICleanable {
 
@@ -41,14 +39,18 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.saturationInterval = JOption.create("Settings.Saturation.Interval", 100,
             "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(cfg);
         this.saturationAmount = EnchantScaler.read(this, "Settings.Saturation.Amount", Placeholders.ENCHANTMENT_LEVEL,
             "Amount of food points to restore.");
         this.saturationMaxFoodLevel = EnchantScaler.read(this, "Settings.Saturation.Max_Food_Level", "20",
             "Maximal player's food level for the enchantment to stop feeding them.");
+
+        this.addPlaceholder(PLACEHOLDER_SATURATION_AMOUNT, level -> NumberUtil.format(this.getSaturationAmount(level)));
+        this.addPlaceholder(PLACEHOLDER_SATURATION_INTERVAL, level -> NumberUtil.format((double) this.saturationInterval / 20D));
+        this.addPlaceholder(PLACEHOLDER_SATURATION_MAX_FOOD_LEVEL, level -> NumberUtil.format(this.getMaxFoodLevel(level)));
 
         this.task = new Task(plugin);
         this.task.start();
@@ -64,16 +66,6 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
             this.task.stop();
             this.task = null;
         }
-    }
-
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_SATURATION_AMOUNT, NumberUtil.format(this.getSaturationAmount(level)))
-            .replace(PLACEHOLDER_SATURATION_INTERVAL, NumberUtil.format((double) this.saturationInterval / 20D))
-            .replace(PLACEHOLDER_SATURATION_MAX_FOOD_LEVEL, NumberUtil.format(this.getMaxFoodLevel(level)))
-        ;
     }
 
     @Override

@@ -50,8 +50,8 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 4.0");
 

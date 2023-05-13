@@ -35,8 +35,8 @@ public class EnchantThunder extends ExcellentEnchant implements Chanced, CombatE
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
             "10.0 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.inThunderstormOnly = JOption.create("Settings.During_Thunderstorm_Only", false,

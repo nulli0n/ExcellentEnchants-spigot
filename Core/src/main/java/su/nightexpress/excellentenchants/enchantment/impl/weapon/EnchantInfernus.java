@@ -13,12 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
-
-import java.util.function.UnaryOperator;
 
 public class EnchantInfernus extends ExcellentEnchant {
 
@@ -35,23 +33,17 @@ public class EnchantInfernus extends ExcellentEnchant {
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.fireTicks = EnchantScaler.read(this, "Settings.Fire_Ticks",
             "60 + " + Placeholders.ENCHANTMENT_LEVEL + " * 20",
             "Sets for how long (in ticks) entity will be ignited on hit. 20 ticks = 1 second.");
+
+        this.addPlaceholder(PLACEHOLDER_FIRE_DURATION, level -> NumberUtil.format((double) this.getFireTicks(level) / 20D));
     }
 
     public int getFireTicks(int level) {
         return (int) this.fireTicks.getValue(level);
-    }
-
-    @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str)
-            .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format((double) this.getFireTicks(level) / 20D))
-        ;
     }
 
     @Override
