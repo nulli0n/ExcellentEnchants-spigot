@@ -5,6 +5,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -102,14 +103,14 @@ public class EnchantUtils {
             ExcellentEnchant enchant = populator.getEnchantByChance(tier);
             // В тире нет подходящих чар (вообще) для итема, исключаем и идем дальше.
             if (enchant == null) {
-                populator.getEnchants().remove(tier);
+                populator.purge(tier);
                 continue;
             }
 
             // Среди уже добавленных чар есть конфликты с тем, что нашли.
             // Исключаем, идем дальше.
             if (enchantsToAdd.keySet().stream().anyMatch(has -> has.conflictsWith(enchant) || enchant.conflictsWith(has))) {
-                populator.getEnchants(tier).remove(enchant);
+                populator.purge(tier, enchant);
                 continue;
             }
 
@@ -117,12 +118,12 @@ public class EnchantUtils {
             // Исключаем, идем дальше.
             int level = levelFunc.apply(enchant);
             if (level < enchant.getStartLevel()) {
-                populator.getEnchants(tier).remove(enchant);
+                populator.purge(tier, enchant);
                 continue;
             }
 
             // Добавляем чар, засчитываем попытку.
-            populator.getEnchants(tier).remove(enchant);
+            populator.purge(tier, enchant);
             enchantsToAdd.put(enchant, level);
             enchRoll--;
         }
@@ -200,6 +201,17 @@ public class EnchantUtils {
         }
         item.setItemMeta(meta);
         return true;
+    }
+
+    @Nullable
+    public static ItemStack getFishingRod(@NotNull Player player) {
+        ItemStack main = player.getInventory().getItem(EquipmentSlot.HAND);
+        if (main != null && main.getType() == Material.FISHING_ROD) return main;
+
+        ItemStack off = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
+        if (off != null && off.getType() == Material.FISHING_ROD) return off;
+
+        return null;
     }
 
     @NotNull

@@ -29,9 +29,9 @@ import su.nightexpress.excellentenchants.tier.TierManager;
 public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     private EnchantRegistry enchantRegistry;
-    private EnchantManager enchantManager;
-    private EnchantNMS     enchantNMS;
-    private TierManager tierManager;
+    private EnchantManager  enchantManager;
+    private EnchantNMS      enchantNMS;
+    private TierManager     tierManager;
 
     @Override
     @NotNull

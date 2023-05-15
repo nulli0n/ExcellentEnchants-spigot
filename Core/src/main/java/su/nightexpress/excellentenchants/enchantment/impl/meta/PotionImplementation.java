@@ -13,7 +13,7 @@ import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 
 public final class PotionImplementation implements Potioned {
 
-    //private final ExcellentEnchant enchant;
+    private final ExcellentEnchant enchant;
     private final PotionEffectType effectType;
     private final Scaler  duration;
     private final Scaler  amplifier;
@@ -22,7 +22,7 @@ public final class PotionImplementation implements Potioned {
     private PotionImplementation(@NotNull ExcellentEnchant enchant,
                                  @NotNull PotionEffectType effectType, boolean isPermanent,
                                  @NotNull EnchantScaler duration, @NotNull EnchantScaler amplifier) {
-        //this.enchant = enchant;
+        this.enchant = enchant;
         this.effectType = effectType;
         this.duration = duration;
         this.amplifier = amplifier;
@@ -82,7 +82,7 @@ public final class PotionImplementation implements Potioned {
         int duration = this.getEffectDuration(level);
         int amplifier = Math.max(0, this.getEffectAmplifier(level) - 1);
 
-        return new PotionEffect(this.getEffectType(), duration, amplifier, false, false);
+        return new PotionEffect(this.getEffectType(), duration, amplifier, false, this.enchant.hasVisualEffects());
     }
 
     public boolean addEffect(@NotNull LivingEntity target, int level) {

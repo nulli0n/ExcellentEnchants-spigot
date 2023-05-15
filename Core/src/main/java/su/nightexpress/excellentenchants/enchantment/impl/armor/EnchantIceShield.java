@@ -74,7 +74,7 @@ public class EnchantIceShield extends ExcellentEnchant implements Chanced, Potio
         damager.setFreezeTicks(damager.getMaxFreezeTicks());
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.BLOCK_CRACK, Material.ICE)
+            SimpleParticle.of(Particle.BLOCK_CRACK, Material.ICE.createBlockData())
                 .play(damager.getEyeLocation(), 0.25, 0.1, 20);
         }
         return true;

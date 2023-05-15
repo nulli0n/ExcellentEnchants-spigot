@@ -18,7 +18,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
@@ -26,10 +25,10 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.AbstractListener;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
-import su.nightexpress.excellentenchants.api.enchantment.type.*;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
+import su.nightexpress.excellentenchants.api.enchantment.type.*;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> {
@@ -211,14 +210,11 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     public void onEnchantFishing(PlayerFishEvent event) {
         Player player = event.getPlayer();
 
-        ItemStack item;
-        ItemStack main = player.getInventory().getItem(EquipmentSlot.HAND);
-        ItemStack off = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
-        if (main != null && main.getType() == Material.FISHING_ROD) item = main;
-        else if (off != null && off.getType() == Material.FISHING_ROD) item = off;
-        else return;
+        ItemStack item = EnchantUtils.getFishingRod(player);
+        if (item == null) return;
 
         EnchantUtils.getExcellents(item, FishingEnchant.class).forEach((enchant, level) -> {
+            if (event.isCancelled()) return; // Check if event was cancelled by some enchantment.
             if (enchant.isOutOfCharges(item)) return;
             if (enchant.onFishing(event, item, level)) {
                 enchant.consumeCharges(item);

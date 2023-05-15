@@ -233,7 +233,7 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
         entity.getWorld().dropItemNaturally(entity.getLocation(), item);
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.BLOCK_CRACK, Material.REDSTONE_BLOCK).play(entity.getEyeLocation(), 0.25, 0.15, 30);
+            SimpleParticle.of(Particle.BLOCK_CRACK, Material.REDSTONE_BLOCK.createBlockData()).play(entity.getEyeLocation(), 0.25, 0.15, 30);
         }
         return true;
     }

@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.enchantment.impl.weapon;
 
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EntityType;
@@ -89,16 +88,10 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
         if (PDCUtil.getBoolean(entity, this.keyEntityIgnored).orElse(false)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        Material material = Material.getMaterial(entity.getType().name() + "_SPAWN_EGG");
-        if (material == null) {
-            if (entity.getType() == EntityType.MUSHROOM_COW) {
-                material = Material.MOOSHROOM_SPAWN_EGG;
-            }
-            else return false;
-        }
+        ItemStack eggItem = plugin.getEnchantNMS().getSpawnEgg(entity);
+        if (eggItem == null) return false;
 
-        ItemStack egg = new ItemStack(material);
-        e.getDrops().add(egg);
+        e.getDrops().add(eggItem);
         return true;
     }
 

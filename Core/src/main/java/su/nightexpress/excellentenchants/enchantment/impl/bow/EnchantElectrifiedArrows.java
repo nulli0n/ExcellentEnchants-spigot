@@ -92,7 +92,7 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
         block.getWorld().strikeLightning(block.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(plugin, true));
         if (this.hasVisualEffects()) {
             Location center = LocationUtil.getCenter(block.getLocation());
-            SimpleParticle.of(Particle.BLOCK_CRACK, block.getType()).play(center, 1, 0.05, 120);
+            SimpleParticle.of(Particle.BLOCK_CRACK, block.getType().createBlockData()).play(center, 1, 0.05, 120);
             SimpleParticle.of(Particle.FIREWORKS_SPARK).play(center, 1, 0.05, 120);
         }
         return true;

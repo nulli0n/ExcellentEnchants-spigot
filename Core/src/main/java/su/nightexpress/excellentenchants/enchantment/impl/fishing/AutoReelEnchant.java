@@ -9,11 +9,11 @@ import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-public class AutoFishEnchant extends ExcellentEnchant implements FishingEnchant {
+public class AutoReelEnchant extends ExcellentEnchant implements FishingEnchant {
 
-    public static final String ID = "auto_fish";
+    public static final String ID = "auto_reel";
 
-    public AutoFishEnchant(@NotNull ExcellentEnchants plugin) {
+    public AutoReelEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
         this.getDefaults().setDescription("Automatically reels in a hook on bite.");
         this.getDefaults().setLevelMax(1);
@@ -29,6 +29,7 @@ public class AutoFishEnchant extends ExcellentEnchant implements FishingEnchant 
     @Override
     public boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level) {
         if (event.getState() != PlayerFishEvent.State.BITE) return false;
+        if (!this.isAvailableToUse(event.getPlayer())) return false;
 
         this.plugin.runTask(task -> {
             if (event.isCancelled()) return;

@@ -10,7 +10,7 @@ import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.armor.*;
 import su.nightexpress.excellentenchants.enchantment.impl.bow.*;
-import su.nightexpress.excellentenchants.enchantment.impl.fishing.AutoFishEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.fishing.*;
 import su.nightexpress.excellentenchants.enchantment.impl.tool.*;
 import su.nightexpress.excellentenchants.enchantment.impl.universal.EnchantCurseOfFragility;
 import su.nightexpress.excellentenchants.enchantment.impl.weapon.*;
@@ -35,14 +35,22 @@ public class EnchantRegistry {
     public void setup() {
         // Prevent to register enchantments during the runtime.
         if (this.isLocked) {
-            REGISTRY_MAP.values().forEach(ExcellentEnchant::loadSettings);
+            REGISTRY_MAP.values().forEach(enchant -> {
+                enchant.loadSettings();
+                enchant.registerListeners();
+            });
             return;
         }
 
         Reflex.setFieldValue(Enchantment.class, "acceptingNew", true);
 
         // Fising Enchants
-        this.register(AutoFishEnchant.ID,() -> new AutoFishEnchant(plugin));
+        this.register(AutoReelEnchant.ID,() -> new AutoReelEnchant(plugin));
+        this.register(DoubleCatchEnchant.ID, () -> new DoubleCatchEnchant(plugin));
+        this.register(SeasonedAnglerEnchant.ID, () -> new SeasonedAnglerEnchant(plugin));
+        this.register(SurvivalistEnchant.ID, () -> new SurvivalistEnchant(plugin));
+        this.register(CurseOfDrownedEnchant.ID, () -> new CurseOfDrownedEnchant(plugin));
+        this.register(RiverMasterEnchant.ID, () -> new RiverMasterEnchant(plugin));
 
         // Tool enchants
         this.register(EnchantBlastMining.ID, () -> new EnchantBlastMining(plugin));

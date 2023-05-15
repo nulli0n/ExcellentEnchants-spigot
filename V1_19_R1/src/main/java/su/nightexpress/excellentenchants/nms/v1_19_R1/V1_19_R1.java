@@ -5,6 +5,7 @@ import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,6 +23,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 
 import java.util.HashSet;
@@ -42,6 +44,18 @@ public class V1_19_R1 implements EnchantNMS {
         CraftFishHook craftFishHook = (CraftFishHook) hook;
         FishingHook handle = craftFishHook.getHandle();
         handle.retrieve(CraftItemStack.asNMSCopy(item));
+    }
+
+    @Override
+    @Nullable
+    public ItemStack getSpawnEgg(@NotNull LivingEntity entity) {
+        CraftLivingEntity craftLivingEntity = (CraftLivingEntity) entity;
+        net.minecraft.world.entity.LivingEntity livingEntity = craftLivingEntity.getHandle();
+
+        SpawnEggItem eggItem = SpawnEggItem.byId(livingEntity.getType());
+        if (eggItem == null) return null;
+
+        return CraftItemStack.asBukkitCopy(eggItem.getDefaultInstance());
     }
 
     @Override

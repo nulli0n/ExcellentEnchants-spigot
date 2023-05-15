@@ -69,7 +69,7 @@ public class EnchantIceAspect extends ExcellentEnchant implements Chanced, Potio
         victim.setFreezeTicks(victim.getMaxFreezeTicks());
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.BLOCK_CRACK, Material.ICE).play(victim.getEyeLocation(), 0.25, 0.15, 30);
+            SimpleParticle.of(Particle.BLOCK_CRACK, Material.ICE.createBlockData()).play(victim.getEyeLocation(), 0.25, 0.15, 30);
         }
         return true;
     }

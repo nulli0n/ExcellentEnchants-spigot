@@ -144,8 +144,11 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         boolean expReward = recipe.hasExperienceReward();
         int villagerExperience = recipe.getVillagerExperience();
         float priceMultiplier = recipe.getPriceMultiplier();
+        int demand = recipe.getDemand();
+        int specialPrice = recipe.getSpecialPrice();
 
-        MerchantRecipe recipe2 = new MerchantRecipe(result, uses, maxUses, expReward, villagerExperience, priceMultiplier);
+        MerchantRecipe recipe2 = new MerchantRecipe(result, uses, maxUses, expReward, villagerExperience,
+            priceMultiplier, demand, specialPrice);
         recipe2.setIngredients(recipe.getIngredients());
         e.setRecipe(recipe2);
     }

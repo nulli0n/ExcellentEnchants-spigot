@@ -97,6 +97,9 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     @NotNull
     public PlaceholderMap getPlaceholders(int level) {
+        if (level > this.getMaxLevel()) level = this.getMaxLevel();
+        if (level < this.getStartLevel()) level = this.getStartLevel();
+
         return this.placeholdersMap.get(level);
     }
 

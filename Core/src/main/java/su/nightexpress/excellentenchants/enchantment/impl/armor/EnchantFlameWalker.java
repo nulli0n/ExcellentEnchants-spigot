@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.api.server.AbstractTask;
+import su.nexmedia.engine.utils.Pair;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
@@ -29,6 +30,7 @@ import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
@@ -36,7 +38,7 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
     public static final String ID = "flame_walker";
 
     private static final BlockFace[] FACES = {BlockFace.SOUTH, BlockFace.NORTH, BlockFace.EAST, BlockFace.WEST};
-    private static final Map<Block, Long> BLOCKS_TO_DESTROY = new ConcurrentHashMap<>();
+    private static final Map<Block, Pair<Long, Integer>> BLOCKS_TO_DESTROY = new ConcurrentHashMap<>();
 
     private EnchantScaler blockDecayTime;
     private BlockTickTask blockTickTask;
@@ -70,7 +72,7 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
     }
 
     public static void addBlock(@NotNull Block block, double seconds) {
-        BLOCKS_TO_DESTROY.put(block, (long) (System.currentTimeMillis() + seconds * 1000L));
+        BLOCKS_TO_DESTROY.put(block, Pair.of(System.currentTimeMillis() + (long) seconds * 1000L, Rnd.get(100)));
     }
 
     @Override
@@ -148,12 +150,31 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
             BLOCKS_TO_DESTROY.keySet().removeIf(block -> {
                 if (block.isEmpty()) return true;
 
-                long time = BLOCKS_TO_DESTROY.get(block);
+                Pair<Long, Integer> pair = BLOCKS_TO_DESTROY.get(block);
+                long time = pair.getFirst();
                 if (now >= time) {
+                    block.getWorld().getPlayers().forEach(player -> {
+                        player.sendBlockDamage(block.getLocation(), 0F, pair.getSecond());
+                    });
+
                     block.setType(Material.LAVA);
-                    SimpleParticle.of(Particle.BLOCK_CRACK, Material.MAGMA_BLOCK)
+
+                    SimpleParticle.of(Particle.BLOCK_CRACK, Material.MAGMA_BLOCK.createBlockData())
                         .play(block.getLocation(), 0.5, 0.7, 0.5, 0.03, 30);
+
                     return true;
+                }
+                else {
+                    long diff = TimeUnit.MILLISECONDS.toSeconds(time - now);
+
+                    float progress = (float) (1D - Math.min(1D, diff / 5D));
+                    if (progress > 1F) progress = 1F;
+                    if (progress < 0F) progress = 0F;
+
+                    float finalProgress = progress;
+                    block.getWorld().getPlayers().forEach(player -> {
+                        player.sendBlockDamage(block.getLocation(), finalProgress, pair.getSecond());
+                    });
                 }
                 return false;
             });
