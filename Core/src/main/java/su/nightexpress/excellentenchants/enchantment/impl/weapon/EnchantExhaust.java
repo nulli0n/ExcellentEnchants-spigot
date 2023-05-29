@@ -68,7 +68,7 @@ public class EnchantExhaust extends ExcellentEnchant implements Chanced, Potione
         if (!this.addEffect(victim, level)) return false;
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.ITEM_CRACK, Material.ROTTEN_FLESH).play(victim.getEyeLocation(), 0.25, 0.1, 30);
+            SimpleParticle.of(Particle.ITEM_CRACK, new ItemStack(Material.ROTTEN_FLESH)).play(victim.getEyeLocation(), 0.25, 0.1, 30);
         }
         return true;
     }

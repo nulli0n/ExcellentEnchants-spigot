@@ -10,6 +10,7 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class TierManager extends AbstractManager<ExcellentEnchants> {
@@ -21,7 +22,7 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
 
     public TierManager(@NotNull ExcellentEnchants plugin) {
         super(plugin);
-        this.tiers = new HashMap<>();
+        this.tiers = new ConcurrentHashMap<>();
 
     }
 

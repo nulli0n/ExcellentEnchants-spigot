@@ -97,7 +97,7 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
         drop.getVelocity().multiply(3D);
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.ITEM_CRACK, itemCut.getType()).play(victim.getEyeLocation(), 0.25, 0.15, 30);
+            SimpleParticle.of(Particle.ITEM_CRACK, itemCut).play(victim.getEyeLocation(), 0.25, 0.15, 30);
             MessageUtil.sound(victim.getLocation(), Sound.ENTITY_ITEM_BREAK);
         }
         return true;
