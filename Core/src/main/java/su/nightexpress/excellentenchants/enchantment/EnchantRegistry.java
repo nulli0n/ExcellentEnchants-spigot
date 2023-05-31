@@ -153,7 +153,13 @@ public class EnchantRegistry {
     private void register(@NotNull String id, @NotNull Supplier<ExcellentEnchant> supplier) {
         if (Config.ENCHANTMENTS_DISABLED.get().contains(id)) return;
 
+
         ExcellentEnchant enchant = supplier.get();
+        if (Enchantment.getByKey(enchant.getKey()) != null) {
+            this.plugin.error("Could not register '" + enchant.getId() + "': Such enchantment already registered.");
+            return;
+        }
+
         Enchantment.registerEnchantment(enchant);
         REGISTRY_MAP.put(enchant.getKey(), enchant);
         enchant.loadSettings();
