@@ -72,8 +72,12 @@ public class EnchantPopulator {
 
     @Nullable
     public Tier getTierByChance() {
-        if (this.getEnchants().keySet().isEmpty()) return null;
-        return ExcellentEnchantsAPI.getTierManager().getTierByChance(this.getObtainType());
+        Map<Tier, Double> map = this.getEnchants().keySet().stream()
+            .filter(tier -> tier.getChance(this.getObtainType()) > 0D)
+            .collect(Collectors.toMap(k -> k, v -> v.getChance(this.getObtainType()), (o, n) -> n, HashMap::new));
+        if (map.isEmpty()) return null;
+
+        return Rnd.getByWeight(map);
     }
 
     @Nullable

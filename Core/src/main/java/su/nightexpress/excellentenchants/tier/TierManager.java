@@ -11,6 +11,7 @@ import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class TierManager extends AbstractManager<ExcellentEnchants> {
 
@@ -90,9 +91,11 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
 
     @Nullable
     public Tier getTierByChance(@NotNull ObtainType obtainType) {
-        Map<Tier, Double> map = new HashMap<>();
-        this.getTiers().forEach(tier -> map.put(tier, tier.getChance(obtainType)));
-        map.values().removeIf(chance -> chance <= 0D);
+        Map<Tier, Double> map = this.getTiers().stream()
+            .filter(tier -> tier.getChance(obtainType) > 0D)
+            .collect(Collectors.toMap(k -> k, v -> v.getChance(obtainType), (o, n) -> n, HashMap::new));
+        if (map.isEmpty()) return null;
+
         return Rnd.getByWeight(map);
     }
 
