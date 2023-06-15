@@ -148,7 +148,7 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
             long now = System.currentTimeMillis();
 
             BLOCKS_TO_DESTROY.keySet().removeIf(block -> {
-                if (block.isEmpty()) return true;
+                if (block.isEmpty() || block.getType() != Material.MAGMA_BLOCK) return true;
 
                 Pair<Long, Integer> pair = BLOCKS_TO_DESTROY.get(block);
                 long time = pair.getFirst();
