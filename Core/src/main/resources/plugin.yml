@@ -4,6 +4,6 @@ name: ExcellentEnchants
 author: NightExpress
 desciption: Vanilla-like enchants for your server.
 depend: [ NexEngine ]
-softdepend: [ ProtocolLib, NoCheatPlus, PlaceholderAPI ]
+softdepend: [ ProtocolLib, NoCheatPlus, PlaceholderAPI, MythicMobs ]
 api-version: 1.17
 load: STARTUP

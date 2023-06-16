@@ -42,7 +42,7 @@ public enum FitItemType {
             case LEGGINGS -> ItemUtil.isLeggings(item);
             case BOOTS -> ItemUtil.isBoots(item);
             case ELYTRA -> item.getType() == Material.ELYTRA;
-            case WEAPON -> ItemUtil.isWeapon(item);
+            case WEAPON -> SWORD.isIncluded(item) || ItemUtil.isTrident(item);
             case TOOL -> ItemUtil.isTool(item);
             case ARMOR -> ItemUtil.isArmor(item);
             case SWORD -> ItemUtil.isSword(item) || (Config.ENCHANTMENTS_ITEM_SWORD_ENCHANTS_TO_AXES.get() && AXE.isIncluded(item));

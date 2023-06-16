@@ -28,11 +28,6 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
 
     @Override
     protected void onLoad() {
-        /*if (ExcellentEnchants.isLoaded) {
-            this.getTiers().forEach(tier -> tier.getEnchants().clear());
-            return;
-        }*/
-
         this.config = JYML.loadOrExtract(plugin, FILE_NAME);
 
         for (String sId : config.getSection("")) {

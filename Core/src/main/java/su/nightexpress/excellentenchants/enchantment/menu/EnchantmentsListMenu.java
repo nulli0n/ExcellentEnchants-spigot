@@ -80,12 +80,6 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
 
     @Override
     @NotNull
-    public Comparator<ExcellentEnchant> getObjectSorter() {
-        return (o1, o2) -> 0;
-    }
-
-    @Override
-    @NotNull
     public List<ExcellentEnchant> getObjects(@NotNull Player player) {
         return new ArrayList<>(EnchantRegistry.getRegistered().stream()
             .sorted(Comparator.comparing(ExcellentEnchant::getName)).toList());
