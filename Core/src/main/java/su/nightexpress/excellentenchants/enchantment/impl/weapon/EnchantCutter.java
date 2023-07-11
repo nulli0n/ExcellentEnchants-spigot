@@ -12,7 +12,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.particle.SimpleParticle;
-import su.nexmedia.engine.utils.MessageUtil;
+import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -98,7 +98,7 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
 
         if (this.hasVisualEffects()) {
             SimpleParticle.of(Particle.ITEM_CRACK, itemCut).play(victim.getEyeLocation(), 0.25, 0.15, 30);
-            MessageUtil.sound(victim.getLocation(), Sound.ENTITY_ITEM_BREAK);
+            LocationUtil.sound(victim.getLocation(), Sound.ENTITY_ITEM_BREAK);
         }
         return true;
     }

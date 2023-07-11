@@ -19,11 +19,11 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.manager.AbstractListener;
-import su.nexmedia.engine.hooks.Hooks;
+import su.nexmedia.engine.utils.EngineUtils;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.HookId;
@@ -191,7 +191,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
             EntityEquipment equipment = entity.getEquipment();
             if (equipment == null) return;
 
-            boolean isMythic = Hooks.hasPlugin(HookId.MYTHIC_MOBS) && MythicMobsHook.isMythicMob(entity);
+            boolean isMythic = EngineUtils.hasPlugin(HookId.MYTHIC_MOBS) && MythicMobsHook.isMythicMob(entity);
             boolean doPopulation = Config.getObtainSettings(ObtainType.MOB_SPAWNING).isPresent() && !isMythic;
 
             for (EquipmentSlot slot : EquipmentSlot.values()) {

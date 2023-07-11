@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.lang.LangManager;
+import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nexmedia.engine.utils.StringUtil;
@@ -71,7 +72,8 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
         ).setWriter((cfg, path, set) -> cfg.set(path, set.stream().map(Enum::name).toList())).read(cfg);
 
         this.headName = JOption.create("Settings.Head_Item.Name", "&c" + Placeholders.GENERIC_TYPE + "'s Head",
-            "Head item display name. Use '" + Placeholders.GENERIC_TYPE + "' for entity name.").read(cfg);
+            "Head item display name. Use '" + Placeholders.GENERIC_TYPE + "' for entity name.")
+            .mapReader(Colorizer::apply).read(cfg);
 
         this.headTextures = JOption.forMap("Settings.Head_Item.Textures",
             id -> StringUtil.getEnum(id, EntityType.class).orElse(null),

@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.LocationUtil;
-import su.nexmedia.engine.utils.MessageUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -104,7 +103,7 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
         Block block = e.getBlockState().getBlock();
         if (this.hasVisualEffects()) {
             Location location = LocationUtil.getCenter(block.getLocation(), true);
-            MessageUtil.sound(location, this.sound);
+            LocationUtil.sound(location, this.sound);
             SimpleParticle.of(Particle.FLAME).play(location, 0.25, 0.05, 20);
         }
         return true;

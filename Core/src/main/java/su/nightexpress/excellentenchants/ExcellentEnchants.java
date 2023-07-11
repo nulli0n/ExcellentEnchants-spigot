@@ -5,7 +5,7 @@ import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.Version;
 import su.nexmedia.engine.api.command.GeneralCommand;
 import su.nexmedia.engine.command.list.ReloadSubCommand;
-import su.nexmedia.engine.hooks.Hooks;
+import su.nexmedia.engine.utils.EngineUtils;
 import su.nightexpress.excellentenchants.command.BookCommand;
 import su.nightexpress.excellentenchants.command.EnchantCommand;
 import su.nightexpress.excellentenchants.command.ListCommand;
@@ -21,8 +21,6 @@ import su.nightexpress.excellentenchants.hook.impl.ProtocolHook;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 import su.nightexpress.excellentenchants.nms.v1_17_R1.V1_17_R1;
 import su.nightexpress.excellentenchants.nms.v1_18_R2.V1_18_R2;
-import su.nightexpress.excellentenchants.nms.v1_19_R1.V1_19_R1;
-import su.nightexpress.excellentenchants.nms.v1_19_R2.V1_19_R2;
 import su.nightexpress.excellentenchants.nms.v1_19_R3.V1_19_R3;
 import su.nightexpress.excellentenchants.nms.v1_20_R1.V1_20_R1;
 import su.nightexpress.excellentenchants.tier.TierManager;
@@ -74,13 +72,12 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     }
 
     private void setNMS() {
-        this.enchantNMS = switch (Version.CURRENT) {
+        this.enchantNMS = switch (Version.getCurrent()) {
             case V1_17_R1 -> new V1_17_R1();
             case V1_18_R2 -> new V1_18_R2();
-            case V1_19_R1 -> new V1_19_R1();
-            case V1_19_R2 -> new V1_19_R2();
             case V1_19_R3 -> new V1_19_R3();
             case V1_20_R1 -> new V1_20_R1();
+            default -> null;
         };
     }
 
@@ -92,7 +89,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     @Override
     public void loadLang() {
         this.getLangManager().loadMissing(Lang.class);
-        this.getLangManager().setupEnum(FitItemType.class);
+        this.getLangManager().loadEnum(FitItemType.class);
         this.getLang().saveChanges();
     }
 
@@ -108,7 +105,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     @Override
     public void registerHooks() {
         if (Config.ENCHANTMENTS_DISPLAY_MODE.get() == 2) {
-            if (Hooks.hasPlugin(HookId.PROTOCOL_LIB)) {
+            if (EngineUtils.hasPlugin(HookId.PROTOCOL_LIB)) {
                 ProtocolHook.setup();
             }
             else {
@@ -116,7 +113,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
                 Config.ENCHANTMENTS_DISPLAY_MODE.set(1);
             }
         }
-        if (Hooks.hasPlaceholderAPI()) {
+        if (EngineUtils.hasPlaceholderAPI()) {
             PlaceholderHook.setup();
         }
     }

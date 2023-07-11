@@ -130,9 +130,9 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
             List<String> charges = enchant.isChargesEnabled() ? new ArrayList<>(this.enchantLoreCharges) : Collections.emptyList();
             List<String> obtaining = new ArrayList<>(this.enchantLoreObtaining);
 
-            lore = StringUtil.replace(lore, PLACEHOLDER_CONFLICTS, false, conflicts);
-            lore = StringUtil.replace(lore, PLACEHOLDER_CHARGES, false, charges);
-            lore = StringUtil.replace(lore, PLACEHOLDER_OBTAINING, false, obtaining);
+            lore = StringUtil.replaceInList(lore, PLACEHOLDER_CONFLICTS, conflicts);
+            lore = StringUtil.replaceInList(lore, PLACEHOLDER_CHARGES, charges);
+            lore = StringUtil.replaceInList(lore, PLACEHOLDER_OBTAINING, obtaining);
             lore = StringUtil.replace(lore, Placeholders.ENCHANTMENT_DESCRIPTION, true, enchant.getDescription());
 
             meta.setLore(lore);

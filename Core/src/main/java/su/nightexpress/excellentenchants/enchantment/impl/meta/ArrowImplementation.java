@@ -42,7 +42,7 @@ public final class ArrowImplementation implements Arrowed {
             (cfg1, path, def) -> SimpleParticle.read(cfg1, path),
             particle,
             "Sets particle effect for the arrow trail of this enchantment."
-        ).setWriter((cfg1, path, particle1) -> SimpleParticle.write(particle1, cfg1, path)).read(cfg);
+        ).setWriter((cfg1, path, particle1) -> particle1.write(cfg1, path)).read(cfg);
 
         return new ArrowImplementation(enchant, effect);
     }

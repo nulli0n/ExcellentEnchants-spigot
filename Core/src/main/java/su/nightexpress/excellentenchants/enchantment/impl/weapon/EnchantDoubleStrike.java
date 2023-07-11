@@ -8,7 +8,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.particle.SimpleParticle;
-import su.nexmedia.engine.utils.MessageUtil;
+import su.nexmedia.engine.utils.LocationUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -58,7 +58,7 @@ public class EnchantDoubleStrike extends ExcellentEnchant implements Chanced, Co
 
         if (this.hasVisualEffects()) {
             SimpleParticle.of(Particle.EXPLOSION_NORMAL).play(victim.getEyeLocation(), 0.25, 0.15, 15);
-            MessageUtil.sound(victim.getLocation(), Sound.ENTITY_GENERIC_EXPLODE);
+            LocationUtil.sound(victim.getLocation(), Sound.ENTITY_GENERIC_EXPLODE);
         }
         return true;
     }

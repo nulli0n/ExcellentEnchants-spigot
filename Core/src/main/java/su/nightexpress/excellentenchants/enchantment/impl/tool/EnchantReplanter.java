@@ -15,15 +15,15 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.MessageUtil;
+import su.nexmedia.engine.utils.PlayerUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.InteractEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Set;
 
@@ -147,7 +147,7 @@ public class EnchantReplanter extends ExcellentEnchant implements Chanced, Inter
             if (seed == Material.NETHER_WART && blockGround.getType() == Material.SOUL_SAND
                 || seed != Material.NETHER_WART && blockGround.getType() == Material.FARMLAND) {
                 if (this.takeSeeds(player, seed)) {
-                    MessageUtil.sound(player, seed == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT);
+                    PlayerUtil.sound(player, seed == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT);
                     plugin.getEnchantNMS().sendAttackPacket(player, 0);
                     blockPlant.setType(this.fineSeedsToBlock(seed));
                     break;

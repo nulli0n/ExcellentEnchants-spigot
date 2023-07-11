@@ -84,7 +84,7 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
 
         plugin.getMessage(Lang.COMMAND_TIER_BOOK_DONE)
             .replace(tier.replacePlaceholders())
-            .replace(Placeholders.Player.replacer(player))
+            .replace(Placeholders.forPlayer(player))
             .send(sender);
     }
 }

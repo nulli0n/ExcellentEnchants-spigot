@@ -48,7 +48,7 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
         Player player = (Player) sender;
         ItemStack item = player.getInventory().getItemInMainHand();
         if (item.getType().isAir()) {
-            this.errorItem(sender);
+            this.plugin.getMessage(Lang.COMMAND_ENCHANT_ERROR_NO_ITEM).send(sender);
             return;
         }
 

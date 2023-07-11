@@ -76,7 +76,7 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
 
         plugin.getMessage(Lang.COMMAND_BOOK_DONE)
             .replace(Placeholders.GENERIC_ENCHANT, LangManager.getEnchantment(enchantment))
-            .replace(Placeholders.Player.replacer(player))
+            .replace(Placeholders.forPlayer(player))
             .send(sender);
     }
 }

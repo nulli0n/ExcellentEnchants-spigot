@@ -17,12 +17,12 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.api.server.AbstractTask;
 import su.nexmedia.engine.utils.Pair;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.api.enchantment.Cleanable;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
+public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
 
     public static final String ID = "flame_walker";
 

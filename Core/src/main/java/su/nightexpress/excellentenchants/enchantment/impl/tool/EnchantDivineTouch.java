@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.enchantment.impl.tool;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -21,6 +22,7 @@ import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.LocationUtil;
+import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -40,8 +42,12 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
     private String spawnerName;
     private ChanceImplementation chanceImplementation;
 
+    private final NamespacedKey key;
+
     public EnchantDivineTouch(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.key = new NamespacedKey(plugin, "divine_spawner");
+
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to mine spawner.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(1.0);
@@ -91,6 +97,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
         stateItem.setDisplayName(this.spawnerName.replace(Placeholders.GENERIC_TYPE, plugin.getLangManager().getEnum(spawnerBlock.getSpawnedType())));
         itemSpawner.setItemMeta(stateItem);
 
+        PDCUtil.set(itemSpawner, this.key, true);
         return itemSpawner;
     }
 
@@ -133,6 +140,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
         Player player = e.getPlayer();
         ItemStack spawner = player.getInventory().getItem(e.getHand());
         if (spawner == null || spawner.getType() != Material.SPAWNER || !(spawner.getItemMeta() instanceof BlockStateMeta meta)) return;
+        if (PDCUtil.getBoolean(spawner, this.key).isEmpty()) return;
 
         CreatureSpawner spawnerItem = (CreatureSpawner) meta.getBlockState();
         CreatureSpawner spawnerBlock = (CreatureSpawner) block.getState();

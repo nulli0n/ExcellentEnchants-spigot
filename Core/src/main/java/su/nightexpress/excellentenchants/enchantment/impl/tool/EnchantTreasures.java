@@ -10,24 +10,24 @@ import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nexmedia.playerblocktracker.PlayerBlockTracker;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.Cleanable;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-public class EnchantTreasures extends ExcellentEnchant implements Chanced, BlockBreakEnchant, BlockDropEnchant, ICleanable {
+public class EnchantTreasures extends ExcellentEnchant implements Chanced, BlockBreakEnchant, BlockDropEnchant, Cleanable {
 
     public static final String ID = "treasures";
     private static final String META = "wasted";

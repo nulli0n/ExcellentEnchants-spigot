@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.particle.SimpleParticle;
-import su.nexmedia.engine.utils.MessageUtil;
+import su.nexmedia.engine.utils.PlayerUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -65,7 +65,7 @@ public class CurseOfDrownedEnchant extends ExcellentEnchant implements FishingEn
 
         if (this.hasVisualEffects()) {
             SimpleParticle.of(Particle.WATER_SPLASH).play(hook.getLocation(), 0.5, 0.1, 50);
-            MessageUtil.sound(event.getPlayer(), Sound.ENTITY_DROWNED_AMBIENT);
+            PlayerUtil.sound(event.getPlayer(), Sound.ENTITY_DROWNED_AMBIENT);
         }
         return true;
     }

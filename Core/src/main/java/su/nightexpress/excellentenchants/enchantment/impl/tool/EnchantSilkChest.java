@@ -25,16 +25,14 @@ import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Stream;
 
 public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEnchant {
@@ -44,7 +42,6 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     private       String                      chestName;
     private       List<String>                chestLore;
     private final NamespacedKey               keyChest;
-    @Deprecated private final Map<Integer, NamespacedKey> keyItems;
 
     public EnchantSilkChest(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
@@ -53,10 +50,6 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         this.getDefaults().setTier(0.5);
 
         this.keyChest = new NamespacedKey(plugin, ID + ".item");
-        this.keyItems = new TreeMap<>();
-        for (int pos = 0; pos < 27; pos++) {
-            this.getItemKey(pos);
-        }
     }
 
     @Override
@@ -68,11 +61,6 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         this.chestLore = JOption.create("Settings.Chest_Item.Lore", new ArrayList<>(),
             "Chest item lore.",
             "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").mapReader(Colorizer::apply).read(cfg);
-    }
-
-    @Deprecated
-    private NamespacedKey getItemKey(int pos) {
-        return this.keyItems.computeIfAbsent(pos, key -> new NamespacedKey(plugin, "silkchest_item_" + pos));
     }
 
     @Override
@@ -88,7 +76,7 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     }
 
     public boolean isSilkChest(@NotNull ItemStack item) {
-        return PDCUtil.getBoolean(item, this.keyChest).orElse(false) || PDCUtil.getString(item, this.getItemKey(0)).orElse(null) != null;
+        return PDCUtil.getBoolean(item, this.keyChest).isPresent();
     }
 
     @NotNull
@@ -174,15 +162,6 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
 
         chest.setCustomName(null);
         chest.update(true);
-
-        Inventory inventory = chest.getBlockInventory();
-        for (int pos = 0; pos < inventory.getSize(); pos++) {
-            String data = PDCUtil.getString(item, this.getItemKey(pos)).orElse(null);
-            if (data == null) continue;
-
-            ItemStack itemInv = ItemUtil.fromBase64(data);
-            inventory.setItem(pos, itemInv);
-        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

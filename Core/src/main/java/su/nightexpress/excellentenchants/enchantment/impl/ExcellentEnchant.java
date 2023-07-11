@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.api.manager.IListener;
+import su.nexmedia.engine.api.manager.EventListener;
 import su.nexmedia.engine.api.placeholder.PlaceholderMap;
 import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.ItemUtil;
@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public abstract class ExcellentEnchant extends Enchantment implements IEnchantment, IListener {
+public abstract class ExcellentEnchant extends Enchantment implements IEnchantment, EventListener {
 
     protected final ExcellentEnchants plugin;
     protected final JYML              cfg;

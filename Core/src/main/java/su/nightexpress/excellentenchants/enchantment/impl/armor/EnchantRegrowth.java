@@ -7,12 +7,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.api.enchantment.Cleanable;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
@@ -22,7 +22,7 @@ import su.nightexpress.excellentenchants.enchantment.task.AbstractEnchantmentTas
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
-public class EnchantRegrowth extends ExcellentEnchant implements Chanced, PassiveEnchant, ICleanable {
+public class EnchantRegrowth extends ExcellentEnchant implements Chanced, PassiveEnchant, Cleanable {
 
     public static final String ID = "regrowth";
 

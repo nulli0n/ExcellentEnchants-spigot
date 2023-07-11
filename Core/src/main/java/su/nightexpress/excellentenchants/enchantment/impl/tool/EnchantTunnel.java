@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.LocationUtil;
+import su.nexmedia.engine.utils.EntityUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
@@ -75,7 +75,7 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
         if (block.getType().isInteractable() && !INTERACTABLE_BLOCKS.contains(block.getType())) return false;
         if (block.getDrops(item).isEmpty()) return false;
 
-        BlockFace dir = LocationUtil.getDirection(player);
+        BlockFace dir = EntityUtil.getDirection(player);
         boolean isY = dir != null && block.getRelative(dir.getOppositeFace()).isEmpty();
         boolean isZ = dir == BlockFace.EAST || dir == BlockFace.WEST;
 
