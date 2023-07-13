@@ -106,6 +106,7 @@ public class EnchantRegistry {
         this.register(EnchantRegrowth.ID, () -> new EnchantRegrowth(plugin));
         this.register(EnchantSaturation.ID, () -> new EnchantSaturation(plugin));
         this.register(EnchantSelfDestruction.ID, () -> new EnchantSelfDestruction(plugin));
+        this.register(StoppingForceEnchant.ID, () -> new StoppingForceEnchant(plugin));
         this.register(EnchantSonic.ID, () -> new EnchantSonic(plugin));
 
         // Bow enchants
@@ -115,6 +116,7 @@ public class EnchantRegistry {
         this.register(EnchantElectrifiedArrows.ID, () -> new EnchantElectrifiedArrows(plugin));
         this.register(EnchantEnderBow.ID, () -> new EnchantEnderBow(plugin));
         this.register(EnchantExplosiveArrows.ID, () -> new EnchantExplosiveArrows(plugin));
+        this.register(FlareEnchant.ID, () -> new FlareEnchant(plugin));
         this.register(EnchantGhast.ID, () -> new EnchantGhast(plugin));
         this.register(EnchantHover.ID, () -> new EnchantHover(plugin));
         this.register(EnchantPoisonedArrows.ID, () -> new EnchantPoisonedArrows(plugin));
@@ -122,6 +124,7 @@ public class EnchantRegistry {
 
         // Universal
         this.register(EnchantCurseOfFragility.ID, () -> new EnchantCurseOfFragility(plugin));
+        this.register(CurseOfMediocrityEnchant.ID, () -> new CurseOfMediocrityEnchant(plugin));
 
         Enchantment.stopAcceptingRegistrations();
         this.plugin.info("Enchantments Registered: " + getRegistered().size());

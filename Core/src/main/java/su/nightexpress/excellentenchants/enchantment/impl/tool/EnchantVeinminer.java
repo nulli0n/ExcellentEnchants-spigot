@@ -8,7 +8,6 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.utils.Scaler;
@@ -24,6 +23,7 @@ import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,15 +31,21 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
 
     public static final  String      ID                = "veinminer";
 
-    private static final BlockFace[] AREA = {BlockFace.UP, BlockFace.DOWN, BlockFace.EAST, BlockFace.WEST, BlockFace.SOUTH, BlockFace.NORTH};
-    private static final String      META_BLOCK_VEINED = ID + "_block_veined";
+    private static final BlockFace[] AREA = {
+        BlockFace.UP, BlockFace.DOWN, BlockFace.EAST,
+        BlockFace.WEST, BlockFace.SOUTH, BlockFace.NORTH
+    };
+
     private static final String      PLACEHOLDER_BLOCK_LIMIT = "%enchantment_block_limit%";
 
     private Scaler        blocksLimit;
     private Set<Material> blocksAffected;
+    private final Set<UUID> activePlayers;
 
     public EnchantVeinminer(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
+        this.activePlayers = new HashSet<>();
+
         this.getDefaults().setDescription("Mines up to " + PLACEHOLDER_BLOCK_LIMIT + " blocks of the ore vein at once.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
@@ -104,6 +110,10 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
             .filter(blockAdded -> blockAdded.getType() == block.getType()).collect(Collectors.toSet());
     }
 
+    public boolean isInVein(@NotNull Player player) {
+        return this.activePlayers.contains(player.getUniqueId());
+    }
+
     private void vein(@NotNull Player player, @NotNull Block source, int level) {
         Set<Block> ores = new HashSet<>();
         Set<Block> prepare = new HashSet<>(this.getNearby(source));
@@ -118,31 +128,25 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
             prepare.addAll(nearby);
         }
         ores.remove(source);
-        ores.forEach(ore -> {
-            // Play block break particles before the block broken.
-            //EffectUtil.playEffect(LocationUtil.getCenter(ore.getLocation()), Particle.BLOCK_CRACK.name(), ore.getType().name(), 0.2, 0.2, 0.2, 0.1, 20);
-
-            ore.setMetadata(META_BLOCK_VEINED, new FixedMetadataValue(plugin, true));
-            //plugin.getNMS().breakBlock(player, ore);
-            player.breakBlock(ore);
-            ore.removeMetadata(META_BLOCK_VEINED, plugin);
-        });
+        ores.forEach(player::breakBlock);
     }
 
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack tool, int level) {
+        if (this.isInVein(player)) return false;
         if (!this.isAvailableToUse(player)) return false;
         if (EnchantUtils.contains(tool, EnchantBlastMining.ID)) return false;
         if (EnchantUtils.contains(tool, EnchantTunnel.ID)) return false;
 
         Block block = e.getBlock();
-        if (block.hasMetadata(META_BLOCK_VEINED)) return false;
         if (block.getDrops(tool).isEmpty()) return false;
         if (!this.getBlocksAffected().contains(block.getType())) return false;
 
+        this.activePlayers.add(player.getUniqueId());
         NoCheatPlusHook.exemptBlocks(player);
         this.vein(player, block, level);
         NoCheatPlusHook.unexemptBlocks(player);
+        this.activePlayers.remove(player.getUniqueId());
 
         return true;
     }

@@ -199,6 +199,7 @@ public class EnchantUtils {
         if (sizeReal > 0) {
             PDCUtil.set(meta, KEY_LORE_SIZE, sizeReal);
         }
+        else PDCUtil.remove(meta, KEY_LORE_SIZE);
         item.setItemMeta(meta);
         return true;
     }

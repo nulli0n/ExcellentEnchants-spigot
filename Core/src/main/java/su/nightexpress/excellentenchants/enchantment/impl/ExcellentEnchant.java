@@ -65,6 +65,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
             PlaceholderMap map = new PlaceholderMap()
                 .add(Placeholders.ENCHANTMENT_DESCRIPTION, () -> String.join("\n", this.getDescription()))
+                .add(Placeholders.ENCHANTMENT_ID, this::getId)
                 .add(Placeholders.ENCHANTMENT_NAME, this::getDisplayName)
                 .add(Placeholders.ENCHANTMENT_NAME_FORMATTED, () -> this.getNameFormatted(level))
                 .add(Placeholders.ENCHANTMENT_LEVEL, () -> NumberUtil.toRoman(level))

@@ -7,7 +7,6 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.utils.EntityUtil;
@@ -21,11 +20,11 @@ import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant {
 
     public static final String   ID                   = "tunnel";
-    private static final String  META_BLOCK_TUNNEL    = ID + "_block_tunneled";
     // X and Z offsets for each block AoE mined
     private static final int[][] MINING_COORD_OFFSETS = new int[][]{{0, 0}, {0, -1}, {-1, 0}, {0, 1}, {1, 0}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1},};
     private static final Set<Material> INTERACTABLE_BLOCKS = new HashSet<>();
@@ -35,10 +34,13 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
         INTERACTABLE_BLOCKS.add(Material.DEEPSLATE_REDSTONE_ORE);
     }
 
+    private final Set<UUID> activePlayers;
     private boolean disableOnSneak;
 
     public EnchantTunnel(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
+        this.activePlayers = new HashSet<>();
+
         this.getDefaults().setDescription("Mines multiple blocks at once in a certain shape.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(1.0);
@@ -64,14 +66,19 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
         return EnchantmentTarget.TOOL;
     }
 
+    public boolean isTunneling(@NotNull Player player) {
+        return this.activePlayers.contains(player.getUniqueId());
+    }
+
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        Block block = e.getBlock();
+        if (this.isTunneling(player)) return false;
         if (!this.isAvailableToUse(player)) return false;
         if (this.disableOnSneak && player.isSneaking()) return false;
         if (EnchantUtils.contains(item, EnchantVeinminer.ID)) return false;
         if (EnchantUtils.contains(item, EnchantBlastMining.ID)) return false;
-        if (block.hasMetadata(META_BLOCK_TUNNEL)) return false;
+
+        Block block = e.getBlock();
         if (block.getType().isInteractable() && !INTERACTABLE_BLOCKS.contains(block.getType())) return false;
         if (block.getDrops(item).isEmpty()) return false;
 
@@ -85,6 +92,7 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
         else if (level == 2) blocksBroken = 5;
         else if (level == 3) blocksBroken = 9;
 
+        this.activePlayers.add(player.getUniqueId());
         NoCheatPlusHook.exemptBlocks(player);
 
         for (int i = 0; i < blocksBroken; i++) {
@@ -113,21 +121,11 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
             if (addType == Material.BEDROCK || addType == Material.END_PORTAL || addType == Material.END_PORTAL_FRAME) continue;
             if (addType == Material.OBSIDIAN && addType != block.getType()) continue;
 
-            // Play block break particles before it's broken.
-            /*SimpleParticle.of(Particle.BLOCK_CRACK, blockAdd.getType())
-                .play(damager.getEyeLocation(), 0.25, 0.1, 20);
-            EffectUtil.playEffect(LocationUtil.getCenter(blockAdd.getLocation()), Particle.BLOCK_CRACK.name(), blockAdd.getType().name(), 0.2, 0.2, 0.2, 0.1, 20);
-
-             */
-
-            // Add metadata to prevent enchantment triggering in a loop.
-            blockAdd.setMetadata(META_BLOCK_TUNNEL, new FixedMetadataValue(plugin, true));
-            //plugin.getNMS().breakBlock(player, blockAdd);
             player.breakBlock(blockAdd);
-            blockAdd.removeMetadata(META_BLOCK_TUNNEL, plugin);
         }
 
         NoCheatPlusHook.unexemptBlocks(player);
+        this.activePlayers.remove(player.getUniqueId());
         return true;
     }
 }

@@ -26,8 +26,9 @@ public class EnchantDefaults {
 
     private String        displayName;
     private Tier          tier;
-    private List<String>  description;
-    private boolean       isTreasure;
+    private List<String> description;
+    private boolean      hiddenFromList;
+    private boolean      isTreasure;
     private int           levelMin;
     private int           levelMax;
     private EnchantScaler levelByEnchantCost;
@@ -46,6 +47,7 @@ public class EnchantDefaults {
         this.setDisplayName(StringUtil.capitalizeUnderscored(enchant.getId()));
         this.setTier(0.1);
         this.setDescription(new ArrayList<>());
+        this.setHiddenFromList(false);
         this.setTreasure(false);
         this.setLevelMin(1);
         this.setLevelMax(3);
@@ -71,6 +73,9 @@ public class EnchantDefaults {
             "Enchantment description. It will be shown in item lore under enchantment name.",
             "You can use 'Enchantment' placeholders: " + Placeholders.URL_PLACEHOLDERS)
             .read(cfg));
+
+        this.setHiddenFromList(JOption.create("Hide_From_List", false,
+            "Sets whether or not this enchantment will be hidden from Enchants GUI.").read(cfg));
 
         this.setTreasure(JOption.create("Is_Treasure", this.isTreasure(),
             "Sets whether this enchantment is a treasure enchantment.",
@@ -167,6 +172,14 @@ public class EnchantDefaults {
     @NotNull
     public List<String> getDescription() {
         return description;
+    }
+
+    public boolean isHiddenFromList() {
+        return hiddenFromList;
+    }
+
+    public void setHiddenFromList(boolean hiddenFromList) {
+        this.hiddenFromList = hiddenFromList;
     }
 
     public boolean isTreasure() {

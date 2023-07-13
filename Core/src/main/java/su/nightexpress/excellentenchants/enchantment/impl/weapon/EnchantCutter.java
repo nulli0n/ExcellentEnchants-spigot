@@ -5,12 +5,14 @@ import org.bukkit.Sound;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.NumberUtil;
@@ -31,6 +33,8 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
 
     private EnchantScaler durabilityReduction;
     private ChanceImplementation chanceImplementation;
+    private boolean allowPlayers;
+    private boolean allowMobs;
 
     public EnchantCutter(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.LOWEST);
@@ -47,6 +51,12 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
         this.durabilityReduction = EnchantScaler.read(this, "Settings.Item.Durability_Reduction",
             Placeholders.ENCHANTMENT_LEVEL + " / 100",
             "Amount (in percent) of how much item durability will be reduced.");
+
+        this.allowPlayers = JOption.create("Settings.Allow_Players", true,
+            "Sets whether or not this enchantment will have effect on players.").read(cfg);
+
+        this.allowMobs = JOption.create("Settings.Allow_Mobs", true,
+            "Sets whether or not this enchantment will have effect on mobs.").read(cfg);
 
         this.addPlaceholder(PLACEHOLDER_DURABILITY_DAMAGE, level -> NumberUtil.format(this.getDurabilityReduction(level) * 100D));
     }
@@ -76,6 +86,9 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
 
         ItemStack[] armor = equipment.getArmorContents();
         if (armor.length == 0) return false;
+
+        boolean isPlayer = victim instanceof Player;
+        if (isPlayer && !this.allowPlayers || (!isPlayer && !this.allowMobs)) return false;
 
         int get = Rnd.get(armor.length);
         ItemStack itemCut = armor[get];

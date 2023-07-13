@@ -17,6 +17,7 @@ public class Placeholders extends su.nexmedia.engine.utils.Placeholders {
     public static final String ENCHANTMENT_POTION_DURATION = "%enchantment_potion_duration%";
     public static final String ENCHANTMENT_POTION_TYPE     = "%enchantment_potion_type%";
 
+    public static final String ENCHANTMENT_ID                          = "%enchantment_id%";
     public static final String ENCHANTMENT_NAME                          = "%enchantment_name%";
     public static final String ENCHANTMENT_NAME_FORMATTED                = "%enchantment_name_formatted%";
     public static final String ENCHANTMENT_DESCRIPTION                   = "%enchantment_description%";

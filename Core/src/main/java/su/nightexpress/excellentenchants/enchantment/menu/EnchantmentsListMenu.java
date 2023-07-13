@@ -24,6 +24,7 @@ import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implements AutoPaged<ExcellentEnchant> {
 
@@ -82,6 +83,7 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
     @NotNull
     public List<ExcellentEnchant> getObjects(@NotNull Player player) {
         return new ArrayList<>(EnchantRegistry.getRegistered().stream()
+            .filter(Predicate.not(enchant -> enchant.getDefaults().isHiddenFromList()))
             .sorted(Comparator.comparing(ExcellentEnchant::getName)).toList());
     }
 
