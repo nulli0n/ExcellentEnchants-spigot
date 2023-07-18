@@ -91,6 +91,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
                 map.add(Placeholders.ENCHANTMENT_POTION_DURATION, () -> NumberUtil.format(potioned.getEffectDuration(level) / 20D));
                 map.add(Placeholders.ENCHANTMENT_POTION_TYPE, () -> LangManager.getPotionType(potioned.getEffectType()));
             }
+            map.add(this.getTier().getPlaceholders());
 
             this.placeholdersMap.put(level, map);
         }

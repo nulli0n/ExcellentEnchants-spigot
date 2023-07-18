@@ -10,10 +10,11 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.event.block.BlockCanBuildEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.particle.SimpleParticle;
@@ -89,9 +90,9 @@ public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, 
         if (!relative.getType().isAir()) return false;
 
         if (projectile.getShooter() instanceof Player player) {
-            BlockCanBuildEvent event = new BlockCanBuildEvent(relative, player, Material.TORCH.createBlockData(), true);
+            BlockPlaceEvent event = new BlockPlaceEvent(relative, relative.getState(), block, new ItemStack(Material.TORCH),  player,true, EquipmentSlot.HAND);
             plugin.getPluginManager().callEvent(event);
-            if (!event.isBuildable()) return false;
+            if (event.isCancelled() || !event.canBuild()) return false;
         }
 
         if (face == BlockFace.UP) {

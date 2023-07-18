@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
 import su.nexmedia.engine.api.command.CommandResult;
-import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.PlayerUtil;
 import su.nexmedia.engine.utils.random.Rnd;
@@ -75,7 +74,7 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
         PlayerUtil.addItem(player, item);
 
         plugin.getMessage(Lang.COMMAND_BOOK_DONE)
-            .replace(Placeholders.GENERIC_ENCHANT, LangManager.getEnchantment(enchantment))
+            .replace(Placeholders.GENERIC_ENCHANT, EnchantUtils.getLocalized(enchantment))
             .replace(Placeholders.forPlayer(player))
             .send(sender);
     }

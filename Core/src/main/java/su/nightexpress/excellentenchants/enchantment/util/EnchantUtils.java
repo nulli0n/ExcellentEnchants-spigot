@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.ItemUtil;
@@ -42,6 +43,20 @@ public class EnchantUtils {
     @NotNull
     public static NamespacedKey createKey(@NotNull String id) {
         return NamespacedKey.minecraft(id.toLowerCase());
+    }
+
+    @NotNull
+    public static String getLocalized(@NotNull String keyRaw) {
+        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(keyRaw));
+        return enchantment == null ? "null" : getLocalized(enchantment);
+    }
+
+    @NotNull
+    public static String getLocalized(@NotNull Enchantment enchantment) {
+        if (enchantment instanceof ExcellentEnchant excellentEnchant) {
+            return excellentEnchant.getDisplayName();
+        }
+        return LangManager.getEnchantment(enchantment);
     }
 
     public static boolean isEnchantable(@NotNull ItemStack item) {

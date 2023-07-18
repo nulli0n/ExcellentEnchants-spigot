@@ -36,8 +36,13 @@ public class Placeholders extends su.nexmedia.engine.utils.Placeholders {
     public static final String ENCHANTMENT_CHARGES_RECHARGE_AMOUNT       = "%enchantment_charges_recharge_amount%";
     public static final String ENCHANTMENT_CHARGES_FUEL_ITEM             = "%enchantment_charges_fuel_item%";
 
-    public static final String TIER_ID   = "%tier_id%";
-    public static final String TIER_NAME          = "%tier_name%";
+    public static final String TIER_ID                            = "%tier_id%";
+    public static final String TIER_NAME                          = "%tier_name%";
+    public static final String TIER_OBTAIN_CHANCE_ENCHANTING      = "%tier_obtain_chance_enchanting%";
+    public static final String TIER_OBTAIN_CHANCE_VILLAGER        = "%tier_obtain_chance_villager%";
+    public static final String TIER_OBTAIN_CHANCE_LOOT_GENERATION = "%tier_obtain_chance_loot_generation%";
+    public static final String TIER_OBTAIN_CHANCE_FISHING         = "%tier_obtain_chance_fishing%";
+    public static final String TIER_OBTAIN_CHANCE_MOB_SPAWNING    = "%tier_obtain_chance_mob_spawning%";
 
 
 }

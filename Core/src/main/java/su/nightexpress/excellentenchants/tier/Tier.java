@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.placeholder.Placeholder;
 import su.nexmedia.engine.api.placeholder.PlaceholderMap;
 import su.nexmedia.engine.utils.Colorizer;
+import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 
@@ -29,6 +30,11 @@ public class Tier implements Placeholder {
         this.placeholderMap = new PlaceholderMap()
             .add(Placeholders.TIER_ID, this::getId)
             .add(Placeholders.TIER_NAME, this::getName)
+            .add(Placeholders.TIER_OBTAIN_CHANCE_ENCHANTING, () -> NumberUtil.format(this.getChance(ObtainType.ENCHANTING)))
+            .add(Placeholders.TIER_OBTAIN_CHANCE_VILLAGER, () -> NumberUtil.format(this.getChance(ObtainType.VILLAGER)))
+            .add(Placeholders.TIER_OBTAIN_CHANCE_LOOT_GENERATION, () -> NumberUtil.format(this.getChance(ObtainType.LOOT_GENERATION)))
+            .add(Placeholders.TIER_OBTAIN_CHANCE_FISHING, () -> NumberUtil.format(this.getChance(ObtainType.FISHING)))
+            .add(Placeholders.TIER_OBTAIN_CHANCE_MOB_SPAWNING, () -> NumberUtil.format(this.getChance(ObtainType.MOB_SPAWNING)))
         ;
     }
 
