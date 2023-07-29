@@ -178,6 +178,9 @@ public class EnchantUtils {
     public static boolean updateDisplay(@NotNull ItemStack item) {
         if (Config.ENCHANTMENTS_DISPLAY_MODE.get() != 1) return false;
 
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return false;
+
         if (!isEnchantable(item)) {
             PDCUtil.remove(item, KEY_LORE_SIZE);
             return false;
@@ -185,14 +188,12 @@ public class EnchantUtils {
 
         Map<ExcellentEnchant, Integer> enchants = getExcellents(item);
 
-        int sizeHas = PDCUtil.getInt(item, KEY_LORE_SIZE).orElse(0);
+        int sizeCached = PDCUtil.getInt(item, KEY_LORE_SIZE).orElse(0);
         int sizeReal = enchants.size();
-
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return false;
+        if (sizeCached == 0 && sizeReal == 0) return false;
 
         List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
-        for (int index = 0; index < sizeHas && !lore.isEmpty(); index++) {
+        for (int index = 0; index < sizeCached && !lore.isEmpty(); index++) {
             lore.remove(0);
         }
         //lore.removeIf(str -> enchants.keySet().stream().anyMatch(enchant -> str.contains(enchant.getDisplayName())));
@@ -280,38 +281,45 @@ public class EnchantUtils {
         return getCharges(item, enchant) == max;
     }
 
-    public static void consumeCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
+    public static void consumeCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int level) {
         if (!enchant.isChargesEnabled()) return;
 
-        int level = getLevel(item, enchant);
+        //int level = getLevel(item, enchant);
         int has = getCharges(item, enchant);
         int use = enchant.getChargesConsumeAmount(level);
-        setCharges(item, enchant, has - use);
+        setCharges(item, enchant, level,has - use);
     }
 
-    public static void restoreCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
-        if (!enchant.isChargesEnabled()) return;
-
+    /*public static void restoreCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
         int level = getLevel(item, enchant);
-        int max = enchant.getChargesMax(level);
-        setCharges(item, enchant, max);
+        restoreCharges(item, enchant, level);
+    }*/
+
+    public static void restoreCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int level) {
+        setCharges(item, enchant, level, Integer.MAX_VALUE);
     }
 
-    public static void rechargeCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
-        if (!enchant.isChargesEnabled()) return;
+    public static void rechargeCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int level) {
+        //if (!enchant.isChargesEnabled()) return;
 
-        int level = getLevel(item, enchant);
+        //int level = getLevel(item, enchant);
         int recharge = enchant.getChargesRechargeAmount(level);
         int has = getCharges(item, enchant);
-        setCharges(item, enchant, has + recharge);
+        int set = has + recharge;
+        setCharges(item, enchant, level, set);
     }
 
-    public static void setCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int charges) {
+    /*public static void setCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int charges) {
+        int level = getLevel(item, enchant);
+        setCharges(item, enchant, level, charges);
+    }*/
+
+    public static void setCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int level, int charges) {
         if (!enchant.isChargesEnabled()) return;
 
-        int level = getLevel(item, enchant);
         int max = enchant.getChargesMax(level);
-        PDCUtil.set(item, enchant.getChargesKey(), Math.max(0, Math.min(charges, max)));
+        int set = Math.min(Math.abs(charges), max);
+        PDCUtil.set(item, enchant.getChargesKey(), set);
     }
 
     public static int getExcellentAmount(@NotNull ItemStack item) {
@@ -390,10 +398,11 @@ public class EnchantUtils {
                 if (enchant instanceof Potioned potioned) {
                     if (enchant.isOutOfCharges(item)) return;
                     if (enchant.onTrigger(entity, item, level)) {
-                        enchant.consumeCharges(item);
+                        enchant.consumeChargesNoUpdate(item, level);
                     }
                 }
             });
+            EnchantUtils.updateDisplay(item);
         });
     }
 }

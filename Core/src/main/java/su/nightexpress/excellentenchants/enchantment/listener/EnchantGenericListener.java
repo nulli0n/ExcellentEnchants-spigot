@@ -119,7 +119,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
 
             e.getEnchantsToAdd().forEach((enchantment, level) -> {
                 if (enchantment instanceof ExcellentEnchant enchant && enchant.isChargesEnabled()) {
-                    EnchantUtils.restoreCharges(result, enchant);
+                    EnchantUtils.restoreCharges(result, enchant, level);
                 }
             });
             EnchantUtils.updateDisplay(result);
@@ -198,7 +198,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
                 ItemStack item = equipment.getItem(slot);
                 if (EnchantUtils.isEnchantable(item)) {
                     if (doPopulation) EnchantUtils.populate(item, ObtainType.MOB_SPAWNING);
-                    EnchantUtils.getExcellents(item).keySet().forEach(enchant -> EnchantUtils.restoreCharges(item, enchant));
+                    EnchantUtils.getExcellents(item).forEach((enchant, level) -> EnchantUtils.restoreCharges(item, enchant, level));
                     equipment.setItem(slot, item);
                 }
             }

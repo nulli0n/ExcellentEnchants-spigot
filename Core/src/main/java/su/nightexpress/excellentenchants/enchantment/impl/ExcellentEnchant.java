@@ -164,7 +164,11 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     @NotNull
     public String getNameFormatted(int level) {
-        return this.getTier().getColor() + this.getDisplayName() + " " + NumberUtil.toRoman(level);
+        String name = this.getTier().getColor() + this.getDisplayName();
+        if (level > 1 || this.getMaxLevel() > 1) {
+            name += " " + NumberUtil.toRoman(level);
+        }
+        return name;
     }
 
     @NotNull
@@ -353,8 +357,13 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     @Override
-    public void consumeCharges(@NotNull ItemStack item) {
-        EnchantUtils.consumeCharges(item, this);
+    public void consumeChargesNoUpdate(@NotNull ItemStack item, int level) {
+        EnchantUtils.consumeCharges(item, this, level);
+    }
+
+    @Override
+    public void consumeCharges(@NotNull ItemStack item, int level) {
+        this.consumeChargesNoUpdate(item, level);
         EnchantUtils.updateDisplay(item);
     }
 }

@@ -111,7 +111,7 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
                     enchants.forEach((enchant, level) -> {
                         if (enchant.isOutOfCharges(item)) return;
                         if (enchant.onTrigger(entity, item, level)) {
-                            enchant.consumeCharges(item);
+                            enchant.consumeCharges(item, level);
                         }
                     });
                 });

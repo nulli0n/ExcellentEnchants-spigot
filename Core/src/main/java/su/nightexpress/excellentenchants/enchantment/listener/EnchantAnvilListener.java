@@ -21,7 +21,6 @@ import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -73,23 +72,26 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
                                    @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
         if (second.getType().isAir()) return false;
 
-        Set<ExcellentEnchant> chargeables = EnchantUtils.getExcellents(first).keySet().stream()
-            .filter(en -> en.isChargesEnabled() && en.isChargesFuel(second) && !en.isFullOfCharges(first))
-            .collect(Collectors.toSet());
-        if (chargeables.isEmpty()) return false;
+        Map<ExcellentEnchant, Integer> chargable = new HashMap<>();
+        EnchantUtils.getExcellents(first).forEach((enchant, level) -> {
+            if (enchant.isChargesEnabled() && enchant.isChargesFuel(second) && !enchant.isFullOfCharges(first)) {
+                chargable.put(enchant, level);
+            }
+        });
+        if (chargable.isEmpty()) return false;
 
         ItemStack result2 = new ItemStack(first);
 
         int count = 0;
-        while (count < second.getAmount() && !chargeables.stream().allMatch(en -> en.isFullOfCharges(result2))) {
-            chargeables.forEach(enchant -> EnchantUtils.rechargeCharges(result2, enchant));
+        while (count < second.getAmount() && !chargable.keySet().stream().allMatch(en -> en.isFullOfCharges(result2))) {
+            chargable.forEach((enchant, level) -> EnchantUtils.rechargeCharges(result2, enchant, level));
             count++;
         }
 
         PDCUtil.set(result2, RECHARGED, count);
         EnchantUtils.updateDisplay(result2);
         e.setResult(result2);
-        this.plugin.runTask(task -> e.getInventory().setRepairCost(chargeables.size()));
+        this.plugin.runTask(task -> e.getInventory().setRepairCost(chargable.size()));
         return true;
     }
 
@@ -116,7 +118,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         enchantments.forEach((enchant, level) -> {
             if (EnchantUtils.add(result2, enchant, level, false)) {
                 repairCost.addAndGet(enchant.getAnvilMergeCost(level));
-                EnchantUtils.setCharges(result2, enchant, charges.getOrDefault(enchant, 0));
+                EnchantUtils.setCharges(result2, enchant, level, charges.getOrDefault(enchant, 0));
             }
         });
 

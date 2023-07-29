@@ -94,9 +94,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         EnchantUtils.getExcellents(weapon, CombatEnchant.class).forEach((combatEnchant, level) -> {
             if (combatEnchant.isOutOfCharges(weapon)) return;
             if (combatEnchant.onAttack(e, damager, victim, weapon, level)) {
-                combatEnchant.consumeCharges(weapon);
+                combatEnchant.consumeChargesNoUpdate(weapon, level);
             }
         });
+        EnchantUtils.updateDisplay(weapon);
     }
 
     private void handleCombatArmorEnchants(@NotNull EntityDamageByEntityEvent e,
@@ -112,9 +113,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
             EnchantUtils.getExcellents(armor, CombatEnchant.class).forEach((combatEnchant, level) -> {
                 if (combatEnchant.isOutOfCharges(armor)) return;
                 if (combatEnchant.onProtect(e, damager, victim, weaponDamager, level)) {
-                    combatEnchant.consumeCharges(armor);
+                    combatEnchant.consumeChargesNoUpdate(armor, level);
                 }
             });
+            EnchantUtils.updateDisplay(armor);
         }
     }
 
@@ -123,9 +125,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
             enchants.forEach((enchant, level) -> {
                 if (enchant.isOutOfCharges(item)) return;
                 if (enchant.onDamage(e, entity, item, level)) {
-                    enchant.consumeCharges(item);
+                    enchant.consumeChargesNoUpdate(item, level);
                 }
             });
+            EnchantUtils.updateDisplay(item);
         });
     }
 
@@ -159,9 +162,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                     arrowed.addData(projectile);
                     arrowed.addTrail(projectile);
                 }
-                bowEnchant.consumeCharges(bow);
+                bowEnchant.consumeChargesNoUpdate(bow, level);
             }
         });
+        EnchantUtils.updateDisplay(bow);
 
         if (e.getProjectile() instanceof Projectile projectile) {
             this.setSourceWeapon(projectile, bow);
@@ -201,9 +205,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         EnchantUtils.getExcellents(item, InteractEnchant.class).forEach((interEnchant, level) -> {
             if (interEnchant.isOutOfCharges(item)) return;
             if (interEnchant.onInteract(e, player, item, level)) {
-                interEnchant.consumeCharges(item);
+                interEnchant.consumeChargesNoUpdate(item, level);
             }
         });
+        EnchantUtils.updateDisplay(item);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -217,9 +222,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
             if (event.isCancelled()) return; // Check if event was cancelled by some enchantment.
             if (enchant.isOutOfCharges(item)) return;
             if (enchant.onFishing(event, item, level)) {
-                enchant.consumeCharges(item);
+                enchant.consumeChargesNoUpdate(item, level);
             }
         });
+        EnchantUtils.updateDisplay(item);
     }
 
     // ---------------------------------------------------------------
@@ -233,9 +239,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
             enchants.forEach(((deathEnchant, level) -> {
                 if (deathEnchant.isOutOfCharges(item)) return;
                 if (deathEnchant.onDeath(e, entity, level)) {
-                    deathEnchant.consumeCharges(item);
+                    deathEnchant.consumeChargesNoUpdate(item, level);
                 }
             }));
+            EnchantUtils.updateDisplay(item);
         });
 
         Player killer = entity.getKiller();
@@ -247,9 +254,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         EnchantUtils.getExcellents(weapon, DeathEnchant.class).forEach((deathEnchant, level) -> {
             if (deathEnchant.isOutOfCharges(weapon)) return;
             if (deathEnchant.onKill(e, entity, killer, level)) {
-                deathEnchant.consumeCharges(weapon);
+                deathEnchant.consumeChargesNoUpdate(weapon, level);
             }
         });
+        EnchantUtils.updateDisplay(weapon);
     }
 
     // Handle BlockBreak enchantments.
@@ -264,9 +272,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         EnchantUtils.getExcellents(tool, BlockBreakEnchant.class).forEach((blockEnchant, level) -> {
             if (blockEnchant.isOutOfCharges(tool)) return;
             if (blockEnchant.onBreak(e, player, tool, level)) {
-                blockEnchant.consumeCharges(tool);
+                blockEnchant.consumeChargesNoUpdate(tool, level);
             }
         });
+        EnchantUtils.updateDisplay(tool);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -281,9 +290,10 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         EnchantUtils.getExcellents(tool, BlockDropEnchant.class).forEach((enchant, level) -> {
             if (enchant.isOutOfCharges(tool)) return;
             if (enchant.onDrop(e, dropContainer, player, tool, level)) {
-                enchant.consumeCharges(tool);
+                enchant.consumeChargesNoUpdate(tool, level);
             }
         });
+        EnchantUtils.updateDisplay(tool);
 
         BlockState state = e.getBlockState();
         World world = state.getWorld();

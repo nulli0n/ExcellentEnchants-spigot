@@ -141,7 +141,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
                     enchants.forEach((enchant, level) -> {
                         if (enchant.isOutOfCharges(item)) return;
                         if (enchant.onTrigger(entity, item, level)) {
-                            enchant.consumeCharges(item);
+                            enchant.consumeCharges(item, level);
                         }
                     });
                 });

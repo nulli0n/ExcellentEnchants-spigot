@@ -76,5 +76,7 @@ public interface IEnchantment {
 
     boolean isOutOfCharges(@NotNull ItemStack item);
 
-    void consumeCharges(@NotNull ItemStack item);
+    void consumeCharges(@NotNull ItemStack item, int level);
+
+    void consumeChargesNoUpdate(@NotNull ItemStack item, int level);
 }

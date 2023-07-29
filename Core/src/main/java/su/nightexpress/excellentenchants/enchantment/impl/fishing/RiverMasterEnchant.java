@@ -63,6 +63,6 @@ public class RiverMasterEnchant extends ExcellentEnchant {
 
         hook.setVelocity(hook.getVelocity().multiply(this.getDistanceMod(level)));
 
-        this.consumeCharges(rod);
+        this.consumeCharges(rod, level);
     }
 }

@@ -87,7 +87,7 @@ public class EnchantElementalProtection extends ExcellentEnchant {
             if (level <= 0) continue;
 
             protectionAmount += this.getProtectionAmount(level);
-            this.consumeCharges(armor);
+            this.consumeCharges(armor, level);
         }
 
         if (protectionAmount <= 0D) return;
