@@ -38,11 +38,7 @@ public class EnchantHover extends ExcellentEnchant implements Chanced, Arrowed, 
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an arrow with " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.)");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.1);
-        this.getDefaults().setConflicts(
-            EnchantEnderBow.ID, EnchantGhast.ID, EnchantBomber.ID,
-            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
-            EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID
-        );
+        this.getDefaults().setConflicts(EnchantEnderBow.ID, EnchantGhast.ID, EnchantHover.ID, EnchantBomber.ID);
     }
 
     @Override

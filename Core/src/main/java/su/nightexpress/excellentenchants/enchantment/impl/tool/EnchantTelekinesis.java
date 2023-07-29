@@ -58,18 +58,18 @@ public class EnchantTelekinesis extends ExcellentEnchant implements Chanced, Blo
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent e, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         List<ItemStack> drops = new ArrayList<>();
-        drops.addAll(e.getItems().stream().map(Item::getItemStack).toList());
+        drops.addAll(event.getItems().stream().map(Item::getItemStack).toList());
         drops.addAll(dropContainer.getDrop());
         drops.removeIf(Objects::isNull);
         drops.forEach(drop -> PlayerUtil.addItem(player, drop));
 
         dropContainer.getDrop().clear();
-        e.getItems().clear();
+        event.getItems().clear();
 
         return true;
     }

@@ -4,6 +4,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import su.nexmedia.engine.Version;
 import su.nexmedia.engine.utils.Reflex;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.config.Config;
@@ -122,6 +123,11 @@ public class EnchantRegistry {
         this.register(SniperEnchant.ID, () -> new SniperEnchant(plugin));
         this.register(EnchantPoisonedArrows.ID, () -> new EnchantPoisonedArrows(plugin));
         this.register(EnchantWitheredArrows.ID, () -> new EnchantWitheredArrows(plugin));
+
+        if (Version.isAbove(Version.V1_18_R2)) {
+            this.register(DarknessArrowsEnchant.ID, () -> new DarknessArrowsEnchant(plugin));
+            this.register(DarknessCloakEnchant.ID, () -> new DarknessCloakEnchant(plugin));
+        }
 
         // Universal
         this.register(EnchantCurseOfFragility.ID, () -> new EnchantCurseOfFragility(plugin));

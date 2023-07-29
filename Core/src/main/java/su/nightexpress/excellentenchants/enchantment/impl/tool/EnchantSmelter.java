@@ -89,18 +89,18 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent e, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (e.getBlockState() instanceof Container) return false;
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
+        if (event.getBlockState() instanceof Container) return false;
         if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
-        if (e.getItems().stream().noneMatch(drop -> this.isSmeltable(drop.getItemStack().getType()))) return false;
+        if (event.getItems().stream().noneMatch(drop -> this.isSmeltable(drop.getItemStack().getType()))) return false;
 
-        e.getItems().forEach(drop -> {
+        event.getItems().forEach(drop -> {
             Material material = this.smeltingTable.get(drop.getItemStack().getType());
             if (material != null) drop.getItemStack().setType(material);
         });
 
-        Block block = e.getBlockState().getBlock();
+        Block block = event.getBlockState().getBlock();
         if (this.hasVisualEffects()) {
             Location location = LocationUtil.getCenter(block.getLocation(), true);
             LocationUtil.sound(location, this.sound);

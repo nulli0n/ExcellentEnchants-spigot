@@ -15,25 +15,25 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-public class EnchantConfusingArrows extends ExcellentEnchant implements Chanced, Arrowed, Potioned, BowEnchant {
+public class DarknessArrowsEnchant extends ExcellentEnchant implements Chanced, Arrowed, Potioned, BowEnchant {
 
-    public static final String ID = "confusing_arrows";
+    public static final String ID = "darkness_arrows";
 
-    private ArrowImplementation arrowImplementation;
+    private ArrowImplementation  arrowImplementation;
     private ChanceImplementation chanceImplementation;
     private PotionImplementation potionImplementation;
 
-    public EnchantConfusingArrows(@NotNull ExcellentEnchants plugin) {
+    public DarknessArrowsEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an arrow with " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.)");
         this.getDefaults().setLevelMax(3);
@@ -44,11 +44,11 @@ public class EnchantConfusingArrows extends ExcellentEnchant implements Chanced,
     @Override
     public void loadSettings() {
         super.loadSettings();
-        this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.SPELL_MOB));
+        this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.ASH));
         this.chanceImplementation = ChanceImplementation.create(this,
-            "20.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5.0");
-        this.potionImplementation = PotionImplementation.create(this, PotionEffectType.CONFUSION, false,
-            "6.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 3.0",
+            "25.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5.0");
+        this.potionImplementation = PotionImplementation.create(this, PotionEffectType.DARKNESS, false,
+            "4.0 + " + Placeholders.ENCHANTMENT_LEVEL,
             Placeholders.ENCHANTMENT_LEVEL);
     }
 

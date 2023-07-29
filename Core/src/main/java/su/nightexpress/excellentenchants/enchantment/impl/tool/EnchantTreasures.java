@@ -136,8 +136,8 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent e, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
-        Block block = e.getBlockState().getBlock();
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
+        Block block = event.getBlockState().getBlock();
         if (block.hasMetadata(META)) {
             block.removeMetadata(META, plugin);
             return false;
@@ -145,7 +145,7 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
         if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        dropContainer.getDrop().addAll(this.getTreasures(e.getBlockState().getType()));
+        dropContainer.getDrop().addAll(this.getTreasures(event.getBlockState().getType()));
         return true;
     }
 

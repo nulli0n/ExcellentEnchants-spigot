@@ -130,23 +130,29 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent e, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
-        BlockState state = e.getBlockState();
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer,
+                          @NotNull Player player, @NotNull ItemStack item, int level) {
+        BlockState state = event.getBlockState();
         Block block = state.getBlock();
 
         if (!this.isAvailableToUse(player)) return false;
         if (!(state instanceof Chest chest)) return false;
 
         // Добавляем в сундук обратно предметы из дроп листа, кроме самого сундука.
-        e.getItems().removeIf(drop -> drop.getItemStack().getType() == state.getType() && drop.getItemStack().getAmount() == 1);
-        chest.getBlockInventory().addItem(e.getItems().stream().map(Item::getItemStack).toList().toArray(new ItemStack[0]));
+        event.getItems().removeIf(drop -> drop.getItemStack().getType() == state.getType() && drop.getItemStack().getAmount() == 1);
+        chest.getBlockInventory().addItem(event.getItems().stream().map(Item::getItemStack).toList().toArray(new ItemStack[0]));
+
+        if (chest.getBlockInventory().isEmpty()) {
+            dropContainer.getDrop().add(new ItemStack(chest.getType()));
+            return false;
+        }
 
         // Добавляем кастомный сундук в кастомный дроп лист.
         dropContainer.getDrop().add(this.getSilkChest(chest));
 
         // Очищаем инвентарь сундука и дефолтный дроп лист.
         chest.getBlockInventory().clear();
-        e.getItems().clear();
+        event.getItems().clear();
 
         return true;
     }

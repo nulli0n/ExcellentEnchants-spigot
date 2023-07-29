@@ -62,12 +62,12 @@ public class CurseOfMediocrityEnchant extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent e, @NotNull EnchantDropContainer dropContainer,
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer,
                           @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        e.getItems().forEach(drop -> {
+        event.getItems().forEach(drop -> {
             ItemStack stack = drop.getItemStack();
             ItemUtil.mapMeta(stack, meta -> {
                 meta.getEnchants().keySet().forEach(meta::removeEnchant);

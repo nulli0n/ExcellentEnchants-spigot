@@ -102,8 +102,8 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent e, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
-        BlockState state = e.getBlockState();
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
+        BlockState state = event.getBlockState();
         Block block = state.getBlock();
         if (!block.hasMetadata(META_HANDLE)) return false;
         if (!(state instanceof CreatureSpawner spawnerBlock)) return false;

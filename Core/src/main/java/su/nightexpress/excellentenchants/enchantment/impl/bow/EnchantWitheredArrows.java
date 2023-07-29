@@ -38,12 +38,7 @@ public class EnchantWitheredArrows extends ExcellentEnchant implements Chanced, 
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an arrow with " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.)");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.5);
-
-        this.getDefaults().setConflicts(
-            EnchantEnderBow.ID, EnchantGhast.ID, EnchantHover.ID,
-            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
-            EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID
-        );
+        this.getDefaults().setConflicts(EnchantEnderBow.ID, EnchantGhast.ID, EnchantHover.ID, EnchantBomber.ID);
     }
 
     @Override

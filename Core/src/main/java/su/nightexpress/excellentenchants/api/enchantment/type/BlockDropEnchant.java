@@ -9,6 +9,6 @@ import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 
 public interface BlockDropEnchant extends IEnchantment {
 
-    boolean onDrop(@NotNull BlockDropItemEvent e, @NotNull EnchantDropContainer dropContainer,
+    boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer,
                    @NotNull Player player, @NotNull ItemStack item, int level);
 }

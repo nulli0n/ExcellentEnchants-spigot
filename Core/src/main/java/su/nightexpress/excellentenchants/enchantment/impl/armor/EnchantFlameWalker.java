@@ -12,7 +12,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +30,7 @@ import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -75,6 +78,10 @@ public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
         BLOCKS_TO_DESTROY.put(block, Pair.of(System.currentTimeMillis() + (long) seconds * 1000L, Rnd.get(100)));
     }
 
+    public static boolean isBlock(@NotNull Block block) {
+        return BLOCKS_TO_DESTROY.containsKey(block);
+    }
+
     @Override
     @NotNull
     public EnchantmentTarget getItemTarget() {
@@ -111,12 +118,32 @@ public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onFlameWalkerBlock(BlockBreakEvent e) {
-        if (BLOCKS_TO_DESTROY.containsKey(e.getBlock())) {
-            e.setDropItems(false);
-            e.setExpToDrop(0);
-            e.getBlock().setType(Material.LAVA);
+    public void onFlameWalkerBlock(BlockBreakEvent event) {
+        if (isBlock(event.getBlock())) {
+            event.setDropItems(false);
+            event.setExpToDrop(0);
+            event.getBlock().setType(Material.LAVA);
         }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBlockExplode(EntityExplodeEvent event) {
+        this.processExplosion(event.blockList());
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBlockExplode2(BlockExplodeEvent event) {
+        this.processExplosion(event.blockList());
+    }
+
+    private void processExplosion(@NotNull List<Block> blocks) {
+        blocks.removeIf(block -> {
+            if (isBlock(block)) {
+                block.setType(Material.AIR);
+                return true;
+            }
+            return false;
+        });
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
