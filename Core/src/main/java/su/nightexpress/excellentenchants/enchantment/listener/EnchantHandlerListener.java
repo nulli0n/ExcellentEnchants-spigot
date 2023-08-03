@@ -232,13 +232,13 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     // Death Related Enchants
     // ---------------------------------------------------------------
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onEnchantDeath(EntityDeathEvent e) {
-        LivingEntity entity = e.getEntity();
+    public void onEnchantDeath(EntityDeathEvent event) {
+        LivingEntity entity = event.getEntity();
 
         EnchantUtils.getEquipped(entity, DeathEnchant.class).forEach((item, enchants) -> {
             enchants.forEach(((deathEnchant, level) -> {
                 if (deathEnchant.isOutOfCharges(item)) return;
-                if (deathEnchant.onDeath(e, entity, level)) {
+                if (deathEnchant.onDeath(event, entity, item, level)) {
                     deathEnchant.consumeChargesNoUpdate(item, level);
                 }
             }));
@@ -253,7 +253,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
 
         EnchantUtils.getExcellents(weapon, DeathEnchant.class).forEach((deathEnchant, level) -> {
             if (deathEnchant.isOutOfCharges(weapon)) return;
-            if (deathEnchant.onKill(e, entity, killer, level)) {
+            if (deathEnchant.onKill(event, entity, killer, level)) {
                 deathEnchant.consumeChargesNoUpdate(weapon, level);
             }
         });

@@ -84,17 +84,17 @@ public class EnchantCurseOfMisfortune extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
         if (!this.isAvailableToUse(killer)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        e.getDrops().clear();
-        if (!this.isDropExp()) e.setDroppedExp(0);
+        event.getDrops().clear();
+        if (!this.isDropExp()) event.setDroppedExp(0);
         return true;
     }
 
     @Override
-    public boolean onDeath(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, int level) {
+    public boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level) {
         return false;
     }
 }

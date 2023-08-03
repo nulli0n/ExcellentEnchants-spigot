@@ -14,6 +14,7 @@ import su.nightexpress.excellentenchants.enchantment.impl.bow.*;
 import su.nightexpress.excellentenchants.enchantment.impl.fishing.*;
 import su.nightexpress.excellentenchants.enchantment.impl.tool.*;
 import su.nightexpress.excellentenchants.enchantment.impl.universal.EnchantCurseOfFragility;
+import su.nightexpress.excellentenchants.enchantment.impl.universal.SoulboundEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.weapon.*;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.tier.Tier;
@@ -132,6 +133,7 @@ public class EnchantRegistry {
         // Universal
         this.register(EnchantCurseOfFragility.ID, () -> new EnchantCurseOfFragility(plugin));
         this.register(CurseOfMediocrityEnchant.ID, () -> new CurseOfMediocrityEnchant(plugin));
+        this.register(SoulboundEnchant.ID, () -> new SoulboundEnchant(plugin));
 
         Enchantment.stopAcceptingRegistrations();
         this.plugin.info("Enchantments Registered: " + getRegistered().size());

@@ -99,7 +99,7 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
         if (!this.isAvailableToUse(entity)) return false;
 
         Map<Material, Pair<int[], Double>> items = this.loot.get(entity.getType());
@@ -115,14 +115,14 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
             if (amount <= 0) return;
 
             ItemStack item = new ItemStack(material);
-            e.getDrops().add(item);
+            event.getDrops().add(item);
         });
 
         return true;
     }
 
     @Override
-    public boolean onDeath(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, int level) {
+    public boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level) {
         return false;
     }
 }

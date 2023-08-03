@@ -4,6 +4,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -48,18 +49,18 @@ public class EnchantExpHunter extends ExcellentEnchant implements DeathEnchant {
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
         if (!this.isAvailableToUse(entity)) return false;
 
         double expModifier = this.getExpModifier(level);
-        double expFinal = Math.ceil((double) e.getDroppedExp() * expModifier);
+        double expFinal = Math.ceil((double) event.getDroppedExp() * expModifier);
 
-        e.setDroppedExp((int) expFinal);
+        event.setDroppedExp((int) expFinal);
         return true;
     }
 
     @Override
-    public boolean onDeath(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, int level) {
+    public boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level) {
         return false;
     }
 }

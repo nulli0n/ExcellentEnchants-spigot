@@ -180,12 +180,12 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
     }
 
     @Override
-    public boolean onDeath(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, int level) {
+    public boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level) {
         return false;
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
         if (!this.isAvailableToUse(entity)) return false;
 
         EntityType entityType = entity.getType();

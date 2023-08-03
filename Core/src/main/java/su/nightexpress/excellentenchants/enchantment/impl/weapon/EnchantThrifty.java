@@ -81,7 +81,7 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
         if (!this.isAvailableToUse(entity)) return false;
 
         if (this.ignoredEntityTypes.contains(entity.getType())) return false;
@@ -91,12 +91,12 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
         ItemStack eggItem = plugin.getEnchantNMS().getSpawnEgg(entity);
         if (eggItem == null) return false;
 
-        e.getDrops().add(eggItem);
+        event.getDrops().add(eggItem);
         return true;
     }
 
     @Override
-    public boolean onDeath(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, int level) {
+    public boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level) {
         return false;
     }
 

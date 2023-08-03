@@ -4,6 +4,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.PlayerUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -45,17 +46,17 @@ public class EnchantNimble extends ExcellentEnchant implements Chanced, DeathEnc
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
         if (!this.isAvailableToUse(entity)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        e.getDrops().forEach(item -> PlayerUtil.addItem(killer, item));
-        e.getDrops().clear();
+        event.getDrops().forEach(item -> PlayerUtil.addItem(killer, item));
+        event.getDrops().clear();
         return true;
     }
 
     @Override
-    public boolean onDeath(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, int level) {
+    public boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level) {
         return false;
     }
 }

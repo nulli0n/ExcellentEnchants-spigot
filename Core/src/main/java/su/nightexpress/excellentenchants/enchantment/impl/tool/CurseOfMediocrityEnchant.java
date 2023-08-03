@@ -85,16 +85,16 @@ public class CurseOfMediocrityEnchant extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public boolean onDeath(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, int level) {
+    public boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level) {
         return false;
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent e, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
         if (!this.isAvailableToUse(killer)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        e.getDrops().forEach(stack -> {
+        event.getDrops().forEach(stack -> {
             ItemUtil.mapMeta(stack, meta -> {
                 meta.getEnchants().keySet().forEach(meta::removeEnchant);
             });
