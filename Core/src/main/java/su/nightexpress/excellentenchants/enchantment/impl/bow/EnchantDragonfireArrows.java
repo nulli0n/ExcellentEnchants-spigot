@@ -1,22 +1,26 @@
 package su.nightexpress.excellentenchants.enchantment.impl.bow;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.particle.SimpleParticle;
+import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
@@ -104,6 +108,7 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
     public boolean onHit(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         if (!this.isOurProjectile(projectile)) return false;
         if (e.getHitEntity() != null) return false;
+        if (projectile.getShooter() == null) return false;
 
         this.createCloud(projectile.getShooter(), projectile.getLocation() , level);
         return true;
@@ -117,9 +122,22 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
         return true;
     }
 
-    private void createCloud(@Nullable ProjectileSource shooter, @NotNull Location location, int level) {
+    private void createCloud(@NotNull ProjectileSource shooter, @NotNull Location location, int level) {
         World world = location.getWorld();
         if (world == null) return;
+
+        // There are some tweaks to respect protection plugins using even call.
+
+        ItemStack item = new ItemStack(Material.LINGERING_POTION);
+        ItemUtil.mapMeta(item, meta -> {
+            if (meta instanceof PotionMeta potionMeta) {
+                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 20, 0), true);
+            }
+        });
+
+        ThrownPotion potion = shooter.launchProjectile(ThrownPotion.class);
+        potion.setItem(item);
+        potion.teleport(location);
 
         AreaEffectCloud cloud = world.spawn(location, AreaEffectCloud.class);
         cloud.clearCustomEffects();
@@ -129,5 +147,12 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
         cloud.setDuration(this.getFireDuration(level));
         cloud.setRadiusPerTick((7.0F - cloud.getRadius()) / (float) cloud.getDuration());
         cloud.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 1, 1), true);
+
+        LingeringPotionSplashEvent splashEvent = new LingeringPotionSplashEvent(potion, cloud);
+        plugin.getPluginManager().callEvent(splashEvent);
+        if (splashEvent.isCancelled()) {
+            cloud.remove();
+        }
+        potion.remove();
     }
 }
