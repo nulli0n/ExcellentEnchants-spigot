@@ -282,9 +282,6 @@ public class EnchantUtils {
     }
 
     public static void consumeCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int level) {
-        if (!enchant.isChargesEnabled()) return;
-
-        //int level = getLevel(item, enchant);
         int has = getCharges(item, enchant);
         int use = enchant.getChargesConsumeAmount(level);
         setCharges(item, enchant, level,has - use);

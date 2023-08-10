@@ -358,11 +358,15 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     @Override
     public void consumeChargesNoUpdate(@NotNull ItemStack item, int level) {
+        if (!this.isChargesEnabled()) return;
+
         EnchantUtils.consumeCharges(item, this, level);
     }
 
     @Override
     public void consumeCharges(@NotNull ItemStack item, int level) {
+        if (!this.isChargesEnabled()) return;
+
         this.consumeChargesNoUpdate(item, level);
         EnchantUtils.updateDisplay(item);
     }
