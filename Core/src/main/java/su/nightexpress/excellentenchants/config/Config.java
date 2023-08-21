@@ -60,6 +60,10 @@ public class Config {
         "Use '" + Placeholders.GENERIC_AMOUNT + "' placeholder for amount of charges.")
         .setWriter((cfg, path, map) -> map.forEach((perc, str) -> cfg.set(path + "." + perc, str)));
 
+    public static final JOption<Boolean> ENCHANTMENTS_CHARGES_COMPARE_TYPE_ONLY = JOption.create("Enchantments.Charges.Compare_Material_Only", false,
+        "When enabled, only item material will be checked to determine if item can be used as an enchantment fuel.",
+        "When disabled (default), it will compare the whole item meta including name, lore, model data etc.");
+
     public static final JOption<ItemStack> ENCHANTMENTS_CHARGES_FUEL_ITEM = JOption.create("Enchantments.Charges.Fuel_Item",
         new ItemStack(Material.LAPIS_LAZULI),
         "Default item used to recharge item's enchantments on anvils.",

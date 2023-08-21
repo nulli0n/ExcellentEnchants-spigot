@@ -124,7 +124,7 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
             if (lore == null) lore = new ArrayList<>();
 
             List<String> conflicts = enchant.getConflicts().isEmpty() ? Collections.emptyList() : new ArrayList<>(this.enchantLoreConflicts);
-            List<String> conflictNames = enchant.getConflicts().stream().map(EnchantUtils::getLocalized).toList();
+            List<String> conflictNames = enchant.getConflicts().stream().map(EnchantUtils::getLocalized).filter(Objects::nonNull).toList();
             conflicts = StringUtil.replace(conflicts, Placeholders.ENCHANTMENT_NAME, true, conflictNames);
 
             List<String> charges = enchant.isChargesEnabled() ? new ArrayList<>(this.enchantLoreCharges) : Collections.emptyList();

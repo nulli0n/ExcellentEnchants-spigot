@@ -45,10 +45,10 @@ public class EnchantUtils {
         return NamespacedKey.minecraft(id.toLowerCase());
     }
 
-    @NotNull
+    @Nullable
     public static String getLocalized(@NotNull String keyRaw) {
         Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(keyRaw));
-        return enchantment == null ? "null" : getLocalized(enchantment);
+        return enchantment == null ? null : getLocalized(enchantment);
     }
 
     @NotNull
@@ -173,6 +173,12 @@ public class EnchantUtils {
             meta.removeEnchant(enchantment);
         }
         item.setItemMeta(meta);
+    }
+
+    public static void updateChargesDisplay(@NotNull ItemStack item) {
+        if (Config.ENCHANTMENTS_CHARGES_ENABLED.get()) {
+            updateDisplay(item);
+        }
     }
 
     public static boolean updateDisplay(@NotNull ItemStack item) {
@@ -399,7 +405,7 @@ public class EnchantUtils {
                     }
                 }
             });
-            EnchantUtils.updateDisplay(item);
+            EnchantUtils.updateChargesDisplay(item);
         });
     }
 }

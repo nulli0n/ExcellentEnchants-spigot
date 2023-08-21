@@ -333,6 +333,9 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     public boolean isChargesFuel(@NotNull ItemStack item) {
+        if (Config.ENCHANTMENTS_CHARGES_COMPARE_TYPE_ONLY.get()) {
+            return item.getType() == this.getChargesFuel().getType();
+        }
         return item.isSimilar(this.getChargesFuel());
     }
 

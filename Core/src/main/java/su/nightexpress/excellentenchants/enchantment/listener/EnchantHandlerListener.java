@@ -27,6 +27,7 @@ import su.nexmedia.engine.utils.EntityUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
+import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
@@ -97,7 +98,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                 combatEnchant.consumeChargesNoUpdate(weapon, level);
             }
         });
-        EnchantUtils.updateDisplay(weapon);
+        EnchantUtils.updateChargesDisplay(weapon);
     }
 
     private void handleCombatArmorEnchants(@NotNull EntityDamageByEntityEvent e,
@@ -116,7 +117,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                     combatEnchant.consumeChargesNoUpdate(armor, level);
                 }
             });
-            EnchantUtils.updateDisplay(armor);
+            EnchantUtils.updateChargesDisplay(armor);
         }
     }
 
@@ -128,7 +129,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                     enchant.consumeChargesNoUpdate(item, level);
                 }
             });
-            EnchantUtils.updateDisplay(item);
+            EnchantUtils.updateChargesDisplay(item);
         });
     }
 
@@ -165,7 +166,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                 bowEnchant.consumeChargesNoUpdate(bow, level);
             }
         });
-        EnchantUtils.updateDisplay(bow);
+        EnchantUtils.updateChargesDisplay(bow);
 
         if (e.getProjectile() instanceof Projectile projectile) {
             this.setSourceWeapon(projectile, bow);
@@ -208,7 +209,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                 interEnchant.consumeChargesNoUpdate(item, level);
             }
         });
-        EnchantUtils.updateDisplay(item);
+        EnchantUtils.updateChargesDisplay(item);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -225,7 +226,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                 enchant.consumeChargesNoUpdate(item, level);
             }
         });
-        EnchantUtils.updateDisplay(item);
+        EnchantUtils.updateChargesDisplay(item);
     }
 
     // ---------------------------------------------------------------
@@ -242,7 +243,9 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                     deathEnchant.consumeChargesNoUpdate(item, level);
                 }
             }));
-            EnchantUtils.updateDisplay(item);
+            if (Config.ENCHANTMENTS_CHARGES_ENABLED.get()) {
+                EnchantUtils.updateChargesDisplay(item);
+            }
         });
 
         Player killer = entity.getKiller();
@@ -257,7 +260,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                 deathEnchant.consumeChargesNoUpdate(weapon, level);
             }
         });
-        EnchantUtils.updateDisplay(weapon);
+        EnchantUtils.updateChargesDisplay(weapon);
     }
 
     // Handle BlockBreak enchantments.
@@ -275,7 +278,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                 blockEnchant.consumeChargesNoUpdate(tool, level);
             }
         });
-        EnchantUtils.updateDisplay(tool);
+        EnchantUtils.updateChargesDisplay(tool);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -293,7 +296,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
                 enchant.consumeChargesNoUpdate(tool, level);
             }
         });
-        EnchantUtils.updateDisplay(tool);
+        EnchantUtils.updateChargesDisplay(tool);
 
         BlockState state = e.getBlockState();
         World world = state.getWorld();
