@@ -78,7 +78,7 @@ public class ProtocolHook {
     }
 
     @Nullable
-    private static ItemStack update(@Nullable ItemStack item, boolean isCreative) {
+    public static ItemStack update(@Nullable ItemStack item, boolean isCreative) {
         if (item == null || item.getType().isAir()) return item;
 
         ItemStack copy = new ItemStack(item);

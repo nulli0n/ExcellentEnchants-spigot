@@ -55,6 +55,16 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
         this.enchantManager = new EnchantManager(this);
         this.enchantManager.setup();
+
+        if (Config.ENCHANTMENTS_DISPLAY_MODE.get() == 2) {
+            if (EngineUtils.hasPlugin(HookId.PROTOCOL_LIB)) {
+                ProtocolHook.setup();
+            }
+            else {
+                this.warn(HookId.PROTOCOL_LIB + " is not installed. Set display mode to Plain lore.");
+                Config.ENCHANTMENTS_DISPLAY_MODE.set(1);
+            }
+        }
     }
 
     @Override
@@ -104,15 +114,6 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     @Override
     public void registerHooks() {
-        if (Config.ENCHANTMENTS_DISPLAY_MODE.get() == 2) {
-            if (EngineUtils.hasPlugin(HookId.PROTOCOL_LIB)) {
-                ProtocolHook.setup();
-            }
-            else {
-                this.warn(HookId.PROTOCOL_LIB + " is not installed. Set display mode to Plain lore.");
-                Config.ENCHANTMENTS_DISPLAY_MODE.set(1);
-            }
-        }
         if (EngineUtils.hasPlaceholderAPI()) {
             PlaceholderHook.setup();
         }

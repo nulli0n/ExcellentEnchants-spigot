@@ -1,5 +1,7 @@
 package su.nightexpress.excellentenchants.enchantment.impl.universal;
 
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -40,6 +42,8 @@ public class SoulboundEnchant extends ExcellentEnchant {
         if (deathEvent.getKeepInventory()) return;
 
         List<ItemStack> saveList = new ArrayList<>();
+        Location location = player.getLocation();
+        World world = player.getWorld();
 
         deathEvent.getDrops().removeIf(drop -> {
             if (EnchantUtils.getLevel(drop, this) > 0) {
@@ -55,8 +59,13 @@ public class SoulboundEnchant extends ExcellentEnchant {
 
         this.plugin.runTask(task -> {
             saveList.forEach(save -> {
-                this.consumeCharges(save, EnchantUtils.getLevel(save, this));
-                player.getInventory().addItem(save);
+                if (player.getInventory().firstEmpty() == -1) {
+                    world.dropItemNaturally(location, save);
+                }
+                else {
+                    this.consumeCharges(save, EnchantUtils.getLevel(save, this));
+                    player.getInventory().addItem(save);
+                }
             });
         });
     }
