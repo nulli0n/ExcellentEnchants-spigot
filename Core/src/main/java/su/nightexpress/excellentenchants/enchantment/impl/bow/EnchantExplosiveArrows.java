@@ -100,14 +100,14 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
     }
 
     @Override
-    public boolean onShoot(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
+    public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
         if (!this.isAvailableToUse(shooter)) return false;
 
         return this.checkTriggerChance(level);
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         if (!this.isOurProjectile(projectile)) return false;
 
         Entity shooter = null;
@@ -126,7 +126,7 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
     }
 
     @Override
-    public boolean onDamage(@NotNull EntityDamageByEntityEvent e, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         return this.isOurProjectile(projectile);
     }
 

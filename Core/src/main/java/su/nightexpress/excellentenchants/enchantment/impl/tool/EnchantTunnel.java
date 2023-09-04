@@ -20,7 +20,6 @@ import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant {
 
@@ -34,12 +33,10 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
         INTERACTABLE_BLOCKS.add(Material.DEEPSLATE_REDSTONE_ORE);
     }
 
-    private final Set<UUID> activePlayers;
     private boolean disableOnSneak;
 
     public EnchantTunnel(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
-        this.activePlayers = new HashSet<>();
 
         this.getDefaults().setDescription("Mines multiple blocks at once in a certain shape.");
         this.getDefaults().setLevelMax(3);
@@ -66,19 +63,13 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
         return EnchantmentTarget.TOOL;
     }
 
-    public boolean isTunneling(@NotNull Player player) {
-        return this.activePlayers.contains(player.getUniqueId());
-    }
-
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (this.isTunneling(player)) return false;
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
+        if (EnchantUtils.isBusy()) return false;
         if (!this.isAvailableToUse(player)) return false;
         if (this.disableOnSneak && player.isSneaking()) return false;
-        if (EnchantUtils.contains(item, EnchantVeinminer.ID)) return false;
-        if (EnchantUtils.contains(item, EnchantBlastMining.ID)) return false;
 
-        Block block = e.getBlock();
+        Block block = event.getBlock();
         if (block.getType().isInteractable() && !INTERACTABLE_BLOCKS.contains(block.getType())) return false;
         if (block.getDrops(item).isEmpty()) return false;
 
@@ -90,9 +81,8 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
         int blocksBroken = 1;
         if (level == 1) blocksBroken = 2;
         else if (level == 2) blocksBroken = 5;
-        else if (level == 3) blocksBroken = 9;
+        else if (level >= 3) blocksBroken = 9;
 
-        this.activePlayers.add(player.getUniqueId());
         NoCheatPlusHook.exemptBlocks(player);
 
         for (int i = 0; i < blocksBroken; i++) {
@@ -121,11 +111,10 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
             if (addType == Material.BEDROCK || addType == Material.END_PORTAL || addType == Material.END_PORTAL_FRAME) continue;
             if (addType == Material.OBSIDIAN && addType != block.getType()) continue;
 
-            player.breakBlock(blockAdd);
+            EnchantUtils.safeBusyBreak(player, blockAdd);
         }
 
         NoCheatPlusHook.unexemptBlocks(player);
-        this.activePlayers.remove(player.getUniqueId());
         return true;
     }
 }

@@ -21,8 +21,8 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -128,15 +128,15 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
     }
 
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (PlayerBlockTracker.isTracked(e.getBlock())) {
-            e.getBlock().setMetadata(META, new FixedMetadataValue(plugin, true));
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
+        if (PlayerBlockTracker.isTracked(event.getBlock())) {
+            event.getBlock().setMetadata(META, new FixedMetadataValue(plugin, true));
         }
         return false;
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
         Block block = event.getBlockState().getBlock();
         if (block.hasMetadata(META)) {
             block.removeMetadata(META, plugin);
@@ -145,7 +145,11 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
         if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        dropContainer.getDrop().addAll(this.getTreasures(event.getBlockState().getType()));
+        this.getTreasures(event.getBlockState().getType()).forEach(treasure -> {
+            EnchantUtils.popResource(event, treasure);
+        });
+
+        //dropContainer.getDrop().addAll(this.getTreasures(event.getBlockState().getType()));
         return true;
     }
 

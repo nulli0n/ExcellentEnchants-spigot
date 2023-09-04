@@ -61,15 +61,15 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
     }
 
     @Override
-    public boolean onAttack(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!this.isAvailableToUse(damager)) return false;
         if (!(victim instanceof Illager)) return false;
 
         double damageAdd = this.getDamageAddict(level);
-        double damageHas = e.getDamage();
+        double damageHas = event.getDamage();
         double damageFinal = this.isDamageMultiplier() ? (damageHas * damageAdd) : (damageHas + damageAdd);
 
-        e.setDamage(damageFinal);
+        event.setDamage(damageFinal);
 
         if (this.hasVisualEffects()) {
             SimpleParticle.of(Particle.VILLAGER_ANGRY).play(victim.getEyeLocation(), 0.25, 0.1, 30);
@@ -78,7 +78,7 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
     }
 
     @Override
-    public boolean onProtect(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         return false;
     }
 }

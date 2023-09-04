@@ -8,5 +8,5 @@ import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 
 public interface InteractEnchant extends IEnchantment {
 
-    boolean onInteract(@NotNull PlayerInteractEvent e, @NotNull Player player, @NotNull ItemStack item, int level);
+    boolean onInteract(@NotNull PlayerInteractEvent event, @NotNull Player player, @NotNull ItemStack item, int level);
 }

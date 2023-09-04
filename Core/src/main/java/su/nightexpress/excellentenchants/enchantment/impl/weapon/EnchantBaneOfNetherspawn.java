@@ -65,13 +65,13 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
     }
 
     @Override
-    public boolean onAttack(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!ENTITY_TYPES.contains(victim.getType())) return false;
         if (!this.isAvailableToUse(damager)) return false;
 
-        double damageEvent = e.getDamage();
+        double damageEvent = event.getDamage();
         double damageAdd = this.getDamageModifier(level);
-        e.setDamage(this.damageModifier ? damageEvent * damageAdd : damageEvent + damageAdd);
+        event.setDamage(this.damageModifier ? damageEvent * damageAdd : damageEvent + damageAdd);
         if (this.hasVisualEffects()) {
             SimpleParticle.of(Particle.SMOKE_NORMAL).play(victim.getEyeLocation(), 0.25, 0.1, 30);
         }
@@ -79,7 +79,7 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
     }
 
     @Override
-    public boolean onProtect(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         return false;
     }
 }

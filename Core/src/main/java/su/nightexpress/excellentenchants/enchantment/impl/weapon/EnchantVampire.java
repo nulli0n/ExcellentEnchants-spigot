@@ -73,7 +73,7 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
     }
 
     @Override
-    public boolean onAttack(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!this.isAvailableToUse(damager)) return false;
 
         double healthMax = EntityUtil.getAttribute(damager, Attribute.GENERIC_MAX_HEALTH);
@@ -83,7 +83,7 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
         if (!this.checkTriggerChance(level)) return false;
 
         double healAmount = this.getHealAmount(level);
-        double healFinal = this.isHealMultiplier() ? e.getDamage() * healAmount : healAmount;
+        double healFinal = this.isHealMultiplier() ? event.getDamage() * healAmount : healAmount;
 
         EntityRegainHealthEvent healthEvent = new EntityRegainHealthEvent(damager, healFinal, EntityRegainHealthEvent.RegainReason.CUSTOM);
         plugin.getPluginManager().callEvent(healthEvent);
@@ -98,7 +98,7 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
     }
 
     @Override
-    public boolean onProtect(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         return false;
     }
 }

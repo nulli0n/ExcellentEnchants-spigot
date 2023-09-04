@@ -1,10 +1,7 @@
 package su.nightexpress.excellentenchants.enchantment.listener;
 
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -29,7 +26,6 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> {
@@ -282,26 +278,26 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEnchantBlockDropItem(BlockDropItemEvent e) {
-        Player player = e.getPlayer();
+    public void onEnchantBlockDropItem(BlockDropItemEvent event) {
+        Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.CREATIVE) return;
 
         ItemStack tool = player.getInventory().getItemInMainHand();
         if (tool.getType().isAir() || tool.getType() == Material.ENCHANTED_BOOK) return;
 
-        EnchantDropContainer dropContainer = new EnchantDropContainer(e);
+        //EnchantDropContainer dropContainer = new EnchantDropContainer(e);
         EnchantUtils.getExcellents(tool, BlockDropEnchant.class).forEach((enchant, level) -> {
             if (enchant.isOutOfCharges(tool)) return;
-            if (enchant.onDrop(e, dropContainer, player, tool, level)) {
+            if (enchant.onDrop(event, player, tool, level)) {
                 enchant.consumeChargesNoUpdate(tool, level);
             }
         });
         EnchantUtils.updateChargesDisplay(tool);
 
-        BlockState state = e.getBlockState();
-        World world = state.getWorld();
-        Location location = state.getLocation();
+        //BlockState state = e.getBlockState();
+        //World world = state.getWorld();
+        //Location location = state.getLocation();
 
-        dropContainer.getDrop().forEach(item -> world.dropItem(location, item));
+        //dropContainer.getDrop().forEach(item -> world.dropItem(location, item));
     }
 }

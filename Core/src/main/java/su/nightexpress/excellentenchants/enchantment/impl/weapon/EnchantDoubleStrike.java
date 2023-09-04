@@ -50,11 +50,11 @@ public class EnchantDoubleStrike extends ExcellentEnchant implements Chanced, Co
     }
 
     @Override
-    public boolean onAttack(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!this.isAvailableToUse(damager)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        e.setDamage(e.getDamage() * 2D);
+        event.setDamage(event.getDamage() * 2D);
 
         if (this.hasVisualEffects()) {
             SimpleParticle.of(Particle.EXPLOSION_NORMAL).play(victim.getEyeLocation(), 0.25, 0.15, 15);
@@ -64,7 +64,7 @@ public class EnchantDoubleStrike extends ExcellentEnchant implements Chanced, Co
     }
 
     @Override
-    public boolean onProtect(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         return false;
     }
 }

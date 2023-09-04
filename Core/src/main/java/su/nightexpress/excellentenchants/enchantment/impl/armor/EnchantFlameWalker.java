@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nexmedia.engine.Version;
 import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.api.server.AbstractTask;
 import su.nexmedia.engine.utils.Pair;
@@ -180,9 +181,11 @@ public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
                 Pair<Long, Integer> pair = BLOCKS_TO_DESTROY.get(block);
                 long time = pair.getFirst();
                 if (now >= time) {
-                    block.getWorld().getPlayers().forEach(player -> {
-                        player.sendBlockDamage(block.getLocation(), 0F, pair.getSecond());
-                    });
+                    if (Version.isAtLeast(Version.V1_19_R3)) {
+                        block.getWorld().getPlayers().forEach(player -> {
+                            player.sendBlockDamage(block.getLocation(), 0F, pair.getSecond());
+                        });
+                    }
 
                     block.setType(Material.LAVA);
 
@@ -191,7 +194,7 @@ public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
 
                     return true;
                 }
-                else {
+                else if (Version.isAtLeast(Version.V1_19_R3)) {
                     long diff = TimeUnit.MILLISECONDS.toSeconds(time - now);
 
                     float progress = (float) (1D - Math.min(1D, diff / 5D));

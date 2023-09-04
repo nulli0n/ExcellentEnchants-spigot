@@ -2,10 +2,14 @@ package su.nightexpress.excellentenchants.enchantment.util;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -32,6 +36,7 @@ import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,6 +44,37 @@ import java.util.stream.Stream;
 public class EnchantUtils {
 
     public static final NamespacedKey KEY_LORE_SIZE = new NamespacedKey(ExcellentEnchantsAPI.PLUGIN, "lore_size");
+
+    private static boolean busyBreak = false;
+
+    public static void popResource(@NotNull BlockDropItemEvent event, @NotNull ItemStack itemStack) {
+        Item item = ExcellentEnchantsAPI.PLUGIN.getEnchantNMS().popResource(event.getBlock(), itemStack);
+        event.getItems().add(item);
+    }
+
+    public static boolean isBusyByOthers() {
+        return false;
+    }
+
+    public static boolean isBusyByEnchant() {
+        return busyBreak;
+    }
+
+    public static boolean isBusy() {
+        return isBusyByEnchant() || isBusyByOthers();
+    }
+
+    public static void busyBreak(@NotNull Player player, @NotNull Block block) {
+        busyBreak = true;
+        player.breakBlock(block);
+        busyBreak = false;
+    }
+
+    public static void safeBusyBreak(@NotNull Player player, @NotNull Block block) {
+        if (!isBusy()) {
+            busyBreak(player, block);
+        }
+    }
 
     @NotNull
     public static NamespacedKey createKey(@NotNull String id) {
@@ -65,15 +101,19 @@ public class EnchantUtils {
         return item.getType() == Material.ENCHANTED_BOOK || Stream.of(EnchantmentTarget.values()).anyMatch(target -> target.includes(item));
     }
 
-    public static boolean populate(@NotNull ItemStack item, @NotNull ObtainType obtainType) {
-        int enchantsHad = getAmount(item);
+    // TODO Move in populator class
 
-        getPopulationCandidates(item, obtainType).forEach((enchantment, level) -> {
-            add(item, enchantment, level, false);
+    public static boolean populate(@NotNull ItemStack item, @NotNull ObtainType obtainType, @Nullable World world) {
+        AtomicBoolean status = new AtomicBoolean(false);
+
+        getPopulationCandidates(item, obtainType, world).forEach((enchantment, level) -> {
+            if (add(item, enchantment, level, false)) {
+                status.set(true);
+            }
         });
         updateDisplay(item);
 
-        return getAmount(item) != enchantsHad;
+        return status.get();
     }
 
     @NotNull
@@ -88,14 +128,16 @@ public class EnchantUtils {
     }
 
     @NotNull
-    public static Map<Enchantment, Integer> getPopulationCandidates(@NotNull ItemStack item, @NotNull ObtainType obtainType) {
-        return getPopulationCandidates(item, obtainType, new HashMap<>(), (enchant) -> enchant.generateLevel(obtainType));
+    public static Map<Enchantment, Integer> getPopulationCandidates(@NotNull ItemStack item, @NotNull ObtainType obtainType,
+                                                                    @Nullable World world) {
+        return getPopulationCandidates(item, obtainType, new HashMap<>(), (enchant) -> enchant.generateLevel(obtainType), world);
     }
 
     @NotNull
     public static Map<Enchantment, Integer> getPopulationCandidates(@NotNull ItemStack item, @NotNull ObtainType obtainType,
                                                                     @NotNull Map<Enchantment, Integer> enchantsPrepared,
-                                                                    @NotNull Function<ExcellentEnchant, Integer> levelFunc) {
+                                                                    @NotNull Function<ExcellentEnchant, Integer> levelFunc,
+                                                                    @Nullable World world) {
         Map<Enchantment, Integer> enchantsToAdd = new HashMap<>(enchantsPrepared);
 
         ObtainSettings settings = Config.getObtainSettings(obtainType).orElse(null);
@@ -104,44 +146,54 @@ public class EnchantUtils {
         int enchMax = settings.getEnchantsTotalMax();
         int enchRoll = Rnd.get(settings.getEnchantsCustomMin(), settings.getEnchantsCustomMax());
 
-        // Класс для исключения неудачных попыток.
         EnchantPopulator populator = new EnchantPopulator(obtainType, item);
 
-        // Добавляем сколько можем, пока нужное количество не будет добавлено или не закончатся чары и/или тиры.
+        // Try to populate as many as possible.
         while (!populator.isEmpty() && enchRoll > 0) {
-            // Достигнут максимум чар (любых) для итема, заканчиваем.
+            // Limit reached.
             if (enchantsToAdd.size() >= enchMax) break;
 
             Tier tier = populator.getTierByChance();
-            if (tier == null) break; // Нет тира?
+            if (tier == null) break; // no tiers left.
 
             ExcellentEnchant enchant = populator.getEnchantByChance(tier);
-            // В тире нет подходящих чар (вообще) для итема, исключаем и идем дальше.
+            // Remove entire tier if no enchants can be selected.
             if (enchant == null) {
                 populator.purge(tier);
                 continue;
             }
 
-            // Среди уже добавленных чар есть конфликты с тем, что нашли.
-            // Исключаем, идем дальше.
+            // Remove disabled world enchants.
+            if (world != null && enchant.isDisabledInWorld(world)) {
+                populator.purge(tier, enchant);
+                continue;
+            }
+
+            // Remove conflicting enchants.
             if (enchantsToAdd.keySet().stream().anyMatch(has -> has.conflictsWith(enchant) || enchant.conflictsWith(has))) {
                 populator.purge(tier, enchant);
                 continue;
             }
 
-            // Не получилось сгенерировать подходящий уровень.
-            // Исключаем, идем дальше.
+            // Level generation failed.
             int level = levelFunc.apply(enchant);
             if (level < enchant.getStartLevel()) {
                 populator.purge(tier, enchant);
                 continue;
             }
 
-            // Добавляем чар, засчитываем попытку.
+            // All good!
             populator.purge(tier, enchant);
             enchantsToAdd.put(enchant, level);
             enchRoll--;
         }
+
+        if (!enchantsToAdd.isEmpty()) {
+            if (obtainType == ObtainType.VILLAGER && item.getType() == Material.ENCHANTED_BOOK && enchRoll == 1) {
+                getAll(item).keySet().forEach(enchantment -> remove(item, enchantment));
+            }
+        }
+
         return enchantsToAdd;
     }
 

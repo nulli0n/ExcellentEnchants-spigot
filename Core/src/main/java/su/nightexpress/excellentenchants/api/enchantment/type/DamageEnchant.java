@@ -8,5 +8,5 @@ import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 
 public interface DamageEnchant extends IEnchantment {
 
-    boolean onDamage(@NotNull EntityDamageEvent e, @NotNull LivingEntity entity, @NotNull ItemStack item, int level);
+    boolean onDamage(@NotNull EntityDamageEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level);
 }

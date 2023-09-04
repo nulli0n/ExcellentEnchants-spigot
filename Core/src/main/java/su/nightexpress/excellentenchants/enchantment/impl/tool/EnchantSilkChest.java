@@ -28,8 +28,8 @@ import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +130,7 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer,
+    public boolean onDrop(@NotNull BlockDropItemEvent event,
                           @NotNull Player player, @NotNull ItemStack item, int level) {
         BlockState state = event.getBlockState();
         Block block = state.getBlock();
@@ -143,12 +143,12 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         chest.getBlockInventory().addItem(event.getItems().stream().map(Item::getItemStack).toList().toArray(new ItemStack[0]));
 
         if (chest.getBlockInventory().isEmpty()) {
-            dropContainer.getDrop().add(new ItemStack(chest.getType()));
+            EnchantUtils.popResource(event, new ItemStack(chest.getType()));
             return false;
         }
 
         // Добавляем кастомный сундук в кастомный дроп лист.
-        dropContainer.getDrop().add(this.getSilkChest(chest));
+        EnchantUtils.popResource(event, this.getSilkChest(chest));
 
         // Очищаем инвентарь сундука и дефолтный дроп лист.
         chest.getBlockInventory().clear();

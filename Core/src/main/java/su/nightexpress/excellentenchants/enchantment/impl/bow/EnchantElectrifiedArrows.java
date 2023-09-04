@@ -72,18 +72,18 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public boolean onShoot(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
+    public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
         if (!this.isAvailableToUse(shooter)) return false;
 
         return this.checkTriggerChance(level);
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         if (!this.isOurProjectile(projectile)) return false;
-        if (e.getHitEntity() != null || e.getHitBlock() == null) return false;
+        if (event.getHitEntity() != null || event.getHitBlock() == null) return false;
 
-        Block block = e.getHitBlock();
+        Block block = event.getHitBlock();
         block.getWorld().strikeLightning(block.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(plugin, true));
         if (this.hasVisualEffects()) {
             Location center = LocationUtil.getCenter(block.getLocation());
@@ -94,7 +94,7 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public boolean onDamage(@NotNull EntityDamageByEntityEvent e, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!this.isOurProjectile(projectile)) return false;
 
         plugin.getServer().getScheduler().runTask(plugin, () -> {

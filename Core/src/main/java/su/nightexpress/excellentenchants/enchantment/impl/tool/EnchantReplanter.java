@@ -120,21 +120,21 @@ public class EnchantReplanter extends ExcellentEnchant implements Chanced, Inter
     }
 
     @Override
-    public boolean onInteract(@NotNull PlayerInteractEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public boolean onInteract(@NotNull PlayerInteractEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isReplantOnRightClick()) return false;
         if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         // Check for a event hand. We dont want to trigger it twice.
-        if (e.getHand() != EquipmentSlot.HAND) return false;
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return false;
+        if (event.getHand() != EquipmentSlot.HAND) return false;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return false;
 
         // Check if player holds seeds to plant them by offhand interaction.
         ItemStack off = player.getInventory().getItemInOffHand();
         if (!off.getType().isAir() && CROPS.contains(off.getType())) return false;
 
         // Check if clicked block is a farmland.
-        Block blockGround = e.getClickedBlock();
+        Block blockGround = event.getClickedBlock();
         if (blockGround == null) return false;
         if (blockGround.getType() != Material.FARMLAND && blockGround.getType() != Material.SOUL_SAND) return false;
 
@@ -158,12 +158,12 @@ public class EnchantReplanter extends ExcellentEnchant implements Chanced, Inter
     }
 
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isReplantOnPlantBreak()) return false;
         if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        Block blockPlant = e.getBlock();
+        Block blockPlant = event.getBlock();
         //if (EnchantTelekinesis.isDropHandled(blockPlant)) return false;
         //if (EnchantRegister.TELEKINESIS != null && item.containsEnchantment(EnchantRegister.TELEKINESIS)) return false;
 

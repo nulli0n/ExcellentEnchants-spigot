@@ -8,5 +8,5 @@ import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 
 public interface BlockBreakEnchant extends IEnchantment {
 
-    boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level);
+    boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level);
 }

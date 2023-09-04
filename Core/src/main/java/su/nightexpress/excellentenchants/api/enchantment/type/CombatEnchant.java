@@ -8,11 +8,11 @@ import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 
 public interface CombatEnchant extends IEnchantment {
 
-    boolean onAttack(@NotNull EntityDamageByEntityEvent e,
+    boolean onAttack(@NotNull EntityDamageByEntityEvent event,
                      @NotNull LivingEntity damager, @NotNull LivingEntity victim,
                      @NotNull ItemStack weapon, int level);
 
-    boolean onProtect(@NotNull EntityDamageByEntityEvent e,
+    boolean onProtect(@NotNull EntityDamageByEntityEvent event,
                       @NotNull LivingEntity damager, @NotNull LivingEntity victim,
                       @NotNull ItemStack weapon, int level);
 }

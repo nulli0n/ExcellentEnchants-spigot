@@ -60,7 +60,7 @@ public class EnchantThunder extends ExcellentEnchant implements Chanced, CombatE
     }
 
     @Override
-    public boolean onAttack(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!this.isAvailableToUse(damager)) return false;
         if (this.isInThunderstormOnly() && !victim.getWorld().isThundering()) return false;
         if (victim.getLocation().getBlock().getLightFromSky() != 15) return false;
@@ -76,7 +76,7 @@ public class EnchantThunder extends ExcellentEnchant implements Chanced, CombatE
     }
 
     @Override
-    public boolean onProtect(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         return false;
     }
 

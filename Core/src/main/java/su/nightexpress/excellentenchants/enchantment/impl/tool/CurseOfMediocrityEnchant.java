@@ -16,7 +16,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class CurseOfMediocrityEnchant extends ExcellentEnchant implements Chanced, BlockDropEnchant, DeathEnchant {
@@ -62,7 +61,7 @@ public class CurseOfMediocrityEnchant extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer,
+    public boolean onDrop(@NotNull BlockDropItemEvent event,
                           @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
@@ -73,12 +72,6 @@ public class CurseOfMediocrityEnchant extends ExcellentEnchant implements Chance
                 meta.getEnchants().keySet().forEach(meta::removeEnchant);
             });
             drop.setItemStack(stack);
-        });
-
-        dropContainer.getDrop().forEach(stack -> {
-            ItemUtil.mapMeta(stack, meta -> {
-                meta.getEnchants().keySet().forEach(meta::removeEnchant);
-            });
         });
 
         return true;

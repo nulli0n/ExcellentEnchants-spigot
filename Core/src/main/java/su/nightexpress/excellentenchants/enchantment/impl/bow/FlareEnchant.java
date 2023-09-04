@@ -69,8 +69,8 @@ public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, 
     }
 
     @Override
-    public boolean onShoot(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!(e.getProjectile() instanceof Arrow arrow)) return false;
+    public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
+        if (!(event.getProjectile() instanceof Arrow arrow)) return false;
         if (!this.isAvailableToUse(shooter)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
@@ -110,7 +110,7 @@ public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, 
     }
 
     @Override
-    public boolean onDamage(@NotNull EntityDamageByEntityEvent e, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         return false;
     }
 }

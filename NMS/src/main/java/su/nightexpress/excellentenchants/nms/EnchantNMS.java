@@ -3,6 +3,7 @@ package su.nightexpress.excellentenchants.nms;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -20,4 +21,6 @@ public interface EnchantNMS {
     @Nullable ItemStack getSpawnEgg(@NotNull LivingEntity entity);
 
     @NotNull Set<Block> handleFlameWalker(@NotNull LivingEntity entity, @NotNull Location location, int level);
+
+    @NotNull Item popResource(@NotNull Block block, @NotNull ItemStack item);
 }

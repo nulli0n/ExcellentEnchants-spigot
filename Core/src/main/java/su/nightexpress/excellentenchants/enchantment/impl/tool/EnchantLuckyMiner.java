@@ -66,12 +66,12 @@ public class EnchantLuckyMiner extends ExcellentEnchant implements Chanced, Bloc
     }
 
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         double expMod = this.getExpModifier(level);
-        e.setExpToDrop((int) ((double) e.getExpToDrop() * expMod));
+        event.setExpToDrop((int) ((double) event.getExpToDrop() * expMod));
         return true;
     }
 }

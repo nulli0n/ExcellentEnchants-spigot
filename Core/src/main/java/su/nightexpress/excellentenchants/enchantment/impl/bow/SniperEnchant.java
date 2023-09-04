@@ -65,13 +65,13 @@ public class SniperEnchant extends ExcellentEnchant implements BowEnchant, Chanc
     }
 
     @Override
-    public boolean onShoot(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
+    public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
         if (!this.isAvailableToUse(shooter)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         double modifier = this.getSpeedModifier(level);
 
-        Entity entity = e.getProjectile();
+        Entity entity = event.getProjectile();
         Vector vector = entity.getVelocity();
         entity.setVelocity(vector.multiply(modifier));
 
@@ -79,12 +79,12 @@ public class SniperEnchant extends ExcellentEnchant implements BowEnchant, Chanc
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         return false;
     }
 
     @Override
-    public boolean onDamage(@NotNull EntityDamageByEntityEvent e, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         return false;
     }
 }

@@ -11,7 +11,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -33,13 +32,11 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
     public static final String ID = "blast_mining";
     public static final String PLACEHOLDER_EXPLOSION_POWER = "%enchantment_explosion_power%";
 
-    private static final String META_EXPLOSION_SOURCE = ID + "_explosion_source";
-    private static final String META_EXPLOSION_MINED = ID + "_explosion_mined";
-
     private EnchantScaler explosionPower;
     private EnchantScaler minBlockStrength;
-
     private ChanceImplementation chanceImplementation;
+
+    private int explodeLevel;
 
     public EnchantBlastMining(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
@@ -52,11 +49,14 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
     @Override
     public void loadSettings() {
         super.loadSettings();
+
         this.chanceImplementation = ChanceImplementation.create(this,
             "20.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+
         this.explosionPower = EnchantScaler.read(this, "Settings.Explosion.Power",
             "3.0 + (" + Placeholders.ENCHANTMENT_LEVEL + " - 1.0 * 0.25)",
             "Explosion power. The more power = the more blocks (area) to explode.");
+
         this.minBlockStrength = EnchantScaler.read(this, "Settings.Min_Block_Strength",
             "1.5 - " + Placeholders.ENCHANTMENT_LEVEL + " / 10",
             "Minimal block strength value for the enchantment to have effect.",
@@ -80,8 +80,8 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
         return (float) minBlockStrength.getValue(level);
     }
 
-    private boolean isBlockHardEnough(@NotNull Block block, int level) {
-        float strength = block.getType().getHardness();//plugin.getNMS().getBlockStrength(block);
+    private boolean isHardEnough(@NotNull Block block, int level) {
+        float strength = block.getType().getHardness();
         return (strength >= this.getMinBlockStrength(level));
     }
 
@@ -98,50 +98,37 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
     }
 
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isAvailableToUse(player)) return false;
+        if (EnchantUtils.isBusy()) return false;
 
-        if (EnchantUtils.contains(item, EnchantVeinminer.ID)) return false;
-        if (EnchantUtils.contains(item, EnchantTunnel.ID)) return false;
-
-        Block block = e.getBlock();
-        if (block.hasMetadata(META_EXPLOSION_MINED)) return false;
-
-        if (!this.isBlockHardEnough(block, level)) return false;
+        Block block = event.getBlock();
+        if (!this.isHardEnough(block, level)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         float power = (float) this.getExplosionPower(level);
 
-        player.setMetadata(META_EXPLOSION_SOURCE, new FixedMetadataValue(plugin, level));
+        this.explodeLevel = level;
         NoCheatPlusHook.exemptBlocks(player);
         boolean exploded = block.getWorld().createExplosion(block.getLocation(), power, false, true, player);
         NoCheatPlusHook.unexemptBlocks(player);
-        player.removeMetadata(META_EXPLOSION_SOURCE, plugin);
+        this.explodeLevel = -1;
+
         return exploded;
     }
 
     // Process explosion event to mine blocks.
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlastExplosionEvent(EntityExplodeEvent e) {
-        if (!(e.getEntity() instanceof Player player)) return;
-        if (!player.hasMetadata(META_EXPLOSION_SOURCE)) return;
+    public void onBlastExplosionEvent(EntityExplodeEvent event) {
+        if (this.explodeLevel <= 0) return;
+        if (!(event.getEntity() instanceof Player player)) return;
 
-        int level = player.getMetadata(META_EXPLOSION_SOURCE).get(0).asInt();
-        List<Block> blockList = e.blockList();
-
-        // Remove the 'source' block which player mined and caused the explosion to prevent duplicated drops.
-        // Remove all the 'soft' blocks that should not be exploded.
-        blockList.removeIf(block -> block.getLocation().equals(e.getLocation()) || !this.isBlockHardEnough(block, level));
-
-        // Break all 'exploded' blocks by a player, adding metadata to them to prevent trigger enchantment in a loop.
+        List<Block> blockList = event.blockList();
         blockList.forEach(block -> {
-            block.setMetadata(META_EXPLOSION_MINED, new FixedMetadataValue(plugin, true));
-            //plugin.getNMS().breakBlock(player, block);
-            player.breakBlock(block);
-            block.removeMetadata(META_EXPLOSION_MINED, plugin);
-        });
+            if (block.getLocation().equals(event.getLocation()) || !this.isHardEnough(block, this.explodeLevel)) return;
 
-        // Clear list of 'exploded' blocks so the event won't affect them, as they are already mined by a player.
+            EnchantUtils.safeBusyBreak(player, block);
+        });
         blockList.clear();
     }
 
@@ -151,14 +138,12 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
         if (e.getCause() != DamageCause.ENTITY_EXPLOSION) return;
         if (!(e.getDamager() instanceof Player player)) return;
 
-        e.setCancelled(player.hasMetadata(META_EXPLOSION_SOURCE));
+        e.setCancelled(this.explodeLevel > 0);
     }
 
     // Do not reduce item durability for 'exploded' blocks.
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlastExplosionItemDamage(PlayerItemDamageEvent e) {
-        if (!e.getPlayer().hasMetadata(META_EXPLOSION_SOURCE)) return;
-
-        e.setCancelled(true);
+        e.setCancelled(this.explodeLevel > 0);
     }
 }

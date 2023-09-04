@@ -68,7 +68,7 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
     }
 
     @Override
-    public boolean onAttack(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!this.isAvailableToUse(damager)) return false;
 
         double healthPoint = this.getHealthPoint(level);
@@ -84,12 +84,12 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
         double damageCap = this.getDamageCapacity(level);
         double damageFinal = Math.min(damageCap, 1D + damageAmount * pointAmount);
 
-        e.setDamage(e.getDamage() * damageFinal);
+        event.setDamage(event.getDamage() * damageFinal);
         return true;
     }
 
     @Override
-    public boolean onProtect(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         return false;
     }
 }

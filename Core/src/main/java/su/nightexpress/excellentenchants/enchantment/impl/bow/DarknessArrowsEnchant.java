@@ -77,9 +77,9 @@ public class DarknessArrowsEnchant extends ExcellentEnchant implements Chanced, 
     }
 
     @Override
-    public boolean onShoot(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
+    public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
         if (!this.isAvailableToUse(shooter)) return false;
-        if (!(e.getProjectile() instanceof Arrow arrow)) return false;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
@@ -87,12 +87,12 @@ public class DarknessArrowsEnchant extends ExcellentEnchant implements Chanced, 
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         return this.isOurProjectile(projectile);
     }
 
     @Override
-    public boolean onDamage(@NotNull EntityDamageByEntityEvent e, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         return this.isOurProjectile(projectile);
     }
 }

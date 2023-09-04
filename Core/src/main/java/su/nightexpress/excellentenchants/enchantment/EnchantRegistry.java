@@ -124,7 +124,6 @@ public class EnchantRegistry {
         this.register(SniperEnchant.ID, () -> new SniperEnchant(plugin));
         this.register(EnchantPoisonedArrows.ID, () -> new EnchantPoisonedArrows(plugin));
         this.register(EnchantWitheredArrows.ID, () -> new EnchantWitheredArrows(plugin));
-
         if (Version.isAbove(Version.V1_18_R2)) {
             this.register(DarknessArrowsEnchant.ID, () -> new DarknessArrowsEnchant(plugin));
             this.register(DarknessCloakEnchant.ID, () -> new DarknessCloakEnchant(plugin));

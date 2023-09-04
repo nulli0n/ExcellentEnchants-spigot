@@ -74,12 +74,12 @@ public class EnchantCurseOfMisfortune extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
         if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        e.setDropItems(false);
-        if (!this.isDropExp()) e.setExpToDrop(0);
+        event.setDropItems(false);
+        if (!this.isDropExp()) event.setExpToDrop(0);
         return true;
     }
 

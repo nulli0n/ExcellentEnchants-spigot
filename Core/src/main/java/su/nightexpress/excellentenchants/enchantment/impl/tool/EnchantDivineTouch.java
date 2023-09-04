@@ -31,8 +31,8 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, BlockBreakEnchant, BlockDropEnchant {
 
@@ -102,16 +102,16 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
         BlockState state = event.getBlockState();
         Block block = state.getBlock();
         if (!block.hasMetadata(META_HANDLE)) return false;
         if (!(state instanceof CreatureSpawner spawnerBlock)) return false;
 
-        dropContainer.getDrop().add(this.getSpawner(spawnerBlock));
+        EnchantUtils.popResource(event, this.getSpawner(spawnerBlock));
 
-        Location location = LocationUtil.getCenter(block.getLocation());
         if (this.hasVisualEffects()) {
+            Location location = LocationUtil.getCenter(block.getLocation());
             SimpleParticle.of(Particle.VILLAGER_HAPPY).play(location, 0.3, 0.15, 30);
         }
         block.removeMetadata(META_HANDLE, this.plugin);
@@ -119,14 +119,14 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
     }
 
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        Block block = e.getBlock();
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
+        Block block = event.getBlock();
         if (!this.isAvailableToUse(player)) return false;
         if (!(block.getState() instanceof CreatureSpawner spawnerBlock)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        e.setExpToDrop(0);
-        e.setDropItems(true);
+        event.setExpToDrop(0);
+        event.setDropItems(true);
         block.setMetadata(META_HANDLE, new FixedMetadataValue(this.plugin, true));
         return false; // Do not consume charges
     }

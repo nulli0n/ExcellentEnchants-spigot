@@ -3,9 +3,13 @@ package su.nightexpress.excellentenchants.nms.v1_19_R3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,12 +17,14 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftFishHook;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -90,5 +96,21 @@ public class V1_19_R3 implements EnchantNMS {
             blocks.add(bukkitLoc.getBlock());
         }
         return blocks;
+    }
+
+    @NotNull
+    public Item popResource(@NotNull Block block, @NotNull ItemStack item) {
+        Level world = ((CraftWorld)block.getWorld()).getHandle();
+        BlockPos pos = ((CraftBlock)block).getPosition();
+        net.minecraft.world.item.ItemStack itemstack = CraftItemStack.asNMSCopy(item);
+
+        float yMod = EntityType.ITEM.getHeight() / 2.0F;
+        double x = (pos.getX() + 0.5F) + Mth.nextDouble(world.random, -0.25D, 0.25D);
+        double y = (pos.getY() + 0.5F) + Mth.nextDouble(world.random, -0.25D, 0.25D) - yMod;
+        double z = (pos.getZ() + 0.5F) + Mth.nextDouble(world.random, -0.25D, 0.25D);
+
+        ItemEntity itemEntity = new ItemEntity(world, x, y, z, itemstack);
+        itemEntity.setDefaultPickUpDelay();
+        return (Item) itemEntity.getBukkitEntity();
     }
 }

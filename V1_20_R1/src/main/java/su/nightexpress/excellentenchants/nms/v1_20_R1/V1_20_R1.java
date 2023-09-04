@@ -3,9 +3,13 @@ package su.nightexpress.excellentenchants.nms.v1_20_R1;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,12 +17,14 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftFishHook;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -91,4 +97,50 @@ public class V1_20_R1 implements EnchantNMS {
         }
         return blocks;
     }
+
+    @NotNull
+    public Item popResource(@NotNull Block block, @NotNull ItemStack item) {
+        Level world = ((CraftWorld)block.getWorld()).getHandle();
+        BlockPos pos = ((CraftBlock)block).getPosition();
+        net.minecraft.world.item.ItemStack itemstack = CraftItemStack.asNMSCopy(item);
+
+        float yMod = EntityType.ITEM.getHeight() / 2.0F;
+        double x = (pos.getX() + 0.5F) + Mth.nextDouble(world.random, -0.25D, 0.25D);
+        double y = (pos.getY() + 0.5F) + Mth.nextDouble(world.random, -0.25D, 0.25D) - yMod;
+        double z = (pos.getZ() + 0.5F) + Mth.nextDouble(world.random, -0.25D, 0.25D);
+
+        ItemEntity itemEntity = new ItemEntity(world, x, y, z, itemstack);
+        itemEntity.setDefaultPickUpDelay();
+        return (Item) itemEntity.getBukkitEntity();
+    }
+
+    /*public static void popResourceFromFace(Level world, BlockPos blockposition, Direction enumdirection, ItemStack itemstack) {
+        int i = enumdirection.getStepX();
+        int j = enumdirection.getStepY();
+        int k = enumdirection.getStepZ();
+        float f = EntityType.ITEM.getWidth() / 2.0F;
+        float f1 = EntityType.ITEM.getHeight() / 2.0F;
+        double d0 = (double)((float)blockposition.getX() + 0.5F) + (i == 0 ? Mth.nextDouble(world.random, -0.25D, 0.25D) : (double)((float)i * (0.5F + f)));
+        double d1 = (double)((float)blockposition.getY() + 0.5F) + (j == 0 ? Mth.nextDouble(world.random, -0.25D, 0.25D) : (double)((float)j * (0.5F + f1))) - (double)f1;
+        double d2 = (double)((float)blockposition.getZ() + 0.5F) + (k == 0 ? Mth.nextDouble(world.random, -0.25D, 0.25D) : (double)((float)k * (0.5F + f)));
+        double d3 = i == 0 ? Mth.nextDouble(world.random, -0.1D, 0.1D) : (double)i * 0.1D;
+        double d4 = j == 0 ? Mth.nextDouble(world.random, 0.0D, 0.1D) : (double)j * 0.1D + 0.1D;
+        double d5 = k == 0 ? Mth.nextDouble(world.random, -0.1D, 0.1D) : (double)k * 0.1D;
+        popResource(world, () -> {
+            return new ItemEntity(world, d0, d1, d2, itemstack, d3, d4, d5);
+        }, itemstack);
+    }
+
+    private static void popResource(Level world, Supplier<ItemEntity> supplier, ItemStack itemstack) {
+        if (!world.isClientSide && !itemstack.isEmpty() && world.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
+            ItemEntity entityitem = (ItemEntity)supplier.get();
+            entityitem.setDefaultPickUpDelay();
+            if (world.captureDrops != null) {
+                world.captureDrops.add(entityitem);
+            } else {
+                world.addFreshEntity(entityitem);
+            }
+        }
+
+    }*/
 }
