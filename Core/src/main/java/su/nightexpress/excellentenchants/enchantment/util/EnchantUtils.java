@@ -106,12 +106,23 @@ public class EnchantUtils {
     public static boolean populate(@NotNull ItemStack item, @NotNull ObtainType obtainType, @Nullable World world) {
         AtomicBoolean status = new AtomicBoolean(false);
 
-        getPopulationCandidates(item, obtainType, world).forEach((enchantment, level) -> {
+        var population = getPopulationCandidates(item, obtainType, world);
+
+        if (obtainType == ObtainType.VILLAGER && item.getType() == Material.ENCHANTED_BOOK) {
+            if (Config.ENCHANTMENTS_SINGLE_ENCHANT_IN_VILLAGER_BOOKS.get() && !population.isEmpty()) {
+                getAll(item).keySet().forEach(enchantment -> remove(item, enchantment));
+            }
+        }
+
+        population.forEach((enchantment, level) -> {
             if (add(item, enchantment, level, false)) {
                 status.set(true);
             }
         });
-        updateDisplay(item);
+
+        if (status.get()) {
+            updateDisplay(item);
+        }
 
         return status.get();
     }
@@ -186,12 +197,6 @@ public class EnchantUtils {
             populator.purge(tier, enchant);
             enchantsToAdd.put(enchant, level);
             enchRoll--;
-        }
-
-        if (!enchantsToAdd.isEmpty()) {
-            if (obtainType == ObtainType.VILLAGER && item.getType() == Material.ENCHANTED_BOOK && enchRoll == 1) {
-                getAll(item).keySet().forEach(enchantment -> remove(item, enchantment));
-            }
         }
 
         return enchantsToAdd;

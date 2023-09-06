@@ -117,6 +117,9 @@ public class Config {
         "When enabled, passive enchantments (permanent potion effects, regeneration, etc.) will be applied to mobs as well.",
         "Disable this if you're experiencing performance issues.");
 
+    public static final JOption<Boolean> ENCHANTMENTS_SINGLE_ENCHANT_IN_VILLAGER_BOOKS = JOption.create("Enchantments.Single_Enchant_In_Villager_Books", true,
+        "Sets whether or not enchanted books in villager trades will have only 1 enchant, vanilla or custom one.");
+
     private static final JOption<Map<ObtainType, ObtainSettings>> OBTAIN_SETTINGS = new JOption<Map<ObtainType, ObtainSettings>>("Enchantments.Obtaining",
         (cfg, path, def) -> Stream.of(ObtainType.values()).collect(Collectors.toMap(k -> k, v -> ObtainSettings.read(cfg, path + "." + v.getPathName()))),
         () -> Stream.of(ObtainType.values()).collect(Collectors.toMap(k -> k, v -> new ObtainSettings(true, 4, 80D, 0, 2))),
