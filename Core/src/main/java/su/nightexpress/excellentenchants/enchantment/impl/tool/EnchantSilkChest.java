@@ -141,18 +141,16 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         // Добавляем в сундук обратно предметы из дроп листа, кроме самого сундука.
         event.getItems().removeIf(drop -> drop.getItemStack().getType() == state.getType() && drop.getItemStack().getAmount() == 1);
         chest.getBlockInventory().addItem(event.getItems().stream().map(Item::getItemStack).toList().toArray(new ItemStack[0]));
+        event.getItems().clear();
 
         if (chest.getBlockInventory().isEmpty()) {
             EnchantUtils.popResource(event, new ItemStack(chest.getType()));
             return false;
         }
 
-        // Добавляем кастомный сундук в кастомный дроп лист.
         EnchantUtils.popResource(event, this.getSilkChest(chest));
 
-        // Очищаем инвентарь сундука и дефолтный дроп лист.
         chest.getBlockInventory().clear();
-        event.getItems().clear();
 
         return true;
     }

@@ -347,7 +347,7 @@ public class EnchantUtils {
     public static void consumeCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int level) {
         int has = getCharges(item, enchant);
         int use = enchant.getChargesConsumeAmount(level);
-        setCharges(item, enchant, level,has - use);
+        setCharges(item, enchant, level,has < use ? 0 : has - use);
     }
 
     /*public static void restoreCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {

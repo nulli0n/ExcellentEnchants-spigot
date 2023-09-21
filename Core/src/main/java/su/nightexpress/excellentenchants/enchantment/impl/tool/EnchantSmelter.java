@@ -89,8 +89,7 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
 
     @Override
     public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
-        // TODO Use furnace recipes
-        // TODO Re-add smelted items instead of setType
+        // TODO Use furnace recipes & Re-add smelted items instead of setType
 
         if (event.getBlockState() instanceof Container) return false;
         if (!this.isAvailableToUse(player)) return false;
@@ -99,7 +98,11 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
 
         event.getItems().forEach(drop -> {
             Material material = this.smeltingTable.get(drop.getItemStack().getType());
-            if (material != null) drop.getItemStack().setType(material);
+            if (material != null) {
+                ItemStack stack = drop.getItemStack();
+                stack.setType(material);
+                drop.setItemStack(stack);
+            }
         });
 
         Block block = event.getBlockState().getBlock();

@@ -3,6 +3,7 @@ package su.nightexpress.excellentenchants.nms.v1_20_R1;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -40,7 +41,7 @@ public class V1_20_R1 implements EnchantNMS {
     @Override
     public void sendAttackPacket(@NotNull Player player, int id) {
         CraftPlayer craftPlayer = (CraftPlayer) player;
-        Entity entity = craftPlayer.getHandle();
+        ServerPlayer entity = craftPlayer.getHandle();
         ClientboundAnimatePacket packet = new ClientboundAnimatePacket(entity, id);
         craftPlayer.getHandle().connection.send(packet);
     }
