@@ -19,6 +19,7 @@ import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant {
@@ -73,8 +74,14 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
         if (block.getType().isInteractable() && !INTERACTABLE_BLOCKS.contains(block.getType())) return false;
         if (block.getDrops(item).isEmpty()) return false;
 
-        BlockFace dir = EntityUtil.getDirection(player);
-        boolean isY = dir != null && block.getRelative(dir.getOppositeFace()).isEmpty();
+
+        final List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 10);
+        if (lastTwoTargetBlocks.size() != 2 || !lastTwoTargetBlocks.get(1).getType().isOccluding()) {
+            return false;
+        }
+        final Block targetBlock = lastTwoTargetBlocks.get(1);
+        final Block adjacentBlock = lastTwoTargetBlocks.get(0);
+        final BlockFace dir = targetBlock.getFace(adjacentBlock);
         boolean isZ = dir == BlockFace.EAST || dir == BlockFace.WEST;
 
         // Mine + shape if Tunnel I, 3x3 if Tunnel II
@@ -92,11 +99,10 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
             int zAdd = MINING_COORD_OFFSETS[i][1];
 
             Block blockAdd;
-            if (isY) {
-                blockAdd = block.getLocation().clone().add(isZ ? 0 : xAdd, zAdd, isZ ? xAdd : 0).getBlock();
-            }
-            else {
+            if (dir == BlockFace.UP || dir == BlockFace.DOWN) {
                 blockAdd = block.getLocation().clone().add(xAdd, 0, zAdd).getBlock();
+            } else {
+                blockAdd = block.getLocation().clone().add(isZ ? 0 : xAdd, zAdd, isZ ? xAdd : 0).getBlock();
             }
 
             // Skip blocks that should not be mined
