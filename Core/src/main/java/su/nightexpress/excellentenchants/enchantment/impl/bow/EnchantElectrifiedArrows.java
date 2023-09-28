@@ -16,8 +16,8 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.LocationUtil;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
@@ -48,7 +48,7 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
     @Override
     public void loadSettings() {
         super.loadSettings();
-        this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.FIREWORKS_SPARK));
+        this.arrowImplementation = ArrowImplementation.create(this, UniParticle.of(Particle.FIREWORKS_SPARK));
         this.chanceImplementation = ChanceImplementation.create(this,
             "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
     }
@@ -87,8 +87,8 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
         block.getWorld().strikeLightning(block.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(plugin, true));
         if (this.hasVisualEffects()) {
             Location center = LocationUtil.getCenter(block.getLocation());
-            SimpleParticle.of(Particle.BLOCK_CRACK, block.getType().createBlockData()).play(center, 1, 0.05, 120);
-            SimpleParticle.of(Particle.FIREWORKS_SPARK).play(center, 1, 0.05, 120);
+            UniParticle.blockCrack(block.getType()).play(center, 1, 0.05, 120);
+            UniParticle.of(Particle.FIREWORKS_SPARK).play(center, 1, 0.05, 120);
         }
         return true;
     }

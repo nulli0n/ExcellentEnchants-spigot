@@ -19,9 +19,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
@@ -57,7 +57,7 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
     @Override
     public void loadSettings() {
         super.loadSettings();
-        this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.DRAGON_BREATH));
+        this.arrowImplementation = ArrowImplementation.create(this, UniParticle.of(Particle.DRAGON_BREATH));
         this.chanceImplementation = ChanceImplementation.create(this,
             "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
         this.fireDuration = EnchantScaler.read(this, "Settings.Fire.Duration",

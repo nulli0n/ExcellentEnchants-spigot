@@ -9,9 +9,9 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -92,7 +92,7 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
         damager.setHealth(Math.min(healthMax, healthHas + healthEvent.getAmount()));
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.HEART).play(damager.getEyeLocation(), 0.25, 0.15, 5);
+            UniParticle.of(Particle.HEART).play(damager.getEyeLocation(), 0.25, 0.15, 5);
         }
         return true;
     }

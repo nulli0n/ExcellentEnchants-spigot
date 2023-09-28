@@ -14,8 +14,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
@@ -53,7 +53,7 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
     @Override
     public void loadSettings() {
         super.loadSettings();
-        this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.SMOKE_NORMAL));
+        this.arrowImplementation = ArrowImplementation.create(this, UniParticle.of(Particle.SMOKE_NORMAL));
         this.chanceImplementation = ChanceImplementation.create(this,
             "10.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
         this.explosionFireSpread = JOption.create("Settings.Explosion.Fire_Spread", true,

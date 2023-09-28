@@ -3,7 +3,6 @@ package su.nightexpress.excellentenchants.enchantment.impl.weapon;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Particle;
 import org.bukkit.block.Skull;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EntityType;
@@ -18,12 +17,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nexmedia.engine.utils.StringUtil;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -235,7 +234,7 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
         entity.getWorld().dropItemNaturally(entity.getLocation(), item);
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.BLOCK_CRACK, Material.REDSTONE_BLOCK.createBlockData()).play(entity.getEyeLocation(), 0.25, 0.15, 30);
+            UniParticle.blockCrack(Material.REDSTONE_BLOCK).play(entity.getEyeLocation(), 0.25, 0.15, 30);
         }
         return true;
     }

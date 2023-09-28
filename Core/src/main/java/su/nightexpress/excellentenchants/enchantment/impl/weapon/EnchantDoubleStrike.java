@@ -7,8 +7,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.particle.SimpleParticle;
-import su.nexmedia.engine.utils.LocationUtil;
+import su.nexmedia.engine.utils.values.UniParticle;
+import su.nexmedia.engine.utils.values.UniSound;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -57,8 +57,8 @@ public class EnchantDoubleStrike extends ExcellentEnchant implements Chanced, Co
         event.setDamage(event.getDamage() * 2D);
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.EXPLOSION_NORMAL).play(victim.getEyeLocation(), 0.25, 0.15, 15);
-            LocationUtil.sound(victim.getLocation(), Sound.ENTITY_GENERIC_EXPLODE);
+            UniParticle.of(Particle.EXPLOSION_NORMAL).play(victim.getEyeLocation(), 0.25, 0.15, 15);
+            UniSound.of(Sound.ENTITY_GENERIC_EXPLODE).play(victim.getLocation());
         }
         return true;
     }

@@ -2,7 +2,6 @@ package su.nightexpress.excellentenchants.enchantment.impl.armor;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
@@ -20,10 +19,10 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.Version;
-import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.api.server.AbstractTask;
 import su.nexmedia.engine.utils.Pair;
 import su.nexmedia.engine.utils.random.Rnd;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.Cleanable;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
@@ -188,10 +187,7 @@ public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
                     }
 
                     block.setType(Material.LAVA);
-
-                    SimpleParticle.of(Particle.BLOCK_CRACK, Material.MAGMA_BLOCK.createBlockData())
-                        .play(block.getLocation(), 0.5, 0.7, 0.5, 0.03, 30);
-
+                    UniParticle.blockCrack(Material.MAGMA_BLOCK).play(block.getLocation(), 0.5, 0.7, 0.5, 0.03, 30);
                     return true;
                 }
                 else if (Version.isAtLeast(Version.V1_19_R3)) {

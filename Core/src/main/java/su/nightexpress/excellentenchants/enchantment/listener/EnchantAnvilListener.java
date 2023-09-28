@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.manager.AbstractListener;
 import su.nexmedia.engine.utils.PDCUtil;
-import su.nexmedia.engine.utils.PlayerUtil;
+import su.nexmedia.engine.utils.values.UniSound;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
@@ -151,7 +151,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         e.getView().setCursor(item);
         e.setCancelled(false);
 
-        PlayerUtil.sound(player, Sound.BLOCK_ENCHANTMENT_TABLE_USE);
+        UniSound.of(Sound.BLOCK_ENCHANTMENT_TABLE_USE).play(player);
 
         ItemStack second = inventory.getItem(1);
         if (second != null && !second.getType().isAir()) {

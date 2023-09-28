@@ -4,6 +4,8 @@ import su.nexmedia.engine.api.lang.LangKey;
 import su.nexmedia.engine.lang.EngineLang;
 import su.nightexpress.excellentenchants.Placeholders;
 
+import static su.nexmedia.engine.utils.Colors.*;
+
 public class Lang extends EngineLang {
 
     public static final LangKey COMMAND_LIST_DESC = LangKey.of("Command.List.Desc", "List of all custom enchantments.");

@@ -13,8 +13,9 @@ import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.LocationUtil;
+import su.nexmedia.engine.utils.values.UniParticle;
+import su.nexmedia.engine.utils.values.UniSound;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -30,7 +31,7 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
 
     public static final String ID = "smelter";
 
-    private Sound                   sound;
+    private UniSound                sound;
     private Map<Material, Material> smeltingTable;
     private ChanceImplementation chanceImplementation;
 
@@ -51,7 +52,7 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
         this.chanceImplementation = ChanceImplementation.create(this,
             "25.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 10");
 
-        this.sound = JOption.create("Settings.Sound", Sound.class, Sound.BLOCK_LAVA_EXTINGUISH,
+        this.sound = JOption.create("Settings.Sound",UniSound.of(Sound.BLOCK_LAVA_EXTINGUISH),
             "Sound to play on smelting.",
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html").read(cfg);
 
@@ -108,8 +109,8 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
         Block block = event.getBlockState().getBlock();
         if (this.hasVisualEffects()) {
             Location location = LocationUtil.getCenter(block.getLocation(), true);
-            LocationUtil.sound(location, this.sound);
-            SimpleParticle.of(Particle.FLAME).play(location, 0.25, 0.05, 20);
+            UniParticle.of(Particle.FLAME).play(location, 0.25, 0.05, 20);
+            this.sound.play(location);
         }
         return true;
     }

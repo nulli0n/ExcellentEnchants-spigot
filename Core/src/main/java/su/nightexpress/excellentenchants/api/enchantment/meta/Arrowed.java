@@ -2,7 +2,7 @@ package su.nightexpress.excellentenchants.api.enchantment.meta;
 
 import org.bukkit.entity.Projectile;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.particle.SimpleParticle;
+import su.nexmedia.engine.utils.values.UniParticle;
 
 import java.util.Optional;
 
@@ -11,7 +11,7 @@ public interface Arrowed {
     @NotNull Arrowed getArrowImplementation();
 
     @NotNull
-    default Optional<SimpleParticle> getTrailParticle() {
+    default Optional<UniParticle> getTrailParticle() {
         return this.getArrowImplementation().getTrailParticle();
     }
 

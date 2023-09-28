@@ -7,7 +7,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.particle.SimpleParticle;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -73,7 +73,7 @@ public class DarknessCloakEnchant extends ExcellentEnchant implements Chanced, P
         if (!this.addEffect(damager, level)) return false;
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.ASH).play(damager.getEyeLocation(), 0.75, 0.1, 30);
+            UniParticle.of(Particle.ASH).play(damager.getEyeLocation(), 0.75, 0.1, 30);
         }
 
         return true;

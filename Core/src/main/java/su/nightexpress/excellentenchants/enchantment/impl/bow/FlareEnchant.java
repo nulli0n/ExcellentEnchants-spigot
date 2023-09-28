@@ -17,7 +17,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.particle.SimpleParticle;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
@@ -47,7 +47,7 @@ public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, 
     public void loadSettings() {
         super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this, "100.0");
-        this.arrowImplementation = ArrowImplementation.create(this, SimpleParticle.of(Particle.FIREWORKS_SPARK));
+        this.arrowImplementation = ArrowImplementation.create(this, UniParticle.of(Particle.FIREWORKS_SPARK));
     }
 
     @NotNull

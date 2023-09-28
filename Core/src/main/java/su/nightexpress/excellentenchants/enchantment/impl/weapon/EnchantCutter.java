@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.enchantment.impl.weapon;
 
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Item;
@@ -13,10 +12,10 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.particle.SimpleParticle;
-import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nexmedia.engine.utils.random.Rnd;
+import su.nexmedia.engine.utils.values.UniParticle;
+import su.nexmedia.engine.utils.values.UniSound;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -110,8 +109,8 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
         drop.getVelocity().multiply(3D);
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.ITEM_CRACK, itemCut).play(victim.getEyeLocation(), 0.25, 0.15, 30);
-            LocationUtil.sound(victim.getLocation(), Sound.ENTITY_ITEM_BREAK);
+            UniParticle.itemCrack(itemCut).play(victim.getEyeLocation(), 0.25, 0.15, 30);
+            UniSound.of(Sound.ENTITY_ITEM_BREAK).play(victim.getLocation());
         }
         return true;
     }

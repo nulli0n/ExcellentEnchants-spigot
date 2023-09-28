@@ -19,10 +19,10 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.PDCUtil;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -112,7 +112,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
 
         if (this.hasVisualEffects()) {
             Location location = LocationUtil.getCenter(block.getLocation());
-            SimpleParticle.of(Particle.VILLAGER_HAPPY).play(location, 0.3, 0.15, 30);
+            UniParticle.of(Particle.VILLAGER_HAPPY).play(location, 0.3, 0.15, 30);
         }
         block.removeMetadata(META_HANDLE, this.plugin);
         return true;

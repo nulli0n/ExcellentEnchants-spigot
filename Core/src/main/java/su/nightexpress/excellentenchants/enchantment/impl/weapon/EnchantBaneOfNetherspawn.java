@@ -8,8 +8,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.NumberUtil;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
@@ -73,7 +73,7 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
         double damageAdd = this.getDamageModifier(level);
         event.setDamage(this.damageModifier ? damageEvent * damageAdd : damageEvent + damageAdd);
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.SMOKE_NORMAL).play(victim.getEyeLocation(), 0.25, 0.1, 30);
+            UniParticle.of(Particle.SMOKE_NORMAL).play(victim.getEyeLocation(), 0.25, 0.1, 30);
         }
         return true;
     }

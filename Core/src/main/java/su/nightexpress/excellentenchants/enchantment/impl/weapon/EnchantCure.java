@@ -7,7 +7,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.particle.SimpleParticle;
+import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -62,7 +62,7 @@ public class EnchantCure extends ExcellentEnchant implements Chanced, CombatEnch
         event.setCancelled(true);
 
         if (this.hasVisualEffects()) {
-            SimpleParticle.of(Particle.CLOUD).play(victim.getEyeLocation(), 0.25, 0.1, 30);
+            UniParticle.of(Particle.CLOUD).play(victim.getEyeLocation(), 0.25, 0.1, 30);
         }
 
         if (victim instanceof PigZombie pigZombie) {

@@ -10,8 +10,8 @@ import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
+import su.nexmedia.engine.utils.blocktracker.PlayerBlockTracker;
 import su.nexmedia.engine.utils.random.Rnd;
-import su.nexmedia.playerblocktracker.PlayerBlockTracker;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.Cleanable;
@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 public class EnchantTreasures extends ExcellentEnchant implements Chanced, BlockBreakEnchant, BlockDropEnchant, Cleanable {
 
     public static final String ID = "treasures";
-    private static final String META = "wasted";
+    @Deprecated private static final String META = "wasted";
 
     private Map<Material, Map<Material, Double>> treasures;
     private ChanceImplementation chanceImplementation;
@@ -43,7 +43,7 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.1);
 
-        PlayerBlockTracker.initialize(plugin);
+        PlayerBlockTracker.initialize();
         PlayerBlockTracker.BLOCK_FILTERS.add(this.blockTracker = (block) -> {
            return this.treasures.containsKey(block.getType());
         });
@@ -106,7 +106,6 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
     @Override
     public void clear() {
         PlayerBlockTracker.BLOCK_FILTERS.remove(this.blockTracker);
-        PlayerBlockTracker.shutdown();
     }
 
     @NotNull

@@ -9,8 +9,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.random.Rnd;
+import su.nexmedia.engine.utils.values.UniSound;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
@@ -72,7 +72,7 @@ public class EnchantRocket extends ExcellentEnchant implements Chanced, CombatEn
         Firework firework = this.createRocket(victim.getLocation(), level);
         firework.addPassenger(victim);
 
-        LocationUtil.sound(victim.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH);
+        UniSound.of(Sound.ENTITY_FIREWORK_ROCKET_LAUNCH).play(victim.getLocation());
         return true;
     }
 
