@@ -80,7 +80,7 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, ItemStack weapon, int level) {
         if (this.ignoredEntityTypes.contains(entity.getType())) return false;
         if (PDCUtil.getBoolean(entity, this.keyEntityIgnored).orElse(false)) return false;
         if (!this.checkTriggerChance(level)) return false;

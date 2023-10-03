@@ -40,7 +40,7 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chance
             EnchantEnderBow.ID, EnchantBomber.ID,
             EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
             EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID,
-            DarknessArrowsEnchant.ID,
+            DarknessArrowsEnchant.ID, VampiricArrowsEnchant.ID,
             EnchantHover.ID, FlareEnchant.ID,
             Enchantment.ARROW_FIRE.getKey().getKey(),
             Enchantment.ARROW_KNOCKBACK.getKey().getKey(),

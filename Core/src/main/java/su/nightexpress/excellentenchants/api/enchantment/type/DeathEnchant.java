@@ -12,7 +12,7 @@ public interface DeathEnchant extends IEnchantment {
 
     boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level);
 
-    boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level);
+    boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, ItemStack weapon, int level);
 
     @NotNull
     default EventPriority getDeathPriority() {

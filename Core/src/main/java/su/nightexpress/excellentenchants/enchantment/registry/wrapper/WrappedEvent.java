@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.registry.wrapper;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;

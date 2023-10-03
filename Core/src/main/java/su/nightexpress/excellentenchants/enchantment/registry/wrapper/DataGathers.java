@@ -267,10 +267,9 @@ public class DataGathers {
 
         @Override
         public boolean useEnchant(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, @NotNull DeathEnchant enchant, int level) {
-            Player killer = entity.getKiller();
-            if (killer == null) return false;
+            if (!(entity instanceof Player killer)) return false;
 
-            return enchant.onKill(event, entity, killer, level); // TODO item?
+            return enchant.onKill(event, event.getEntity(), killer, item, level);
         }
     };
 

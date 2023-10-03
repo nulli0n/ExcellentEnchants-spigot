@@ -27,6 +27,7 @@ import su.nightexpress.excellentenchants.enchantment.impl.bow.*;
 import su.nightexpress.excellentenchants.enchantment.impl.fishing.*;
 import su.nightexpress.excellentenchants.enchantment.impl.tool.*;
 import su.nightexpress.excellentenchants.enchantment.impl.universal.CurseOfFragilityEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.universal.RestoreEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.universal.SoulboundEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.weapon.*;
 import su.nightexpress.excellentenchants.enchantment.registry.wrapper.DataGather;
@@ -106,6 +107,7 @@ public class EnchantRegistry extends AbstractManager<ExcellentEnchants> {
         this.register(EnchantBlindness.ID, () -> new EnchantBlindness(plugin));
         this.register(EnchantConfusion.ID, () -> new EnchantConfusion(plugin));
         this.register(EnchantCutter.ID, () -> new EnchantCutter(plugin));
+        this.register(CurseOfDeathEnchant.ID, () -> new CurseOfDeathEnchant(plugin));
         this.register(EnchantDecapitator.ID, () -> new EnchantDecapitator(plugin));
         this.register(EnchantDoubleStrike.ID, () -> new EnchantDoubleStrike(plugin));
         this.register(EnchantExhaust.ID, () -> new EnchantExhaust(plugin));
@@ -119,6 +121,7 @@ public class EnchantRegistry extends AbstractManager<ExcellentEnchants> {
         this.register(EnchantRocket.ID, () -> new EnchantRocket(plugin));
         this.register(EnchantScavenger.ID, () -> new EnchantScavenger(plugin));
         this.register(EnchantSurprise.ID, () -> new EnchantSurprise(plugin));
+        this.register(SwiperEnchant.ID, () -> new SwiperEnchant(plugin));
         this.register(EnchantTemper.ID, () -> new EnchantTemper(plugin));
         this.register(EnchantThrifty.ID, () -> new EnchantThrifty(plugin));
         this.register(EnchantThunder.ID, () -> new EnchantThunder(plugin));
@@ -155,6 +158,7 @@ public class EnchantRegistry extends AbstractManager<ExcellentEnchants> {
         this.register(EnchantHover.ID, () -> new EnchantHover(plugin));
         this.register(SniperEnchant.ID, () -> new SniperEnchant(plugin));
         this.register(EnchantPoisonedArrows.ID, () -> new EnchantPoisonedArrows(plugin));
+        this.register(VampiricArrowsEnchant.ID, () -> new VampiricArrowsEnchant(plugin));
         this.register(EnchantWitheredArrows.ID, () -> new EnchantWitheredArrows(plugin));
         if (Version.isAbove(Version.V1_18_R2)) {
             this.register(DarknessArrowsEnchant.ID, () -> new DarknessArrowsEnchant(plugin));
@@ -165,6 +169,7 @@ public class EnchantRegistry extends AbstractManager<ExcellentEnchants> {
         this.register(CurseOfFragilityEnchant.ID, () -> new CurseOfFragilityEnchant(plugin));
         this.register(CurseOfMediocrityEnchant.ID, () -> new CurseOfMediocrityEnchant(plugin));
         this.register(SoulboundEnchant.ID, () -> new SoulboundEnchant(plugin));
+        this.register(RestoreEnchant.ID, () -> new RestoreEnchant(plugin));
 
         Enchantment.stopAcceptingRegistrations();
         this.plugin.info("Enchantments Registered: " + EnchantRegistry.getRegistered().size());

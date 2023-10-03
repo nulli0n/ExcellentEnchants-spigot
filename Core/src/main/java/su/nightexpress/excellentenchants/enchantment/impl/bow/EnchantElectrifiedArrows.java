@@ -41,7 +41,7 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an electrified arrow.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
-        this.getDefaults().setConflicts(EnchantEnderBow.ID, EnchantGhast.ID, EnchantHover.ID, EnchantBomber.ID);
+        this.getDefaults().setConflicts(EnchantEnderBow.ID, EnchantGhast.ID, EnchantBomber.ID);
     }
 
     @Override

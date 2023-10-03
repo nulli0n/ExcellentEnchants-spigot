@@ -98,7 +98,7 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, ItemStack weapon, int level) {
         Map<Material, Pair<int[], Double>> items = this.loot.get(entity.getType());
         if (items == null) return false;
 

@@ -48,7 +48,7 @@ public class EnchantExpHunter extends ExcellentEnchant implements DeathEnchant {
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, ItemStack weapon, int level) {
         double expModifier = this.getExpModifier(level);
         double expFinal = Math.ceil((double) event.getDroppedExp() * expModifier);
 

@@ -95,7 +95,7 @@ public class CurseOfMisfortuneEnchant extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
+    public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, ItemStack weapon, int level) {
         if (!this.checkTriggerChance(level)) return false;
 
         event.getDrops().clear();

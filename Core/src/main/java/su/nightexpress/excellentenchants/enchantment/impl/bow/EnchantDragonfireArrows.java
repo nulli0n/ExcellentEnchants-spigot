@@ -50,7 +50,7 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an dragonfire arrow (R=" + PLACEHOLDER_FIRE_RADIUS + ", " + PLACEHOLDER_FIRE_DURATION + "s).");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.7);
-        this.getDefaults().setConflicts(EnchantEnderBow.ID, EnchantGhast.ID, EnchantHover.ID, EnchantBomber.ID);
+        this.getDefaults().setConflicts(EnchantEnderBow.ID, EnchantGhast.ID, EnchantBomber.ID);
     }
 
     @Override

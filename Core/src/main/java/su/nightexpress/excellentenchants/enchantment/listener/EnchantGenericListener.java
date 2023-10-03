@@ -44,9 +44,11 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEnchantProjectileLand(ProjectileHitEvent event) {
-        EnchantUtils.removeSourceWeapon(event.getEntity());
+        this.plugin.runTask(task -> {
+            EnchantUtils.removeSourceWeapon(event.getEntity());
+        });
     }
 
     // ---------------------------------------------------------------
