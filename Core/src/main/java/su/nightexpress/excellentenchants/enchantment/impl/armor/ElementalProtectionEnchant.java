@@ -8,17 +8,18 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
+import su.nexmedia.engine.api.manager.EventListener;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.Set;
 
-public class EnchantElementalProtection extends ExcellentEnchant {
+public class ElementalProtectionEnchant extends ExcellentEnchant implements GenericEnchant, EventListener {
 
     public static final String ID                              = "elemental_protection";
     public static final String PLACEHOLDER_PROTECTION_AMOUNT   = "%enchantment_protection_amount%";
@@ -33,8 +34,8 @@ public class EnchantElementalProtection extends ExcellentEnchant {
     private double        protectionCapacity;
     private boolean       protectionAsModifier;
 
-    public EnchantElementalProtection(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+    public ElementalProtectionEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setDescription("Reduces Poison, Magic, Wither, Lightning, Freeze damage by " + PLACEHOLDER_PROTECTION_AMOUNT + ".");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.2);
@@ -76,9 +77,9 @@ public class EnchantElementalProtection extends ExcellentEnchant {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onDamage(EntityDamageEvent e) {
-        if (!DAMAGE_CAUSES.contains(e.getCause())) return;
-        if (!(e.getEntity() instanceof LivingEntity entity)) return;
+    public void onDamage(EntityDamageEvent event) {
+        if (!DAMAGE_CAUSES.contains(event.getCause())) return;
+        if (!(event.getEntity() instanceof LivingEntity entity)) return;
         if (!this.isAvailableToUse(entity)) return;
 
         double protectionAmount = 0D;
@@ -96,10 +97,10 @@ public class EnchantElementalProtection extends ExcellentEnchant {
         }
 
         if (this.isProtectionAsModifier()) {
-            e.setDamage(Math.max(0, e.getDamage() * (1D - protectionAmount)));
+            event.setDamage(Math.max(0, event.getDamage() * (1D - protectionAmount)));
         }
         else {
-            e.setDamage(Math.max(0, e.getDamage() - protectionAmount));
+            event.setDamage(Math.max(0, event.getDamage() - protectionAmount));
         }
     }
 }

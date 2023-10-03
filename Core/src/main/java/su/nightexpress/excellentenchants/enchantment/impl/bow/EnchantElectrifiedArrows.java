@@ -26,7 +26,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chanced, Arrowed, BowEnchant {
 
@@ -38,7 +37,7 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
     private ChanceImplementation chanceImplementation;
 
     public EnchantElectrifiedArrows(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an electrified arrow.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
@@ -73,13 +72,11 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isAvailableToUse(shooter)) return false;
-
         return this.checkTriggerChance(level);
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent event, LivingEntity user, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         if (!this.isOurProjectile(projectile)) return false;
         if (event.getHitEntity() != null || event.getHitBlock() == null) return false;
 
@@ -90,7 +87,7 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
             UniParticle.blockCrack(block.getType()).play(center, 1, 0.05, 120);
             UniParticle.of(Particle.FIREWORKS_SPARK).play(center, 1, 0.05, 120);
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -103,7 +100,7 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
             victim.getWorld().strikeLightning(victim.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(plugin, true));
         });
 
-        return true;
+        return false;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

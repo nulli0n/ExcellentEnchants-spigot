@@ -3,6 +3,7 @@ package su.nightexpress.excellentenchants.enchantment.impl.tool;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +17,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class CurseOfMediocrityEnchant extends ExcellentEnchant implements Chanced, BlockDropEnchant, DeathEnchant {
 
@@ -25,7 +25,7 @@ public class CurseOfMediocrityEnchant extends ExcellentEnchant implements Chance
     private ChanceImplementation chanceImplementation;
 
     public CurseOfMediocrityEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.LOWEST);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to disenchant item drops.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0D);
@@ -51,6 +51,12 @@ public class CurseOfMediocrityEnchant extends ExcellentEnchant implements Chance
 
     @NotNull
     @Override
+    public EventPriority getDropPriority() {
+        return EventPriority.HIGHEST;
+    }
+
+    @NotNull
+    @Override
     public Chanced getChanceImplementation() {
         return this.chanceImplementation;
     }
@@ -62,8 +68,7 @@ public class CurseOfMediocrityEnchant extends ExcellentEnchant implements Chance
 
     @Override
     public boolean onDrop(@NotNull BlockDropItemEvent event,
-                          @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (!this.isAvailableToUse(player)) return false;
+                          @NotNull LivingEntity player, @NotNull ItemStack item, int level) {
         if (!this.checkTriggerChance(level)) return false;
 
         event.getItems().forEach(drop -> {
@@ -84,7 +89,6 @@ public class CurseOfMediocrityEnchant extends ExcellentEnchant implements Chance
 
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
-        if (!this.isAvailableToUse(killer)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         event.getDrops().forEach(stack -> {

@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.enchantment.impl.tool;
 
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -12,6 +13,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nexmedia.engine.api.manager.EventListener;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
@@ -21,13 +23,12 @@ import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 
 import java.util.List;
 
-public class EnchantBlastMining extends ExcellentEnchant implements Chanced, BlockBreakEnchant {
+public class BlastMiningEnchant extends ExcellentEnchant implements Chanced, BlockBreakEnchant, EventListener {
 
     public static final String ID = "blast_mining";
     public static final String PLACEHOLDER_EXPLOSION_POWER = "%enchantment_explosion_power%";
@@ -38,12 +39,12 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
 
     private int explodeLevel;
 
-    public EnchantBlastMining(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+    public BlastMiningEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to mine blocks by explosion.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(1.0);
-        this.getDefaults().setConflicts(EnchantVeinminer.ID, EnchantTunnel.ID);
+        this.getDefaults().setConflicts(VeinminerEnchant.ID, TunnelEnchant.ID);
     }
 
     @Override
@@ -98,8 +99,8 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
     }
 
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (!this.isAvailableToUse(player)) return false;
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
+        if (!(entity instanceof Player player)) return false;
         if (EnchantUtils.isBusy()) return false;
 
         Block block = event.getBlock();

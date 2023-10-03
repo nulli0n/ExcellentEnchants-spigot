@@ -6,6 +6,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
+import su.nexmedia.engine.api.manager.EventListener;
 import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
@@ -28,14 +30,13 @@ import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEnchant {
+public class SilkChestEnchant extends ExcellentEnchant implements BlockDropEnchant, EventListener {
 
     public static final String ID = "silk_chest";
 
@@ -43,8 +44,8 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     private       List<String>                chestLore;
     private final NamespacedKey               keyChest;
 
-    public EnchantSilkChest(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.HIGH);
+    public SilkChestEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setDescription("Drop chests and saves all its content.");
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.5);
@@ -73,6 +74,12 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     @NotNull
     public EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.TOOL;
+    }
+
+    @NotNull
+    @Override
+    public EventPriority getDropPriority() {
+        return EventPriority.NORMAL;
     }
 
     public boolean isSilkChest(@NotNull ItemStack item) {
@@ -131,11 +138,10 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
 
     @Override
     public boolean onDrop(@NotNull BlockDropItemEvent event,
-                          @NotNull Player player, @NotNull ItemStack item, int level) {
+                          @NotNull LivingEntity player, @NotNull ItemStack item, int level) {
         BlockState state = event.getBlockState();
         Block block = state.getBlock();
 
-        if (!this.isAvailableToUse(player)) return false;
         if (!(state instanceof Chest chest)) return false;
 
         // Добавляем в сундук обратно предметы из дроп листа, кроме самого сундука.

@@ -31,7 +31,6 @@ import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced, Arrowed, BowEnchant {
 
@@ -47,7 +46,7 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
     private ChanceImplementation chanceImplementation;
 
     public EnchantDragonfireArrows(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an dragonfire arrow (R=" + PLACEHOLDER_FIRE_RADIUS + ", " + PLACEHOLDER_FIRE_DURATION + "s).");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.7);
@@ -99,19 +98,17 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isAvailableToUse(shooter)) return false;
-
         return this.checkTriggerChance(level);
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent event, LivingEntity user, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         if (!this.isOurProjectile(projectile)) return false;
         if (event.getHitEntity() != null) return false;
         if (projectile.getShooter() == null) return false;
 
         this.createCloud(projectile.getShooter(), projectile.getLocation() , level);
-        return true;
+        return false;
     }
 
     @Override
@@ -119,7 +116,7 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
         if (!this.isOurProjectile(projectile)) return false;
 
         this.createCloud(shooter, victim.getLocation(), level);
-        return true;
+        return false;
     }
 
     private void createCloud(@NotNull ProjectileSource shooter, @NotNull Location location, int level) {

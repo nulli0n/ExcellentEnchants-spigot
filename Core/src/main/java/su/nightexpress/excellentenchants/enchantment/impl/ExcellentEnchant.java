@@ -25,7 +25,6 @@ import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantDefaults;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.tier.Tier;
 
@@ -33,22 +32,20 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public abstract class ExcellentEnchant extends Enchantment implements IEnchantment, EventListener {
+public abstract class ExcellentEnchant extends Enchantment implements IEnchantment {
 
-    protected final ExcellentEnchants plugin;
-    protected final JYML              cfg;
-    protected final String            id;
-    protected final EnchantPriority priority;
-    protected final EnchantDefaults defaults;
-    protected final NamespacedKey   chargesKey;
+    protected final ExcellentEnchants            plugin;
+    protected final JYML                         cfg;
+    protected final String                       id;
+    protected final EnchantDefaults              defaults;
+    protected final NamespacedKey                chargesKey;
     protected final Map<Integer, PlaceholderMap> placeholdersMap;
 
-    public ExcellentEnchant(@NotNull ExcellentEnchants plugin, @NotNull String id, @NotNull EnchantPriority priority) {
+    public ExcellentEnchant(@NotNull ExcellentEnchants plugin, @NotNull String id) {
         super(NamespacedKey.minecraft(id.toLowerCase()));
         this.plugin = plugin;
         this.id = this.getKey().getKey();
         this.cfg = new JYML(plugin.getDataFolder() + EnchantManager.DIR_ENCHANTS, id + ".yml");
-        this.priority = priority;
         this.chargesKey = new NamespacedKey(plugin, this.getId() + ".charges");
         this.defaults = new EnchantDefaults(this);
         this.placeholdersMap = new HashMap<>();
@@ -111,9 +108,10 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         }
     }
 
-    @Override
     public void registerListeners() {
-        this.plugin.getPluginManager().registerEvents(this, plugin);
+        if (this instanceof EventListener listener) {
+            this.plugin.getPluginManager().registerEvents(listener, plugin);
+        }
     }
 
     @NotNull
@@ -127,6 +125,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         return disabled.contains(this.getKey().getKey()) || disabled.contains(Placeholders.WILDCARD);
     }
 
+    @Override
     public boolean isAvailableToUse(@NotNull LivingEntity entity) {
         return !this.isDisabledInWorld(entity.getWorld());
     }
@@ -139,11 +138,6 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     @NotNull
     public String getId() {
         return this.id;
-    }
-
-    @NotNull
-    public EnchantPriority getPriority() {
-        return priority;
     }
 
     @NotNull

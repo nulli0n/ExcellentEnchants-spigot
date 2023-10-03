@@ -4,7 +4,7 @@ import su.nexmedia.engine.api.lang.LangKey;
 import su.nexmedia.engine.lang.EngineLang;
 import su.nightexpress.excellentenchants.Placeholders;
 
-import static su.nexmedia.engine.utils.Colors.*;
+import static su.nexmedia.engine.utils.Colors.RED;
 
 public class Lang extends EngineLang {
 

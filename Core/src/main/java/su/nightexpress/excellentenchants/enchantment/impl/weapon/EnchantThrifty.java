@@ -20,7 +20,6 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Objects;
 import java.util.Set;
@@ -37,7 +36,7 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
     private ChanceImplementation chanceImplementation;
 
     public EnchantThrifty(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to obtain mob spawn egg on kill.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.75);
@@ -82,8 +81,6 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
 
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
-        if (!this.isAvailableToUse(entity)) return false;
-
         if (this.ignoredEntityTypes.contains(entity.getType())) return false;
         if (PDCUtil.getBoolean(entity, this.keyEntityIgnored).orElse(false)) return false;
         if (!this.checkTriggerChance(level)) return false;

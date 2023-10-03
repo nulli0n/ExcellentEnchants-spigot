@@ -16,7 +16,6 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class CurseOfDrownedEnchant extends ExcellentEnchant implements FishingEnchant, Chanced {
 
@@ -25,7 +24,7 @@ public class CurseOfDrownedEnchant extends ExcellentEnchant implements FishingEn
     private ChanceImplementation chanceImplementation;
 
     public CurseOfDrownedEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.HIGHEST);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to fish up a Drowned Zombie.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0D);
@@ -53,7 +52,6 @@ public class CurseOfDrownedEnchant extends ExcellentEnchant implements FishingEn
     @Override
     public boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level) {
         if (event.getState() != PlayerFishEvent.State.CAUGHT_FISH) return false;
-        if (!this.isAvailableToUse(event.getPlayer())) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         FishHook hook = event.getHook();

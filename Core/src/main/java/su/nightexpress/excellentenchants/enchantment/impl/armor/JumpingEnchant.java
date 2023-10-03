@@ -7,29 +7,28 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
 
-public class EnchantSonic extends ExcellentEnchant implements Potioned, PassiveEnchant {
+public class JumpingEnchant extends ExcellentEnchant implements Potioned, PassiveEnchant {
 
-    public static final String ID = "sonic";
+    public static final String ID = "bunny_hop";
 
     private PotionImplementation potionImplementation;
 
-    public EnchantSonic(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Grants permanent " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " effect.");
+    public JumpingEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setLevelMax(3);
-        this.getDefaults().setTier(0.3);
+        this.getDefaults().setTier(0.1);
+        this.getDefaults().setDescription("Grants permanent " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " effect.");
     }
 
     @Override
     public void loadSettings() {
         super.loadSettings();
-        this.potionImplementation = PotionImplementation.create(this, PotionEffectType.SPEED, true);
+        this.potionImplementation = PotionImplementation.create(this, PotionEffectType.JUMP, true);
     }
 
     @NotNull
@@ -46,8 +45,6 @@ public class EnchantSonic extends ExcellentEnchant implements Potioned, PassiveE
 
     @Override
     public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
-        if (!this.isAvailableToUse(entity)) return false;
-
         return this.addEffect(entity, level);
     }
 }

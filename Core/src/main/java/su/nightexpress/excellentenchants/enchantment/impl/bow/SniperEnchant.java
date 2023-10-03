@@ -4,6 +4,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -18,7 +19,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class SniperEnchant extends ExcellentEnchant implements BowEnchant, Chanced {
 
@@ -30,7 +30,7 @@ public class SniperEnchant extends ExcellentEnchant implements BowEnchant, Chanc
     private EnchantScaler speedModifier;
 
     public SniperEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.LOWEST);
+        super(plugin, ID);
 
         this.getDefaults().setDescription("Increases projectile speed by " + PLACEHOLDER_PROJECTILE_SPEED + "%");
         this.getDefaults().setLevelMax(5);
@@ -48,6 +48,12 @@ public class SniperEnchant extends ExcellentEnchant implements BowEnchant, Chanc
         this.addPlaceholder(PLACEHOLDER_PROJECTILE_SPEED, level -> NumberUtil.format(this.getSpeedModifier(level) * 100D));
     }
 
+    @NotNull
+    @Override
+    public Chanced getChanceImplementation() {
+        return this.chanceImplementation;
+    }
+
     public double getSpeedModifier(int level) {
         return this.speedModifier.getValue(level);
     }
@@ -60,13 +66,12 @@ public class SniperEnchant extends ExcellentEnchant implements BowEnchant, Chanc
 
     @NotNull
     @Override
-    public Chanced getChanceImplementation() {
-        return this.chanceImplementation;
+    public EventPriority getShootPriority() {
+        return EventPriority.LOWEST;
     }
 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isAvailableToUse(shooter)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         double modifier = this.getSpeedModifier(level);
@@ -79,7 +84,7 @@ public class SniperEnchant extends ExcellentEnchant implements BowEnchant, Chanc
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent event, LivingEntity user, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         return false;
     }
 

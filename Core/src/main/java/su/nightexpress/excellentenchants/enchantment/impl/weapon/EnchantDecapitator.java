@@ -29,7 +29,6 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
     private final NamespacedKey skullKey;
 
     public EnchantDecapitator(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to obtain player''s or mob''s head.");
         this.getDefaults().setLevelMax(4);
         this.getDefaults().setTier(0.75);
@@ -185,8 +184,6 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
 
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
-        if (!this.isAvailableToUse(entity)) return false;
-
         EntityType entityType = entity.getType();
         if (this.ignoredEntityTypes.contains(entityType)) return false;
         if (!this.checkTriggerChance(level)) return false;

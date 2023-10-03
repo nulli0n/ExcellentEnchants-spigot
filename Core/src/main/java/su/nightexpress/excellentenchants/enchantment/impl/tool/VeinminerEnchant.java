@@ -5,6 +5,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +18,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 
@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnchant {
+public class VeinminerEnchant extends ExcellentEnchant implements BlockBreakEnchant {
 
     public static final  String      ID                = "veinminer";
 
@@ -40,13 +40,13 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
     private Scaler        blocksLimit;
     private Set<Material> blocksAffected;
 
-    public EnchantVeinminer(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.HIGH);
+    public VeinminerEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
 
         this.getDefaults().setDescription("Mines up to " + PLACEHOLDER_BLOCK_LIMIT + " blocks of the ore vein at once.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
-        this.getDefaults().setConflicts(EnchantBlastMining.ID, EnchantTunnel.ID);
+        this.getDefaults().setConflicts(BlastMiningEnchant.ID, TunnelEnchant.ID);
     }
 
     @Override
@@ -125,8 +125,8 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
     }
 
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack tool, int level) {
-        if (!this.isAvailableToUse(player)) return false;
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity entity, @NotNull ItemStack tool, int level) {
+        if (!(entity instanceof Player player)) return false;
         if (EnchantUtils.isBusy()) return false;
 
         Block block = event.getBlock();

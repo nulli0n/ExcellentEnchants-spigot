@@ -6,6 +6,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SmallFireball;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -14,11 +15,10 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
@@ -31,7 +31,7 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chance
     private ChanceImplementation chanceImplementation;
 
     public EnchantGhast(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.HIGHEST);
+        super(plugin, ID);
         this.getDefaults().setDescription("Shoots fireballs instead of arrows.");
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.3);
@@ -78,9 +78,14 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chance
         return EnchantmentTarget.BOW;
     }
 
+    @NotNull
+    @Override
+    public EventPriority getShootPriority() {
+        return EventPriority.LOWEST;
+    }
+
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isAvailableToUse(shooter)) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!(event.getProjectile() instanceof Projectile projectile)) return false;
 
@@ -104,7 +109,7 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chance
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent event, LivingEntity user, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         return false;
     }
 

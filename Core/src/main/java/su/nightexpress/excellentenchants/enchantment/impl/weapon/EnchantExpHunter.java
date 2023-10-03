@@ -12,7 +12,6 @@ import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantExpHunter extends ExcellentEnchant implements DeathEnchant {
 
@@ -22,7 +21,7 @@ public class EnchantExpHunter extends ExcellentEnchant implements DeathEnchant {
     private EnchantScaler expModifier;
 
     public EnchantExpHunter(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription("Increases exp drop from mobs by " + PLACEHOLDER_EXP_MODIFIER + "%.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.3);
@@ -50,8 +49,6 @@ public class EnchantExpHunter extends ExcellentEnchant implements DeathEnchant {
 
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
-        if (!this.isAvailableToUse(entity)) return false;
-
         double expModifier = this.getExpModifier(level);
         double expFinal = Math.ceil((double) event.getDroppedExp() * expModifier);
 

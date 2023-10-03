@@ -4,17 +4,16 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.EntityUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 
@@ -22,7 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant {
+public class TunnelEnchant extends ExcellentEnchant implements BlockBreakEnchant {
 
     public static final String   ID                   = "tunnel";
     // X and Z offsets for each block AoE mined
@@ -36,13 +35,13 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
 
     private boolean disableOnSneak;
 
-    public EnchantTunnel(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.HIGH);
+    public TunnelEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
 
         this.getDefaults().setDescription("Mines multiple blocks at once in a certain shape.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(1.0);
-        this.getDefaults().setConflicts(EnchantVeinminer.ID, EnchantBlastMining.ID);
+        this.getDefaults().setConflicts(VeinminerEnchant.ID, BlastMiningEnchant.ID);
     }
 
     @Override
@@ -65,9 +64,9 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
     }
 
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
+        if (!(entity instanceof Player player)) return false;
         if (EnchantUtils.isBusy()) return false;
-        if (!this.isAvailableToUse(player)) return false;
         if (this.disableOnSneak && player.isSneaking()) return false;
 
         Block block = event.getBlock();

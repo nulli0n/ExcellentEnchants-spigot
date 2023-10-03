@@ -4,6 +4,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,6 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantDoubleStrike extends ExcellentEnchant implements Chanced, CombatEnchant {
 
@@ -24,7 +24,7 @@ public class EnchantDoubleStrike extends ExcellentEnchant implements Chanced, Co
     private ChanceImplementation chanceImplementation;
 
     public EnchantDoubleStrike(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.LOW);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to inflict double damage.");
         this.getDefaults().setLevelMax(4);
         this.getDefaults().setTier(1.0);
@@ -49,9 +49,14 @@ public class EnchantDoubleStrike extends ExcellentEnchant implements Chanced, Co
         return EnchantmentTarget.WEAPON;
     }
 
+    @NotNull
+    @Override
+    public EventPriority getAttackPriority() {
+        return EventPriority.HIGHEST;
+    }
+
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isAvailableToUse(damager)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         event.setDamage(event.getDamage() * 2D);

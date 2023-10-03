@@ -2,9 +2,9 @@ package su.nightexpress.excellentenchants.enchantment.impl.meta;
 
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.random.Rnd;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 
 public final class ChanceImplementation implements Chanced {
 

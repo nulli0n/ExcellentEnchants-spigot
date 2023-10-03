@@ -3,6 +3,7 @@ package su.nightexpress.excellentenchants.enchantment.impl.weapon;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,6 @@ import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
 
@@ -27,7 +27,7 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
     private EnchantScaler healthPoint;
 
     public EnchantTemper(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription("Inflicts " + PLACEHOLDER_DAMAGE_AMOUNT + "% (max. " + PLACEHOLDER_DAMAGE_CAPACITY + "%) more damage for each " + PLACEHOLDER_HEALTH_POINT + " hearts missing.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.3);
@@ -67,10 +67,14 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
         return EnchantmentTarget.WEAPON;
     }
 
+    @NotNull
+    @Override
+    public EventPriority getAttackPriority() {
+        return EventPriority.NORMAL;
+    }
+
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isAvailableToUse(damager)) return false;
-
         double healthPoint = this.getHealthPoint(level);
         double healthHas = damager.getHealth();
         double healthMax = EntityUtil.getAttribute(damager, Attribute.GENERIC_MAX_HEALTH);

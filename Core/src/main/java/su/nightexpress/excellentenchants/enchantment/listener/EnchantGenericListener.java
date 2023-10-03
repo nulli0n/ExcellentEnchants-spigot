@@ -2,14 +2,11 @@ package su.nightexpress.excellentenchants.enchantment.listener;
 
 import org.bukkit.World;
 import org.bukkit.block.Chest;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.enchantment.EnchantItemEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.VillagerAcquireTradeEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -24,6 +21,7 @@ import su.nexmedia.engine.utils.EngineUtils;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.EnchantPopulator;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
@@ -39,21 +37,33 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         super(enchantManager.plugin());
     }
 
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onEnchantProjectileShoot(EntityShootBowEvent event) {
+        if (event.getProjectile() instanceof Projectile projectile) {
+            EnchantUtils.setSourceWeapon(projectile, event.getBow());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEnchantProjectileLand(ProjectileHitEvent event) {
+        EnchantUtils.removeSourceWeapon(event.getEntity());
+    }
+
     // ---------------------------------------------------------------
     // Update enchantment lore after grindstone
     // ---------------------------------------------------------------
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEnchantUpdateGrindstoneClick(InventoryClickEvent e) {
-        Inventory inventory = e.getInventory();
+    public void onEnchantUpdateGrindstoneClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
         if (inventory.getType() != InventoryType.GRINDSTONE) return;
-        if (e.getRawSlot() == 2) return;
+        if (event.getRawSlot() == 2) return;
 
         this.updateGrindstone(inventory);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEnchantUpdateGrindstoneDrag(InventoryDragEvent e) {
-        Inventory inventory = e.getInventory();
+    public void onEnchantUpdateGrindstoneDrag(InventoryDragEvent event) {
+        Inventory inventory = event.getInventory();
         if (inventory.getType() != InventoryType.GRINDSTONE) return;
 
         this.updateGrindstone(inventory);
@@ -80,10 +90,10 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEnchantUpdatePickup(EntityPickupItemEvent e) {
-        if (!(e.getEntity() instanceof Player player)) return;
+    public void onEnchantUpdatePickup(EntityPickupItemEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
 
-        Item item = e.getItem();
+        Item item = event.getItem();
         ItemStack itemStack = item.getItemStack();
         if (EnchantUtils.updateDisplay(itemStack)) {
             item.setItemStack(itemStack);
@@ -98,13 +108,12 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         ItemStack target = event.getItem();
         World world = event.getEnchanter().getWorld();
 
-        Map<Enchantment, Integer> enchantsPrepared = event.getEnchantsToAdd();
-        Map<Enchantment, Integer> enchantsToPopulate = EnchantUtils.getPopulationCandidates(
-            target, ObtainType.ENCHANTING, enchantsPrepared,
-            enchant -> enchant.getLevelByEnchantCost(event.getExpLevelCost()),
-            world);
+        EnchantPopulator populator = this.plugin.createPopulator(target, ObtainType.ENCHANTING)
+            .withWorld(world)
+            .withLevelGenerator(enchant -> enchant.getLevelByEnchantCost(event.getExpLevelCost()))
+            .withDefaultPopulation(event.getEnchantsToAdd());
 
-        enchantsPrepared.putAll(enchantsToPopulate);
+        event.getEnchantsToAdd().putAll(populator.createPopulation());
 
         plugin.getServer().getScheduler().runTask(plugin, () -> {
             ItemStack result = event.getInventory().getItem(0);
@@ -141,10 +150,11 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
     public void onEnchantPopulateVillagerAcquire(VillagerAcquireTradeEvent event) {
         MerchantRecipe recipe = event.getRecipe();
         ItemStack result = recipe.getResult();
-        World world = event.getEntity().getWorld();
-
         if (!EnchantUtils.isEnchantable(result)) return;
-        if (!EnchantUtils.populate(result, ObtainType.VILLAGER, world)) return;
+
+        EnchantPopulator populator = this.plugin.createPopulator(result, ObtainType.VILLAGER)
+            .withWorld(event.getEntity().getWorld());
+        if (!populator.populate()) return;
 
         int uses = recipe.getUses();
         int maxUses = recipe.getMaxUses();
@@ -171,7 +181,9 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         if (entity instanceof Minecart || holder instanceof Chest) {
             event.getLoot().forEach(item -> {
                 if (item != null && EnchantUtils.isEnchantable(item)) {
-                    EnchantUtils.populate(item, ObtainType.LOOT_GENERATION, world);
+                    this.plugin.createPopulator(item, ObtainType.LOOT_GENERATION)
+                        .withWorld(world)
+                        .populate();
                 }
             });
         }
@@ -186,15 +198,18 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         ItemStack itemStack = item.getItemStack();
         World world = item.getWorld();
         if (EnchantUtils.isEnchantable(itemStack)) {
-            EnchantUtils.populate(itemStack, ObtainType.FISHING, world);
+            this.plugin.createPopulator(itemStack, ObtainType.FISHING).withWorld(world).populate();
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEnchantPopulateSpawn(CreatureSpawnEvent e) {
+    public void onEnchantPopulateSpawn(CreatureSpawnEvent event) {
         //if (Config.getObtainSettings(ObtainType.MOB_SPAWNING).isEmpty()) return;
-        LivingEntity entity = e.getEntity();
+        LivingEntity entity = event.getEntity();
         if (entity.getType() == EntityType.ARMOR_STAND) return;
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.DISPENSE_EGG) return;
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) return;
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER) return;
 
         this.plugin.runTaskLater(task -> {
             EntityEquipment equipment = entity.getEquipment();
@@ -207,7 +222,9 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 ItemStack item = equipment.getItem(slot);
                 if (EnchantUtils.isEnchantable(item)) {
-                    if (doPopulation) EnchantUtils.populate(item, ObtainType.MOB_SPAWNING, world);
+                    if (doPopulation) {
+                        this.plugin.createPopulator(item, ObtainType.MOB_SPAWNING).withWorld(world).populate();
+                    }
                     EnchantUtils.getExcellents(item).forEach((enchant, level) -> EnchantUtils.restoreCharges(item, enchant, level));
                     equipment.setItem(slot, item);
                 }

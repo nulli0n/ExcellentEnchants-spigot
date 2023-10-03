@@ -19,10 +19,9 @@ import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.task.AbstractEnchantmentTask;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
-public class EnchantRegrowth extends ExcellentEnchant implements Chanced, PassiveEnchant, Cleanable {
+public class RegrowthEnchant extends ExcellentEnchant implements Chanced, PassiveEnchant, Cleanable {
 
     public static final String ID = "regrowth";
 
@@ -39,8 +38,8 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
     private ChanceImplementation chanceImplementation;
     private Task task;
 
-    public EnchantRegrowth(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+    public RegrowthEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setDescription("Restores " + PLACEHOLDER_HEAL_AMOUNT + " hearts every " + PLACEHOLDER_HEAL_INTERVAL + "s.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.7);
@@ -111,7 +110,6 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
 
     @Override
     public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
-        if (!this.isAvailableToUse(entity)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         double healthMax = EntityUtil.getAttribute(entity, Attribute.GENERIC_MAX_HEALTH);
@@ -137,7 +135,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
         @Override
         public void action() {
             for (LivingEntity entity : this.getEntities()) {
-                EnchantUtils.getEquipped(entity, EnchantRegrowth.class).forEach((item, enchants) -> {
+                EnchantUtils.getEquipped(entity, RegrowthEnchant.class).forEach((item, enchants) -> {
                     enchants.forEach((enchant, level) -> {
                         if (enchant.isOutOfCharges(item)) return;
                         if (enchant.onTrigger(entity, item, level)) {

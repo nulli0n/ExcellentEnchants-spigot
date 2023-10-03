@@ -19,15 +19,16 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.Version;
+import su.nexmedia.engine.api.manager.EventListener;
 import su.nexmedia.engine.api.server.AbstractTask;
 import su.nexmedia.engine.utils.Pair;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nexmedia.engine.utils.values.UniParticle;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.Cleanable;
+import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.List;
@@ -36,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
+public class FlameWalkerEnchant extends ExcellentEnchant implements GenericEnchant, EventListener, Cleanable {
 
     public static final String ID = "flame_walker";
 
@@ -46,8 +47,8 @@ public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
     private EnchantScaler blockDecayTime;
     private BlockTickTask blockTickTask;
 
-    public EnchantFlameWalker(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+    public FlameWalkerEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setDescription("Ability to walk on lava and magma blocks without getting damage.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.7);
@@ -93,12 +94,12 @@ public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPlayerMove(PlayerMoveEvent e) {
-        Player player = e.getPlayer();
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
         if (player.isFlying() || !this.isAvailableToUse(player)) return;
 
-        Location from = e.getFrom();
-        Location to = e.getTo();
+        Location from = event.getFrom();
+        Location to = event.getTo();
         if (to == null) return;
         if (from.getX() == to.getX() && from.getY() == to.getY() && from.getZ() == to.getZ()) return;
 
@@ -147,9 +148,9 @@ public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onMagmaDamage(EntityDamageEvent e) {
-        if (e.getCause() != EntityDamageEvent.DamageCause.HOT_FLOOR) return;
-        if (!(e.getEntity() instanceof LivingEntity livingEntity)) return;
+    public void onMagmaDamage(EntityDamageEvent event) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.HOT_FLOOR) return;
+        if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
         if (!this.isAvailableToUse(livingEntity)) return;
 
         EntityEquipment equipment = livingEntity.getEquipment();
@@ -161,7 +162,7 @@ public class EnchantFlameWalker extends ExcellentEnchant implements Cleanable {
         int level = EnchantUtils.getLevel(boots, this);
         if (level <= 0) return;
 
-        e.setCancelled(true);
+        event.setCancelled(true);
     }
 
     static class BlockTickTask extends AbstractTask<ExcellentEnchants> {

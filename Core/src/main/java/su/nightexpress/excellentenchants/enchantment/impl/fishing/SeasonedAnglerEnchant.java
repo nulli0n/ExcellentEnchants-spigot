@@ -10,7 +10,6 @@ import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class SeasonedAnglerEnchant extends ExcellentEnchant implements FishingEnchant {
 
@@ -19,7 +18,7 @@ public class SeasonedAnglerEnchant extends ExcellentEnchant implements FishingEn
     private EnchantScaler expMod;
 
     public SeasonedAnglerEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription("Increases amount of XP gained from fishing by " + Placeholders.GENERIC_AMOUNT + "%.");
         this.getDefaults().setLevelMax(4);
         this.getDefaults().setTier(0.1);
@@ -48,7 +47,6 @@ public class SeasonedAnglerEnchant extends ExcellentEnchant implements FishingEn
     @Override
     public boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level) {
         if (event.getState() != PlayerFishEvent.State.CAUGHT_FISH) return false;
-        if (!this.isAvailableToUse(event.getPlayer())) return false;
         if (event.getExpToDrop() == 0) return false;
 
         int expDrop = event.getExpToDrop();

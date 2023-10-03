@@ -15,7 +15,6 @@ import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Set;
 
@@ -36,7 +35,7 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
     private EnchantScaler damageFormula;
 
     public EnchantBaneOfNetherspawn(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription("Inflicts " + PLACEHOLDER_DAMAGE + " more damage to nether mobs.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.1);
@@ -67,7 +66,6 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!ENTITY_TYPES.contains(victim.getType())) return false;
-        if (!this.isAvailableToUse(damager)) return false;
 
         double damageEvent = event.getDamage();
         double damageAdd = this.getDamageModifier(level);

@@ -3,6 +3,7 @@ package su.nightexpress.excellentenchants.enchantment.impl.armor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -16,17 +17,16 @@ import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-public class EnchantIceShield extends ExcellentEnchant implements Chanced, Potioned, CombatEnchant {
+public class IceShieldEnchant extends ExcellentEnchant implements Chanced, Potioned, CombatEnchant {
 
     public static final String ID = "ice_shield";
 
     private ChanceImplementation chanceImplementation;
     private PotionImplementation potionImplementation;
 
-    public EnchantIceShield(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+    public IceShieldEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to freeze and apply " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.) on attacker.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.1);
@@ -45,6 +45,12 @@ public class EnchantIceShield extends ExcellentEnchant implements Chanced, Potio
     @Override
     public EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.ARMOR_TORSO;
+    }
+
+    @NotNull
+    @Override
+    public EventPriority getProtectPriority() {
+        return EventPriority.HIGHEST;
     }
 
     @Override
@@ -66,7 +72,6 @@ public class EnchantIceShield extends ExcellentEnchant implements Chanced, Potio
 
     @Override
     public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isAvailableToUse(victim)) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!this.addEffect(damager, level)) return false;
 

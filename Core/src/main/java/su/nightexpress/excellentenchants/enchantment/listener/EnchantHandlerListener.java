@@ -1,82 +1,37 @@
 package su.nightexpress.excellentenchants.enchantment.listener;
 
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.Event.Result;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDropItemEvent;
-import org.bukkit.event.entity.*;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.player.PlayerFishEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.AbstractListener;
-import su.nexmedia.engine.utils.EntityUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
-import su.nightexpress.excellentenchants.api.enchantment.type.*;
-import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> {
-
-    private static final String META_PROJECTILE_WEAPON = "sourceWeapon";
 
     public EnchantHandlerListener(@NotNull EnchantManager enchantManager) {
         super(enchantManager.plugin());
     }
 
-    private void setSourceWeapon(@NotNull Projectile projectile, @NotNull ItemStack item) {
-        projectile.setMetadata(META_PROJECTILE_WEAPON, new FixedMetadataValue(plugin, item));
-    }
-
-    @Nullable
-    private ItemStack getSourceWeapon(@NotNull Projectile projectile) {
-        return projectile.hasMetadata(META_PROJECTILE_WEAPON) ? (ItemStack) projectile.getMetadata(META_PROJECTILE_WEAPON).get(0).value() : null;
-    }
-
-    private void removeSourceWeapon(@NotNull Projectile projectile) {
-        projectile.removeMetadata(META_PROJECTILE_WEAPON, plugin);
-    }
-
     // ---------------------------------------------------------------
     // Combat Attacking Enchants
     // ---------------------------------------------------------------
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEnchantCombatMelee(EntityDamageEvent e) {
-        if (e.getCause() == DamageCause.THORNS) return;
-        if (!(e.getEntity() instanceof LivingEntity victim)) return;
+    /*@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEnchantCombatMelee(EntityDamageEvent event) {
+        if (event.getCause() == DamageCause.THORNS) return;
+        if (!(event.getEntity() instanceof LivingEntity victim)) return;
 
-        if (e instanceof EntityDamageByEntityEvent ede) {
-            LivingEntity damager = null;
-            if (ede.getDamager() instanceof LivingEntity living) {
-                damager = living;
-            }
-            else if (ede.getDamager() instanceof Projectile pj && pj.getShooter() instanceof LivingEntity living) {
-                damager = living;
-            }
-            if (damager == null || damager.equals(victim)) return;
-
-            if (ede.getDamager() instanceof Projectile projectile) {
+        if (event instanceof EntityDamageByEntityEvent ede) {
+            if (ede.getDamager() instanceof Projectile projectile && this.getSourceWeapon(projectile) != null) {
                 this.handleCombatBowEnchants(ede, projectile, victim);
+                return;
             }
-            else {
-                this.handleCombatWeaponEnchants(ede, damager, victim);
-            }
+
+            if (!(ede.getDamager() instanceof LivingEntity damager) || damager == victim) return;
+
+            this.handleCombatWeaponEnchants(ede, damager, victim);
             this.handleCombatArmorEnchants(ede, damager, victim);
         }
         else {
-            this.handleArmorEnchants(e, victim);
+            this.handleArmorEnchants(event, victim);
         }
     }
 
@@ -145,17 +100,17 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     // Bow Shooting Enchants
     // ---------------------------------------------------------------
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEnchantBowShoot(EntityShootBowEvent e) {
-        LivingEntity shooter = e.getEntity();
+    public void onEnchantBowShoot(EntityShootBowEvent event) {
+        LivingEntity shooter = event.getEntity();
         if (shooter.getEquipment() == null) return;
 
-        ItemStack bow = e.getBow();
+        ItemStack bow = event.getBow();
         if (bow == null || bow.getType().isAir() || bow.getType() == Material.ENCHANTED_BOOK) return;
 
         EnchantUtils.getExcellents(bow, BowEnchant.class).forEach((bowEnchant, level) -> {
             if (bowEnchant.isOutOfCharges(bow)) return;
-            if (bowEnchant.onShoot(e, shooter, bow, level)) {
-                if (bowEnchant instanceof Arrowed arrowed && e.getProjectile() instanceof Projectile projectile) {
+            if (bowEnchant.onShoot(event, shooter, bow, level)) {
+                if (bowEnchant instanceof Arrowed arrowed && event.getProjectile() instanceof Projectile projectile) {
                     arrowed.addData(projectile);
                     arrowed.addTrail(projectile);
                 }
@@ -164,7 +119,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         });
         EnchantUtils.updateChargesDisplay(bow);
 
-        if (e.getProjectile() instanceof Projectile projectile) {
+        if (event.getProjectile() instanceof Projectile projectile) {
             this.setSourceWeapon(projectile, bow);
         }
     }
@@ -173,35 +128,35 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     // Bow Hit Land Enchants
     // ---------------------------------------------------------------
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEnchantBowHit(ProjectileHitEvent e) {
-        Projectile projectile = e.getEntity();
+    public void onEnchantBowHit(ProjectileHitEvent event) {
+        Projectile projectile = event.getEntity();
 
         ItemStack bow = this.getSourceWeapon(projectile);
         if (bow == null || bow.getType().isAir() || bow.getType() == Material.ENCHANTED_BOOK) return;
 
         EnchantUtils.getExcellents(bow, BowEnchant.class).forEach((bowEnchant, level) -> {
-            bowEnchant.onHit(e, projectile, bow, level);
+            bowEnchant.onHit(event, null, projectile, bow, level);
         });
 
         // Prevent to apply enchants multiple times on hits.
-        this.plugin.getScheduler().runTask(this.plugin, c -> this.removeSourceWeapon(projectile));
+        this.plugin.runTask(task -> this.removeSourceWeapon(projectile));
     }
 
     // ---------------------------------------------------------------
     // Interaction Related Enchants
     // ---------------------------------------------------------------
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onEnchantInteract(PlayerInteractEvent e) {
-        if (e.useInteractedBlock() == Result.DENY) return;
-        if (e.useItemInHand() == Result.DENY) return;
+    public void onEnchantInteract(PlayerInteractEvent event) {
+        if (event.useInteractedBlock() == Result.DENY) return;
+        if (event.useItemInHand() == Result.DENY) return;
 
-        ItemStack item = e.getItem();
+        ItemStack item = event.getItem();
         if (item == null || item.getType().isAir() || item.getType() == Material.ENCHANTED_BOOK) return;
 
-        Player player = e.getPlayer();
+        Player player = event.getPlayer();
         EnchantUtils.getExcellents(item, InteractEnchant.class).forEach((interEnchant, level) -> {
             if (interEnchant.isOutOfCharges(item)) return;
-            if (interEnchant.onInteract(e, player, item, level)) {
+            if (interEnchant.onInteract(event, player, item, level)) {
                 interEnchant.consumeChargesNoUpdate(item, level);
             }
         });
@@ -261,8 +216,8 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
 
     // Handle BlockBreak enchantments.
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEnchantBlockBreak(BlockBreakEvent e) {
-        Player player = e.getPlayer();
+    public void onEnchantBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.CREATIVE) return;
 
         ItemStack tool = player.getInventory().getItemInMainHand();
@@ -270,7 +225,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
 
         EnchantUtils.getExcellents(tool, BlockBreakEnchant.class).forEach((blockEnchant, level) -> {
             if (blockEnchant.isOutOfCharges(tool)) return;
-            if (blockEnchant.onBreak(e, player, tool, level)) {
+            if (blockEnchant.onBreak(event, player, tool, level)) {
                 blockEnchant.consumeChargesNoUpdate(tool, level);
             }
         });
@@ -285,7 +240,6 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         ItemStack tool = player.getInventory().getItemInMainHand();
         if (tool.getType().isAir() || tool.getType() == Material.ENCHANTED_BOOK) return;
 
-        //EnchantDropContainer dropContainer = new EnchantDropContainer(e);
         EnchantUtils.getExcellents(tool, BlockDropEnchant.class).forEach((enchant, level) -> {
             if (enchant.isOutOfCharges(tool)) return;
             if (enchant.onDrop(event, player, tool, level)) {
@@ -293,11 +247,5 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
             }
         });
         EnchantUtils.updateChargesDisplay(tool);
-
-        //BlockState state = e.getBlockState();
-        //World world = state.getWorld();
-        //Location location = state.getLocation();
-
-        //dropContainer.getDrop().forEach(item -> world.dropItem(location, item));
-    }
+    }*/
 }

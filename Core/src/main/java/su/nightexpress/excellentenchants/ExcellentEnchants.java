@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants;
 
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.Version;
@@ -13,8 +14,10 @@ import su.nightexpress.excellentenchants.command.TierbookCommand;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
-import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
+import su.nightexpress.excellentenchants.enchantment.EnchantPopulator;
+import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 import su.nightexpress.excellentenchants.hook.HookId;
 import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
 import su.nightexpress.excellentenchants.hook.impl.ProtocolHook;
@@ -28,7 +31,7 @@ import su.nightexpress.excellentenchants.tier.TierManager;
 
 public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
-    private EnchantRegistry enchantRegistry;
+    private EnchantRegistry registry;
     private EnchantManager  enchantManager;
     private EnchantNMS      enchantNMS;
     private TierManager     tierManager;
@@ -42,7 +45,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     @Override
     public void onLoad() {
         super.onLoad();
-        this.enchantRegistry = new EnchantRegistry(this);
+        this.registry = new EnchantRegistry(this);
     }
 
     @Override
@@ -52,7 +55,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
         this.tierManager = new TierManager(this);
         this.tierManager.setup();
 
-        this.enchantRegistry.setup();
+        this.registry.setup();
 
         this.enchantManager = new EnchantManager(this);
         this.enchantManager.setup();
@@ -79,7 +82,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
             this.tierManager = null;
         }
         PlaceholderHook.shutdown();
-        //this.enchantRegistry.shutdown(); Do we ever need this at all?
+        this.registry.shutdown();
     }
 
     private void setNMS() {
@@ -127,13 +130,18 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     }
 
     @NotNull
+    public EnchantPopulator createPopulator(@NotNull ItemStack item, @NotNull ObtainType obtainType) {
+        return new EnchantPopulator(this, item, obtainType);
+    }
+
+    @NotNull
     public TierManager getTierManager() {
         return tierManager;
     }
 
     @NotNull
-    public EnchantRegistry getEnchantRegistry() {
-        return this.enchantRegistry;
+    public EnchantRegistry getRegistry() {
+        return registry;
     }
 
     @NotNull

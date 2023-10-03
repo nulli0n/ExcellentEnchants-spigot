@@ -4,11 +4,11 @@ import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.blocktracker.PlayerBlockTracker;
 import su.nexmedia.engine.utils.random.Rnd;
@@ -21,24 +21,24 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-public class EnchantTreasures extends ExcellentEnchant implements Chanced, BlockBreakEnchant, BlockDropEnchant, Cleanable {
+public class TreasuresEnchant extends ExcellentEnchant implements Chanced, BlockBreakEnchant, BlockDropEnchant, Cleanable {
 
     public static final String ID = "treasures";
-    @Deprecated private static final String META = "wasted";
+
+    private final Predicate<Block> blockTracker;
 
     private Map<Material, Map<Material, Double>> treasures;
     private ChanceImplementation chanceImplementation;
 
-    private final Predicate<Block> blockTracker;
+    private Block handleDrop;
 
-    public EnchantTreasures(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+    public TreasuresEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to attempt to find a treasure in mined block.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.1);
@@ -126,29 +126,31 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
         return EnchantmentTarget.TOOL;
     }
 
+    @NotNull
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (PlayerBlockTracker.isTracked(event.getBlock())) {
-            event.getBlock().setMetadata(META, new FixedMetadataValue(plugin, true));
-        }
+    public EventPriority getDropPriority() {
+        return EventPriority.NORMAL;
+    }
+
+    @Override
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity player, @NotNull ItemStack item, int level) {
+        if (!event.isDropItems()) return false;
+        if (PlayerBlockTracker.isTracked(event.getBlock())) return false;
+
+        this.handleDrop = event.getBlock();
         return false;
     }
 
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
-        Block block = event.getBlockState().getBlock();
-        if (block.hasMetadata(META)) {
-            block.removeMetadata(META, plugin);
-            return false;
-        }
-        if (!this.isAvailableToUse(player)) return false;
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull LivingEntity player, @NotNull ItemStack item, int level) {
+        if (this.handleDrop != event.getBlock()) return false;
+        this.handleDrop = null;
+
         if (!this.checkTriggerChance(level)) return false;
 
         this.getTreasures(event.getBlockState().getType()).forEach(treasure -> {
             EnchantUtils.popResource(event, treasure);
         });
-
-        //dropContainer.getDrop().addAll(this.getTreasures(event.getBlockState().getType()));
         return true;
     }
 

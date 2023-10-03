@@ -23,7 +23,6 @@ import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantConfusingArrows extends ExcellentEnchant implements Chanced, Arrowed, Potioned, BowEnchant {
 
@@ -34,7 +33,7 @@ public class EnchantConfusingArrows extends ExcellentEnchant implements Chanced,
     private PotionImplementation potionImplementation;
 
     public EnchantConfusingArrows(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an arrow with " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.)");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.1);
@@ -78,7 +77,6 @@ public class EnchantConfusingArrows extends ExcellentEnchant implements Chanced,
 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isAvailableToUse(shooter)) return false;
         if (!(event.getProjectile() instanceof Arrow arrow)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
@@ -87,12 +85,12 @@ public class EnchantConfusingArrows extends ExcellentEnchant implements Chanced,
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
-        return this.isOurProjectile(projectile);
+    public boolean onHit(@NotNull ProjectileHitEvent event, LivingEntity user, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+        return false;
     }
 
     @Override
     public boolean onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        return this.isOurProjectile(projectile);
+        return false;
     }
 }

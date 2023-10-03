@@ -5,16 +5,16 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 
 public class EnchantEnderBow extends ExcellentEnchant implements BowEnchant, Chanced {
@@ -24,7 +24,7 @@ public class EnchantEnderBow extends ExcellentEnchant implements BowEnchant, Cha
     private ChanceImplementation chanceImplementation;
 
     public EnchantEnderBow(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.HIGHEST);
+        super(plugin, ID);
         this.getDefaults().setDescription("Shoots ender pearls instead of arrows.");
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(1.0);
@@ -59,9 +59,14 @@ public class EnchantEnderBow extends ExcellentEnchant implements BowEnchant, Cha
         return EnchantmentTarget.BOW;
     }
 
+    @NotNull
+    @Override
+    public EventPriority getShootPriority() {
+        return EventPriority.LOWEST;
+    }
+
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isAvailableToUse(shooter)) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!(event.getProjectile() instanceof Projectile projectile)) return false;
 
@@ -72,7 +77,7 @@ public class EnchantEnderBow extends ExcellentEnchant implements BowEnchant, Cha
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent event, LivingEntity user, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         return false;
     }
 

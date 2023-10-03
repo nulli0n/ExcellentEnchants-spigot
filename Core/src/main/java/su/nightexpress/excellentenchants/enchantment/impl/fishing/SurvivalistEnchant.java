@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.enchantment.impl.fishing;
 
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Item;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.ItemStack;
@@ -11,7 +12,6 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +25,7 @@ public class SurvivalistEnchant extends ExcellentEnchant implements FishingEncha
     private ChanceImplementation chanceImplementation;
 
     public SurvivalistEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.HIGH);
+        super(plugin, ID);
         this.getDefaults().setDescription("Automatically cooks fish if what is caught is raw.");
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.4);
@@ -58,10 +58,15 @@ public class SurvivalistEnchant extends ExcellentEnchant implements FishingEncha
         return EnchantmentTarget.FISHING_ROD;
     }
 
+    @NotNull
+    @Override
+    public EventPriority getFishingPriority() {
+        return EventPriority.HIGH;
+    }
+
     @Override
     public boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level) {
         if (event.getState() != PlayerFishEvent.State.CAUGHT_FISH) return false;
-        if (!this.isAvailableToUse(event.getPlayer())) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!(event.getCaught() instanceof Item drop)) return false;
 

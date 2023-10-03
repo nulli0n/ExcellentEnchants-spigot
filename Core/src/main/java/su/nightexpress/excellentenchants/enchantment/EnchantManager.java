@@ -5,7 +5,6 @@ import su.nexmedia.engine.api.manager.AbstractManager;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.enchantment.listener.EnchantAnvilListener;
 import su.nightexpress.excellentenchants.enchantment.listener.EnchantGenericListener;
-import su.nightexpress.excellentenchants.enchantment.listener.EnchantHandlerListener;
 import su.nightexpress.excellentenchants.enchantment.menu.EnchantmentsListMenu;
 import su.nightexpress.excellentenchants.enchantment.task.ArrowTrailsTask;
 import su.nightexpress.excellentenchants.enchantment.task.PotionEffectsTask;
@@ -26,7 +25,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     @Override
     protected void onLoad() {
         this.enchantmentsListMenu = new EnchantmentsListMenu(this.plugin);
-        this.addListener(new EnchantHandlerListener(this));
+        //this.addListener(new EnchantHandlerListener(this));
         this.addListener(new EnchantGenericListener(this));
         this.addListener(new EnchantAnvilListener(this.plugin));
 

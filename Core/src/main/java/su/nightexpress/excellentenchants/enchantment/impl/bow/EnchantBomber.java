@@ -5,6 +5,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -18,7 +19,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEnchant {
 
@@ -29,7 +29,7 @@ public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEncha
     private ChanceImplementation chanceImplementation;
 
     public EnchantBomber(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.HIGHEST);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch TNT that explodes in " + PLACEHOLDER_FUSE_TICKS + "s.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.7);
@@ -73,9 +73,14 @@ public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEncha
         return EnchantmentTarget.BOW;
     }
 
+    @NotNull
+    @Override
+    public EventPriority getShootPriority() {
+        return EventPriority.LOWEST;
+    }
+
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isAvailableToUse(shooter)) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!(event.getProjectile() instanceof Projectile projectile)) return false;
 
@@ -88,7 +93,7 @@ public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEncha
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent event, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent event, LivingEntity user, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         return false;
     }
 

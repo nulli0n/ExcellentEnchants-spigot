@@ -1,6 +1,7 @@
 package su.nightexpress.excellentenchants.api.enchantment.type;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -15,4 +16,14 @@ public interface CombatEnchant extends IEnchantment {
     boolean onProtect(@NotNull EntityDamageByEntityEvent event,
                       @NotNull LivingEntity damager, @NotNull LivingEntity victim,
                       @NotNull ItemStack weapon, int level);
+
+    @NotNull
+    default EventPriority getAttackPriority() {
+        return EventPriority.NORMAL;
+    }
+
+    @NotNull
+    default EventPriority getProtectPriority() {
+        return EventPriority.NORMAL;
+    }
 }

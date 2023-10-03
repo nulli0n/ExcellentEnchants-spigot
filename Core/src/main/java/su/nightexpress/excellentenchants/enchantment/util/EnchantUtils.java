@@ -2,48 +2,41 @@ package su.nightexpress.excellentenchants.enchantment.util;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.lang.LangManager;
-import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
-import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.config.ObtainSettings;
-import su.nightexpress.excellentenchants.enchantment.EnchantPopulator;
-import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
-import su.nightexpress.excellentenchants.tier.Tier;
+import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EnchantUtils {
 
     public static final NamespacedKey KEY_LORE_SIZE = new NamespacedKey(ExcellentEnchantsAPI.PLUGIN, "lore_size");
+    private static final String META_PROJECTILE_WEAPON = "sourceWeapon";
 
     private static boolean busyBreak = false;
 
@@ -99,107 +92,6 @@ public class EnchantUtils {
         if (item.getType().isAir()) return false;
 
         return item.getType() == Material.ENCHANTED_BOOK || Stream.of(EnchantmentTarget.values()).anyMatch(target -> target.includes(item));
-    }
-
-    // TODO Move in populator class
-
-    public static boolean populate(@NotNull ItemStack item, @NotNull ObtainType obtainType, @Nullable World world) {
-        AtomicBoolean status = new AtomicBoolean(false);
-
-        var population = getPopulationCandidates(item, obtainType, world);
-
-        if (obtainType == ObtainType.VILLAGER && item.getType() == Material.ENCHANTED_BOOK) {
-            if (Config.ENCHANTMENTS_SINGLE_ENCHANT_IN_VILLAGER_BOOKS.get() && !population.isEmpty()) {
-                getAll(item).keySet().forEach(enchantment -> remove(item, enchantment));
-            }
-        }
-
-        population.forEach((enchantment, level) -> {
-            if (add(item, enchantment, level, false)) {
-                status.set(true);
-            }
-        });
-
-        if (status.get()) {
-            updateDisplay(item);
-        }
-
-        return status.get();
-    }
-
-    @NotNull
-    public static Set<ExcellentEnchant> populateFilter(@NotNull Set<ExcellentEnchant> enchants,
-                                                       @NotNull ObtainType obtainType, @Nullable ItemStack item) {
-        Set<ExcellentEnchant> set = enchants.stream()
-            .filter(enchant -> enchant.getObtainChance(obtainType) > 0)
-            .filter(enchant -> item == null || enchant.canEnchantItem(item))
-            .collect(Collectors.toCollection(HashSet::new));
-        set.removeIf(enchant -> obtainType == ObtainType.ENCHANTING && (enchant.isTreasure() || enchant.isCursed()));
-        return set;
-    }
-
-    @NotNull
-    public static Map<Enchantment, Integer> getPopulationCandidates(@NotNull ItemStack item, @NotNull ObtainType obtainType,
-                                                                    @Nullable World world) {
-        return getPopulationCandidates(item, obtainType, new HashMap<>(), (enchant) -> enchant.generateLevel(obtainType), world);
-    }
-
-    @NotNull
-    public static Map<Enchantment, Integer> getPopulationCandidates(@NotNull ItemStack item, @NotNull ObtainType obtainType,
-                                                                    @NotNull Map<Enchantment, Integer> enchantsPrepared,
-                                                                    @NotNull Function<ExcellentEnchant, Integer> levelFunc,
-                                                                    @Nullable World world) {
-        Map<Enchantment, Integer> enchantsToAdd = new HashMap<>(enchantsPrepared);
-
-        ObtainSettings settings = Config.getObtainSettings(obtainType).orElse(null);
-        if (settings == null || !Rnd.chance(settings.getEnchantsCustomGenerationChance())) return enchantsToAdd;
-
-        int enchMax = settings.getEnchantsTotalMax();
-        int enchRoll = Rnd.get(settings.getEnchantsCustomMin(), settings.getEnchantsCustomMax());
-
-        EnchantPopulator populator = new EnchantPopulator(obtainType, item);
-
-        // Try to populate as many as possible.
-        while (!populator.isEmpty() && enchRoll > 0) {
-            // Limit reached.
-            if (enchantsToAdd.size() >= enchMax) break;
-
-            Tier tier = populator.getTierByChance();
-            if (tier == null) break; // no tiers left.
-
-            ExcellentEnchant enchant = populator.getEnchantByChance(tier);
-            // Remove entire tier if no enchants can be selected.
-            if (enchant == null) {
-                populator.purge(tier);
-                continue;
-            }
-
-            // Remove disabled world enchants.
-            if (world != null && enchant.isDisabledInWorld(world)) {
-                populator.purge(tier, enchant);
-                continue;
-            }
-
-            // Remove conflicting enchants.
-            if (enchantsToAdd.keySet().stream().anyMatch(has -> has.conflictsWith(enchant) || enchant.conflictsWith(has))) {
-                populator.purge(tier, enchant);
-                continue;
-            }
-
-            // Level generation failed.
-            int level = levelFunc.apply(enchant);
-            if (level < enchant.getStartLevel()) {
-                populator.purge(tier, enchant);
-                continue;
-            }
-
-            // All good!
-            populator.purge(tier, enchant);
-            enchantsToAdd.put(enchant, level);
-            enchRoll--;
-        }
-
-        return enchantsToAdd;
     }
 
     public static boolean add(@NotNull ItemStack item, @NotNull Enchantment enchantment, int level, boolean force) {
@@ -417,12 +309,17 @@ public class EnchantUtils {
 
             map.put(clazz.cast(excellent), level);
         });
-        return CollectionsUtil.sort(map, Comparator.comparing(p -> p.getKey().getPriority(), Comparator.reverseOrder()));
+        return map;//CollectionsUtil.sort(map, Comparator.comparing(p -> p.getKey().getPriority(), Comparator.reverseOrder()));
     }
 
     @NotNull
     public static Map<EquipmentSlot, ItemStack> getEnchantedEquipment(@NotNull LivingEntity entity) {
-        Map<EquipmentSlot, ItemStack> equipment = EntityUtil.getEquippedItems(entity);
+        return getEnchantedEquipment(entity, EquipmentSlot.values());
+    }
+
+    @NotNull
+    public static Map<EquipmentSlot, ItemStack> getEnchantedEquipment(@NotNull LivingEntity entity, @NotNull EquipmentSlot... slots) {
+        Map<EquipmentSlot, ItemStack> equipment = EntityUtil.getEquippedItems(entity, slots);
         equipment.entrySet().removeIf(entry -> {
             ItemStack item = entry.getValue();
             EquipmentSlot slot = entry.getKey();
@@ -445,8 +342,15 @@ public class EnchantUtils {
     @NotNull
     public static <T extends IEnchantment> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,
                                                                                        @NotNull Class<T> clazz) {
+        return getEquipped(entity, clazz, EquipmentSlot.values());
+    }
+
+    @NotNull
+    public static <T extends IEnchantment> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,
+                                                                                       @NotNull Class<T> clazz,
+                                                                                       @NotNull EquipmentSlot... slots) {
         Map<ItemStack, Map<T, Integer>> map = new HashMap<>();
-        getEnchantedEquipment(entity).values().forEach(item -> {
+        getEnchantedEquipment(entity, slots).values().forEach(item -> {
             map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(getExcellents(item, clazz));
         });
         return map;
@@ -455,6 +359,7 @@ public class EnchantUtils {
     public static void updateEquippedEffects(@NotNull LivingEntity entity) {
         getEquipped(entity, PassiveEnchant.class).forEach((item, enchants) -> {
             enchants.forEach((enchant, level) -> {
+                if (!enchant.isAvailableToUse(entity)) return;
                 if (enchant instanceof Potioned potioned) {
                     if (enchant.isOutOfCharges(item)) return;
                     if (enchant.onTrigger(entity, item, level)) {
@@ -464,5 +369,20 @@ public class EnchantUtils {
             });
             EnchantUtils.updateChargesDisplay(item);
         });
+    }
+
+    public static void setSourceWeapon(@NotNull Projectile projectile, @Nullable ItemStack item) {
+        if (item == null) return;
+
+        projectile.setMetadata(META_PROJECTILE_WEAPON, new FixedMetadataValue(ExcellentEnchantsAPI.PLUGIN, item));
+    }
+
+    @Nullable
+    public static ItemStack getSourceWeapon(@NotNull Projectile projectile) {
+        return projectile.hasMetadata(META_PROJECTILE_WEAPON) ? (ItemStack) projectile.getMetadata(META_PROJECTILE_WEAPON).get(0).value() : null;
+    }
+
+    public static void removeSourceWeapon(@NotNull Projectile projectile) {
+        projectile.removeMetadata(META_PROJECTILE_WEAPON, ExcellentEnchantsAPI.PLUGIN);
     }
 }

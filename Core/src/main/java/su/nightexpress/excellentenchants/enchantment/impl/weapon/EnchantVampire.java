@@ -4,6 +4,7 @@ import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.inventory.ItemStack;
@@ -19,7 +20,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatEnchant {
 
@@ -31,7 +31,7 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
     private ChanceImplementation chanceImplementation;
 
     public EnchantVampire(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.LOWEST);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to heal for " + PLACEHOLDER_HEAL_AMOUNT + " heart(s) on hit.");
         this.getDefaults().setLevelMax(4);
         this.getDefaults().setTier(0.75);
@@ -72,10 +72,14 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
         return EnchantmentTarget.WEAPON;
     }
 
+    @NotNull
+    @Override
+    public EventPriority getAttackPriority() {
+        return EventPriority.MONITOR;
+    }
+
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isAvailableToUse(damager)) return false;
-
         double healthMax = EntityUtil.getAttribute(damager, Attribute.GENERIC_MAX_HEALTH);
         double healthHas = damager.getHealth();
         if (healthHas == healthMax) return false;
@@ -83,7 +87,7 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
         if (!this.checkTriggerChance(level)) return false;
 
         double healAmount = this.getHealAmount(level);
-        double healFinal = this.isHealMultiplier() ? event.getDamage() * healAmount : healAmount;
+        double healFinal = this.isHealMultiplier() ? event.getFinalDamage() * healAmount : healAmount;
 
         EntityRegainHealthEvent healthEvent = new EntityRegainHealthEvent(damager, healFinal, EntityRegainHealthEvent.RegainReason.CUSTOM);
         plugin.getPluginManager().callEvent(healthEvent);

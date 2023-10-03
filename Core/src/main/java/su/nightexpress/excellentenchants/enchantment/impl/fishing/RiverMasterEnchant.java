@@ -8,21 +8,22 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nexmedia.engine.api.manager.EventListener;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
-public class RiverMasterEnchant extends ExcellentEnchant {
+public class RiverMasterEnchant extends ExcellentEnchant implements GenericEnchant, EventListener {
 
     public static final String ID = "river_master";
 
     private EnchantScaler distanceMod;
 
     public RiverMasterEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription("Increases casting distance.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.1);
@@ -51,7 +52,6 @@ public class RiverMasterEnchant extends ExcellentEnchant {
     public void onHookLaunch(ProjectileLaunchEvent event) {
         if (!(event.getEntity() instanceof FishHook hook)) return;
         if (!(hook.getShooter() instanceof Player player)) return;
-        if (!this.isAvailableToUse(player)) return;
 
         ItemStack rod = EnchantUtils.getFishingRod(player);
         if (rod == null) return;

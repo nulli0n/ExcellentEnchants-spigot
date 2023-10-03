@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.*;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +15,6 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Set;
 
@@ -27,7 +27,7 @@ public class EnchantCure extends ExcellentEnchant implements Chanced, CombatEnch
     private static final Set<EntityType> CUREABLE = Sets.newHashSet(EntityType.ZOMBIFIED_PIGLIN, EntityType.ZOMBIE_VILLAGER);
 
     public EnchantCure(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to cure Zombified Piglins and Zombie Villagers on hit.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.5);
@@ -52,9 +52,14 @@ public class EnchantCure extends ExcellentEnchant implements Chanced, CombatEnch
         return EnchantmentTarget.WEAPON;
     }
 
+    @NotNull
+    @Override
+    public EventPriority getAttackPriority() {
+        return EventPriority.HIGHEST;
+    }
+
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isAvailableToUse(damager)) return false;
         if (!CUREABLE.contains(victim.getType())) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!(damager instanceof Player player)) return false;

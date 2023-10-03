@@ -15,7 +15,6 @@ import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantVillageDefender extends ExcellentEnchant implements CombatEnchant {
 
@@ -26,7 +25,7 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
     private EnchantScaler damageAmount;
 
     public EnchantVillageDefender(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription("Inflicts " + PLACEHOLDER_DAMAGE_AMOUNT + " more damage to all pillagers.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.1);
@@ -62,7 +61,6 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
 
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isAvailableToUse(damager)) return false;
         if (!(victim instanceof Illager)) return false;
 
         double damageAdd = this.getDamageAddict(level);

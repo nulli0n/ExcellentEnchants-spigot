@@ -7,7 +7,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -23,11 +25,10 @@ import su.nightexpress.excellentenchants.api.enchantment.type.InteractEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Set;
 
-public class EnchantReplanter extends ExcellentEnchant implements Chanced, InteractEnchant, BlockBreakEnchant {
+public class ReplanterEnchant extends ExcellentEnchant implements Chanced, InteractEnchant, BlockBreakEnchant {
 
     public static final String ID = "replanter";
 
@@ -41,8 +42,8 @@ public class EnchantReplanter extends ExcellentEnchant implements Chanced, Inter
         Material.MELON_SEEDS, Material.PUMPKIN_SEEDS,
         Material.POTATO, Material.CARROT, Material.NETHER_WART);
 
-    public EnchantReplanter(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.HIGH);
+    public ReplanterEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setDescription("Automatically replant crops on right click and when harvest.");
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.3);
@@ -119,10 +120,16 @@ public class EnchantReplanter extends ExcellentEnchant implements Chanced, Inter
         return EnchantmentTarget.TOOL;
     }
 
+    @NotNull
     @Override
-    public boolean onInteract(@NotNull PlayerInteractEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public EventPriority getInteractPriority() {
+        return EventPriority.HIGHEST;
+    }
+
+    @Override
+    public boolean onInteract(@NotNull PlayerInteractEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
+        if (!(entity instanceof Player player)) return false;
         if (!this.isReplantOnRightClick()) return false;
-        if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         // Check for a event hand. We dont want to trigger it twice.
@@ -158,9 +165,9 @@ public class EnchantReplanter extends ExcellentEnchant implements Chanced, Inter
     }
 
     @Override
-    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
+        if (!(entity instanceof Player player)) return false;
         if (!this.isReplantOnPlantBreak()) return false;
-        if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         Block blockPlant = event.getBlock();

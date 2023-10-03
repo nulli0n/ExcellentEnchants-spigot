@@ -5,6 +5,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -18,7 +19,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantRocket extends ExcellentEnchant implements Chanced, CombatEnchant {
 
@@ -28,7 +28,7 @@ public class EnchantRocket extends ExcellentEnchant implements Chanced, CombatEn
     private ChanceImplementation chanceImplementation;
 
     public EnchantRocket(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch your enemy into the space.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.5);
@@ -60,9 +60,14 @@ public class EnchantRocket extends ExcellentEnchant implements Chanced, CombatEn
         return EnchantmentTarget.WEAPON;
     }
 
+    @NotNull
+    @Override
+    public EventPriority getAttackPriority() {
+        return EventPriority.HIGHEST;
+    }
+
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isAvailableToUse(damager)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         if (victim.isInsideVehicle()) {

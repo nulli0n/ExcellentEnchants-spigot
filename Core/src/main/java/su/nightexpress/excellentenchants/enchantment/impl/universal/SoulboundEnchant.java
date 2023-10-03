@@ -9,20 +9,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nexmedia.engine.api.manager.EventListener;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SoulboundEnchant extends ExcellentEnchant {
+public class SoulboundEnchant extends ExcellentEnchant implements GenericEnchant, EventListener {
 
     public static final String ID = "soulbound";
 
     public SoulboundEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.LOWEST);
+        super(plugin, ID);
         this.getDefaults().setDescription("Protects from being dropped on death.");
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.8);

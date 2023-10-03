@@ -53,7 +53,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         this.handleEnchantMerging(e, first, second, result);
     }
 
-    private boolean handleRename(@NotNull PrepareAnvilEvent e,
+    private boolean handleRename(@NotNull PrepareAnvilEvent event,
                                  @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
 
         if (!second.getType().isAir() && (second.getType() == first.getType() || second.getType() == Material.ENCHANTED_BOOK)) return false;
@@ -64,11 +64,11 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
             EnchantUtils.add(result2, hasEnch, hasLevel, true);
         });
         EnchantUtils.updateDisplay(result2);
-        e.setResult(result2);
+        event.setResult(result2);
         return true;
     }
 
-    private boolean handleRecharge(@NotNull PrepareAnvilEvent e,
+    private boolean handleRecharge(@NotNull PrepareAnvilEvent event,
                                    @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
         if (second.getType().isAir()) return false;
 
@@ -90,12 +90,12 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
 
         PDCUtil.set(result2, RECHARGED, count);
         EnchantUtils.updateDisplay(result2);
-        e.setResult(result2);
-        this.plugin.runTask(task -> e.getInventory().setRepairCost(chargable.size()));
+        event.setResult(result2);
+        this.plugin.runTask(task -> event.getInventory().setRepairCost(chargable.size()));
         return true;
     }
 
-    private boolean handleEnchantMerging(@NotNull PrepareAnvilEvent e,
+    private boolean handleEnchantMerging(@NotNull PrepareAnvilEvent event,
                                          @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
         // Validate items in the first two slots.
         if (second.getType().isAir() || second.getAmount() > 1 || !EnchantUtils.isEnchantable(second)) return false;
@@ -104,7 +104,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         ItemStack result2 = new ItemStack(result.getType().isAir() ? first : result);
         Map<ExcellentEnchant, Integer> enchantments = EnchantUtils.getExcellents(first);
         Map<ExcellentEnchant, Integer> charges = new HashMap<>(enchantments.keySet().stream().collect(Collectors.toMap(k -> k, v -> v.getCharges(first))));
-        AtomicInteger repairCost = new AtomicInteger(e.getInventory().getRepairCost());
+        AtomicInteger repairCost = new AtomicInteger(event.getInventory().getRepairCost());
 
         // Merge only if it's Item + Item, Item + Enchanted book or Enchanted Book + Enchanted Book
         if (second.getType() == Material.ENCHANTED_BOOK || second.getType() == first.getType()) {
@@ -125,31 +125,31 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         if (first.equals(result2)) return false;
 
         EnchantUtils.updateDisplay(result2);
-        e.setResult(result2);
+        event.setResult(result2);
 
         // NMS ContainerAnvil will set level cost to 0 right after calling the event, need 1 tick delay.
-        this.plugin.runTask(task -> e.getInventory().setRepairCost(repairCost.get()));
+        this.plugin.runTask(task -> event.getInventory().setRepairCost(repairCost.get()));
         return true;
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onClickAnvil(InventoryClickEvent e) {
-        if (!(e.getInventory() instanceof AnvilInventory inventory)) return;
-        if (e.getRawSlot() != 2) return;
+    public void onClickAnvil(InventoryClickEvent event) {
+        if (!(event.getInventory() instanceof AnvilInventory inventory)) return;
+        if (event.getRawSlot() != 2) return;
 
-        ItemStack item = e.getCurrentItem();
+        ItemStack item = event.getCurrentItem();
         if (item == null) return;
 
         int count = PDCUtil.getInt(item, RECHARGED).orElse(0);
         if (count == 0) return;
 
-        Player player = (Player) e.getWhoClicked();
+        Player player = (Player) event.getWhoClicked();
         if (player.getLevel() < inventory.getRepairCost()) return;
 
         player.setLevel(player.getLevel() - inventory.getRepairCost());
         PDCUtil.remove(item, RECHARGED);
-        e.getView().setCursor(item);
-        e.setCancelled(false);
+        event.getView().setCursor(item);
+        event.setCancelled(false);
 
         UniSound.of(Sound.BLOCK_ENCHANTMENT_TABLE_USE).play(player);
 

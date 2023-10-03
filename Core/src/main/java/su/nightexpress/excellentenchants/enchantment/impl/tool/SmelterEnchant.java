@@ -8,7 +8,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -23,11 +24,10 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Map;
 
-public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDropEnchant {
+public class SmelterEnchant extends ExcellentEnchant implements Chanced, BlockDropEnchant {
 
     public static final String ID = "smelter";
 
@@ -35,13 +35,13 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
     private Map<Material, Material> smeltingTable;
     private ChanceImplementation chanceImplementation;
 
-    public EnchantSmelter(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+    public SmelterEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to smelt a block/ore.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.3);
         this.getDefaults().setConflicts(
-            EnchantDivineTouch.ID,
+            DivineTouchEnchant.ID,
             Enchantment.SILK_TOUCH.getKey().getKey()
         );
     }
@@ -88,12 +88,17 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
         return EnchantmentTarget.TOOL;
     }
 
+    @NotNull
     @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull Player player, @NotNull ItemStack item, int level) {
+    public EventPriority getDropPriority() {
+        return EventPriority.NORMAL;
+    }
+
+    @Override
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull LivingEntity player, @NotNull ItemStack item, int level) {
         // TODO Use furnace recipes & Re-add smelted items instead of setType
 
         if (event.getBlockState() instanceof Container) return false;
-        if (!this.isAvailableToUse(player)) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (event.getItems().stream().noneMatch(drop -> this.isSmeltable(drop.getItemStack().getType()))) return false;
 

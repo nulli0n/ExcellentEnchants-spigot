@@ -3,6 +3,7 @@ package su.nightexpress.excellentenchants.enchantment.impl.weapon;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -16,7 +17,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantVenom extends ExcellentEnchant implements Chanced, Potioned, CombatEnchant {
 
@@ -26,7 +26,7 @@ public class EnchantVenom extends ExcellentEnchant implements Chanced, Potioned,
     private PotionImplementation potionImplementation;
 
     public EnchantVenom(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to apply " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.) on hit.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
@@ -60,9 +60,14 @@ public class EnchantVenom extends ExcellentEnchant implements Chanced, Potioned,
         return EnchantmentTarget.WEAPON;
     }
 
+    @NotNull
+    @Override
+    public EventPriority getAttackPriority() {
+        return EventPriority.HIGHEST;
+    }
+
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isAvailableToUse(damager)) return false;
         if (!this.checkTriggerChance(level)) return false;
         if (!this.addEffect(victim, level)) return false;
 

@@ -7,17 +7,18 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nexmedia.engine.api.manager.EventListener;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
-public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced {
+public class CurseOfBreakingEnchant extends ExcellentEnchant implements GenericEnchant, EventListener, Chanced {
 
     public static final String ID = "curse_of_breaking";
     public static final String PLACEHOLDER_DURABILITY_AMOUNT = "%enchantment_durability_amount%";
@@ -25,8 +26,8 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
     private EnchantScaler durabilityAmount;
     private ChanceImplementation chanceImplementation;
 
-    public EnchantCurseOfBreaking(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+    public CurseOfBreakingEnchant(@NotNull ExcellentEnchants plugin) {
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to consume extra " + PLACEHOLDER_DURABILITY_AMOUNT + " durability points.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0D);
@@ -66,11 +67,11 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onItemDurability(PlayerItemDamageEvent e) {
-        Player player = e.getPlayer();
+    public void onItemDurability(PlayerItemDamageEvent event) {
+        Player player = event.getPlayer();
         if (!this.isAvailableToUse(player)) return;
 
-        ItemStack item = e.getItem();
+        ItemStack item = event.getItem();
         int level = EnchantUtils.getLevel(item, this);
 
         if (level < 1) return;
@@ -79,6 +80,6 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
         int durabilityAmount = this.getDurabilityAmount(level);
         if (durabilityAmount <= 0) return;
 
-        e.setDamage(e.getDamage() + durabilityAmount);
+        event.setDamage(event.getDamage() + durabilityAmount);
     }
 }

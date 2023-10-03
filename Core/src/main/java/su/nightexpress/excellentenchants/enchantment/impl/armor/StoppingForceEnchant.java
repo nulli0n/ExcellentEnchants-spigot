@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.enchantment.impl.armor;
 
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class StoppingForceEnchant extends ExcellentEnchant implements Chanced, CombatEnchant {
 
@@ -25,7 +25,7 @@ public class StoppingForceEnchant extends ExcellentEnchant implements Chanced, C
     private EnchantScaler knockbackModifier;
 
     public StoppingForceEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to resist knockback in combat by " + PLACEHOLDER_KNOCKBACK_RESISTANCE + "%.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.5);
@@ -54,6 +54,12 @@ public class StoppingForceEnchant extends ExcellentEnchant implements Chanced, C
 
     @NotNull
     @Override
+    public EventPriority getProtectPriority() {
+        return EventPriority.HIGHEST;
+    }
+
+    @NotNull
+    @Override
     public Chanced getChanceImplementation() {
         return this.chanceImplementation;
     }
@@ -65,7 +71,6 @@ public class StoppingForceEnchant extends ExcellentEnchant implements Chanced, C
 
     @Override
     public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isAvailableToUse(victim)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         this.plugin.runTask(task -> {

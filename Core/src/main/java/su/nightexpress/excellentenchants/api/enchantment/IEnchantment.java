@@ -1,24 +1,26 @@
 package su.nightexpress.excellentenchants.api.enchantment;
 
+import org.bukkit.Keyed;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JYML;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.tier.Tier;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
+import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.List;
 import java.util.Set;
 
-public interface IEnchantment {
+public interface IEnchantment extends Keyed {
+
+    boolean isAvailableToUse(@NotNull LivingEntity entity);
 
     @NotNull JYML getConfig();
 
     @NotNull String getId();
-
-    @NotNull EnchantPriority getPriority();
 
     @NotNull String getDisplayName();
 

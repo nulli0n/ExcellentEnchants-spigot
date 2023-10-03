@@ -17,7 +17,6 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +30,7 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
     private ChanceImplementation chanceImplementation;
 
     public EnchantScavenger(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM);
+        super(plugin, ID);
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to obtain additional loot from mobs.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
@@ -100,8 +99,6 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
 
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, int level) {
-        if (!this.isAvailableToUse(entity)) return false;
-
         Map<Material, Pair<int[], Double>> items = this.loot.get(entity.getType());
         if (items == null) return false;
 

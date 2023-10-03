@@ -10,6 +10,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -26,7 +27,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, BowEnchant {
 
@@ -36,7 +36,7 @@ public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, 
     private ArrowImplementation arrowImplementation;
 
     public FlareEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.LOWEST);
+        super(plugin, ID);
 
         this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to create a torch where arrow lands.");
         this.getDefaults().setLevelMax(1);
@@ -58,6 +58,12 @@ public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, 
 
     @NotNull
     @Override
+    public EventPriority getHitPriority() {
+        return EventPriority.HIGHEST;
+    }
+
+    @NotNull
+    @Override
     public Chanced getChanceImplementation() {
         return this.chanceImplementation;
     }
@@ -71,7 +77,6 @@ public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return false;
-        if (!this.isAvailableToUse(shooter)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         this.addData(arrow);
@@ -79,7 +84,7 @@ public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, 
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+    public boolean onHit(@NotNull ProjectileHitEvent e, LivingEntity user, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
         Block block = e.getHitBlock();
         if (block == null) return false;
 
@@ -106,7 +111,7 @@ public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, 
             relative.setBlockData(directional, true);
         }
 
-        return true;
+        return false;
     }
 
     @Override
