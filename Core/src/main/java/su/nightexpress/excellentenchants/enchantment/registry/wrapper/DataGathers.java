@@ -234,7 +234,7 @@ public class DataGathers {
         @NotNull
         @Override
         public EquipmentSlot[] getEnchantSlots(@NotNull EntityDamageByEntityEvent event) {
-            return EquipmentSlot.values();
+            return new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
         }
 
         @Override
@@ -314,7 +314,7 @@ public class DataGathers {
         @NotNull
         @Override
         public EquipmentSlot[] getEnchantSlots(@NotNull PlayerFishEvent event) {
-            return new EquipmentSlot[] {event.getHand()};
+            return event.getHand() == null ? new EquipmentSlot[] {EquipmentSlot.HAND} : new EquipmentSlot[]{event.getHand()};
         }
 
         @Override
@@ -339,7 +339,7 @@ public class DataGathers {
         @NotNull
         @Override
         public EquipmentSlot[] getEnchantSlots(@NotNull PlayerInteractEvent event) {
-            return new EquipmentSlot[]{event.getHand()};
+            return event.getHand() == null ? new EquipmentSlot[] {EquipmentSlot.HAND} : new EquipmentSlot[]{event.getHand()};
         }
 
         @Override
