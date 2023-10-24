@@ -85,7 +85,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
                 map.add(Placeholders.ENCHANTMENT_CHANCE, () -> NumberUtil.format(chanced.getTriggerChance(level)));
             }
             if (this instanceof Periodic periodic) {
-                map.add(Placeholders.ENCHANTMENT_INTERVAL, () -> NumberUtil.format(periodic.getInterval(level) / 20D));
+                map.add(Placeholders.ENCHANTMENT_INTERVAL, () -> NumberUtil.format(periodic.getInterval() / 20D));
             }
             if (this instanceof Potioned potioned) {
                 map.add(Placeholders.ENCHANTMENT_POTION_LEVEL, () -> NumberUtil.toRoman(potioned.getEffectAmplifier(level)));

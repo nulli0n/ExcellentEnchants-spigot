@@ -34,8 +34,8 @@ public class PeriodImplementation implements Periodic {
     }
 
     @Override
-    public long getInterval(int level) {
-        return (long) this.triggerInterval.getValue(level);
+    public long getInterval() {
+        return (long) this.triggerInterval.getValue(1);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class PeriodImplementation implements Periodic {
     }
 
     @Override
-    public void updateTriggerTime(int level) {
-        this.nextTriggerTime = System.currentTimeMillis() + this.getInterval(level) / 20L * 1000L;
+    public void updateTriggerTime() {
+        this.nextTriggerTime = System.currentTimeMillis() + this.getInterval() * 50L - 100L;
     }
 }

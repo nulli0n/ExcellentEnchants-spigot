@@ -24,7 +24,6 @@ import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
@@ -355,23 +354,16 @@ public class EnchantUtils {
         return map;
     }
 
-    public static void triggerPassiveEnchants(@NotNull LivingEntity entity) {
-        Player player = entity instanceof Player p1 ? p1 : null;
-
-        getEquipped(entity, PassiveEnchant.class).forEach((item, enchants) -> {
-            enchants.forEach((enchant, level) -> {
-                if (!enchant.isAvailableToUse(entity)) return;
-                if (!enchant.isTriggerTime()) return;
-                if (enchant.isOutOfCharges(item)) return;
-                if (enchant.onTrigger(entity, item, level)) {
-                    enchant.consumeChargesNoUpdate(item, level);
-                    enchant.updateTriggerTime(level);
-                }
-            });
-            if (Config.ENCHANTMENTS_CHARGES_ENABLED.get() && player != null) {
-                EnchantUtils.updateDisplay(item);
+    @NotNull
+    public static Map<ItemStack, Integer> getEquipped(@NotNull LivingEntity entity, @NotNull ExcellentEnchant enchantment) {
+        Map<ItemStack, Integer> map = new HashMap<>();
+        getEnchantedEquipment(entity).values().forEach(item -> {
+            int level = getLevel(item, enchantment);
+            if (level > 0) {
+                map.put(item, level);
             }
         });
+        return map;
     }
 
     public static void setSourceWeapon(@NotNull Projectile projectile, @Nullable ItemStack item) {

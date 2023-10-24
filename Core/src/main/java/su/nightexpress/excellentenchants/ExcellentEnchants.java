@@ -96,7 +96,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
             case V1_20_R2 -> new V1_20_R2();
             default -> null;
         };
-        return this.enchantManager != null;
+        return this.enchantNMS != null;
     }
 
     @Override

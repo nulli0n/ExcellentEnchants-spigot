@@ -6,8 +6,8 @@ public interface Periodic {
 
     @NotNull Periodic getPeriodImplementation();
 
-    default long getInterval(int level) {
-        return this.getPeriodImplementation().getInterval(level);
+    default long getInterval() {
+        return this.getPeriodImplementation().getInterval();
     }
 
     default long getNextTriggerTime() {
@@ -18,7 +18,7 @@ public interface Periodic {
         return this.getPeriodImplementation().isTriggerTime();
     }
 
-    default void updateTriggerTime(int level) {
-        this.getPeriodImplementation().updateTriggerTime(level);
+    default void updateTriggerTime() {
+        this.getPeriodImplementation().updateTriggerTime();
     }
 }
