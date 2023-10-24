@@ -7,7 +7,7 @@ import su.nightexpress.excellentenchants.enchantment.listener.EnchantAnvilListen
 import su.nightexpress.excellentenchants.enchantment.listener.EnchantGenericListener;
 import su.nightexpress.excellentenchants.enchantment.menu.EnchantmentsListMenu;
 import su.nightexpress.excellentenchants.enchantment.task.ArrowTrailsTask;
-import su.nightexpress.excellentenchants.enchantment.task.PotionEffectsTask;
+import su.nightexpress.excellentenchants.enchantment.task.PassiveEnchantsTask;
 
 public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
@@ -15,8 +15,8 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
     private EnchantmentsListMenu enchantmentsListMenu;
 
-    private ArrowTrailsTask   arrowTrailsTask;
-    private PotionEffectsTask potionEffectsTask;
+    private ArrowTrailsTask     arrowTrailsTask;
+    private PassiveEnchantsTask passiveEnchantsTask;
 
     public EnchantManager(@NotNull ExcellentEnchants plugin) {
         super(plugin);
@@ -25,15 +25,14 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     @Override
     protected void onLoad() {
         this.enchantmentsListMenu = new EnchantmentsListMenu(this.plugin);
-        //this.addListener(new EnchantHandlerListener(this));
         this.addListener(new EnchantGenericListener(this));
         this.addListener(new EnchantAnvilListener(this.plugin));
 
         this.arrowTrailsTask = new ArrowTrailsTask(this.plugin);
         this.arrowTrailsTask.start();
 
-        this.potionEffectsTask = new PotionEffectsTask(this.plugin);
-        this.potionEffectsTask.start();
+        this.passiveEnchantsTask = new PassiveEnchantsTask(this.plugin);
+        this.passiveEnchantsTask.start();
     }
 
     @Override
@@ -46,9 +45,9 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
             this.arrowTrailsTask.stop();
             this.arrowTrailsTask = null;
         }
-        if (this.potionEffectsTask != null) {
-            this.potionEffectsTask.stop();
-            this.potionEffectsTask = null;
+        if (this.passiveEnchantsTask != null) {
+            this.passiveEnchantsTask.stop();
+            this.passiveEnchantsTask = null;
         }
     }
 

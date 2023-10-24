@@ -13,6 +13,7 @@ public class Placeholders extends su.nexmedia.engine.utils.Placeholders {
     public static final String GENERIC_ENCHANT     = "%enchant%";
 
     public static final String ENCHANTMENT_CHANCE          = "%enchantment_trigger_chance%";
+    public static final String ENCHANTMENT_INTERVAL        = "%enchantment_trigger_interval%";
     public static final String ENCHANTMENT_POTION_LEVEL    = "%enchantment_potion_level%";
     public static final String ENCHANTMENT_POTION_DURATION = "%enchantment_potion_duration%";
     public static final String ENCHANTMENT_POTION_TYPE     = "%enchantment_potion_type%";

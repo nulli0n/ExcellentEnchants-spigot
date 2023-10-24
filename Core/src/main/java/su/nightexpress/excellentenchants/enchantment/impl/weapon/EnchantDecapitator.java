@@ -218,7 +218,7 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
                 String texture = this.headTextures.get(entity.getType());
                 if (texture == null) return false;
 
-                entityName = this.headName.replace(Placeholders.GENERIC_TYPE, plugin.getLangManager().getEnum(entity.getType()));
+                entityName = this.headName.replace(Placeholders.GENERIC_TYPE, LangManager.getEntityType(entity.getType()));
                 ItemUtil.setSkullTexture(item, texture);
                 meta = (SkullMeta) item.getItemMeta();
             }

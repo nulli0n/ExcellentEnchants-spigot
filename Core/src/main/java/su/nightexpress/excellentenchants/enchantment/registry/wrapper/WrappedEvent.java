@@ -1,7 +1,7 @@
 package su.nightexpress.excellentenchants.enchantment.registry.wrapper;
 
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -40,6 +40,8 @@ public class WrappedEvent<E extends Event, T extends IEnchantment> implements Li
         LivingEntity entity = this.dataGather.getEntity(event);
         if (entity == null) return;
 
+        Player player = entity instanceof Player p1 ? p1 : null;
+
         this.dataGather.getEnchants(event, this.enchantClass, entity).forEach((item, enchants) -> {
             enchants.forEach(((enchant, level) -> {
                 if (!this.dataGather.checkPriority(enchant, this.priority)) return;
@@ -49,8 +51,8 @@ public class WrappedEvent<E extends Event, T extends IEnchantment> implements Li
                     enchant.consumeChargesNoUpdate(item, level);
                 }
             }));
-            if (Config.ENCHANTMENTS_CHARGES_ENABLED.get()) {
-                EnchantUtils.updateChargesDisplay(item);
+            if (this.priority == EventPriority.MONITOR && Config.ENCHANTMENTS_CHARGES_ENABLED.get() && player != null) {
+                EnchantUtils.updateDisplay(item);
             }
         });
     }

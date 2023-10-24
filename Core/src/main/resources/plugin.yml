@@ -5,5 +5,5 @@ author: NightExpress
 desciption: Vanilla-like enchants for your server.
 depend: [ NexEngine ]
 softdepend: [ ProtocolLib, NoCheatPlus, PlaceholderAPI, MythicMobs ]
-api-version: 1.17
+api-version: 1.18
 load: STARTUP

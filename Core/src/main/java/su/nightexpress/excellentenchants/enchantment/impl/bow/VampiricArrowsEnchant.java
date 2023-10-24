@@ -104,6 +104,8 @@ public class VampiricArrowsEnchant extends ExcellentEnchant implements BowEnchan
 
     @Override
     public boolean onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+        if (shooter.isDead() || shooter.getHealth() <= 0D) return false;
+
         double healAmount = this.getHealAmount(level);
         if (healAmount <= 0D) return false;
 

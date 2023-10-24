@@ -71,7 +71,7 @@ public class SwiperEnchant extends ExcellentEnchant implements CombatEnchant, Ch
         int levelHas = player.getLevel();
         int xpHas = player.getTotalExperience();
 
-        xpHas = Math.max(0, xpHas - amount);
+        xpHas = Math.max(0, xpHas + amount);
         player.setExp(0F);
         player.setTotalExperience(0);
         player.setLevel(0);

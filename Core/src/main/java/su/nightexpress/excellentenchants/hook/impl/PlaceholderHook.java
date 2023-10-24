@@ -51,6 +51,11 @@ public class PlaceholderHook {
         }
 
         @Override
+        public boolean persist() {
+            return true;
+        }
+
+        @Override
         @Nullable
         public String onPlaceholderRequest(Player player, @NotNull String params) {
             if (params.startsWith("charges_remaining_")) {

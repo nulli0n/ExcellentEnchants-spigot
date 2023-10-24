@@ -64,7 +64,7 @@ public final class PotionImplementation implements Potioned {
 
     public int getEffectDuration(int level) {
         if (this.isPermanent()) {
-            int duration = Config.TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL.get().intValue() + 30;
+            int duration = Config.TASKS_PASSIVE_ENCHANTS_TRIGGER_INTERVAL.get().intValue() + 30;
             if (this.getEffectType().getName().equalsIgnoreCase(PotionEffectType.NIGHT_VISION.getName())) {
                 duration += 30 * 20;
             }

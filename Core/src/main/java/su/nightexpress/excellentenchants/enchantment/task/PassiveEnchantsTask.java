@@ -5,19 +5,27 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.server.AbstractTask;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.config.Config;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractEnchantmentTask extends AbstractTask<ExcellentEnchants> {
+public class PassiveEnchantsTask extends AbstractTask<ExcellentEnchants> {
 
-    public AbstractEnchantmentTask(@NotNull ExcellentEnchants plugin, long interval, boolean async) {
-        super(plugin, interval, async);
+    public PassiveEnchantsTask(@NotNull ExcellentEnchants plugin) {
+        super(plugin, Config.TASKS_PASSIVE_ENCHANTS_TRIGGER_INTERVAL.get(), false);
+    }
+
+    @Override
+    public void action() {
+        for (LivingEntity entity : this.getEntities()) {
+            EnchantUtils.triggerPassiveEnchants(entity);
+        }
     }
 
     @NotNull
-    protected Collection<? extends LivingEntity> getEntities() {
+    private Collection<? extends LivingEntity> getEntities() {
         Set<LivingEntity> list = new HashSet<>(plugin.getServer().getOnlinePlayers());
 
         if (Config.ENCHANTMENTS_ENTITY_PASSIVE_FOR_MOBS.get()) {
@@ -25,7 +33,7 @@ public abstract class AbstractEnchantmentTask extends AbstractTask<ExcellentEnch
                 list.addAll(world.getEntitiesByClass(LivingEntity.class));
             });
         }
-        list.removeIf(e -> e.isDead() || !e.isValid());
+        list.removeIf(entity -> entity.isDead() || !entity.isValid());
         return list;
     }
 }

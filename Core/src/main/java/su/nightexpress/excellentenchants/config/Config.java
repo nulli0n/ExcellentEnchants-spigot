@@ -19,13 +19,18 @@ import java.util.stream.Stream;
 
 public class Config {
 
-    public static final JOption<Long> TASKS_ARROW_TRAIL_TICKS_INTERVAL = JOption.create("Tasks.Arrow_Trail.Tick_Interval",
+    public static final JOption<Long> TASKS_ARROW_TRAIL_TICKS_INTERVAL        = JOption.create("Tasks.Arrow_Trail.Tick_Interval",
         1L,
         "Sets how often (in ticks) arrow trail particle effects will be spawned behind the arrow."
     );
-    public static final JOption<Long> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("Tasks.Passive_Potion_Effects.Apply_Interval",
+
+    public static final JOption<Long> TASKS_PASSIVE_ENCHANTS_TRIGGER_INTERVAL = JOption.create("Tasks.Passive_Enchants.Trigger_Interval",
         100L,
-        "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them."
+        "Sets how often (in ticks) the plugin will attempt to trigger passive enchantment effects on all alive entities.",
+        "For best results it's recommened to keep this value smaller, but at the same rate as enchantment 'Trigger_Interval' settings.",
+        "Examples:",
+        "--- Global: 100 ticks; Regrowth: 100 ticks; Saturation: 100 ticks;",
+        "--- Global: 50 ticks, Regrowth: 100 ticks; Saturation: 150 ticks;"
     );
 
     public static final JOption<Boolean> ENCHANTMENTS_CHARGES_ENABLED = JOption.create("Enchantments.Charges.Enabled",
@@ -86,7 +91,8 @@ public class Config {
         "To disable all enchantments for a world, use '" + Placeholders.WILDCARD + "' instead of enchantment names.")
         .setWriter((cfg, path, map) -> map.forEach((world, enchants) -> cfg.set(path + "." + world, enchants)));
 
-    public static final JOption<Integer> ENCHANTMENTS_DISPLAY_MODE = JOption.create("Enchantments.Display.Mode", 1,
+    public static final JOption<Integer> ENCHANTMENTS_DISPLAY_MODE = JOption.create("Enchantments.Display.Mode",
+        1,
         "Sets how enchantment names and descriptions will be handled on items.",
         "1 = Plain modification of item's lore (lore changes are real and persistent).",
         "2 = Packet modification of item's lore (no real changes are made to the items). Requires ProtocolLib.",

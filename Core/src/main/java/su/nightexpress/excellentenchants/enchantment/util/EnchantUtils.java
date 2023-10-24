@@ -24,7 +24,6 @@ import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
@@ -356,18 +355,22 @@ public class EnchantUtils {
         return map;
     }
 
-    public static void updateEquippedEffects(@NotNull LivingEntity entity) {
+    public static void triggerPassiveEnchants(@NotNull LivingEntity entity) {
+        Player player = entity instanceof Player p1 ? p1 : null;
+
         getEquipped(entity, PassiveEnchant.class).forEach((item, enchants) -> {
             enchants.forEach((enchant, level) -> {
                 if (!enchant.isAvailableToUse(entity)) return;
-                if (enchant instanceof Potioned potioned) {
-                    if (enchant.isOutOfCharges(item)) return;
-                    if (enchant.onTrigger(entity, item, level)) {
-                        enchant.consumeChargesNoUpdate(item, level);
-                    }
+                if (!enchant.isTriggerTime()) return;
+                if (enchant.isOutOfCharges(item)) return;
+                if (enchant.onTrigger(entity, item, level)) {
+                    enchant.consumeChargesNoUpdate(item, level);
+                    enchant.updateTriggerTime(level);
                 }
             });
-            EnchantUtils.updateChargesDisplay(item);
+            if (Config.ENCHANTMENTS_CHARGES_ENABLED.get() && player != null) {
+                EnchantUtils.updateDisplay(item);
+            }
         });
     }
 

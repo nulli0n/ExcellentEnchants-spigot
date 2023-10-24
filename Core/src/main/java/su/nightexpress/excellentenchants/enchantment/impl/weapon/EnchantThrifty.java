@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
+import su.nexmedia.engine.api.manager.EventListener;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -25,7 +26,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEnchant {
+public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEnchant, EventListener {
 
     public static final String ID = "thrifty";
 
@@ -98,9 +99,9 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onCreatureSpawn(CreatureSpawnEvent e) {
-        if (!this.ignoredSpawnReasons.contains(e.getSpawnReason())) return;
+    public void onCreatureSpawn(CreatureSpawnEvent event) {
+        if (!this.ignoredSpawnReasons.contains(event.getSpawnReason())) return;
 
-        PDCUtil.set(e.getEntity(), this.keyEntityIgnored, true);
+        PDCUtil.set(event.getEntity(), this.keyEntityIgnored, true);
     }
 }

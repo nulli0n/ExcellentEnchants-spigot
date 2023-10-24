@@ -19,6 +19,7 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Periodic;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
@@ -82,6 +83,9 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
             if (this instanceof Chanced chanced) {
                 map.add(Placeholders.ENCHANTMENT_CHANCE, () -> NumberUtil.format(chanced.getTriggerChance(level)));
+            }
+            if (this instanceof Periodic periodic) {
+                map.add(Placeholders.ENCHANTMENT_INTERVAL, () -> NumberUtil.format(periodic.getInterval(level) / 20D));
             }
             if (this instanceof Potioned potioned) {
                 map.add(Placeholders.ENCHANTMENT_POTION_LEVEL, () -> NumberUtil.toRoman(potioned.getEffectAmplifier(level)));

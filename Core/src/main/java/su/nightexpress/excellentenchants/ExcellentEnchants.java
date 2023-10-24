@@ -23,7 +23,6 @@ import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
 import su.nightexpress.excellentenchants.hook.impl.ProtocolHook;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 import su.nightexpress.excellentenchants.nms.V1_20_R2;
-import su.nightexpress.excellentenchants.nms.v1_17_R1.V1_17_R1;
 import su.nightexpress.excellentenchants.nms.v1_18_R2.V1_18_R2;
 import su.nightexpress.excellentenchants.nms.v1_19_R3.V1_19_R3;
 import su.nightexpress.excellentenchants.nms.v1_20_R1.V1_20_R1;
@@ -50,7 +49,11 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     @Override
     public void enable() {
-        this.setNMS();
+        if (!this.setNMS()) {
+            this.error("Unsupported server version!");
+            this.getPluginManager().disablePlugin(this);
+            return;
+        }
 
         this.tierManager = new TierManager(this);
         this.tierManager.setup();
@@ -85,15 +88,15 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
         this.registry.shutdown();
     }
 
-    private void setNMS() {
+    private boolean setNMS() {
         this.enchantNMS = switch (Version.getCurrent()) {
-            case V1_17_R1 -> new V1_17_R1();
             case V1_18_R2 -> new V1_18_R2();
             case V1_19_R3 -> new V1_19_R3();
             case V1_20_R1 -> new V1_20_R1();
             case V1_20_R2 -> new V1_20_R2();
             default -> null;
         };
+        return this.enchantManager != null;
     }
 
     @Override

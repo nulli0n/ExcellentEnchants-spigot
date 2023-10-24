@@ -10,6 +10,7 @@ import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.PeriodImplementation;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
 
 public class SpeedyEnchant extends ExcellentEnchant implements Potioned, PassiveEnchant {
@@ -17,6 +18,7 @@ public class SpeedyEnchant extends ExcellentEnchant implements Potioned, Passive
     public static final String ID = "sonic";
 
     private PotionImplementation potionImplementation;
+    private PeriodImplementation periodImplementation;
 
     public SpeedyEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID);
@@ -29,12 +31,19 @@ public class SpeedyEnchant extends ExcellentEnchant implements Potioned, Passive
     public void loadSettings() {
         super.loadSettings();
         this.potionImplementation = PotionImplementation.create(this, PotionEffectType.SPEED, true);
+        this.periodImplementation = PeriodImplementation.create(this, "100");
     }
 
     @NotNull
     @Override
     public PotionImplementation getPotionImplementation() {
         return potionImplementation;
+    }
+
+    @NotNull
+    @Override
+    public PeriodImplementation getPeriodImplementation() {
+        return periodImplementation;
     }
 
     @Override

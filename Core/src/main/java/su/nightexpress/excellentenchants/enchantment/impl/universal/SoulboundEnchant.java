@@ -64,7 +64,7 @@ public class SoulboundEnchant extends ExcellentEnchant implements GenericEnchant
                     world.dropItemNaturally(location, save);
                 }
                 else {
-                    this.consumeCharges(save, EnchantUtils.getLevel(save, this));
+                    this.consumeChargesNoUpdate(save, EnchantUtils.getLevel(save, this));
                     player.getInventory().addItem(save);
                 }
             });

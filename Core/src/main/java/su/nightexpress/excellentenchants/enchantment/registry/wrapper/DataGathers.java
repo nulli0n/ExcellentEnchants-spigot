@@ -14,6 +14,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import su.nexmedia.engine.Version;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
@@ -314,6 +315,8 @@ public class DataGathers {
         @NotNull
         @Override
         public EquipmentSlot[] getEnchantSlots(@NotNull PlayerFishEvent event) {
+            if (Version.isBehind(Version.V1_19_R3)) return new EquipmentSlot[] {EquipmentSlot.HAND};
+
             return event.getHand() == null ? new EquipmentSlot[] {EquipmentSlot.HAND} : new EquipmentSlot[]{event.getHand()};
         }
 
