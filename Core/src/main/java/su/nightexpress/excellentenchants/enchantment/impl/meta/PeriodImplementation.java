@@ -13,6 +13,7 @@ public class PeriodImplementation implements Periodic {
 
     public PeriodImplementation(@NotNull ExcellentEnchant enchant, @NotNull EnchantScaler triggerInterval) {
         this.triggerInterval = triggerInterval;
+        this.updateTriggerTime();
     }
 
     @NotNull

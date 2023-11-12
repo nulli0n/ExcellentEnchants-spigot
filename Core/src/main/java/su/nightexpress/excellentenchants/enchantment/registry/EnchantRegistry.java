@@ -178,7 +178,9 @@ public class EnchantRegistry extends AbstractManager<ExcellentEnchants> {
 
     @Override
     protected void onShutdown() {
-        ENCHANTS_MAP.clear();
+        if (!isLocked) {
+            ENCHANTS_MAP.clear();
+        }
     }
 
     public <T extends IEnchantment> void registerType(@NotNull Class<T> enchantClass) {
