@@ -11,7 +11,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
@@ -37,7 +36,7 @@ public class VeinminerEnchant extends ExcellentEnchant implements BlockBreakEnch
 
     private static final String PLACEHOLDER_BLOCK_LIMIT = "%enchantment_block_limit%";
 
-    private Scaler        blocksLimit;
+    private EnchantScaler        blocksLimit;
     private Set<Material> blocksAffected;
 
     public VeinminerEnchant(@NotNull ExcellentEnchants plugin) {

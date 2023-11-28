@@ -4,7 +4,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.Scaler;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.config.Config;
@@ -15,8 +14,8 @@ public final class PotionImplementation implements Potioned {
 
     private final ExcellentEnchant enchant;
     private final PotionEffectType effectType;
-    private final Scaler  duration;
-    private final Scaler  amplifier;
+    private final EnchantScaler  duration;
+    private final EnchantScaler  amplifier;
     private final boolean isPermanent;
 
     private PotionImplementation(@NotNull ExcellentEnchant enchant,
