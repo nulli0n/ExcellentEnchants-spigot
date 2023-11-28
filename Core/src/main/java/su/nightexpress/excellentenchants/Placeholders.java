@@ -26,6 +26,7 @@ public class Placeholders extends su.nexmedia.engine.utils.Placeholders {
     public static final String ENCHANTMENT_LEVEL_MIN                     = "%enchantment_level_min%";
     public static final String ENCHANTMENT_LEVEL_MAX                     = "%enchantment_level_max%";
     public static final String ENCHANTMENT_TIER                          = "%enchantment_tier%";
+    public static final String ENCHANTMENT_TIER_COLOR                    = "%enchantment_tier_color%";
     public static final String ENCHANTMENT_FIT_ITEM_TYPES                = "%enchantment_fit_item_types%";
     public static final String ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING      = "%enchantment_obtain_chance_enchanting%";
     public static final String ENCHANTMENT_OBTAIN_CHANCE_VILLAGER        = "%enchantment_obtain_chance_villager%";
