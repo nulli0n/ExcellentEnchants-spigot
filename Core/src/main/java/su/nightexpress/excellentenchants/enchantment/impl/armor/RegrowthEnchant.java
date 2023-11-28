@@ -35,7 +35,7 @@ public class RegrowthEnchant extends ExcellentEnchant implements Chanced, Passiv
 
     public RegrowthEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID);
-        this.getDefaults().setDescription("Restores " + PLACEHOLDER_HEAL_AMOUNT + " hearts every " + Placeholders.ENCHANTMENT_INTERVAL + "s.");
+        this.getDefaults().setDescription("Restores " + PLACEHOLDER_HEAL_AMOUNT + " hearts every few seconds.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.7);
     }

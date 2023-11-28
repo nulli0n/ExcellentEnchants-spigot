@@ -31,6 +31,7 @@ public class EnchantDefaults {
     private boolean      isTreasure;
     private int           levelMin;
     private int           levelMax;
+    private int maxMergeLevel;
     private EnchantScaler levelByEnchantCost;
     private EnchantScaler anvilMergeCost;
     private Set<String>   conflicts;
@@ -51,6 +52,7 @@ public class EnchantDefaults {
         this.setTreasure(false);
         this.setLevelMin(1);
         this.setLevelMax(3);
+        this.setMaxMergeLevel(-1);
         this.setConflicts(new HashSet<>());
         this.setVisualEffects(true);
         this.obtainChance = new HashMap<>();
@@ -89,6 +91,11 @@ public class EnchantDefaults {
             "Note: While you can 'bypass' this value by enchant commands, all level-dependant enchantment",
             "settings will have a limit up to this setting.").read(cfg));
 
+        this.setMaxMergeLevel(JOption.create("Anvil.Max_Merge_Level", this.getMaxMergeLevel(),
+            "Sets max. enchantment level that can be obtained by combining 2 items with this enchantment.",
+            "Set this to '-1' to remove merge limit and just use 'Max Level' instead."
+        ).read(cfg));
+
         this.setLevelByEnchantCost(EnchantScaler.read(enchant, ObtainType.ENCHANTING.getPathName() + ".Level_By_Exp_Cost",
             (int)(30D / this.levelMax) + " * " + Placeholders.ENCHANTMENT_LEVEL,
             "Sets how much XP levels must be used in enchanting table to obtain this enchantment.",
@@ -124,14 +131,19 @@ public class EnchantDefaults {
             this.setChargesEnabled(JOption.create("Settings.Charges.Enabled", this.isChargesEnabled(),
                 "When 'true' enables the Charges system for this enchantment.",
                 "When enchanted the first time on enchanting table, it will have maximum charges amount.").read(cfg));
+
             this.setChargesCustomFuel(JOption.create("Settings.Charges.Custom_Fuel", this.isChargesCustomFuel(),
                 "When 'true' uses different (non-default) fuel item (from the 'Fuel_Item' setting) to recharge.").read(cfg));
+
             this.setChargesMax(EnchantScaler.read(enchant, "Settings.Charges.Maximum", "100",
                 "Maximum amount of charges for the enchantment."));
+
             this.setChargesConsumeAmount(EnchantScaler.read(enchant, "Settings.Charges.Consume_Amount", "1",
                 "How many charges will be consumed when enchantment is triggered?"));
+
             this.setChargesRechargeAmount(EnchantScaler.read(enchant, "Settings.Charges.Recharge_Amount", "25",
                 "How many charges will be restored when using 'Fuel Item' in anvil?"));
+
             this.setChargesFuel(JOption.create("Settings.Charges.Fuel_Item", new ItemStack(Material.LAPIS_LAZULI),
                 "An item, that will be used to restore enchantment charges on anvils.",
                 "Item Options:" + Placeholders.URL_ENGINE_ITEMS)
@@ -204,6 +216,14 @@ public class EnchantDefaults {
 
     public int getLevelMax() {
         return levelMax;
+    }
+
+    public int getMaxMergeLevel() {
+        return this.maxMergeLevel;
+    }
+
+    public void setMaxMergeLevel(int maxMergeLevel) {
+        this.maxMergeLevel = Math.min(this.getLevelMax(), maxMergeLevel);
     }
 
     @NotNull

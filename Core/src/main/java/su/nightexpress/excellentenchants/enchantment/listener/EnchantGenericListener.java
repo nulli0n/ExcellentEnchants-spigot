@@ -150,26 +150,26 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
     // ---------------------------------------------------------------
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEnchantPopulateVillagerAcquire(VillagerAcquireTradeEvent event) {
-        MerchantRecipe recipe = event.getRecipe();
-        ItemStack result = recipe.getResult();
+        MerchantRecipe origin = event.getRecipe();
+        ItemStack result = origin.getResult();
         if (!EnchantUtils.isEnchantable(result)) return;
 
         EnchantPopulator populator = this.plugin.createPopulator(result, ObtainType.VILLAGER)
             .withWorld(event.getEntity().getWorld());
         if (!populator.populate()) return;
 
-        int uses = recipe.getUses();
-        int maxUses = recipe.getMaxUses();
-        boolean expReward = recipe.hasExperienceReward();
-        int villagerExperience = recipe.getVillagerExperience();
-        float priceMultiplier = recipe.getPriceMultiplier();
-        int demand = recipe.getDemand();
-        int specialPrice = recipe.getSpecialPrice();
+        int uses = origin.getUses();
+        int maxUses = origin.getMaxUses();
+        boolean expReward = origin.hasExperienceReward();
+        int villagerExperience = origin.getVillagerExperience();
+        float priceMultiplier = origin.getPriceMultiplier();
+        int demand = origin.getDemand();
+        int specialPrice = origin.getSpecialPrice();
 
-        MerchantRecipe recipe2 = new MerchantRecipe(result, uses, maxUses, expReward, villagerExperience,
+        MerchantRecipe recipe = new MerchantRecipe(result, uses, maxUses, expReward, villagerExperience,
             priceMultiplier, demand, specialPrice);
-        recipe2.setIngredients(recipe.getIngredients());
-        event.setRecipe(recipe2);
+        recipe.setIngredients(origin.getIngredients());
+        event.setRecipe(recipe);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

@@ -83,7 +83,7 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
     public List<ExcellentEnchant> getObjects(@NotNull Player player) {
         return new ArrayList<>(EnchantRegistry.getRegistered().stream()
             .filter(Predicate.not(enchant -> enchant.getDefaults().isHiddenFromList()))
-            .sorted(Comparator.comparing(e -> Colorizer.strip(e.getDisplayName()))).toList());
+            .sorted(Comparator.comparing(e -> Colorizer.restrip(e.getDisplayName()))).toList());
     }
 
     @Override

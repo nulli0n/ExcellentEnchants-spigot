@@ -222,6 +222,10 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         return this.getDefaults().getLevelMin();
     }
 
+    public int getMaxMergeLevel() {
+        return this.getDefaults().getMaxMergeLevel() < 0 ? this.getMaxLevel() : this.getDefaults().getMaxMergeLevel();
+    }
+
     public int getLevelByEnchantCost(int expLevel) {
         int get = this.getDefaults().getLevelByEnchantCost().getValues().entrySet().stream()
             .filter(en -> expLevel >= en.getValue().intValue()).max(Comparator.comparingInt(Map.Entry::getKey))

@@ -36,7 +36,7 @@ public enum FitItemType {
 
     public boolean isIncluded(@NotNull ItemStack item) {
         return switch (this) {
-            case UNIVERSAL -> ARMOR.isIncluded(item) || WEAPON.isIncluded(item) || TOOL.isIncluded(item);
+            case UNIVERSAL -> ARMOR.isIncluded(item) || WEAPON.isIncluded(item) || TOOL.isIncluded(item) || BOW.isIncluded(item) || FISHING_ROD.isIncluded(item) || ELYTRA.isIncluded(item);
             case HELMET -> ItemUtil.isHelmet(item);
             case CHESTPLATE -> ItemUtil.isChestplate(item) || (Config.ENCHANTMENTS_ITEM_CHESTPLATE_ENCHANTS_TO_ELYTRA.get() && ELYTRA.isIncluded(item));
             case LEGGINGS -> ItemUtil.isLeggings(item);

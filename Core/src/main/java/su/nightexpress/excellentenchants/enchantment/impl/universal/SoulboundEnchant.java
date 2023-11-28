@@ -33,7 +33,7 @@ public class SoulboundEnchant extends ExcellentEnchant implements GenericEnchant
     @NotNull
     @Override
     public EnchantmentTarget getItemTarget() {
-        return EnchantmentTarget.BREAKABLE;
+        return EnchantmentTarget.WEARABLE;
     }
 
     @EventHandler
