@@ -8,6 +8,8 @@ public class Placeholders extends su.nexmedia.engine.utils.Placeholders {
     public static final String URL_ENGINE_ITEMS  = "https://github.com/nulli0n/NexEngine-spigot/wiki/Configuration-Tips#item-sections";
 
     public static final String GENERIC_TYPE        = "%type%";
+    public static final String GENERIC_ITEM = "%item%";
+    public static final String GENERIC_LEVEL = "%level%";
     public static final String GENERIC_AMOUNT      = "%amount%";
     public static final String GENERIC_DESCRIPTION = "%description%";
     public static final String GENERIC_ENCHANT     = "%enchant%";

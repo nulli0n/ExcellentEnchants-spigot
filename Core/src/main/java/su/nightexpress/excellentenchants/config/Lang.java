@@ -10,10 +10,11 @@ public class Lang extends EngineLang {
 
     public static final LangKey COMMAND_LIST_DESC = LangKey.of("Command.List.Desc", "List of all custom enchantments.");
 
-    public static final LangKey COMMAND_ENCHANT_USAGE         = LangKey.of("Command.Enchant.Usage", "<enchant> <level>");
+    public static final LangKey COMMAND_ENCHANT_USAGE         = LangKey.of("Command.Enchant.Usage", "<enchant> <level> [player] [slot]");
     public static final LangKey COMMAND_ENCHANT_DESC          = LangKey.of("Command.Enchant.Desc", "Enchants the item in your hand.");
-    public static final LangKey COMMAND_ENCHANT_DONE          = LangKey.of("Command.Enchant.Done", LIGHT_YELLOW + "Successfully enchanted!");
-    public static final LangKey COMMAND_ENCHANT_ERROR_NO_ITEM = LangKey.of("Command.Enchant.Error.NoItem", RED + "You must hold an item to enchant it!");
+    public static final LangKey COMMAND_ENCHANT_DONE_SELF     = LangKey.of("Command.Enchant.Done.Self", ORANGE + GENERIC_ITEM + LIGHT_YELLOW + " enchanted with " + GENERIC_ENCHANT + " " + GENERIC_LEVEL + LIGHT_YELLOW + "!");
+    public static final LangKey COMMAND_ENCHANT_DONE_OTHERS   = LangKey.of("Command.Enchant.Done.Others", ORANGE + PLAYER_NAME + LIGHT_YELLOW + "'s " + ORANGE + GENERIC_ITEM + LIGHT_YELLOW + " enchanted with " + GENERIC_ENCHANT + " " + GENERIC_LEVEL + LIGHT_YELLOW + "!");
+    public static final LangKey COMMAND_ENCHANT_ERROR_NO_ITEM = LangKey.of("Command.Enchant.Error.NoItem", RED + "There is no item to enchant!");
 
     public static final LangKey COMMAND_BOOK_USAGE = LangKey.of("Command.Book.Usage", "<player> <enchant> <level>");
     public static final LangKey COMMAND_BOOK_DESC  = LangKey.of("Command.Book.Desc", "Gives custom enchanted book.");
