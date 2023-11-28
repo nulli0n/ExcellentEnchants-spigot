@@ -19,6 +19,8 @@ import java.util.stream.Stream;
 
 public class Config {
 
+    public static final String DIR_MENU = "/menu/";
+
     public static final JOption<Long> TASKS_ARROW_TRAIL_TICKS_INTERVAL        = JOption.create("Tasks.Arrow_Trail.Tick_Interval",
         1L,
         "Sets how often (in ticks) arrow trail particle effects will be spawned behind the arrow."

@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
 import su.nexmedia.engine.api.command.CommandResult;
-import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.*;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
@@ -90,7 +89,7 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
         plugin.getMessage(sender == player ? Lang.COMMAND_ENCHANT_DONE_SELF : Lang.COMMAND_ENCHANT_DONE_OTHERS)
             .replace(Placeholders.forPlayer(player))
             .replace(Placeholders.GENERIC_ITEM, ItemUtil.getItemName(item))
-            .replace(Placeholders.GENERIC_ENCHANT, LangManager.getEnchantment(enchantment))
+            .replace(Placeholders.GENERIC_ENCHANT, EnchantUtils.getLocalized(enchantment))
             .replace(Placeholders.GENERIC_LEVEL, NumberUtil.toRoman(level))
             .send(sender);
     }

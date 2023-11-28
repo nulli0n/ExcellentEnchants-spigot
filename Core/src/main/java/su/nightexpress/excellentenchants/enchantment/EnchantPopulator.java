@@ -69,10 +69,7 @@ public class EnchantPopulator {
             Set<ExcellentEnchant> enchants = EnchantRegistry.getOfTier(tier);
 
             enchants.removeIf(enchant -> {
-                if (enchant.getObtainChance(this.getObtainType()) <= 0D) return true;
-                if (!enchant.canEnchantItem(this.getItem())) return true;
-
-                return this.getObtainType() == ObtainType.ENCHANTING && (enchant.isTreasure() || enchant.isCursed());
+                return !enchant.isObtainable(this.getObtainType()) || !enchant.canEnchantItem(this.getItem());
             });
 
             this.candidates.put(tier, enchants);

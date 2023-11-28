@@ -108,6 +108,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     public void loadLang() {
         this.getLangManager().loadMissing(Lang.class);
         this.getLangManager().loadEnum(FitItemType.class);
+        this.getLangManager().loadEnum(ObtainType.class);
         this.getLang().saveChanges();
     }
 

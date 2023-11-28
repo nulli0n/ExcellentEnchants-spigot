@@ -196,10 +196,21 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     @NotNull
+    public List<String> formatDescription() {
+        return new ArrayList<>(this.getDescription().stream()
+            .map(line -> Config.ENCHANTMENTS_DESCRIPTION_FORMAT.get().replace(Placeholders.GENERIC_DESCRIPTION, line))
+            .toList());
+    }
+
+    @NotNull
     public List<String> formatDescription(int level) {
         return new ArrayList<>(this.getDescription(level).stream()
             .map(line -> Config.ENCHANTMENTS_DESCRIPTION_FORMAT.get().replace(Placeholders.GENERIC_DESCRIPTION, line))
             .toList());
+    }
+
+    public boolean hasConflicts() {
+        return !this.getConflicts().isEmpty();
     }
 
     @NotNull
@@ -232,6 +243,12 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
             .map(Map.Entry::getKey).orElse(0);
 
         return get != 0 ? this.fineLevel(get, ObtainType.ENCHANTING) : 0;
+    }
+
+    public boolean isObtainable(@NotNull ObtainType obtainType) {
+        if (obtainType == ObtainType.ENCHANTING && (this.isTreasure() || this.isCursed())) return false;
+
+        return this.getObtainChance(obtainType) > 0D;
     }
 
     public double getObtainChance(@NotNull ObtainType obtainType) {
