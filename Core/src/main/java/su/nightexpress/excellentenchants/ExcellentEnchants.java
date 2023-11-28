@@ -84,7 +84,9 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
             this.tierManager.shutdown();
             this.tierManager = null;
         }
-        PlaceholderHook.shutdown();
+        if (EngineUtils.hasPlaceholderAPI()) {
+            PlaceholderHook.shutdown();
+        }
         this.registry.shutdown();
     }
 
@@ -124,7 +126,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     @Override
     public void registerHooks() {
         if (EngineUtils.hasPlaceholderAPI()) {
-            PlaceholderHook.setup();
+            PlaceholderHook.setup(this);
         }
     }
 

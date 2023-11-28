@@ -1,48 +1,43 @@
 package su.nightexpress.excellentenchants.tier;
 
-import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.AbstractManager;
+import su.nexmedia.engine.utils.Colors2;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class TierManager extends AbstractManager<ExcellentEnchants> {
 
     public static final String FILE_NAME = "tiers.yml";
 
-    private JYML                    config;
-    private final Map<String, Tier> tiers;
+    private final Map<String, Tier> tierMap;
 
     public TierManager(@NotNull ExcellentEnchants plugin) {
         super(plugin);
-        this.tiers = new ConcurrentHashMap<>();
-
+        this.tierMap = new HashMap<>();
     }
 
     @Override
     protected void onLoad() {
-        this.config = JYML.loadOrExtract(plugin, FILE_NAME);
+        JYML config = this.getConfig();
+
+        if (config.getSection("").isEmpty()) {
+            Config.getDefaultTiers().forEach(tier -> tier.write(config, tier.getId()));
+        }
 
         for (String sId : config.getSection("")) {
             String path = sId + ".";
 
             int priority = config.getInt(path + "Priority");
             String name = config.getString(path + "Name", sId);
-
-            ChatColor color;
-            try {
-                color = ChatColor.of(config.getString(path + "Color", ChatColor.WHITE.getName()));
-            }
-            catch (IllegalArgumentException e) {
-                color = ChatColor.WHITE;
-            }
+            String color = config.getString(path + "Color", Colors2.WHITE);
 
             Map<ObtainType, Double> chance = new HashMap<>();
             for (ObtainType obtainType : ObtainType.values()) {
@@ -53,35 +48,41 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
             }
 
             Tier tier = new Tier(sId, priority, name, color, chance);
-            this.tiers.put(tier.getId(), tier);
+            this.tierMap.put(tier.getId(), tier);
         }
+        config.saveChanges();
 
-        this.plugin.info("Tiers Loaded: " + this.tiers.size());
+        this.plugin.info("Tiers Loaded: " + this.tierMap.size());
     }
 
     @Override
     protected void onShutdown() {
-        this.tiers.clear();
+        this.tierMap.clear();
     }
 
     @NotNull
     public JYML getConfig() {
-        return config;
+        return JYML.loadOrExtract(plugin, FILE_NAME);
     }
 
-    @Nullable
-    public Tier getTierById(@NotNull String id) {
-        return this.tiers.get(id.toLowerCase());
+    @NotNull
+    public Map<String, Tier> getTierMap() {
+        return tierMap;
     }
 
     @NotNull
     public Collection<Tier> getTiers() {
-        return this.tiers.values();
+        return this.getTierMap().values();
+    }
+
+    @Nullable
+    public Tier getTierById(@NotNull String id) {
+        return this.getTierMap().get(id.toLowerCase());
     }
 
     @NotNull
     public List<String> getTierIds() {
-        return new ArrayList<>(this.tiers.keySet());
+        return new ArrayList<>(this.getTierMap().keySet());
     }
 
     @Nullable

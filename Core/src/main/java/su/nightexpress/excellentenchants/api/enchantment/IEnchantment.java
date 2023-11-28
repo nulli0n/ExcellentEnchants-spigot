@@ -3,7 +3,6 @@ package su.nightexpress.excellentenchants.api.enchantment;
 import org.bukkit.Keyed;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

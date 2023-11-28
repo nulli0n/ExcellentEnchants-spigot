@@ -235,15 +235,20 @@ public class EnchantRegistry extends AbstractManager<ExcellentEnchants> {
     }
 
     @NotNull
-    public static Set<PassiveEnchant> getPeriodicTalents() {
+    public static Set<PassiveEnchant> getPeriodicEnchants() {
         return getEnchantments(PassiveEnchant.class);
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <T extends IEnchantment> Set<T> getEnchantments(@NotNull Class<T> clazz) {
-        Set<? super T> set = new HashSet<>(ENCHANTS_MAP.getOrDefault(clazz, Collections.emptySet()));
-        return (Set<T>) set;
+        Set<T> enchants = new HashSet<>();
+
+        ENCHANTS_MAP.getOrDefault(clazz, Collections.emptySet()).forEach(talent -> {
+            enchants.add(clazz.cast(talent));
+        });
+        return enchants;
+        //Set<? super T> set = new HashSet<>(ENCHANTS_MAP.getOrDefault(clazz, Collections.emptySet()));
+        //return (Set<T>) set;
     }
 
     @Nullable

@@ -70,7 +70,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
                 .add(Placeholders.ENCHANTMENT_LEVEL_MIN, () -> String.valueOf(this.getStartLevel()))
                 .add(Placeholders.ENCHANTMENT_LEVEL_MAX, () -> String.valueOf(this.getMaxLevel()))
                 .add(Placeholders.ENCHANTMENT_TIER, () -> this.getTier().getName())
-                .add(Placeholders.ENCHANTMENT_TIER_COLOR, () -> String.valueOf(this.getTier().getColor()))
+                .add(Placeholders.ENCHANTMENT_TIER_COLOR, () -> this.getTier().getColor())
                 .add(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, () -> String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
                 .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, () -> NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
                 .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, () -> NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))

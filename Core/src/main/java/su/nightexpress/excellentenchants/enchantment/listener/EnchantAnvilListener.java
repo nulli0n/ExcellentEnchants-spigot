@@ -33,12 +33,12 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onAnvilRename(PrepareAnvilEvent e) {
-        AnvilInventory inventory = e.getInventory();
+    public void onAnvilRename(PrepareAnvilEvent event) {
+        AnvilInventory inventory = event.getInventory();
 
         ItemStack first = inventory.getItem(0);
         ItemStack second = inventory.getItem(1);
-        ItemStack result = e.getResult();
+        ItemStack result = event.getResult();
 
         if (first == null) first = new ItemStack(Material.AIR);
         if (second == null) second = new ItemStack(Material.AIR);
@@ -47,10 +47,10 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         // Check if source item is an enchantable single item.
         if (first.getType().isAir() || first.getAmount() > 1 || !EnchantUtils.isEnchantable(first)) return;
 
-        if (this.handleRename(e, first, second, result)) return;
-        if (this.handleRecharge(e, first, second, result)) return;
+        if (this.handleRename(event, first, second, result)) return;
+        if (this.handleRecharge(event, first, second, result)) return;
 
-        this.handleEnchantMerging(e, first, second, result);
+        this.handleEnchantMerging(event, first, second, result);
     }
 
     private boolean handleRename(@NotNull PrepareAnvilEvent event,

@@ -6,14 +6,13 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.utils.Colorizer;
+import su.nexmedia.engine.utils.Colors2;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
+import su.nightexpress.excellentenchants.tier.Tier;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -138,5 +137,25 @@ public class Config {
     public static Optional<ObtainSettings> getObtainSettings(@NotNull ObtainType obtainType) {
         ObtainSettings settings = OBTAIN_SETTINGS.get().get(obtainType);
         return settings == null || !settings.isEnabled() ? Optional.empty() : Optional.of(settings);
+    }
+
+    @NotNull
+    public static List<Tier> getDefaultTiers() {
+        List<Tier> list = new ArrayList<>();
+        list.add(new Tier("common", 1, "Common", Colors2.WHITE, getObtainWeight(50D)));
+        list.add(new Tier("rare", 2, "Rare", Colors2.GREEN, getObtainWeight(25D)));
+        list.add(new Tier("unique", 3, "Unique", Colors2.YELLOW, getObtainWeight(15D)));
+        list.add(new Tier("legendary", 4, "Legendary", Colors2.ORANGE, getObtainWeight(5D)));
+        list.add(new Tier("cursed", 0, "Cursed", Colors2.RED, getObtainWeight(5D)));
+        return list;
+    }
+
+    @NotNull
+    private static Map<ObtainType, Double> getObtainWeight(double weight) {
+        Map<ObtainType, Double> map = new HashMap<>();
+        for (ObtainType obtainType : ObtainType.values()) {
+            map.put(obtainType, weight);
+        }
+        return map;
     }
 }

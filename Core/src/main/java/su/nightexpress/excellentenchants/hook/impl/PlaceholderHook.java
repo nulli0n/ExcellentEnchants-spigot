@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.utils.StringUtil;
+import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
@@ -16,9 +17,9 @@ public class PlaceholderHook {
 
     private static EnchantsExpansion expansion;
 
-    public static void setup() {
+    public static void setup(@NotNull ExcellentEnchants plugin) {
         if (expansion == null) {
-            expansion = new EnchantsExpansion();
+            expansion = new EnchantsExpansion(plugin);
             expansion.register();
         }
     }
@@ -32,22 +33,28 @@ public class PlaceholderHook {
 
     static class EnchantsExpansion extends PlaceholderExpansion {
 
+        private final ExcellentEnchants plugin;
+
+        public EnchantsExpansion(@NotNull ExcellentEnchants plugin) {
+            this.plugin = plugin;
+        }
+
         @Override
         @NotNull
         public String getIdentifier() {
-            return "excellentenchants";
+            return this.plugin.getName().toLowerCase();
         }
 
         @Override
         @NotNull
         public String getAuthor() {
-            return ExcellentEnchantsAPI.PLUGIN.getDescription().getAuthors().get(0);
+            return this.plugin.getDescription().getAuthors().get(0);
         }
 
         @Override
         @NotNull
         public String getVersion() {
-            return ExcellentEnchantsAPI.PLUGIN.getDescription().getVersion();
+            return this.plugin.getDescription().getVersion();
         }
 
         @Override

@@ -1,7 +1,7 @@
 package su.nightexpress.excellentenchants.tier;
 
-import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.NotNull;
+import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.placeholder.Placeholder;
 import su.nexmedia.engine.api.placeholder.PlaceholderMap;
 import su.nexmedia.engine.utils.Colorizer;
@@ -16,16 +16,16 @@ public class Tier implements Placeholder {
     private final String                  id;
     private final int                     priority;
     private final String                  name;
-    private final ChatColor               color;
+    private final String               color;
     private final Map<ObtainType, Double> chance;
     private final PlaceholderMap placeholderMap;
 
-    public Tier(@NotNull String id, int priority, @NotNull String name, @NotNull ChatColor color,
+    public Tier(@NotNull String id, int priority, @NotNull String name, @NotNull String color,
                 @NotNull Map<ObtainType, Double> chance) {
         this.id = id.toLowerCase();
         this.priority = priority;
         this.name = Colorizer.apply(name);
-        this.color = color;
+        this.color = Colorizer.apply(color);
         this.chance = chance;
         this.placeholderMap = new PlaceholderMap()
             .add(Placeholders.TIER_ID, this::getId)
@@ -36,6 +36,16 @@ public class Tier implements Placeholder {
             .add(Placeholders.TIER_OBTAIN_CHANCE_FISHING, () -> NumberUtil.format(this.getChance(ObtainType.FISHING)))
             .add(Placeholders.TIER_OBTAIN_CHANCE_MOB_SPAWNING, () -> NumberUtil.format(this.getChance(ObtainType.MOB_SPAWNING)))
         ;
+    }
+
+    public void write(@NotNull JYML cfg, @NotNull String path) {
+        cfg.set(path + ".Name", this.getName());
+        cfg.set(path + ".Color", this.getColor());
+        cfg.set(path + ".Priority", this.getPriority());
+        cfg.remove(path + ".Obtain_Chance");
+        this.getChance().forEach((type, chance) -> {
+            cfg.set(path + ".Obtain_Chance." + type.name(), chance);
+        });
     }
 
     @Override
@@ -59,7 +69,7 @@ public class Tier implements Placeholder {
     }
 
     @NotNull
-    public ChatColor getColor() {
+    public String getColor() {
         return this.color;
     }
 

@@ -53,7 +53,7 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
             return;
         }
 
-        Player player = plugin.getServer().getPlayer(result.getArg(1));
+        Player player = PlayerUtil.getPlayer(result.getArg(1));
         if (player == null) {
             this.errorPlayer(sender);
             return;
