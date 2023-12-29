@@ -71,3 +71,9 @@ jobs:
 
       - name: Package plugin
         run: mvn package
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ExcellentEnchants
+          path: target/*.jar
