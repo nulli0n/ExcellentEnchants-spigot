@@ -47,7 +47,7 @@ jobs:
       - name: Install Spigot 1.19.4
         uses: SpraxDev/Action-SpigotMC@v4
         with:
-          versions: 1.19.3
+          versions: 1.19.4
           remapped: true
           buildToolProvider: SpigotMC
 
