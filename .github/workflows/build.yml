@@ -75,7 +75,6 @@ jobs:
     strategy:
       matrix:
         spigot:
-          - 1.20.4-R0.1-SNAPSHOT
           - 1.20.2-R0.1-SNAPSHOT
           - 1.20.1-R0.1-SNAPSHOT
           - 1.19.4-R0.1-SNAPSHOT
