@@ -100,7 +100,7 @@ jobs:
         uses: stCarolas/setup-maven@v4.5
 
       - name: Package plugin
-        run: mvn package -Dspigot.version=${matrix.spigot}
+        run: mvn package -Dspigot.version=${{ matrix.spigot }}
 
   build:
     runs-on: ubuntu-latest
