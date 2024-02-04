@@ -1,0 +1,18 @@
+Command:
+  List:
+    Desc: Lista de todos los encantamientos personalizados.
+  Enchant:
+    Usage: <enchant> <level>
+    Desc: Encanta el item de tu mano.
+    Done: '&a¡Encantado con éxito!'
+  Book:
+    Usage: <player> <enchant> <level>
+    Desc: Da un libro encantado personalizado.
+    Done: Se ha dado un libro encantado de &6%enchant%&7 a &6%player%&7.
+  TierBook:
+    Usage: <player> <tier> <level>
+    Desc: Da un libro encantado.
+    Error: '&c¡Rareza inválida!'
+    Done: Se ha dado un libro encantado &6%tier%&7 a &6%player%&7.
+Error:
+  NoEnchant: '&cNo hay tal encanto.'
