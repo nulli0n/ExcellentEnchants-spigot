@@ -1,0 +1,37 @@
+Command:
+  List:
+    Desc: カスタムエンチャントリスト
+  Enchant:
+    Usage: <エンチャント名> <レベル>
+    Desc: 手に持っているものにエンチャントを付与します。
+    Done: '&aエンチャントが成功しました！'
+  Book:
+    Usage: <プレイヤー> <エンチャント名> <レベル>
+    Desc: 指定されたエンチャントが施されたエンチャント本を発行する
+    Done: '&6%player_display_name%&7に&6%enchant%&7のエンチャント本を与えました。'
+  TierBook:
+    Usage: <プレーヤー> <ランク> <レベル>
+    Desc: 指定されたランクの任意のエンチャントが施されたエンチャント本を発行する
+    Error: '&cそのようなランクはありません。'
+    Done: '&6%player_name%&7に&6%tier_name%&7ランクのエンチャントブックを与えました。'
+Error:
+  NoEnchant: '&c指定されたエンチャントは存在しません'
+FitItemType:
+  HELMET: ヘルメット
+  CHESTPLATE: チェストプレート
+  LEGGINGS: レギンス
+  BOOTS: ブーツ
+  ELYTRA: エリトラ
+  WEAPON: ウェポン
+  TOOL: ツール
+  ARMOR: アーマー
+  UNIVERSAL: 共通
+  SWORD: ソード
+  TRIDENT: トライデント
+  AXE: 斧
+  BOW: 弓
+  CROSSBOW: クロスボウ
+  HOE: クワ
+  PICKAXE: ツルハシ
+  SHOVEL: ショベル
+  FISHING_ROD: 釣り竿
