@@ -1,63 +1,123 @@
-/*
- * Decompiled with CFR 0.151.
- * 
- * Could not load the following classes:
- *  org.jetbrains.annotations.NotNull
- *  su.nexmedia.engine.NexPlugin
- *  su.nexmedia.engine.api.manager.AbstractManager
- *  su.nexmedia.engine.api.manager.EventListener
- */
 package su.nightexpress.excellentenchants.enchantment;
 
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.manager.AbstractManager;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
+import su.nightexpress.excellentenchants.config.Config;
+import su.nightexpress.excellentenchants.enchantment.impl.armor.FlameWalkerEnchant;
 import su.nightexpress.excellentenchants.enchantment.listener.EnchantAnvilListener;
 import su.nightexpress.excellentenchants.enchantment.listener.EnchantGenericListener;
+import su.nightexpress.excellentenchants.enchantment.listener.EnchantPopulationListener;
 import su.nightexpress.excellentenchants.enchantment.menu.EnchantmentsListMenu;
-import su.nightexpress.excellentenchants.enchantment.task.ArrowTrailsTask;
-import su.nightexpress.excellentenchants.enchantment.task.PassiveEnchantsTask;
+import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.nightcore.manager.AbstractManager;
+import su.nightexpress.nightcore.util.Pair;
 
-public class EnchantManager
-extends AbstractManager<ExcellentEnchants> {
+import java.util.*;
 
-    public static final String DIR_ENCHANTS = "/enchants/";
+public class EnchantManager extends AbstractManager<ExcellentEnchantsPlugin> {
+
+    private final Set<Pair<PassiveEnchant, EnchantmentData>> passiveEnchants;
+
     private EnchantmentsListMenu enchantmentsListMenu;
-    private ArrowTrailsTask arrowTrailsTask;
-    private PassiveEnchantsTask passiveEnchantsTask;
 
-    public EnchantManager(@NotNull ExcellentEnchants plugin) {
+    public EnchantManager(@NotNull ExcellentEnchantsPlugin plugin) {
         super(plugin);
+        this.passiveEnchants = new HashSet<>();
+
+        EnchantRegistry.getEnchantments(PassiveEnchant.class).forEach(passiveEnchant -> {
+            EnchantmentData enchantmentData = EnchantRegistry.getById(passiveEnchant.getId());
+            if (enchantmentData == null) return;
+
+            this.passiveEnchants.add(Pair.of(passiveEnchant, enchantmentData));
+        });
     }
 
     protected void onLoad() {
         this.enchantmentsListMenu = new EnchantmentsListMenu(this.plugin);
-        this.addListener(new EnchantGenericListener(this));
+
+        this.addListener(new EnchantGenericListener(this.plugin, this));
         this.addListener(new EnchantAnvilListener(this.plugin));
-        this.arrowTrailsTask = new ArrowTrailsTask(this.plugin);
-        this.arrowTrailsTask.start();
-        this.passiveEnchantsTask = new PassiveEnchantsTask(this.plugin);
-        this.passiveEnchantsTask.start();
+
+        if (Config.isCustomDistribution()) {
+            this.plugin.info("Using custom distribution system...");
+            this.addListener(new EnchantPopulationListener(this.plugin));
+        }
+
+        this.addTask(this.plugin.createAsyncTask(this::displayProjectileTrails).setTicksInterval(Config.CORE_PROJECTILE_PARTICLE_INTERVAL.get()));
+        this.addTask(this.plugin.createTask(this::updatePassiveEnchantEffects).setTicksInterval(Config.CORE_PASSIVE_ENCHANTS_TRIGGER_INTERVAL.get()));
+        if (EnchantRegistry.isRegistered(FlameWalkerEnchant.ID)) {
+            this.addTask(this.plugin.createTask(FlameWalkerEnchant::tickBlocks).setSecondsInterval(1));
+        }
     }
 
     protected void onShutdown() {
-        if (this.enchantmentsListMenu != null) {
-            this.enchantmentsListMenu.clear();
-            this.enchantmentsListMenu = null;
-        }
-        if (this.arrowTrailsTask != null) {
-            this.arrowTrailsTask.stop();
-            this.arrowTrailsTask = null;
-        }
-        if (this.passiveEnchantsTask != null) {
-            this.passiveEnchantsTask.stop();
-            this.passiveEnchantsTask = null;
+        if (this.enchantmentsListMenu != null) this.enchantmentsListMenu.clear();
+
+        if (EnchantRegistry.isRegistered(FlameWalkerEnchant.ID)) {
+            FlameWalkerEnchant.clear();
         }
     }
 
     @NotNull
-    public EnchantmentsListMenu getEnchantsListGUI() {
-        return this.enchantmentsListMenu;
+    public EnchantmentsListMenu getEnchantmentsListMenu() {
+        return enchantmentsListMenu;
+    }
+
+    public void openEnchantsMenu(@NotNull Player player) {
+        this.enchantmentsListMenu.open(player);
+    }
+
+    private void displayProjectileTrails() {
+        EnchantUtils.getEnchantedProjectiles().removeIf(enchantedProjectile -> {
+            if (!enchantedProjectile.isValid()) {
+                return true;
+            }
+
+            enchantedProjectile.playParticles();
+            return false;
+        });
+    }
+
+    private void updatePassiveEnchantEffects() {
+        if (this.passiveEnchants.isEmpty()) return;
+
+        Set<LivingEntity> entities = this.getPassiveEnchantEntities();
+
+        this.passiveEnchants.forEach(pair -> {
+            PassiveEnchant enchant = pair.getFirst();
+            EnchantmentData enchantmentData = pair.getSecond();
+            if (!enchant.isTriggerTime()) return;
+
+            for (LivingEntity entity : entities) {
+                EnchantUtils.getEquipped(entity, enchantmentData).forEach((item, level) -> {
+                    if (!enchant.isAvailableToUse(entity)) return;
+                    if (enchant.isOutOfCharges(item)) return;
+                    if (enchant.onTrigger(entity, item, level)) {
+                        enchant.consumeCharges(item, level);
+                    }
+                });
+            }
+
+            enchant.updateTriggerTime();
+        });
+    }
+
+    @NotNull
+    private Set<LivingEntity> getPassiveEnchantEntities() {
+        Set<LivingEntity> list = new HashSet<>(plugin.getServer().getOnlinePlayers());
+
+        if (Config.CORE_PASSIVE_ENCHANTS_FOR_MOBS.get()) {
+            plugin.getServer().getWorlds().stream().filter(world -> !world.getPlayers().isEmpty()).forEach(world -> {
+                list.addAll(world.getEntitiesByClass(LivingEntity.class));
+            });
+        }
+        list.removeIf(entity -> entity.isDead() || !entity.isValid());
+        return list;
     }
 }
 

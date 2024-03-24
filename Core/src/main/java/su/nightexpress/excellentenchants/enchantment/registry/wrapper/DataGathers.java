@@ -14,10 +14,11 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.Version;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
+import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantedProjectile;
+import su.nightexpress.nightcore.util.Version;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -96,14 +97,19 @@ public class DataGathers {
 
         @Override
         public boolean useEnchant(@NotNull EntityShootBowEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, @NotNull BowEnchant enchant, int level) {
-            if (enchant.onShoot(event, entity, item, level)) {
-                if (enchant instanceof Arrowed arrowed && event.getProjectile() instanceof Projectile projectile) {
-                    arrowed.addData(projectile);
-                    arrowed.addTrail(projectile);
+            boolean onShoot = enchant.onShoot(event, entity, item, level);
+
+            if (event.getProjectile() instanceof Projectile projectile) {
+                EnchantedProjectile enchantedProjectile = EnchantUtils.getEnchantedProjectile(projectile);
+                if (enchantedProjectile != null && onShoot) {
+                    enchantedProjectile.getEnchantments().put(enchant, level);
+                    if (enchant.hasVisualEffects() && enchant instanceof ArrowData arrowData && !arrowData.getProjectileTrail().isEmpty()) {
+                        enchantedProjectile.getParticles().add(arrowData.getProjectileTrail());
+                    }
                 }
-                return true;
             }
-            return false;
+
+            return onShoot;
         }
     };
 
@@ -129,10 +135,13 @@ public class DataGathers {
         @NotNull
         @Override
         public Map<ItemStack, Map<BowEnchant, Integer>> getEnchants(@NotNull ProjectileHitEvent event, @NotNull Class<BowEnchant> enchantClass, @NotNull LivingEntity entity) {
+            EnchantedProjectile enchantedProjectile = EnchantUtils.getEnchantedProjectile(event.getEntity());
+            if (enchantedProjectile == null) return Collections.emptyMap();
+
             Map<ItemStack, Map<BowEnchant, Integer>> map = new HashMap<>();
-            ItemStack bow = EnchantUtils.getSourceWeapon(event.getEntity());
+            ItemStack bow = enchantedProjectile.getItem();
             if (bow != null) {
-                map.put(bow, EnchantUtils.getExcellents(bow, enchantClass));
+                map.put(bow, enchantedProjectile.getEnchantments());
             }
             return map;
         }
@@ -170,10 +179,13 @@ public class DataGathers {
         public Map<ItemStack, Map<BowEnchant, Integer>> getEnchants(@NotNull EntityDamageByEntityEvent event, @NotNull Class<BowEnchant> enchantClass, @NotNull LivingEntity entity) {
             if (!(event.getDamager() instanceof Projectile projectile)) return Collections.emptyMap();
 
+            EnchantedProjectile enchantedProjectile = EnchantUtils.getEnchantedProjectile(projectile);
+            if (enchantedProjectile == null) return Collections.emptyMap();
+
             Map<ItemStack, Map<BowEnchant, Integer>> map = new HashMap<>();
-            ItemStack bow = EnchantUtils.getSourceWeapon(projectile);
+            ItemStack bow = enchantedProjectile.getItem();
             if (bow != null) {
-                map.put(bow, EnchantUtils.getExcellents(bow, enchantClass));
+                map.put(bow, enchantedProjectile.getEnchantments());
             }
             return map;
         }

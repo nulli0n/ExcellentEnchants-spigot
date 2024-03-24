@@ -6,70 +6,79 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.EntityUtil;
-import su.nexmedia.engine.utils.NumberUtil;
-import su.nexmedia.engine.utils.values.UniParticle;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.data.PeriodicSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.PeriodImplementation;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.PeriodSettingsImpl;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.EntityUtil;
+import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
-public class RegrowthEnchant extends ExcellentEnchant implements Chanced, PassiveEnchant {
+import java.io.File;
+
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class RegrowthEnchant extends AbstractEnchantmentData implements ChanceData, PassiveEnchant {
 
     public static final String ID = "regrowth";
 
-    private static final String PLACEHOLDER_HEAL_AMOUNT     = "%enchantment_heal_amount%";
-    private static final String PLACEHOLDER_HEAL_MIN_HEALTH = "%enchantment_heal_min_health%";
-    private static final String PLACEHOLDER_HEAL_MAX_HEALTH = "%enchantment_heal_max_health%";
+    private Modifier minHealth;
+    private Modifier maxHealth;
+    private Modifier healAmount;
 
-    private EnchantScaler healMinHealth;
-    private EnchantScaler healMaxHealth;
-    private EnchantScaler healAmount;
+    private ChanceSettingsImpl chanceSettings;
+    private PeriodSettingsImpl periodSettings;
 
-    private ChanceImplementation chanceImplementation;
-    private PeriodImplementation periodImplementation;
-
-    public RegrowthEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Restores " + PLACEHOLDER_HEAL_AMOUNT + " hearts every few seconds.");
-        this.getDefaults().setLevelMax(5);
-        this.getDefaults().setTier(0.7);
+    public RegrowthEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Restores " + GENERIC_AMOUNT + "❤ every few seconds.");
+        this.setMaxLevel(5);
+        this.setRarity(Rarity.VERY_RARE);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.chanceImplementation = ChanceImplementation.create(this,
-            "20.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(100, 0, 1, 100));
 
-        this.periodImplementation = PeriodImplementation.create(this, "100");
+        this.periodSettings = PeriodSettingsImpl.create(config);
 
-        this.healMinHealth = EnchantScaler.read(this, "Settings.Heal.Min_Health", "0.5",
-            "Minimal entity health for the enchantment to have effect.");
-        this.healMaxHealth = EnchantScaler.read(this, "Settings.Heal.Max_Health", "20.0",
-            "Maximal entity health when the enchantment will not heal anymore.");
-        this.healAmount = EnchantScaler.read(this, "Settings.Heal.Amount", "0.25",
-            "Amount of hearts to be restored.");
+        this.minHealth = Modifier.read(config, "Settings.Heal.Min_Health",
+            Modifier.add(0.5, 0, 0),
+            "Minimal entity health for the enchantment to have effect."
+        );
 
-        this.addPlaceholder(PLACEHOLDER_HEAL_AMOUNT, level -> NumberUtil.format(this.getHealAmount(level)));
-        this.addPlaceholder(PLACEHOLDER_HEAL_MIN_HEALTH, level -> NumberUtil.format(this.getHealMaxHealth(level)));
-        this.addPlaceholder(PLACEHOLDER_HEAL_MAX_HEALTH, level -> NumberUtil.format(this.getHealMaxHealth(level)));
-    }
+        this.maxHealth = Modifier.read(config, "Settings.Heal.Max_Health",
+            Modifier.add(20, 0, 0),
+            "Maximal entity health when the enchantment will not heal anymore."
+        );
 
-    @NotNull
-    @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+        this.healAmount = Modifier.read(config, "Settings.Heal.Amount",
+            Modifier.add(0, 0.1, 1, 10),
+            "Amount of hearts to be restored."
+        );
+
+        this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getHealAmount(level)));
+        this.addPlaceholder(GENERIC_MIN, level -> NumberUtil.format(this.getMinHealthToHeal(level)));
+        this.addPlaceholder(GENERIC_MAX, level -> NumberUtil.format(this.getMaxHealthToHeal(level)));
     }
 
     @NotNull
     @Override
-    public PeriodImplementation getPeriodImplementation() {
-        return periodImplementation;
+    public ChanceSettings getChanceSettings() {
+        return chanceSettings;
+    }
+
+    @NotNull
+    @Override
+    public PeriodicSettings getPeriodSettings() {
+        return periodSettings;
     }
 
     @NotNull
@@ -82,12 +91,12 @@ public class RegrowthEnchant extends ExcellentEnchant implements Chanced, Passiv
         return this.healAmount.getValue(level);
     }
 
-    public double getHealMinHealth(int level) {
-        return this.healMinHealth.getValue(level);
+    public double getMinHealthToHeal(int level) {
+        return this.minHealth.getValue(level);
     }
 
-    public double getHealMaxHealth(int level) {
-        return this.healMaxHealth.getValue(level);
+    public double getMaxHealthToHeal(int level) {
+        return this.maxHealth.getValue(level);
     }
 
     @Override
@@ -96,7 +105,7 @@ public class RegrowthEnchant extends ExcellentEnchant implements Chanced, Passiv
 
         double healthMax = EntityUtil.getAttribute(entity, Attribute.GENERIC_MAX_HEALTH);
         double healthHas = entity.getHealth();
-        if (healthHas < this.getHealMinHealth(level) || healthHas > this.getHealMaxHealth(level)) return false;
+        if (healthHas < this.getMinHealthToHeal(level) || healthHas > this.getMaxHealthToHeal(level)) return false;
         if (healthHas >= healthMax) return false;
 
         double amount = Math.min(healthMax, healthHas + this.getHealAmount(level));

@@ -7,55 +7,59 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.manager.EventListener;
-import su.nexmedia.engine.utils.NumberUtil;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.nightcore.config.ConfigValue;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.manager.SimpeListener;
+import su.nightexpress.nightcore.util.NumberUtil;
 
+import java.io.File;
 import java.util.Set;
 
-public class ElementalProtectionEnchant extends ExcellentEnchant implements GenericEnchant, EventListener {
+import static su.nightexpress.excellentenchants.Placeholders.*;
 
-    public static final String ID                              = "elemental_protection";
-    public static final String PLACEHOLDER_PROTECTION_AMOUNT   = "%enchantment_protection_amount%";
-    public static final String PLACEHOLDER_PROTECTION_CAPACITY = "%enchantment_protection_capacity%";
+public class ElementalProtectionEnchant extends AbstractEnchantmentData implements SimpeListener, GenericEnchant {
+
+    public static final String ID = "elemental_protection";
 
     private static final Set<EntityDamageEvent.DamageCause> DAMAGE_CAUSES = Set.of(
         EntityDamageEvent.DamageCause.POISON, EntityDamageEvent.DamageCause.WITHER,
         EntityDamageEvent.DamageCause.MAGIC, EntityDamageEvent.DamageCause.FREEZE,
         EntityDamageEvent.DamageCause.LIGHTNING);
 
-    private EnchantScaler protectionAmount;
-    private double        protectionCapacity;
-    private boolean       protectionAsModifier;
+    private Modifier protectionAmount;
+    private double   protectionCapacity;
+    private boolean  protectionAsModifier;
 
-    public ElementalProtectionEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Reduces Poison, Magic, Wither, Lightning, Freeze damage by " + PLACEHOLDER_PROTECTION_AMOUNT + ".");
-        this.getDefaults().setLevelMax(5);
-        this.getDefaults().setTier(0.2);
+    public ElementalProtectionEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Reduces Poison, Magic, Wither, Lightning, Freeze damage by " + GENERIC_AMOUNT + "%.");
+        this.setMaxLevel(5);
+        this.setRarity(Rarity.COMMON);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.protectionAmount = Modifier.read(config, "Settings.Protection.Amount",
+            Modifier.add(0, 5, 1, 100),
+            "Protection amount given by enchantment.");
 
-        this.protectionAmount = EnchantScaler.read(this, "Settings.Protection.Amount",
-            "0.05 * " + Placeholders.ENCHANTMENT_LEVEL,
-            "How protection the enchantment will have?");
-        this.protectionCapacity = JOption.create("Settings.Protection.Capacity", 1D,
-            "Maximal possible protection value from all armor pieces together.").read(cfg);
-        this.protectionAsModifier = JOption.create("Settings.Protection.As_Modifier", false,
-            "When 'true' damage will be reduced by a percent of protection value.",
-            "When 'false' damage will be reduced by a plain protection value.").read(cfg);
+        this.protectionCapacity = ConfigValue.create("Settings.Protection.Capacity",
+            100D,
+            "Maximal possible protection value from all armor pieces together.").read(config);
 
-        this.addPlaceholder(PLACEHOLDER_PROTECTION_AMOUNT, level -> NumberUtil.format(this.getProtectionAmount(level)));
-        this.addPlaceholder(PLACEHOLDER_PROTECTION_CAPACITY, level -> NumberUtil.format(this.getProtectionCapacity()));
+        this.protectionAsModifier = ConfigValue.create("Settings.Protection.As_Modifier",
+            true,
+            "Determines if Protection value is percent based or plain amount."
+        ).read(config);
+
+        this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getProtectionAmount(level)));
+        this.addPlaceholder(GENERIC_MAX, level -> NumberUtil.format(this.getProtectionCapacity()));
     }
 
     @NotNull
@@ -84,7 +88,7 @@ public class ElementalProtectionEnchant extends ExcellentEnchant implements Gene
 
         double protectionAmount = 0D;
         for (ItemStack armor : EnchantUtils.getEnchantedEquipment(entity).values()) {
-            int level = EnchantUtils.getLevel(armor, this.getBackend());
+            int level = EnchantUtils.getLevel(armor, this.getEnchantment());
             if (level <= 0) continue;
 
             protectionAmount += this.getProtectionAmount(level);
@@ -96,11 +100,9 @@ public class ElementalProtectionEnchant extends ExcellentEnchant implements Gene
             protectionAmount = this.getProtectionCapacity();
         }
 
-        if (this.isProtectionAsModifier()) {
-            event.setDamage(Math.max(0, event.getDamage() * (1D - protectionAmount)));
-        }
-        else {
-            event.setDamage(Math.max(0, event.getDamage() - protectionAmount));
-        }
+        double damage = event.getDamage();
+        double blocked = this.isProtectionAsModifier() ? damage * (1D - protectionAmount) : damage - protectionAmount;
+
+        event.setDamage(Math.max(0, blocked));
     }
 }

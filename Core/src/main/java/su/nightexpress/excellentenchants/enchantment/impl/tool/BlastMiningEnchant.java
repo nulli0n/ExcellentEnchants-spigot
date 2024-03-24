@@ -13,64 +13,65 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.manager.EventListener;
-import su.nexmedia.engine.utils.NumberUtil;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
-import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.manager.SimpeListener;
+import su.nightexpress.nightcore.util.NumberUtil;
 
+import java.io.File;
 import java.util.List;
 
-public class BlastMiningEnchant extends ExcellentEnchant implements Chanced, BlockBreakEnchant, EventListener {
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class BlastMiningEnchant extends AbstractEnchantmentData implements ChanceData, BlockBreakEnchant, SimpeListener {
 
     public static final String ID = "blast_mining";
-    public static final String PLACEHOLDER_EXPLOSION_POWER = "%enchantment_explosion_power%";
 
-    private EnchantScaler explosionPower;
-    private EnchantScaler minBlockStrength;
-    private ChanceImplementation chanceImplementation;
+    private Modifier           explosionPower;
+    private Modifier           minBlockStrength;
+    private ChanceSettingsImpl chanceSettings;
 
     private int explodeLevel;
 
-    public BlastMiningEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to mine blocks by explosion.");
-        this.getDefaults().setLevelMax(5);
-        this.getDefaults().setTier(1.0);
-        this.getDefaults().setConflicts(VeinminerEnchant.ID, TunnelEnchant.ID);
+    public BlastMiningEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription(ENCHANTMENT_CHANCE + "% chance to mine blocks by explosion.");
+        this.setMaxLevel(5);
+        this.setRarity(Rarity.RARE);
+        this.setConflicts(VeinminerEnchant.ID, TunnelEnchant.ID);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.multiply(10, 1, 1, 100));
 
-        this.chanceImplementation = ChanceImplementation.create(this,
-            "20.0 * " + Placeholders.ENCHANTMENT_LEVEL);
-
-        this.explosionPower = EnchantScaler.read(this, "Settings.Explosion.Power",
-            "3.0 + (" + Placeholders.ENCHANTMENT_LEVEL + " - 1.0 * 0.25)",
+        this.explosionPower = Modifier.read(config, "Settings.Explosion.Power",
+            Modifier.add(3, 0.75, 1, 8),
             "Explosion power. The more power = the more blocks (area) to explode.");
 
-        this.minBlockStrength = EnchantScaler.read(this, "Settings.Min_Block_Strength",
-            "1.5 - " + Placeholders.ENCHANTMENT_LEVEL + " / 10",
+        this.minBlockStrength = Modifier.read(config, "Settings.Min_Block_Strength",
+            Modifier.add(1.5, -0.1, 1),
             "Minimal block strength value for the enchantment to have effect.",
             "Block strength value is how long it takes to break the block by a hand.",
             "For example, a Stone has 3.0 strength.");
 
-        this.addPlaceholder(PLACEHOLDER_EXPLOSION_POWER, level -> NumberUtil.format(this.getExplosionPower(level)));
+        this.addPlaceholder(GENERIC_RADIUS, level -> NumberUtil.format(this.getExplosionPower(level)));
     }
 
     @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public ChanceSettings getChanceSettings() {
+        return chanceSettings;
     }
 
     public double getExplosionPower(int level) {
@@ -88,7 +89,7 @@ public class BlastMiningEnchant extends ExcellentEnchant implements Chanced, Blo
 
     @Override
     @NotNull
-    public ItemCategory[] getFitItemTypes() {
+    public ItemCategory[] getItemCategories() {
         return new ItemCategory[]{ItemCategory.PICKAXE};
     }
 
@@ -134,17 +135,17 @@ public class BlastMiningEnchant extends ExcellentEnchant implements Chanced, Blo
     }
 
     // Do not damage around entities by enchantment explosion.
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlastExplosionDamage(EntityDamageByEntityEvent e) {
-        if (e.getCause() != DamageCause.ENTITY_EXPLOSION) return;
-        if (!(e.getDamager() instanceof Player player)) return;
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onBlastExplosionDamage(EntityDamageByEntityEvent event) {
+        if (event.getCause() != DamageCause.ENTITY_EXPLOSION) return;
+        if (!(event.getDamager() instanceof Player)) return;
 
-        e.setCancelled(this.explodeLevel > 0);
+        event.setCancelled(this.explodeLevel > 0);
     }
 
     // Do not reduce item durability for 'exploded' blocks.
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlastExplosionItemDamage(PlayerItemDamageEvent e) {
-        e.setCancelled(this.explodeLevel > 0);
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onBlastExplosionItemDamage(PlayerItemDamageEvent event) {
+        event.setCancelled(this.explodeLevel > 0);
     }
 }

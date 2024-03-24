@@ -7,40 +7,43 @@ import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.nightcore.config.FileConfig;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SurvivalistEnchant extends ExcellentEnchant implements FishingEnchant, Chanced {
+public class SurvivalistEnchant extends AbstractEnchantmentData implements FishingEnchant, ChanceData {
 
     public static final String ID = "survivalist";
 
     private final Set<CookingRecipe<?>> cookingRecipes;
 
-    private ChanceImplementation chanceImplementation;
+    private ChanceSettingsImpl chanceSettings;
 
-    public SurvivalistEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Automatically cooks fish if what is caught is raw.");
-        this.getDefaults().setLevelMax(1);
-        this.getDefaults().setTier(0.4);
+    public SurvivalistEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Automatically cooks fish if what is caught is raw.");
+        this.setMaxLevel(1);
+        this.setRarity(Rarity.UNCOMMON);
 
         this.cookingRecipes = new HashSet<>();
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.chanceImplementation = ChanceImplementation.create(this, "100");
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chanceSettings = ChanceSettingsImpl.create(config);
 
         this.cookingRecipes.clear();
         this.plugin.getServer().recipeIterator().forEachRemaining(recipe -> {
-            if (recipe instanceof CookingRecipe<?> cookingRecipe) {
+            if (recipe instanceof CookingRecipe<?> cookingRecipe && cookingRecipe.getInput().getType().isItem()) {
                 this.cookingRecipes.add(cookingRecipe);
             }
         });
@@ -48,8 +51,8 @@ public class SurvivalistEnchant extends ExcellentEnchant implements FishingEncha
 
     @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public ChanceSettings getChanceSettings() {
+        return chanceSettings;
     }
 
     @NotNull
@@ -72,7 +75,7 @@ public class SurvivalistEnchant extends ExcellentEnchant implements FishingEncha
 
         ItemStack stack = drop.getItemStack();
 
-        CookingRecipe<?> recipe = this.cookingRecipes.stream().filter(r -> r.getInput().isSimilar(stack)).findFirst().orElse(null);
+        CookingRecipe<?> recipe = this.cookingRecipes.stream().filter(rec -> rec.getInputChoice().test(stack)).findFirst().orElse(null);
         if (recipe == null) return false;
 
         ItemStack cooked = recipe.getResult();

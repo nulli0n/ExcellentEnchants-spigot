@@ -4,38 +4,42 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.NumberUtil;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.NumberUtil;
 
-public class SeasonedAnglerEnchant extends ExcellentEnchant implements FishingEnchant {
+import java.io.File;
+
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class SeasonedAnglerEnchant extends AbstractEnchantmentData implements FishingEnchant {
 
     public static final String ID = "seasoned_angler";
 
-    private EnchantScaler expMod;
+    private Modifier xpModifier;
 
-    public SeasonedAnglerEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Increases amount of XP gained from fishing by " + Placeholders.GENERIC_AMOUNT + "%.");
-        this.getDefaults().setLevelMax(4);
-        this.getDefaults().setTier(0.1);
+    public SeasonedAnglerEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Increases amount of XP gained from fishing by " + GENERIC_AMOUNT + "%.");
+        this.setMaxLevel(4);
+        this.setRarity(Rarity.UNCOMMON);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.expMod = EnchantScaler.read(this, "Settings.Exp_Percent",
-            "25.0 * " + Placeholders.ENCHANTMENT_LEVEL,
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.xpModifier = Modifier.read(config, "Settings.XP_Modifier",
+            Modifier.add(0, 25, 1, 300),
             "Amount (in percent) of additional XP from fishing.");
 
-        this.addPlaceholder(Placeholders.GENERIC_AMOUNT, level -> NumberUtil.format(this.getExpPercent(level)));
+        this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getXPPercent(level)));
     }
 
-    public int getExpPercent(int level) {
-        return (int) this.expMod.getValue(level);
+    public int getXPPercent(int level) {
+        return (int) this.xpModifier.getValue(level);
     }
 
     @NotNull
@@ -50,7 +54,7 @@ public class SeasonedAnglerEnchant extends ExcellentEnchant implements FishingEn
         if (event.getExpToDrop() == 0) return false;
 
         int expDrop = event.getExpToDrop();
-        int expPercent = this.getExpPercent(level);
+        int expPercent = this.getXPPercent(level);
         int expModified = (int) Math.ceil(expDrop * (1D + expPercent / 100D));
 
         event.setExpToDrop(expModified);

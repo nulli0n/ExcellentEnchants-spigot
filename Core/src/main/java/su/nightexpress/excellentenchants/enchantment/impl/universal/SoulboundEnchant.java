@@ -9,25 +9,33 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.manager.EventListener;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.manager.SimpeListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SoulboundEnchant extends ExcellentEnchant implements GenericEnchant, EventListener {
+public class SoulboundEnchant extends AbstractEnchantmentData implements GenericEnchant, SimpeListener {
 
     public static final String ID = "soulbound";
 
-    public SoulboundEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Protects from being dropped on death.");
-        this.getDefaults().setLevelMax(1);
-        this.getDefaults().setTier(0.8);
-        this.getDefaults().setConflicts(Enchantment.VANISHING_CURSE.getKey().getKey());
+    public SoulboundEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Protects from being dropped on death.");
+        this.setMaxLevel(1);
+        this.setRarity(Rarity.VERY_RARE);
+        this.setConflicts(Enchantment.VANISHING_CURSE.getKey().getKey());
+    }
+
+    @Override
+    protected void loadAdditional(@NotNull FileConfig config) {
+
     }
 
     @NotNull
@@ -47,7 +55,7 @@ public class SoulboundEnchant extends ExcellentEnchant implements GenericEnchant
         World world = player.getWorld();
 
         deathEvent.getDrops().removeIf(drop -> {
-            if (EnchantUtils.getLevel(drop, this.getBackend()) > 0) {
+            if (EnchantUtils.getLevel(drop, this.getEnchantment()) > 0) {
                 if (this.isOutOfCharges(drop)) return false;
 
                 saveList.add(drop);
@@ -64,7 +72,7 @@ public class SoulboundEnchant extends ExcellentEnchant implements GenericEnchant
                     world.dropItemNaturally(location, save);
                 }
                 else {
-                    this.consumeChargesNoUpdate(save, EnchantUtils.getLevel(save, this.getBackend()));
+                    this.consumeChargesNoUpdate(save, EnchantUtils.getLevel(save, this.getEnchantment()));
                     player.getInventory().addItem(save);
                 }
             });

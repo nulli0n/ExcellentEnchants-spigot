@@ -9,10 +9,5 @@ Command:
     Usage: <玩家> <附魔名> <等级>
     Desc: 给予自定义附魔书。
     Done: 已给予&6%player%&6%enchant%&7附魔书。
-  TierBook:
-    Usage: <玩家> <品质> <等级>
-    Desc: 给予自定义品质的附魔书
-    Error: '&c无效品质！'
-    Done: 已给予&6%player&6%enchant%&7附魔书。
 Error:
   NoEnchant: '&c没有这种附魔'

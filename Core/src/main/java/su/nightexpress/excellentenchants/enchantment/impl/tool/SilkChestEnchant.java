@@ -20,53 +20,66 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.manager.EventListener;
-import su.nexmedia.engine.utils.Colorizer;
-import su.nexmedia.engine.utils.ItemUtil;
-import su.nexmedia.engine.utils.PDCUtil;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.nightcore.config.ConfigValue;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.manager.SimpeListener;
+import su.nightexpress.nightcore.util.ItemReplacer;
+import su.nightexpress.nightcore.util.PDCUtil;
+import su.nightexpress.nightcore.util.Plugins;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class SilkChestEnchant extends ExcellentEnchant implements BlockDropEnchant, EventListener {
+public class SilkChestEnchant extends AbstractEnchantmentData implements BlockDropEnchant, SimpeListener {
 
     public static final String ID = "silk_chest";
 
-    private       String                      chestName;
-    private       List<String>                chestLore;
-    private final NamespacedKey               keyChest;
+    private       String        chestName;
+    private       List<String>  chestLore;
+    private final NamespacedKey keyChest;
 
-    public SilkChestEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Drop chests and saves all its content.");
-        this.getDefaults().setLevelMax(1);
-        this.getDefaults().setTier(0.5);
+    public SilkChestEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Drop chests and saves all its content.");
+        this.setMaxLevel(1);
+        this.setRarity(Rarity.VERY_RARE);
 
         this.keyChest = new NamespacedKey(plugin, ID + ".item");
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.chestName = JOption.create("Settings.Chest_Item.Name", "Chest &7(" + Placeholders.GENERIC_AMOUNT + " items)",
+    public boolean checkServerRequirements() {
+        if (Plugins.isSpigot()) {
+            this.warn("Enchantment can only be used in PaperMC or Paper based forks.");
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chestName = ConfigValue.create("Settings.Chest_Item.Name", "Chest (" + Placeholders.GENERIC_AMOUNT + " items)",
             "Chest item display name.",
-            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").mapReader(Colorizer::apply).read(cfg);
-        this.chestLore = JOption.create("Settings.Chest_Item.Lore", new ArrayList<>(),
+            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount."
+        ).read(config);
+
+        this.chestLore = ConfigValue.create("Settings.Chest_Item.Lore", new ArrayList<>(),
             "Chest item lore.",
-            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").mapReader(Colorizer::apply).read(cfg);
+            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount."
+        ).read(config);
     }
 
     @Override
     @NotNull
-    public ItemCategory[] getFitItemTypes() {
+    public ItemCategory[] getItemCategories() {
         return new ItemCategory[]{ItemCategory.AXE};
     }
 
@@ -74,12 +87,6 @@ public class SilkChestEnchant extends ExcellentEnchant implements BlockDropEncha
     @NotNull
     public EnchantmentTarget getCategory() {
         return EnchantmentTarget.TOOL;
-    }
-
-    @NotNull
-    @Override
-    public EventPriority getDropPriority() {
-        return EventPriority.NORMAL;
     }
 
     public boolean isSilkChest(@NotNull ItemStack item) {
@@ -104,43 +111,15 @@ public class SilkChestEnchant extends ExcellentEnchant implements BlockDropEncha
         stateMeta.setLore(this.chestLore);
         chestStack.setItemMeta(stateMeta);
 
-        ItemUtil.replace(chestStack, str -> str.replace(Placeholders.GENERIC_AMOUNT, String.valueOf(amount)));
+        ItemReplacer.replace(chestStack, str -> str.replace(Placeholders.GENERIC_AMOUNT, String.valueOf(amount)));
         PDCUtil.set(chestStack, this.keyChest, true);
         return chestStack;
-
-        // Store and count chest items.
-        /*int amount = 0;
-        int count = 0;
-        for (ItemStack itemInv : chest.getBlockInventory().getContents()) {
-            if (itemInv == null) itemInv = new ItemStack(Material.AIR);
-            else amount++;
-
-            String base64 = ItemUtil.toBase64(itemInv);
-            if (base64 == null) continue;
-            if (base64.length() >= Short.MAX_VALUE) {
-                chest.getWorld().dropItemNaturally(chest.getLocation(), itemInv);
-                continue;
-            }
-            PDCUtil.setData(chestItem, this.getItemKey(count++), base64);
-        }
-
-        // Apply item meta name and items data string.
-        ItemMeta meta = chestItem.getItemMeta();
-        if (meta != null) {
-            String nameOrig = ItemUtil.getItemName(chestItem);
-            String nameChest = this.chestName.replace("%name%", nameOrig).replace("%items%", String.valueOf(amount));
-            meta.setDisplayName(nameChest);
-            chestItem.setItemMeta(meta);
-        }
-
-        return chestItem;*/
     }
 
     @Override
     public boolean onDrop(@NotNull BlockDropItemEvent event,
                           @NotNull LivingEntity player, @NotNull ItemStack item, int level) {
         BlockState state = event.getBlockState();
-        Block block = state.getBlock();
 
         if (!(state instanceof Chest chest)) return false;
 
@@ -150,11 +129,11 @@ public class SilkChestEnchant extends ExcellentEnchant implements BlockDropEncha
         event.getItems().clear();
 
         if (chest.getBlockInventory().isEmpty()) {
-            EnchantUtils.popResource(event, new ItemStack(chest.getType()));
+            this.plugin.populateResource(event, new ItemStack(chest.getType()));
             return false;
         }
 
-        EnchantUtils.popResource(event, this.getSilkChest(chest));
+        this.plugin.populateResource(event, this.getSilkChest(chest));
 
         chest.getBlockInventory().clear();
 
@@ -162,11 +141,11 @@ public class SilkChestEnchant extends ExcellentEnchant implements BlockDropEncha
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onSilkChestPlace(BlockPlaceEvent e) {
-        ItemStack item = e.getItemInHand();
+    public void onSilkChestPlace(BlockPlaceEvent event) {
+        ItemStack item = event.getItemInHand();
         if (item.getType().isAir()) return;
 
-        Block block = e.getBlockPlaced();
+        Block block = event.getBlockPlaced();
         BlockState state = block.getState();
         if (!(state instanceof Chest chest)) return;
 
@@ -175,29 +154,29 @@ public class SilkChestEnchant extends ExcellentEnchant implements BlockDropEncha
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onSilkChestStore(InventoryClickEvent e) {
-        Inventory inventory = e.getInventory();
+    public void onSilkChestStore(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
         if (inventory.getType() == InventoryType.CRAFTING || inventory.getType() == InventoryType.CREATIVE) return;
 
-        Player player = (Player) e.getWhoClicked();
+        Player player = (Player) event.getWhoClicked();
         ItemStack item;
-        if (e.getHotbarButton() >= 0) {
-            item = player.getInventory().getItem(e.getHotbarButton());
+        if (event.getHotbarButton() >= 0) {
+            item = player.getInventory().getItem(event.getHotbarButton());
         }
-        else item = e.getCurrentItem();
+        else item = event.getCurrentItem();
 
         if (item == null || item.getType().isAir() || !this.isSilkChest(item)) return;
 
-        Inventory clicked = e.getClickedInventory();
-        if (e.getClick() != ClickType.NUMBER_KEY) {
-            if (clicked != null && clicked.equals(e.getView().getTopInventory())) return;
+        Inventory clicked = event.getClickedInventory();
+        if (event.getClick() != ClickType.NUMBER_KEY) {
+            if (clicked != null && clicked.equals(event.getView().getTopInventory())) return;
         }
 
-        e.setCancelled(true);
+        event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onSilkChestHopper(InventoryPickupItemEvent e) {
-        e.setCancelled(this.isSilkChest(e.getItem().getItemStack()));
+    public void onSilkChestHopper(InventoryPickupItemEvent event) {
+        event.setCancelled(this.isSilkChest(event.getItem().getItemStack()));
     }
 }

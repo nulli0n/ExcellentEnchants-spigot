@@ -11,13 +11,14 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.FishingHook;
-import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R2.block.CraftBlock;
@@ -27,6 +28,7 @@ import org.bukkit.craftbukkit.v1_20_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R2.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
@@ -34,11 +36,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.utils.Reflex;
-import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
+import su.nightexpress.nightcore.util.Reflex;
 
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -60,20 +60,13 @@ public class V1_20_R2 implements EnchantNMS {
     }
 
     @Override
-    public void registerEnchantment(@NotNull IEnchantment enchantment) {
-        XEnchantment xEnchantment = new XEnchantment(enchantment, net.minecraft.world.item.enchantment.Enchantment.Rarity.COMMON);
-        Registry.register(BuiltInRegistries.ENCHANTMENT, enchantment.getId(), xEnchantment);
+    public void registerEnchantment(@NotNull EnchantmentData data) {
+        CustomEnchantment customEnchantment = new CustomEnchantment(data);
+        Registry.register(BuiltInRegistries.ENCHANTMENT, data.getId(), customEnchantment);
 
-        Enchantment.registerEnchantment(new CraftEnchantment(xEnchantment));
-    }
-
-    public net.minecraft.world.item.enchantment.Enchantment.Rarity getNMSRarity(@NotNull Rarity rarity) {
-        return switch (rarity) {
-            case RARE -> net.minecraft.world.item.enchantment.Enchantment.Rarity.RARE;
-            case COMMON -> net.minecraft.world.item.enchantment.Enchantment.Rarity.COMMON;
-            case UNCOMMON -> net.minecraft.world.item.enchantment.Enchantment.Rarity.UNCOMMON;
-            case VERY_RARE -> net.minecraft.world.item.enchantment.Enchantment.Rarity.VERY_RARE;
-        };
+        CraftEnchantment craftEnchantment = new CraftEnchantment(customEnchantment);
+        Enchantment.registerEnchantment(craftEnchantment);
+        data.setEnchantment(craftEnchantment);
     }
 
     @Override
@@ -91,16 +84,15 @@ public class V1_20_R2 implements EnchantNMS {
         handle.retrieve(CraftItemStack.asNMSCopy(item));
     }
 
+    @NotNull
     @Override
-    @Nullable
-    public ItemStack getSpawnEgg(@NotNull LivingEntity entity) {
-        CraftLivingEntity craftLivingEntity = (CraftLivingEntity) entity;
-        net.minecraft.world.entity.LivingEntity livingEntity = craftLivingEntity.getHandle();
-
-        SpawnEggItem eggItem = SpawnEggItem.byId(livingEntity.getType());
-        if (eggItem == null) return null;
-
-        return CraftItemStack.asBukkitCopy(eggItem.getDefaultInstance());
+    public Material getItemBlockVariant(@NotNull Material material) {
+        ItemStack itemStack = new ItemStack(material);
+        net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        if (nmsStack.getItem() instanceof BlockItem blockItem) {
+            return CraftMagicNumbers.getMaterial(blockItem.getBlock());
+        }
+        return material;
     }
 
     @Override

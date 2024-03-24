@@ -11,32 +11,34 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.FishingHook;
-import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlockType;
+import org.bukkit.craftbukkit.v1_20_R3.enchantments.CraftEnchantment;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftFishHook;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.utils.Reflex;
-import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
+import su.nightexpress.nightcore.util.Reflex;
 
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -46,8 +48,8 @@ public class V1_20_R3 implements EnchantNMS {
 
     @Override
     public void unfreezeRegistry() {
-        Reflex.setFieldValue(BuiltInRegistries.ENCHANTMENT, "l", false);
-        Reflex.setFieldValue(BuiltInRegistries.ENCHANTMENT, "m", new IdentityHashMap<>());
+        Reflex.setFieldValue(BuiltInRegistries.ENCHANTMENT, "l", false); // MappedRegistry#frozen
+        Reflex.setFieldValue(BuiltInRegistries.ENCHANTMENT, "m", new IdentityHashMap<>()); // MappedRegistry#unregisteredIntrusiveHolders
     }
 
     @Override
@@ -55,18 +57,12 @@ public class V1_20_R3 implements EnchantNMS {
         BuiltInRegistries.ENCHANTMENT.freeze();
     }
 
-    public void registerEnchantment(@NotNull IEnchantment enchantment) {
-        XEnchantment xEnchantment = new XEnchantment(enchantment, getNMSRarity(Rarity.COMMON));
-        Registry.register(BuiltInRegistries.ENCHANTMENT, enchantment.getId(), xEnchantment);
-    }
+    public void registerEnchantment(@NotNull EnchantmentData data) {
+        CustomEnchantment enchantment = new CustomEnchantment(data);
+        Registry.register(BuiltInRegistries.ENCHANTMENT, data.getId(), enchantment);
 
-    public net.minecraft.world.item.enchantment.Enchantment.Rarity getNMSRarity(@NotNull Rarity rarity) {
-        return switch (rarity) {
-            case RARE -> net.minecraft.world.item.enchantment.Enchantment.Rarity.RARE;
-            case COMMON -> net.minecraft.world.item.enchantment.Enchantment.Rarity.COMMON;
-            case UNCOMMON -> net.minecraft.world.item.enchantment.Enchantment.Rarity.UNCOMMON;
-            case VERY_RARE -> net.minecraft.world.item.enchantment.Enchantment.Rarity.VERY_RARE;
-        };
+        Enchantment bukkitEnchant = CraftEnchantment.minecraftToBukkit(enchantment);
+        data.setEnchantment(bukkitEnchant);
     }
 
     @Override
@@ -84,7 +80,7 @@ public class V1_20_R3 implements EnchantNMS {
         handle.retrieve(CraftItemStack.asNMSCopy(item));
     }
 
-    @Override
+    /*@Override
     @Nullable
     public ItemStack getSpawnEgg(@NotNull LivingEntity entity) {
         CraftLivingEntity craftLivingEntity = (CraftLivingEntity) entity;
@@ -94,6 +90,17 @@ public class V1_20_R3 implements EnchantNMS {
         if (eggItem == null) return null;
 
         return CraftItemStack.asBukkitCopy(eggItem.getDefaultInstance());
+    }*/
+
+    @NotNull
+    @Override
+    public Material getItemBlockVariant(@NotNull Material material) {
+        ItemStack itemStack = new ItemStack(material);
+        net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        if (nmsStack.getItem() instanceof BlockItem blockItem) {
+            return CraftBlockType.minecraftToBukkit(blockItem.getBlock());
+        }
+        return material;
     }
 
     @Override

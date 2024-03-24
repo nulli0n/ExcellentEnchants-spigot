@@ -8,39 +8,44 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.values.UniParticle;
-import su.nexmedia.engine.utils.values.UniSound;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.wrapper.UniParticle;
+import su.nightexpress.nightcore.util.wrapper.UniSound;
 
-public class CurseOfDrownedEnchant extends ExcellentEnchant implements FishingEnchant, Chanced {
+import java.io.File;
+
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class CurseOfDrownedEnchant extends AbstractEnchantmentData implements FishingEnchant, ChanceData {
 
     public static final String ID = "curse_of_drowned";
 
-    private ChanceImplementation chanceImplementation;
+    private ChanceSettingsImpl chanceSettings;
 
-    public CurseOfDrownedEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to fish up a Drowned Zombie.");
-        this.getDefaults().setLevelMax(5);
-        this.getDefaults().setTier(0D);
+    public CurseOfDrownedEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription(ENCHANTMENT_CHANCE + "% chance to fish up a Drowned Zombie.");
+        this.setMaxLevel(5);
+        this.setRarity(Rarity.UNCOMMON);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.chanceImplementation = ChanceImplementation.create(this,
-            "5.0 + " + Placeholders.ENCHANTMENT_LEVEL);
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(0, 5, 1, 100));
     }
 
     @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public ChanceSettings getChanceSettings() {
+        return chanceSettings;
     }
 
     @NotNull
@@ -62,7 +67,7 @@ public class CurseOfDrownedEnchant extends ExcellentEnchant implements FishingEn
         event.setCancelled(true);
 
         if (this.hasVisualEffects()) {
-            UniParticle.of(Particle.WATER_SPLASH).play(hook.getLocation(), 0.5, 0.1, 50);
+            UniParticle.of(Particle.WATER_SPLASH).play(hook.getLocation(), 0.75, 0.1, 50);
             UniSound.of(Sound.ENTITY_DROWNED_AMBIENT).play(event.getPlayer());
         }
         return true;

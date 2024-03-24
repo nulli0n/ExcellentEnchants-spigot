@@ -7,42 +7,47 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.PlayerUtil;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
-import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.Players;
 
-public class TelekinesisEnchant extends ExcellentEnchant implements Chanced, BlockDropEnchant {
+import java.io.File;
+
+
+public class TelekinesisEnchant extends AbstractEnchantmentData implements ChanceData, BlockDropEnchant {
 
     public static final String ID = "telekinesis";
 
-    private ChanceImplementation chanceImplementation;
+    private ChanceSettingsImpl chanceSettings;
 
-    public TelekinesisEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Moves all blocks loot directly to your inventory.");
-        this.getDefaults().setLevelMax(1);
-        this.getDefaults().setTier(0.75);
+    public TelekinesisEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Moves all blocks loot directly to your inventory.");
+        this.setMaxLevel(1);
+        this.setRarity(Rarity.VERY_RARE);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.chanceImplementation = ChanceImplementation.create(this, "100");
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chanceSettings = ChanceSettingsImpl.create(config);
     }
 
     @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public ChanceSettings getChanceSettings() {
+        return chanceSettings;
     }
 
     @Override
     @NotNull
-    public ItemCategory[] getFitItemTypes() {
+    public ItemCategory[] getItemCategories() {
         return new ItemCategory[]{ItemCategory.TOOL};
     }
 
@@ -64,7 +69,7 @@ public class TelekinesisEnchant extends ExcellentEnchant implements Chanced, Blo
         if (!this.checkTriggerChance(level)) return false;
 
         event.getItems().forEach(drop -> {
-            PlayerUtil.addItem(player, drop.getItemStack());
+            Players.addItem(player, drop.getItemStack());
         });
         event.getItems().clear();
         return true;

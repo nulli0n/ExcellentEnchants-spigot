@@ -9,19 +9,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.config.JOption;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
+import su.nightexpress.nightcore.config.ConfigValue;
+import su.nightexpress.nightcore.config.FileConfig;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class TunnelEnchant extends ExcellentEnchant implements BlockBreakEnchant {
+public class TunnelEnchant extends AbstractEnchantmentData implements BlockBreakEnchant {
 
     public static final String   ID                   = "tunnel";
     // X and Z offsets for each block AoE mined
@@ -35,25 +38,25 @@ public class TunnelEnchant extends ExcellentEnchant implements BlockBreakEnchant
 
     private boolean disableOnSneak;
 
-    public TunnelEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
+    public TunnelEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
 
-        this.getDefaults().setDescription("Mines multiple blocks at once in a certain shape.");
-        this.getDefaults().setLevelMax(3);
-        this.getDefaults().setTier(1.0);
-        this.getDefaults().setConflicts(VeinminerEnchant.ID, BlastMiningEnchant.ID);
+        this.setDescription("Mines multiple blocks at once in a certain shape.");
+        this.setMaxLevel(3);
+        this.setRarity(Rarity.VERY_RARE);
+        this.setConflicts(VeinminerEnchant.ID, BlastMiningEnchant.ID);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.disableOnSneak = JOption.create("Settings.Ignore_When_Sneaking", true,
-            "When 'true' the enchantment won't be triggered when sneaking.").read(cfg);
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.disableOnSneak = ConfigValue.create("Settings.Disable_On_Crouch",
+            true,
+            "Sets whether or not enchantment will have no effect when crouching.").read(config);
     }
 
     @Override
     @NotNull
-    public ItemCategory[] getFitItemTypes() {
+    public ItemCategory[] getItemCategories() {
         return new ItemCategory[]{ItemCategory.PICKAXE, ItemCategory.SHOVEL};
     }
 
