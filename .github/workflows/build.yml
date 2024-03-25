@@ -61,13 +61,13 @@ jobs:
       - name: Check out NexEngine
         uses: actions/checkout@v4
         with:
-          repository: 'nulli0n/NexEngine-spigot'
-          ref: 'v2.2.12-final'
-          path: 'NexEngine'
+          repository: 'nulli0n/nightcore-spigot'
+          ref: 'f70589cbe2b2fde92a1941e76a408dc1296490c5'
+          path: 'nightcore'
 
       - name: Install NexEngine
         run: mvn install
-        working-directory: ./NexEngine
+        working-directory: ./nightcore
 
   ci:
     runs-on: ubuntu-latest
