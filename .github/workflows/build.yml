@@ -58,14 +58,14 @@ jobs:
           remapped: true
           buildToolProvider: SpigotMC
 
-      - name: Check out NexEngine
+      - name: Check out nightcore
         uses: actions/checkout@v4
         with:
           repository: 'nulli0n/nightcore-spigot'
           ref: 'f70589cbe2b2fde92a1941e76a408dc1296490c5'
           path: 'nightcore'
 
-      - name: Install NexEngine
+      - name: Install nightcore
         run: mvn install
         working-directory: ./nightcore
 
