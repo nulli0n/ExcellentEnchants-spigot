@@ -7,17 +7,17 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.utils.StringUtil;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
+import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.StringUtil;
 
 public class PlaceholderHook {
 
     private static EnchantsExpansion expansion;
 
-    public static void setup(@NotNull ExcellentEnchants plugin) {
+    public static void setup(@NotNull ExcellentEnchantsPlugin plugin) {
         if (expansion == null) {
             expansion = new EnchantsExpansion(plugin);
             expansion.register();
@@ -33,9 +33,9 @@ public class PlaceholderHook {
 
     static class EnchantsExpansion extends PlaceholderExpansion {
 
-        private final ExcellentEnchants plugin;
+        private final ExcellentEnchantsPlugin plugin;
 
-        public EnchantsExpansion(@NotNull ExcellentEnchants plugin) {
+        public EnchantsExpansion(@NotNull ExcellentEnchantsPlugin plugin) {
             this.plugin = plugin;
         }
 
@@ -75,22 +75,24 @@ public class PlaceholderHook {
                 ItemStack item = player.getInventory().getItem(slot);
                 if (item == null || item.getType().isAir()) return "-";
 
-                ExcellentEnchant enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[1].toLowerCase()));
+                EnchantmentData enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[1].toLowerCase()));
                 if (enchant == null) return null;
 
                 return String.valueOf(enchant.getCharges(item));
             }
+
             if (params.startsWith("charges_maximum_")) {
                 String[] chargesSplit = params.substring("charges_maximum_".length()).split(":");
                 if (chargesSplit.length < 2) return null;
 
-                ExcellentEnchant enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[0].toLowerCase()));
+                EnchantmentData enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[0].toLowerCase()));
                 if (enchant == null) return null;
 
-                int level = StringUtil.getInteger(chargesSplit[1], 1);
+                int level = NumberUtil.getInteger(chargesSplit[1], 1);
 
                 return String.valueOf(enchant.getChargesMax(level));
             }
+
             return super.onPlaceholderRequest(player, params);
         }
     }

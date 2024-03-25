@@ -11,66 +11,80 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.manager.EventListener;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.manager.SimpeListener;
 
-public class CurseOfFragilityEnchant extends ExcellentEnchant implements GenericEnchant, EventListener {
+import java.io.File;
+
+public class CurseOfFragilityEnchant extends AbstractEnchantmentData implements GenericEnchant, SimpeListener {
 
     public static final String ID = "curse_of_fragility";
 
-    public CurseOfFragilityEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Prevents an item from being grindstoned or anviled.");
-        this.getDefaults().setLevelMax(1);
-        this.getDefaults().setTier(0D);
+    public CurseOfFragilityEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Prevents an item from being grindstoned or anviled.");
+        this.setMaxLevel(1);
+        this.setRarity(Rarity.COMMON);
+    }
+
+    @Override
+    protected void loadAdditional(@NotNull FileConfig config) {
+
     }
 
     @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.BREAKABLE;
     }
 
+    @Override
+    public boolean isCurse() {
+        return true;
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onItemAnvil(PrepareAnvilEvent e) {
-        AnvilInventory inventory = e.getInventory();
+    public void onItemAnvil(PrepareAnvilEvent event) {
+        AnvilInventory inventory = event.getInventory();
         ItemStack first = inventory.getItem(0);
         ItemStack second = inventory.getItem(1);
 
-        boolean cursedFirst = (first != null && EnchantUtils.getLevel(first, this) >= 1);
-        boolean cursedSecond = (second != null && EnchantUtils.getLevel(second, this) >= 1);
+        boolean cursedFirst = (first != null && EnchantUtils.getLevel(first, this.getEnchantment()) >= 1);
+        boolean cursedSecond = (second != null && EnchantUtils.getLevel(second, this.getEnchantment()) >= 1);
 
         if (cursedFirst || cursedSecond) {
-            e.setResult(null);
+            event.setResult(null);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onItemGrindstoneClick(InventoryClickEvent e) {
-        Inventory inventory = e.getInventory();
+    public void onItemGrindstoneClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
         if (inventory.getType() != InventoryType.GRINDSTONE) return;
 
         this.stopGrindstone(inventory);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onItemGrindstoneDrag(InventoryDragEvent e) {
-        Inventory inventory = e.getInventory();
+    public void onItemGrindstoneDrag(InventoryDragEvent event) {
+        Inventory inventory = event.getInventory();
         if (inventory.getType() != InventoryType.GRINDSTONE) return;
 
         this.stopGrindstone(inventory);
     }
 
     private void stopGrindstone(@NotNull Inventory inventory) {
-        plugin.getScheduler().runTask(plugin, () -> {
+        plugin.runTask(task -> {
             ItemStack first = inventory.getItem(0);
             ItemStack second = inventory.getItem(1);
 
-            boolean cursedFirst = (first != null && EnchantUtils.getLevel(first, this) >= 1);
-            boolean cursedSecond = (second != null && EnchantUtils.getLevel(second, this) >= 1);
+            boolean cursedFirst = (first != null && EnchantUtils.getLevel(first, this.getEnchantment()) >= 1);
+            boolean cursedSecond = (second != null && EnchantUtils.getLevel(second, this.getEnchantment()) >= 1);
 
             if (cursedFirst || cursedSecond) {
                 inventory.setItem(2, null);

@@ -18,41 +18,47 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.values.UniParticle;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ArrowSettings;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ArrowSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
-public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, BowEnchant {
+import java.io.File;
+
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class FlareEnchant extends AbstractEnchantmentData implements ChanceData, ArrowData, BowEnchant {
 
     public static final String ID = "flare";
 
-    private ChanceImplementation chanceImplementation;
-    private ArrowImplementation arrowImplementation;
+    private ChanceSettingsImpl chanceSettings;
+    private ArrowSettingsImpl  arrowSettings;
 
-    public FlareEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
+    public FlareEnchant(@NotNull ExcellentEnchantsPlugin plugin, File file) {
+        super(plugin, file);
 
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to create a torch where arrow lands.");
-        this.getDefaults().setLevelMax(1);
-        this.getDefaults().setTier(0.4);
+        this.setDescription(ENCHANTMENT_CHANCE + "% chance to create a torch where arrow lands.");
+        this.setMaxLevel(1);
+        this.setRarity(Rarity.RARE);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.chanceImplementation = ChanceImplementation.create(this, "100.0");
-        this.arrowImplementation = ArrowImplementation.create(this, UniParticle.of(Particle.FIREWORKS_SPARK));
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chanceSettings = ChanceSettingsImpl.create(config);
+        this.arrowSettings = ArrowSettingsImpl.create(config, UniParticle.of(Particle.FIREWORKS_SPARK));
     }
 
     @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.BOW;
     }
 
@@ -64,40 +70,38 @@ public class FlareEnchant extends ExcellentEnchant implements Chanced, Arrowed, 
 
     @NotNull
     @Override
-    public Chanced getChanceImplementation() {
-        return this.chanceImplementation;
+    public ChanceSettings getChanceSettings() {
+        return this.chanceSettings;
     }
 
     @NotNull
     @Override
-    public ArrowImplementation getArrowImplementation() {
-        return this.arrowImplementation;
+    public ArrowSettings getArrowSettings() {
+        return this.arrowSettings;
     }
 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!(event.getProjectile() instanceof Arrow arrow)) return false;
-        if (!this.checkTriggerChance(level)) return false;
+        if (!(event.getProjectile() instanceof Arrow)) return false;
 
-        this.addData(arrow);
-        return true;
+        return this.checkTriggerChance(level);
     }
 
     @Override
-    public boolean onHit(@NotNull ProjectileHitEvent e, LivingEntity user, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
-        Block block = e.getHitBlock();
+    public boolean onHit(@NotNull ProjectileHitEvent event, LivingEntity user, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
+        Block block = event.getHitBlock();
         if (block == null) return false;
 
-        BlockFace face = e.getHitBlockFace();
+        BlockFace face = event.getHitBlockFace();
         if (face == null || face == BlockFace.DOWN) return false;
 
         Block relative = block.getRelative(face);
         if (!relative.getType().isAir()) return false;
 
         if (projectile.getShooter() instanceof Player player) {
-            BlockPlaceEvent event = new BlockPlaceEvent(relative, relative.getState(), block, new ItemStack(Material.TORCH),  player,true, EquipmentSlot.HAND);
-            plugin.getPluginManager().callEvent(event);
-            if (event.isCancelled() || !event.canBuild()) return false;
+            BlockPlaceEvent placeEvent = new BlockPlaceEvent(relative, relative.getState(), block, new ItemStack(Material.TORCH),  player,true, EquipmentSlot.HAND);
+            plugin.getPluginManager().callEvent(placeEvent);
+            if (placeEvent.isCancelled() || !placeEvent.canBuild()) return false;
         }
 
         if (face == BlockFace.UP) {

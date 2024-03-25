@@ -13,69 +13,76 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.lang.LangManager;
-import su.nexmedia.engine.utils.Colorizer;
-import su.nexmedia.engine.utils.ItemUtil;
-import su.nexmedia.engine.utils.PDCUtil;
-import su.nexmedia.engine.utils.StringUtil;
-import su.nexmedia.engine.utils.values.UniParticle;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.nightcore.config.ConfigValue;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.language.LangAssets;
+import su.nightexpress.nightcore.util.ItemUtil;
+import su.nightexpress.nightcore.util.PDCUtil;
+import su.nightexpress.nightcore.util.StringUtil;
+import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class EnchantDecapitator extends ExcellentEnchant implements Chanced, DeathEnchant {
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class EnchantDecapitator extends AbstractEnchantmentData implements ChanceData, DeathEnchant {
 
     public static final String ID = "decapitator";
 
-    private Set<EntityType>     ignoredEntityTypes;
-    private String              headName;
+    private Set<EntityType>         ignoredEntityTypes;
+    private String                  headName;
     private Map<EntityType, String> headTextures;
-
-    private ChanceImplementation chanceImplementation;
+    private ChanceSettingsImpl      chanceSettings;
 
     private final NamespacedKey skullKey;
 
-    public EnchantDecapitator(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to obtain player''s or mob''s head.");
-        this.getDefaults().setLevelMax(4);
-        this.getDefaults().setTier(0.75);
+    public EnchantDecapitator(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription(ENCHANTMENT_CHANCE + "% chance to obtain player''s or mob''s head.");
+        this.setMaxLevel(4);
+        this.setRarity(Rarity.RARE);
 
         this.skullKey = new NamespacedKey(plugin, this.getId() + ".entity_type");
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.chanceImplementation = ChanceImplementation.create(this,
-            "5.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 1.75");
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(5, 1.75, 1, 100));
 
-        this.ignoredEntityTypes = JOption.forSet("Settings.Ignored_Entity_Types",
+        this.ignoredEntityTypes = ConfigValue.forSet("Settings.Ignored_Entity_Types",
             str -> StringUtil.getEnum(str, EntityType.class).orElse(null),
+            (cfg, path, set) -> cfg.set(path, set.stream().map(Enum::name).toList()),
             () -> Set.of(
                 EntityType.BAT, EntityType.BEE, EntityType.ENDER_DRAGON, EntityType.WITHER, EntityType.WITHER_SKELETON
             ),
             "List of entities, that won't drop heads."
-        ).setWriter((cfg, path, set) -> cfg.set(path, set.stream().map(Enum::name).toList())).read(cfg);
+        ).read(config);
 
-        this.headName = JOption.create("Settings.Head_Item.Name", "&c" + Placeholders.GENERIC_TYPE + "'s Head",
-            "Head item display name. Use '" + Placeholders.GENERIC_TYPE + "' for entity name.")
-            .mapReader(Colorizer::apply).read(cfg);
+        this.headName = ConfigValue.create("Settings.Head_Item.Name",
+                "&c" + GENERIC_TYPE + "'s Head",
+                "Head item display name. Use '" + GENERIC_TYPE + "' for entity name.")
+            .read(config);
 
-        this.headTextures = JOption.forMap("Settings.Head_Item.Textures",
+        // TODO
+        this.headTextures = ConfigValue.forMap("Settings.Head_Item.Textures",
             id -> StringUtil.getEnum(id, EntityType.class).orElse(null),
-            (cfg, path, id) -> cfg.getString(path + "." + id),
+            (cfg2, path, id) -> cfg2.getString(path + "." + id),
+            (cfg2, path, map) -> map.forEach((type, txt) -> cfg2.set(path + "." + type.name(), txt)),
             () -> {
                 Map<EntityType, String> map = new HashMap<>();
                 map.put(EntityType.AXOLOTL, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNThkYTFhMGEyYTEzZGQyMDliZmMyNTI5ZDljN2MyOWEyOWRkOWEyM2ZmNGI4MGIzOGI4OTk2MTc3MmU4MDM5ZSJ9fX0=");
@@ -147,38 +154,28 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
             "Head texture values for each entity type.",
             "You can take some from http://minecraft-heads.com",
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html"
-        ).setWriter((cfg, path, map) -> map.forEach((type, txt) -> cfg.set(path + "." + type.name(), txt))).read(cfg);
-
-        /*for (String sType : cfg.getSection("Settings.Head_Item.Textures")) {
-            this.headTextures.put(sType.toUpperCase(), cfg.getString("Settings.Head_Item.Textures." + sType, ""));
-        }
-        this.cfg.setComments("Settings.Head_Item.Textures",
-            "Head texture values for each entity type.",
-            "You can take some from http://minecraft-heads.com",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html");
-
-        this.headTextures = new JOption<Map<String, String>>("Settings.Head_Item.Textures",
-            (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(String::toUpperCase, v -> cfg.getString(path + "." + v, ""))),
-            HashMap::new,
-            "Head texture values for each entity type.",
-            "You can take some from http://minecraft-heads.com",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html").read(cfg);*/
+        ).read(config);
     }
 
     @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public ChanceSettings getChanceSettings() {
+        return chanceSettings;
     }
 
     @Override
     @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.WEAPON;
     }
 
     @Override
     public boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level) {
+        return false;
+    }
+
+    @Override
+    public boolean onResurrect(@NotNull EntityResurrectEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
         return false;
     }
 
@@ -211,14 +208,14 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
 
             String entityName;
             if (entity instanceof Player player) {
-                entityName = this.headName.replace(Placeholders.GENERIC_TYPE, entity.getName());
+                entityName = this.headName.replace(GENERIC_TYPE, entity.getName());
                 meta.setOwningPlayer(player);
             }
             else {
                 String texture = this.headTextures.get(entity.getType());
                 if (texture == null) return false;
 
-                entityName = this.headName.replace(Placeholders.GENERIC_TYPE, LangManager.getEntityType(entity.getType()));
+                entityName = this.headName.replace(GENERIC_TYPE, LangAssets.get(entity.getType()));
                 ItemUtil.setSkullTexture(item, texture);
                 meta = (SkullMeta) item.getItemMeta();
             }
@@ -248,8 +245,8 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockPlace(BlockDropItemEvent e) {
-        if (!(e.getBlockState() instanceof Skull skull)) return;
+    public void onBlockPlace(BlockDropItemEvent event) {
+        if (!(event.getBlockState() instanceof Skull skull)) return;
 
         PDCUtil.getString(skull, this.skullKey).ifPresent(type -> {
             EntityType entityType = StringUtil.getEnum(type, EntityType.class).orElse(null);
@@ -258,12 +255,12 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
             String texture = this.headTextures.get(entityType);
             if (texture == null) return;
 
-            e.getItems().forEach(item -> {
+            event.getItems().forEach(item -> {
                 ItemStack drop = item.getItemStack();
                 if (drop.getType() == Material.PLAYER_HEAD) {
                     ItemUtil.setSkullTexture(drop, texture);
-                    ItemUtil.mapMeta(drop, meta -> {
-                        String name = this.headName.replace(Placeholders.GENERIC_TYPE, LangManager.getEntityType(entityType));
+                    ItemUtil.editMeta(drop, meta -> {
+                        String name = this.headName.replace(GENERIC_TYPE, LangAssets.get(entityType));
                         meta.setDisplayName(name);
                         PDCUtil.set(meta, this.skullKey, type);
                     });

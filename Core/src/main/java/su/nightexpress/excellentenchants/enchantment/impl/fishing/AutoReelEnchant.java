@@ -4,24 +4,33 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.nightcore.config.FileConfig;
 
-public class AutoReelEnchant extends ExcellentEnchant implements FishingEnchant {
+import java.io.File;
+
+public class AutoReelEnchant extends AbstractEnchantmentData implements FishingEnchant {
 
     public static final String ID = "auto_reel";
 
-    public AutoReelEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Automatically reels in a hook on bite.");
-        this.getDefaults().setLevelMax(1);
-        this.getDefaults().setTier(1.0);
+    public AutoReelEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Automatically reels in a hook on bite.");
+        this.setMaxLevel(1);
+        this.setRarity(Rarity.VERY_RARE);
+    }
+
+    @Override
+    protected void loadAdditional(@NotNull FileConfig config) {
+
     }
 
     @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.FISHING_ROD;
     }
 

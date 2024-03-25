@@ -7,53 +7,57 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.manager.EventListener;
-import su.nexmedia.engine.utils.NumberUtil;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.manager.SimpeListener;
+import su.nightexpress.nightcore.util.NumberUtil;
 
-public class CurseOfBreakingEnchant extends ExcellentEnchant implements GenericEnchant, EventListener, Chanced {
+import java.io.File;
+
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class CurseOfBreakingEnchant extends AbstractEnchantmentData implements GenericEnchant, SimpeListener, ChanceData {
 
     public static final String ID = "curse_of_breaking";
-    public static final String PLACEHOLDER_DURABILITY_AMOUNT = "%enchantment_durability_amount%";
 
-    private EnchantScaler durabilityAmount;
-    private ChanceImplementation chanceImplementation;
+    private Modifier           durabilityAmount;
+    private ChanceSettingsImpl chanceSettings;
 
-    public CurseOfBreakingEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to consume extra " + PLACEHOLDER_DURABILITY_AMOUNT + " durability points.");
-        this.getDefaults().setLevelMax(3);
-        this.getDefaults().setTier(0D);
+    public CurseOfBreakingEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription(ENCHANTMENT_CHANCE + "% chance to consume extra " + GENERIC_AMOUNT + " durability points.");
+        this.setMaxLevel(3);
+        this.setRarity(Rarity.COMMON);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.chanceImplementation = ChanceImplementation.create(this,
-            "10.0 * " + Placeholders.ENCHANTMENT_LEVEL);
-        this.durabilityAmount = EnchantScaler.read(this, "Settings.Durability_Amount",
-            Placeholders.ENCHANTMENT_LEVEL,
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.multiply(10, 1, 1, 100));
+
+        this.durabilityAmount = Modifier.read(config, "Settings.Durability_Amount",
+            Modifier.add(0, 1, 1, 5),
             "Amount of durability points to be taken from the item.");
 
-        this.addPlaceholder(PLACEHOLDER_DURABILITY_AMOUNT, level -> NumberUtil.format(this.getDurabilityAmount(level)));
+        this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getDurabilityAmount(level)));
     }
 
     @Override
-    public boolean isCursed() {
+    public boolean isCurse() {
         return true;
     }
 
     @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public ChanceSettings getChanceSettings() {
+        return chanceSettings;
     }
 
     public int getDurabilityAmount(int level) {
@@ -62,7 +66,7 @@ public class CurseOfBreakingEnchant extends ExcellentEnchant implements GenericE
 
     @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.BREAKABLE;
     }
 
@@ -72,7 +76,7 @@ public class CurseOfBreakingEnchant extends ExcellentEnchant implements GenericE
         if (!this.isAvailableToUse(player)) return;
 
         ItemStack item = event.getItem();
-        int level = EnchantUtils.getLevel(item, this);
+        int level = EnchantUtils.getLevel(item, this.getEnchantment());
 
         if (level < 1) return;
         if (!this.checkTriggerChance(level)) return;

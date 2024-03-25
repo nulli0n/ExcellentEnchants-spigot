@@ -11,10 +11,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
-import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.*;
@@ -24,11 +24,11 @@ public class ProtocolHook {
 
     private static boolean isRegistered = false;
 
-    public static void setup() {
+    public static void setup(@NotNull ExcellentEnchantsPlugin plugin) {
         if (isRegistered) return;
 
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-        manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, PacketType.Play.Server.SET_SLOT) {
+        manager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.SET_SLOT) {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
@@ -39,7 +39,7 @@ public class ProtocolHook {
             }
         });
 
-        manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, PacketType.Play.Server.WINDOW_ITEMS) {
+        manager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.WINDOW_ITEMS) {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
@@ -47,15 +47,12 @@ public class ProtocolHook {
                 List<ItemStack> items = packet.getItemListModifier().readSafely(0);
                 boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
 
-                for (int index = 0; index < items.size(); index++) {
-                    ItemStack item = items.get(index);
-                    items.set(index, update(item, isCreative));
-                }
+                items.replaceAll(itemStack -> update(itemStack, isCreative));
                 packet.getItemListModifier().write(0, items);
             }
         });
 
-        manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, PacketType.Play.Server.OPEN_WINDOW_MERCHANT) {
+        manager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.OPEN_WINDOW_MERCHANT) {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
@@ -85,28 +82,29 @@ public class ProtocolHook {
         ItemMeta meta = copy.getItemMeta();
         if (meta == null || meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) return item;
 
-        Map<ExcellentEnchant, Integer> enchants = EnchantUtils.getExcellents(meta)
+        Map<EnchantmentData, Integer> enchants = EnchantUtils.getCustomEnchantments(meta)
             .entrySet().stream()
-            .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
+            .sorted(Comparator.comparing((Map.Entry<EnchantmentData, Integer> entry) -> entry.getKey().getRarity().getWeight())
+                .thenComparing(entry -> entry.getKey().getName()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old,nev) -> nev, LinkedHashMap::new));
         if (enchants.isEmpty()) return item;
 
         List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
         if (!lore.isEmpty()) {
-            enchants.keySet().forEach(enchant -> lore.removeIf(line -> line.contains(enchant.getDisplayName())));
+            enchants.keySet().forEach(enchant -> lore.removeIf(line -> line.contains(enchant.getName())));
             if (isCreative) {
                 enchants.forEach((enchant, level) -> {
-                    lore.removeAll(enchant.formatDescription(level));
+                    lore.removeAll(enchant.getDescriptionReplaced(level));
                 });
             }
         }
-        if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get() && !isCreative) {
+        if (EnchantUtils.canHaveDescription(item) && !isCreative) {
             enchants.forEach((enchant, level) -> {
-                lore.addAll(0, enchant.formatDescription(level));
+                lore.addAll(0, enchant.getDescriptionReplaced(level));
             });
         }
         enchants.forEach((enchant, level) -> {
-            int charges = EnchantUtils.getCharges(meta, enchant);
+            int charges = enchant.getCharges(meta);
             lore.add(0, enchant.getNameFormatted(level, charges));
         });
 

@@ -1,6 +1,8 @@
 package su.nightexpress.excellentenchants.nms.v1_20_R1;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,34 +11,63 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.FishingHook;
-import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R1.enchantments.CraftEnchantment;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftFishHook;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
+import su.nightexpress.nightcore.util.Reflex;
 
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Set;
 
 public class V1_20_R1 implements EnchantNMS {
+
+    @Override
+    public void unfreezeRegistry() {
+        Reflex.setFieldValue(BuiltInRegistries.ENCHANTMENT, "l", false);
+        Reflex.setFieldValue(BuiltInRegistries.ENCHANTMENT, "m", new IdentityHashMap<>());
+        Reflex.setFieldValue(Enchantment.class, "acceptingNew", true);
+    }
+
+    @Override
+    public void freezeRegistry() {
+        Enchantment.stopAcceptingRegistrations();
+        BuiltInRegistries.ENCHANTMENT.freeze();
+    }
+
+    @Override
+    public void registerEnchantment(@NotNull EnchantmentData data) {
+        CustomEnchantment customEnchantment = new CustomEnchantment(data);
+        Registry.register(BuiltInRegistries.ENCHANTMENT, data.getId(), customEnchantment);
+
+        CraftEnchantment craftEnchantment = new CraftEnchantment(customEnchantment);
+        Enchantment.registerEnchantment(craftEnchantment);
+        data.setEnchantment(craftEnchantment);
+    }
 
     @Override
     public void sendAttackPacket(@NotNull Player player, int id) {
@@ -53,16 +84,15 @@ public class V1_20_R1 implements EnchantNMS {
         handle.retrieve(CraftItemStack.asNMSCopy(item));
     }
 
+    @NotNull
     @Override
-    @Nullable
-    public ItemStack getSpawnEgg(@NotNull LivingEntity entity) {
-        CraftLivingEntity craftLivingEntity = (CraftLivingEntity) entity;
-        net.minecraft.world.entity.LivingEntity livingEntity = craftLivingEntity.getHandle();
-
-        SpawnEggItem eggItem = SpawnEggItem.byId(livingEntity.getType());
-        if (eggItem == null) return null;
-
-        return CraftItemStack.asBukkitCopy(eggItem.getDefaultInstance());
+    public Material getItemBlockVariant(@NotNull Material material) {
+        ItemStack itemStack = new ItemStack(material);
+        net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        if (nmsStack.getItem() instanceof BlockItem blockItem) {
+            return CraftMagicNumbers.getMaterial(blockItem.getBlock());
+        }
+        return material;
     }
 
     @Override

@@ -5,16 +5,17 @@
     <parent>
         <artifactId>ExcellentEnchants</artifactId>
         <groupId>su.nightexpress.excellentenchants</groupId>
-        <version>3.6.4</version>
+        <version>4.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>Core</artifactId>
 
     <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
-        <spigot.version>1.20.1-R0.1-SNAPSHOT</spigot.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spigot.version>1.20.4-R0.1-SNAPSHOT</spigot.version>
     </properties>
 
     <repositories>
@@ -55,7 +56,7 @@
         <dependency>
             <groupId>io.lumine</groupId>
             <artifactId>Mythic-Dist</artifactId>
-            <version>5.0.1-SNAPSHOT</version>
+            <version>5.6.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -72,28 +73,33 @@
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
-            <artifactId>NMS</artifactId>
-            <version>3.6.4</version>
+            <artifactId>API</artifactId>
+            <version>4.0.0</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
-            <artifactId>V1_18_R2</artifactId>
-            <version>3.6.4</version>
+            <artifactId>NMS</artifactId>
+            <version>4.0.0</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_19_R3</artifactId>
-            <version>3.6.4</version>
+            <version>4.0.0</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_20_R1</artifactId>
-            <version>3.6.4</version>
+            <version>4.0.0</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_20_R2</artifactId>
-            <version>3.6.4</version>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>su.nightexpress.excellentenchants</groupId>
+            <artifactId>V1_20_R3</artifactId>
+            <version>4.0.0</version>
         </dependency>
     </dependencies>
 

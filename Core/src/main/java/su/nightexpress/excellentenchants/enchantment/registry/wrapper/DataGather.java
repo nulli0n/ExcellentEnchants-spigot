@@ -7,12 +7,12 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.Map;
 
-public abstract class DataGather<E extends Event, T extends IEnchantment> {
+public abstract class DataGather<E extends Event, T extends EnchantmentData> {
 
     @Nullable
     public abstract LivingEntity getEntity(@NotNull E event);

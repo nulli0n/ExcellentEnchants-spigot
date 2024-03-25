@@ -5,111 +5,129 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.EventPriority;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.LocationUtil;
-import su.nexmedia.engine.utils.values.UniParticle;
-import su.nexmedia.engine.utils.values.UniSound;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.nightcore.config.ConfigValue;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.BukkitThing;
+import su.nightexpress.nightcore.util.LocationUtil;
+import su.nightexpress.nightcore.util.wrapper.UniParticle;
+import su.nightexpress.nightcore.util.wrapper.UniSound;
 
-import java.util.Map;
+import java.io.File;
+import java.util.*;
 
-public class SmelterEnchant extends ExcellentEnchant implements Chanced, BlockDropEnchant {
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class SmelterEnchant extends AbstractEnchantmentData implements ChanceData, BlockDropEnchant {
 
     public static final String ID = "smelter";
 
-    private UniSound                sound;
-    private Map<Material, Material> smeltingTable;
-    private ChanceImplementation chanceImplementation;
+    private UniSound           sound;
+    private boolean            disableOnCrouch;
+    private ChanceSettingsImpl chanceSettings;
 
-    public SmelterEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to smelt a block/ore.");
-        this.getDefaults().setLevelMax(5);
-        this.getDefaults().setTier(0.3);
-        this.getDefaults().setConflicts(
-            DivineTouchEnchant.ID,
+    private final Set<Material> exemptedBlocks;
+    private final Set<FurnaceRecipe> recipes;
+
+    public SmelterEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Smelts mined blocks with " + ENCHANTMENT_CHANCE + "% chance.");
+        this.setMaxLevel(5);
+        this.setRarity(Rarity.UNCOMMON);
+        this.setConflicts(
+            SilkSpawnerEnchant.ID,
             Enchantment.SILK_TOUCH.getKey().getKey()
         );
+
+        this.exemptedBlocks = new HashSet<>();
+        this.recipes = new HashSet<>();
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.chanceImplementation = ChanceImplementation.create(this,
-            "25.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 10");
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.plugin.getServer().recipeIterator().forEachRemaining(recipe -> {
+            if (recipe instanceof FurnaceRecipe furnaceRecipe && furnaceRecipe.getInput().getType().isBlock()) {
+                this.recipes.add(furnaceRecipe);
+            }
+        });
 
-        this.sound = JOption.create("Settings.Sound",UniSound.of(Sound.BLOCK_LAVA_EXTINGUISH),
+        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(10, 8, 1, 100));
+
+        this.disableOnCrouch = ConfigValue.create("Settings.Disable_On_Crouch",
+            true,
+            "Sets whether or not enchantment will have no effect when crouching."
+        ).read(config);
+
+        this.sound = ConfigValue.create("Settings.Sound",
+            UniSound.of(Sound.BLOCK_LAVA_EXTINGUISH),
             "Sound to play on smelting.",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html").read(cfg);
+            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html"
+        ).read(config);
 
-        this.smeltingTable = JOption.forMap("Settings.Smelting_Table",
-            key -> Material.getMaterial(key.toUpperCase()),
-            (cfg, path, key) -> Material.getMaterial(cfg.getString(path + "." + key, "").toUpperCase()),
-            Map.of(
-                Material.RAW_IRON, Material.IRON_INGOT,
-                Material.RAW_GOLD, Material.GOLD_INGOT
-            ),
-            "Table of Original -> Smelted items.",
-            "Syntax: 'Material Source : Material Result'.",
-            "Note: Material source is material name of the dropped item, not the broken block!",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html"
-        ).setWriter((cfg, path, map) -> map.forEach((src, to) -> cfg.set(path + "." + src.name(), to.name()))).read(cfg);
+        this.exemptedBlocks.addAll(ConfigValue.forSet("Settings.Exempted_Blocks",
+            BukkitThing::getMaterial,
+            (cfg, path, set) -> cfg.set(path, set.stream().map(material -> material.getKey().getKey()).toList()),
+            Set.of(Material.STONE),
+            "List of blocks that are immune to smelter effect."
+        ).read(config));
     }
 
     @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public ChanceSettings getChanceSettings() {
+        return chanceSettings;
     }
 
     @Override
     @NotNull
-    public FitItemType[] getFitItemTypes() {
-        return new FitItemType[]{FitItemType.PICKAXE, FitItemType.AXE, FitItemType.SHOVEL};
+    public ItemCategory[] getItemCategories() {
+        return new ItemCategory[]{ItemCategory.PICKAXE, ItemCategory.AXE, ItemCategory.SHOVEL};
     }
 
     @Override
     @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.TOOL;
     }
 
-    @NotNull
     @Override
-    public EventPriority getDropPriority() {
-        return EventPriority.NORMAL;
-    }
+    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
+        if (this.disableOnCrouch && entity instanceof Player player && player.isSneaking()) return false;
 
-    @Override
-    public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull LivingEntity player, @NotNull ItemStack item, int level) {
-        // TODO Use furnace recipes & Re-add smelted items instead of setType
+        BlockState state = event.getBlockState();
+        if (state instanceof Container || this.exemptedBlocks.contains(state.getType())) return false;
 
-        if (event.getBlockState() instanceof Container) return false;
         if (!this.checkTriggerChance(level)) return false;
-        if (event.getItems().stream().noneMatch(drop -> this.isSmeltable(drop.getItemStack().getType()))) return false;
 
-        event.getItems().forEach(drop -> {
-            Material material = this.smeltingTable.get(drop.getItemStack().getType());
-            if (material != null) {
-                ItemStack stack = drop.getItemStack();
-                stack.setType(material);
-                drop.setItemStack(stack);
-            }
+        List<ItemStack> smelts = new ArrayList<>();
+        event.getItems().removeIf(drop -> {
+            FurnaceRecipe recipe = this.recipes.stream().filter(rec -> rec.getInputChoice().test(drop.getItemStack())).findFirst().orElse(null);
+            if (recipe == null) return false;
+
+            smelts.add(recipe.getResult());
+            return true;
         });
+        if (smelts.isEmpty()) return false;
+
+        smelts.forEach(itemStack -> this.plugin.populateResource(event, itemStack));
 
         Block block = event.getBlockState().getBlock();
         if (this.hasVisualEffects()) {
@@ -118,9 +136,5 @@ public class SmelterEnchant extends ExcellentEnchant implements Chanced, BlockDr
             this.sound.play(location);
         }
         return true;
-    }
-
-    public boolean isSmeltable(@NotNull Material material) {
-        return this.smeltingTable.containsKey(material);
     }
 }

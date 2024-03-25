@@ -1,47 +1,38 @@
 package su.nightexpress.excellentenchants.enchantment.util;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Item;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.lang.LangManager;
-import su.nexmedia.engine.utils.EntityUtil;
-import su.nexmedia.engine.utils.ItemUtil;
-import su.nexmedia.engine.utils.PDCUtil;
-import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
-import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
+import su.nightexpress.nightcore.language.LangAssets;
+import su.nightexpress.nightcore.util.*;
+import su.nightexpress.nightcore.util.text.NightMessage;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 public class EnchantUtils {
 
-    public static final NamespacedKey KEY_LORE_SIZE = new NamespacedKey(ExcellentEnchantsAPI.PLUGIN, "lore_size");
-    private static final String META_PROJECTILE_WEAPON = "sourceWeapon";
+    private static final Map<UUID, EnchantedProjectile> ENCHANTED_PROJECTILE_MAP = new ConcurrentHashMap<>();
 
     private static boolean busyBreak = false;
-
-    public static void popResource(@NotNull BlockDropItemEvent event, @NotNull ItemStack itemStack) {
-        Item item = ExcellentEnchantsAPI.PLUGIN.getEnchantNMS().popResource(event.getBlock(), itemStack);
-        event.getItems().add(item);
-    }
 
     public static boolean isBusyByOthers() {
         return false;
@@ -67,23 +58,24 @@ public class EnchantUtils {
         }
     }
 
-    @NotNull
+    /*@NotNull
     public static NamespacedKey createKey(@NotNull String id) {
         return NamespacedKey.minecraft(id.toLowerCase());
-    }
+    }*/
 
     @Nullable
     public static String getLocalized(@NotNull String keyRaw) {
-        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(keyRaw));
+        Enchantment enchantment = BukkitThing.getEnchantment(keyRaw);
         return enchantment == null ? null : getLocalized(enchantment);
     }
 
     @NotNull
     public static String getLocalized(@NotNull Enchantment enchantment) {
-        if (enchantment instanceof ExcellentEnchant excellentEnchant) {
-            return excellentEnchant.getDisplayName();
+        EnchantmentData enchant = EnchantRegistry.getByKey(enchantment.getKey());
+        if (enchant != null) {
+            return enchant.getName();
         }
-        return LangManager.getEnchantment(enchantment);
+        return LangAssets.get(enchantment);
     }
 
     public static boolean isEnchantable(@NotNull ItemStack item) {
@@ -92,10 +84,14 @@ public class EnchantUtils {
         return item.getType() == Material.ENCHANTED_BOOK || Stream.of(EnchantmentTarget.values()).anyMatch(target -> target.includes(item));
     }
 
-    public static boolean add(@NotNull ItemStack item, @NotNull Enchantment enchantment, int level, boolean force) {
-        if (!force && !enchantment.canEnchantItem(item)) return false;
+    public static boolean isEnchantedBook(@NotNull ItemStack item) {
+        return /*item.getType() == Material.BOOK || */item.getType() == Material.ENCHANTED_BOOK;
+    }
 
-        remove(item, enchantment);
+    public static boolean add(@NotNull ItemStack item, @NotNull Enchantment enchantment, int level, boolean force) {
+        if (!force && (!enchantment.canEnchantItem(item) && !isEnchantedBook(item))) return false;
+
+        //remove(item, enchantment);
 
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return false;
@@ -111,6 +107,15 @@ public class EnchantUtils {
         return true;
     }
 
+    public static void removeAll(@NotNull ItemStack item) {
+        if (Version.isAtLeast(Version.V1_20_R3)) {
+            item.removeEnchantments();
+        }
+        else {
+            getEnchantments(item).keySet().forEach(item::removeEnchantment);
+        }
+    }
+
     public static void remove(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
         ItemMeta meta = item.getItemMeta();
         if (meta instanceof EnchantmentStorageMeta storageMeta) {
@@ -122,10 +127,20 @@ public class EnchantUtils {
         item.setItemMeta(meta);
     }
 
-    public static void updateChargesDisplay(@NotNull ItemStack item) {
+    /*public static void updateChargesDisplay(@NotNull ItemStack item) {
         if (Config.ENCHANTMENTS_CHARGES_ENABLED.get()) {
             updateDisplay(item);
         }
+    }*/
+
+    public static boolean canHaveDescription(@NotNull ItemStack item) {
+        if (!Config.ENCHANTMENTS_DISPLAY_DESCRIPTION_ENABLED.get()) return false;
+
+        if (Config.ENCHANTMENTS_DISPLAY_DESCRIPTION_BOOKS_ONLY.get()) {
+            return isEnchantedBook(item);
+        }
+
+        return true;
     }
 
     public static boolean updateDisplay(@NotNull ItemStack item) {
@@ -135,40 +150,48 @@ public class EnchantUtils {
         if (meta == null) return false;
 
         if (!isEnchantable(item)) {
-            PDCUtil.remove(item, KEY_LORE_SIZE);
+            PDCUtil.remove(item, Keys.loreSize);
             return false;
         }
 
-        Map<ExcellentEnchant, Integer> enchants = getExcellents(item);
+        Map<EnchantmentData, Integer> enchantDataMap = Lists.sort(getCustomEnchantments(item),
+            Comparator.comparing(
+                (Map.Entry<EnchantmentData, Integer> entry) -> entry.getKey().getRarity().getWeight()
+            )
+            .thenComparing(entry -> entry.getKey().getName())
+        );
 
-        int sizeCached = PDCUtil.getInt(item, KEY_LORE_SIZE).orElse(0);
-        int sizeReal = enchants.size();
+        int sizeCached = PDCUtil.getInt(item, Keys.loreSize).orElse(0);
+        int sizeReal = enchantDataMap.size();
         if (sizeCached == 0 && sizeReal == 0) return false;
 
         List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
         for (int index = 0; index < sizeCached && !lore.isEmpty(); index++) {
             lore.remove(0);
         }
-        //lore.removeIf(str -> enchants.keySet().stream().anyMatch(enchant -> str.contains(enchant.getDisplayName())));
 
         if (!meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
-            if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get()) {
-                enchants.forEach((enchant, level) -> {
-                    lore.addAll(0, enchant.formatDescription(level));
-                });
-                sizeReal += enchants.keySet().stream().map(ExcellentEnchant::getDescription).mapToInt(List::size).sum();
+            if (canHaveDescription(item)) {
+                for (var entry : enchantDataMap.entrySet()) {
+                    List<String> description = entry.getKey().getDescriptionReplaced(entry.getValue());
+
+                    lore.addAll(0, NightMessage.asLegacy(description));
+                    sizeReal += description.size();
+                }
             }
-            enchants.forEach((enchant, level) -> {
-                lore.add(0, enchant.getNameFormatted(level, getCharges(meta, enchant)));
+            enchantDataMap.forEach((enchant, level) -> {
+                lore.add(0, NightMessage.asLegacy(enchant.getNameFormatted(level, enchant.getCharges(meta))));
             });
         }
         else sizeReal = 0;
 
         meta.setLore(lore);
+
         if (sizeReal > 0) {
-            PDCUtil.set(meta, KEY_LORE_SIZE, sizeReal);
+            PDCUtil.set(meta, Keys.loreSize, sizeReal);
         }
-        else PDCUtil.remove(meta, KEY_LORE_SIZE);
+        else PDCUtil.remove(meta, Keys.loreSize);
+
         item.setItemMeta(meta);
         return true;
     }
@@ -185,25 +208,21 @@ public class EnchantUtils {
     }
 
     @NotNull
-    public static Map<Enchantment, Integer> getAll(@NotNull ItemStack item) {
+    public static Map<Enchantment, Integer> getEnchantments(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        return meta == null ? Collections.emptyMap() : getAll(meta);
+        return meta == null ? Collections.emptyMap() : getEnchantments(meta);
     }
 
     @NotNull
-    public static Map<Enchantment, Integer> getAll(@NotNull ItemMeta meta) {
-        return (meta instanceof EnchantmentStorageMeta meta2) ? meta2.getStoredEnchants() : meta.getEnchants();
-    }
-
-    public static int getAmount(@NotNull ItemStack item) {
-        return getAll(item).size();
+    public static Map<Enchantment, Integer> getEnchantments(@NotNull ItemMeta meta) {
+        return (meta instanceof EnchantmentStorageMeta storageMeta) ? storageMeta.getStoredEnchants() : meta.getEnchants();
     }
 
     public static boolean contains(@NotNull ItemStack item, @NotNull String id) {
-        ExcellentEnchant enchant = EnchantRegistry.getById(id);
+        EnchantmentData enchant = EnchantRegistry.getById(id);
         if (enchant == null) return false;
 
-        return contains(item, enchant);
+        return contains(item, enchant.getEnchantment());
     }
 
     public static boolean contains(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
@@ -211,86 +230,32 @@ public class EnchantUtils {
     }
 
     public static int getLevel(@NotNull ItemStack item, @NotNull Enchantment enchant) {
-        return getAll(item).getOrDefault(enchant, 0);
+        return getEnchantments(item).getOrDefault(enchant, 0);
     }
 
-    public static int getCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
-        return enchant.isChargesEnabled() ? PDCUtil.getInt(item, enchant.getChargesKey()).orElse(0) : -1;
+    public static int countEnchantments(@NotNull ItemStack item) {
+        return getEnchantments(item).size();
     }
 
-    public static int getCharges(@NotNull ItemMeta meta, @NotNull ExcellentEnchant enchant) {
-        return enchant.isChargesEnabled() ? PDCUtil.getInt(meta, enchant.getChargesKey()).orElse(0) : -1;
-    }
-
-    public static boolean isOutOfCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
-        return enchant.isChargesEnabled() && getCharges(item, enchant) == 0;
-    }
-
-    public static boolean isFullOfCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
-        if (!enchant.isChargesEnabled()) return true;
-
-        int level = getLevel(item, enchant);
-        int max = enchant.getChargesMax(level);
-        return getCharges(item, enchant) == max;
-    }
-
-    public static void consumeCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int level) {
-        int has = getCharges(item, enchant);
-        int use = enchant.getChargesConsumeAmount(level);
-        setCharges(item, enchant, level, has < use ? 0 : has - use);
-    }
-
-    /*public static void restoreCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
-        int level = getLevel(item, enchant);
-        restoreCharges(item, enchant, level);
-    }*/
-
-    public static void restoreCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int level) {
-        setCharges(item, enchant, level, Integer.MAX_VALUE);
-    }
-
-    public static void rechargeCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int level) {
-        //if (!enchant.isChargesEnabled()) return;
-
-        //int level = getLevel(item, enchant);
-        int recharge = enchant.getChargesRechargeAmount(level);
-        int has = getCharges(item, enchant);
-        int set = has + recharge;
-        setCharges(item, enchant, level, set);
-    }
-
-    /*public static void setCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int charges) {
-        int level = getLevel(item, enchant);
-        setCharges(item, enchant, level, charges);
-    }*/
-
-    public static void setCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant, int level, int charges) {
-        if (!enchant.isChargesEnabled()) return;
-
-        int max = enchant.getChargesMax(level);
-        int set = Math.min(Math.abs(charges), max);
-        PDCUtil.set(item, enchant.getChargesKey(), set);
-    }
-
-    public static int getExcellentAmount(@NotNull ItemStack item) {
-        return getExcellents(item).size();
+    public static int countCustomEnchantments(@NotNull ItemStack item) {
+        return getCustomEnchantments(item).size();
     }
 
     @NotNull
-    public static Map<ExcellentEnchant, Integer> getExcellents(@NotNull ItemStack item) {
-        return getExcellents(getAll(item));
+    public static Map<EnchantmentData, Integer> getCustomEnchantments(@NotNull ItemStack item) {
+        return toCustomEnchantments(getEnchantments(item));
     }
 
     @NotNull
-    public static Map<ExcellentEnchant, Integer> getExcellents(@NotNull ItemMeta meta) {
-        return getExcellents(getAll(meta));
+    public static Map<EnchantmentData, Integer> getCustomEnchantments(@NotNull ItemMeta meta) {
+        return toCustomEnchantments(getEnchantments(meta));
     }
 
     @NotNull
-    private static Map<ExcellentEnchant, Integer> getExcellents(@NotNull Map<Enchantment, Integer> enchants) {
-        Map<ExcellentEnchant, Integer> map = new HashMap<>();
+    private static Map<EnchantmentData, Integer> toCustomEnchantments(@NotNull Map<Enchantment, Integer> enchants) {
+        Map<EnchantmentData, Integer> map = new HashMap<>();
         enchants.forEach((enchantment, level) -> {
-            ExcellentEnchant excellent = EnchantRegistry.getByKey(enchantment.getKey());
+            EnchantmentData excellent = EnchantRegistry.getByKey(enchantment.getKey());
             if (excellent != null) {
                 map.put(excellent, level);
             }
@@ -299,15 +264,15 @@ public class EnchantUtils {
     }
 
     @NotNull
-    public static <T extends IEnchantment> Map<T, Integer> getExcellents(@NotNull ItemStack item, @NotNull Class<T> clazz) {
+    public static <T extends EnchantmentData> Map<T, Integer> getCustomEnchantments(@NotNull ItemStack item, @NotNull Class<T> clazz) {
         Map<T, Integer> map = new HashMap<>();
-        getAll(item).forEach((enchantment, level) -> {
-            ExcellentEnchant excellent = EnchantRegistry.getByKey(enchantment.getKey());
-            if (excellent == null || !clazz.isAssignableFrom(excellent.getClass())) return;
+        getEnchantments(item).forEach((enchantment, level) -> {
+            EnchantmentData enchantmentData = EnchantRegistry.getByKey(enchantment.getKey());
+            if (enchantmentData == null || !clazz.isAssignableFrom(enchantmentData.getClass())) return;
 
-            map.put(clazz.cast(excellent), level);
+            map.put(clazz.cast(enchantmentData), level);
         });
-        return map;//CollectionsUtil.sort(map, Comparator.comparing(p -> p.getKey().getPriority(), Comparator.reverseOrder()));
+        return map;
     }
 
     @NotNull
@@ -329,36 +294,36 @@ public class EnchantUtils {
     }
 
     @NotNull
-    public static Map<ItemStack, Map<ExcellentEnchant, Integer>> getEquipped(@NotNull LivingEntity entity) {
-        Map<ItemStack, Map<ExcellentEnchant, Integer>> map = new HashMap<>();
+    public static Map<ItemStack, Map<EnchantmentData, Integer>> getEquipped(@NotNull LivingEntity entity) {
+        Map<ItemStack, Map<EnchantmentData, Integer>> map = new HashMap<>();
         getEnchantedEquipment(entity).values().forEach(item -> {
-            map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(getExcellents(item));
+            map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(getCustomEnchantments(item));
         });
         return map;
     }
 
     @NotNull
-    public static <T extends IEnchantment> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,
+    public static <T extends EnchantmentData> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,
                                                                                        @NotNull Class<T> clazz) {
         return getEquipped(entity, clazz, EquipmentSlot.values());
     }
 
     @NotNull
-    public static <T extends IEnchantment> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,
+    public static <T extends EnchantmentData> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,
                                                                                        @NotNull Class<T> clazz,
                                                                                        @NotNull EquipmentSlot... slots) {
         Map<ItemStack, Map<T, Integer>> map = new HashMap<>();
         getEnchantedEquipment(entity, slots).values().forEach(item -> {
-            map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(getExcellents(item, clazz));
+            map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(getCustomEnchantments(item, clazz));
         });
         return map;
     }
 
     @NotNull
-    public static Map<ItemStack, Integer> getEquipped(@NotNull LivingEntity entity, @NotNull ExcellentEnchant enchantment) {
+    public static Map<ItemStack, Integer> getEquipped(@NotNull LivingEntity entity, @NotNull EnchantmentData enchantmentData) {
         Map<ItemStack, Integer> map = new HashMap<>();
         getEnchantedEquipment(entity).values().forEach(item -> {
-            int level = getLevel(item, enchantment);
+            int level = getLevel(item, enchantmentData.getEnchantment());
             if (level > 0) {
                 map.put(item, level);
             }
@@ -366,18 +331,32 @@ public class EnchantUtils {
         return map;
     }
 
-    public static void setSourceWeapon(@NotNull Projectile projectile, @Nullable ItemStack item) {
-        if (item == null) return;
-
-        projectile.setMetadata(META_PROJECTILE_WEAPON, new FixedMetadataValue(ExcellentEnchantsAPI.PLUGIN, item));
+    public static void addEnchantedProjectile(@NotNull Projectile projectile, @Nullable ItemStack item) {
+        EnchantedProjectile enchantedProjectile = new EnchantedProjectile(projectile, item);
+        ENCHANTED_PROJECTILE_MAP.put(projectile.getUniqueId(), enchantedProjectile);
     }
 
     @Nullable
-    public static ItemStack getSourceWeapon(@NotNull Projectile projectile) {
-        return projectile.hasMetadata(META_PROJECTILE_WEAPON) ? (ItemStack) projectile.getMetadata(META_PROJECTILE_WEAPON).get(0).value() : null;
+    public static EnchantedProjectile getEnchantedProjectile(@NotNull Projectile projectile) {
+        return ENCHANTED_PROJECTILE_MAP.get(projectile.getUniqueId());
     }
 
-    public static void removeSourceWeapon(@NotNull Projectile projectile) {
-        projectile.removeMetadata(META_PROJECTILE_WEAPON, ExcellentEnchantsAPI.PLUGIN);
+    public static void removeEnchantedProjectile(@NotNull Projectile projectile) {
+        ENCHANTED_PROJECTILE_MAP.remove(projectile.getUniqueId());
+    }
+
+    @NotNull
+    public static Collection<EnchantedProjectile> getEnchantedProjectiles() {
+        return ENCHANTED_PROJECTILE_MAP.values();
+    }
+
+    public static void setSpawnReason(@NotNull Entity entity, @NotNull CreatureSpawnEvent.SpawnReason reason) {
+        PDCUtil.set(entity, Keys.entitySpawnReason, reason.name());
+    }
+
+    @Nullable
+    public static CreatureSpawnEvent.SpawnReason getSpawnReason(@NotNull Entity entity) {
+        String name = PDCUtil.getString(entity, Keys.entitySpawnReason).orElse(null);
+        return name == null ? null : StringUtil.getEnum(name, CreatureSpawnEvent.SpawnReason.class).orElse(null);
     }
 }

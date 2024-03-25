@@ -14,68 +14,72 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.EntityUtil;
-import su.nexmedia.engine.utils.NumberUtil;
-import su.nexmedia.engine.utils.values.UniParticle;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Arrowed;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ArrowSettings;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementation;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ArrowSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.EntityUtil;
+import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
-public class VampiricArrowsEnchant extends ExcellentEnchant implements BowEnchant, Arrowed, Chanced {
+import java.io.File;
+
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class VampiricArrowsEnchant extends AbstractEnchantmentData implements BowEnchant, ArrowData, ChanceData {
 
     public static final String ID = "vampiric_arrows";
 
-    public static final String PLACEHOLDER_HEAL_AMOUNT = "%heal_amount%";
+    private ArrowSettingsImpl  arrowSettings;
+    private ChanceSettingsImpl chanceSettings;
+    private Modifier           healAmount;
 
-    private ArrowImplementation arrowImplementation;
-    private ChanceImplementation chanceImplementation;
-    private EnchantScaler healAmount;
-
-    public VampiricArrowsEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to restore " + PLACEHOLDER_HEAL_AMOUNT + "❤ on arrow hit.");
-        this.getDefaults().setLevelMax(3);
-        this.getDefaults().setTier(0.3);
-        this.getDefaults().setConflicts(EnchantEnderBow.ID, EnchantGhast.ID, EnchantBomber.ID);
+    public VampiricArrowsEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription(ENCHANTMENT_CHANCE + "% chance to restore " + GENERIC_AMOUNT + "❤ on arrow hit.");
+        this.setMaxLevel(3);
+        this.setRarity(Rarity.RARE);
+        this.setConflicts(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.arrowSettings = ArrowSettingsImpl.create(config, UniParticle.redstone(Color.RED, 1f));
 
-        this.arrowImplementation = ArrowImplementation.create(this, UniParticle.redstone(Color.RED, 1f));
+        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(8, 4, 1, 100));
 
-        this.chanceImplementation = ChanceImplementation.create(this, "20.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+        this.healAmount = Modifier.read(config, "Settings.Heal_Amount",
+            Modifier.add(0, 1, 1, 10),
+            "Amount of health to be restored on hit."
+        );
 
-        this.healAmount = EnchantScaler.read(this, "Settings.Heal_Amount",
-            Placeholders.ENCHANTMENT_LEVEL,
-            "Amount of health to be restored on hit.");
-
-        this.addPlaceholder(PLACEHOLDER_HEAL_AMOUNT, level -> NumberUtil.format(this.getHealAmount(level)));
+        this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getHealAmount(level)));
     }
 
     @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.BOW;
     }
 
     @NotNull
     @Override
-    public Arrowed getArrowImplementation() {
-        return this.arrowImplementation;
+    public ArrowSettings getArrowSettings() {
+        return this.arrowSettings;
     }
 
     @NotNull
     @Override
-    public Chanced getChanceImplementation() {
-        return this.chanceImplementation;
+    public ChanceSettings getChanceSettings() {
+        return this.chanceSettings;
     }
 
     public double getHealAmount(int level) {
@@ -90,11 +94,9 @@ public class VampiricArrowsEnchant extends ExcellentEnchant implements BowEnchan
 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!(event.getProjectile() instanceof Arrow arrow)) return false;
-        if (!this.checkTriggerChance(level)) return false;
+        if (!(event.getProjectile() instanceof Arrow)) return false;
 
-        this.addData(arrow);
-        return true;
+        return this.checkTriggerChance(level);
     }
 
     @Override

@@ -1,30 +1,54 @@
 package su.nightexpress.excellentenchants.config;
 
-import su.nexmedia.engine.api.lang.LangKey;
-import su.nexmedia.engine.lang.EngineLang;
+import su.nightexpress.nightcore.core.CoreLang;
+import su.nightexpress.nightcore.language.entry.LangString;
+import su.nightexpress.nightcore.language.entry.LangText;
 
-import static su.nexmedia.engine.utils.Colors2.*;
 import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
-public class Lang extends EngineLang {
+public class Lang extends CoreLang {
 
-    public static final LangKey COMMAND_LIST_DESC = LangKey.of("Command.List.Desc", "List of all custom enchantments.");
+    public static final LangString COMMAND_LIST_DESC = LangString.of("Command.List.Desc",
+        "List of all custom enchantments.");
 
-    public static final LangKey COMMAND_ENCHANT_USAGE         = LangKey.of("Command.Enchant.Usage", "<enchant> <level> [player] [slot]");
-    public static final LangKey COMMAND_ENCHANT_DESC          = LangKey.of("Command.Enchant.Desc", "Enchants the item in your hand.");
-    public static final LangKey COMMAND_ENCHANT_DONE_SELF     = LangKey.of("Command.Enchant.Done.Self", LIGHT_ORANGE + GENERIC_ITEM + LIGHT_YELLOW + " enchanted with " + GENERIC_ENCHANT + " " + GENERIC_LEVEL + LIGHT_YELLOW + "!");
-    public static final LangKey COMMAND_ENCHANT_DONE_OTHERS   = LangKey.of("Command.Enchant.Done.Others", LIGHT_ORANGE + PLAYER_DISPLAY_NAME + LIGHT_YELLOW + "'s " + LIGHT_ORANGE + GENERIC_ITEM + LIGHT_YELLOW + " enchanted with " + GENERIC_ENCHANT + " " + GENERIC_LEVEL + LIGHT_YELLOW + "!");
-    public static final LangKey COMMAND_ENCHANT_ERROR_NO_ITEM = LangKey.of("Command.Enchant.Error.NoItem", RED + "There is no item to enchant!");
+    public static final LangString COMMAND_ENCHANT_USAGE = LangString.of("Command.Enchant.Usage",
+        "<enchant> <level> [player] [slot]");
 
-    public static final LangKey COMMAND_BOOK_USAGE = LangKey.of("Command.Book.Usage", "<player> <enchant> <level>");
-    public static final LangKey COMMAND_BOOK_DESC  = LangKey.of("Command.Book.Desc", "Gives custom enchanted book.");
-    public static final LangKey COMMAND_BOOK_DONE  = LangKey.of("Command.Book.Done", LIGHT_YELLOW + "Given " + LIGHT_ORANGE + GENERIC_ENCHANT + LIGHT_YELLOW + " enchanted book to " + LIGHT_ORANGE + PLAYER_DISPLAY_NAME + LIGHT_YELLOW + ".");
+    public static final LangString COMMAND_ENCHANT_DESC = LangString.of("Command.Enchant.Desc",
+        "Enchants the item in your hand.");
 
-    public static final LangKey COMMAND_TIER_BOOK_USAGE = LangKey.of("Command.TierBook.Usage", "<player> <tier> <level>");
-    public static final LangKey COMMAND_TIER_BOOK_DESC  = LangKey.of("Command.TierBook.Desc", "Gives an enchanted book.");
-    public static final LangKey COMMAND_TIER_BOOK_ERROR = LangKey.of("Command.TierBook.Error", RED + "Invalid tier!");
-    public static final LangKey COMMAND_TIER_BOOK_DONE  = LangKey.of("Command.TierBook.Done", LIGHT_YELLOW + "Given " + LIGHT_ORANGE + TIER_NAME + LIGHT_YELLOW + " enchanted book to " + LIGHT_ORANGE + PLAYER_DISPLAY_NAME + LIGHT_YELLOW + ".");
+    public static final LangText COMMAND_ENCHANT_DONE_SELF = LangText.of("Command.Enchant.Done.Self",
+        LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose(GENERIC_ITEM) + " enchanted with " + LIGHT_YELLOW.enclose(GENERIC_ENCHANT + " " + GENERIC_LEVEL) + "!"));
 
-    public static final LangKey ERROR_NO_ENCHANT = LangKey.of("Error.NoEnchant", RED + "Invalid enchantment.");
+    public static final LangText COMMAND_ENCHANT_DONE_OTHERS = LangText.of("Command.Enchant.Done.Others",
+        LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose(PLAYER_DISPLAY_NAME) + "'s " + LIGHT_YELLOW.enclose(GENERIC_ITEM) + " enchanted with " + LIGHT_YELLOW.enclose(GENERIC_ENCHANT + " " + GENERIC_LEVEL) + "!"));
+
+    public static final LangText COMMAND_ENCHANT_ERROR_NO_ITEM = LangText.of("Command.Enchant.Error.NoItem",
+        RED.enclose("There is no item to enchant!"));
+
+    public static final LangString COMMAND_BOOK_USAGE = LangString.of("Command.Book.Usage",
+        "<player> <enchant> <level>");
+
+    public static final LangString COMMAND_BOOK_DESC = LangString.of("Command.Book.Desc",
+        "Gives custom enchanted book.");
+
+    public static final LangText COMMAND_BOOK_DONE = LangText.of("Command.Book.Done",
+        LIGHT_GRAY.enclose("Given " + LIGHT_YELLOW.enclose(GENERIC_ENCHANT) + " enchanted book to " + LIGHT_YELLOW.enclose(PLAYER_DISPLAY_NAME) + "."));
+
+    public static final LangString COMMAND_RARITY_BOOK_USAGE = LangString.of("Command.RarityBook.Usage",
+        "<player> <tier> <level>");
+
+    public static final LangString COMMAND_RARITY_BOOK_DESC = LangString.of("Command.RarityBook.Desc",
+        "Give an enchanted book with enchantment of specified rarity.");
+
+    public static final LangText COMMAND_RARITY_BOOK_DONE = LangText.of("Command.RarityBook.Done",
+        LIGHT_GRAY.enclose("Given " + LIGHT_YELLOW.enclose(GENERIC_NAME) + " enchanted book to " + LIGHT_YELLOW.enclose(PLAYER_DISPLAY_NAME) + "."));
+
+    public static final LangText ERROR_NO_ENCHANT = LangText.of("Error.NoEnchant",
+        RED.enclose("Invalid enchantment."));
+
+    public static final LangText ERROR_INVALID_RARITY = LangText.of("Error.InvalidRarity",
+        RED.enclose("Invalid rarity!"));
 
 }

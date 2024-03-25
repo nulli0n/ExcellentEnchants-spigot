@@ -6,44 +6,47 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.utils.random.Rnd;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.DistributionWay;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.config.ObtainSettings;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.config.DistributionWaySettings;
+import su.nightexpress.excellentenchants.enchantment.data.CustomDistribution;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
-import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
-import su.nightexpress.excellentenchants.tier.Tier;
+import su.nightexpress.nightcore.util.random.Rnd;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.BiFunction;
 
 public class EnchantPopulator {
 
-    private final ExcellentEnchants                plugin;
-    private final ObtainType                       obtainType;
-    private final ItemStack                        item;
-    private final Map<Tier, Set<ExcellentEnchant>> candidates;
-    private final Map<Enchantment, Integer>        population;
+    //private final ExcellentEnchants                plugin;
+
+    private final DistributionWay                   distributionWay;
+    private final ItemStack                         item;
+    private final Map<Rarity, Set<EnchantmentData>> candidates;
+    private final Map<Enchantment, Integer>         defaultPopulation;
+    private final Set<BiFunction<EnchantmentData, CustomDistribution, Boolean>>   predicates;
 
     private World world;
-    private Function<ExcellentEnchant, Integer> levelGenerator;
+    private BiFunction<EnchantmentData, CustomDistribution, Integer> levelGenerator;
 
-    public EnchantPopulator(@NotNull ExcellentEnchants plugin, @NotNull ItemStack item, @NotNull ObtainType obtainType) {
-        this.plugin = plugin;
+    public EnchantPopulator(@NotNull ExcellentEnchantsPlugin plugin, @NotNull ItemStack item, @NotNull DistributionWay distributionWay) {
+        //this.plugin = plugin;
         this.item = item;
-        this.obtainType = obtainType;
+        this.distributionWay = distributionWay;
         this.candidates = new HashMap<>();
-        this.population = new HashMap<>();
-        this.withLevelGenerator(enchant -> enchant.generateLevel(this.getObtainType()));
+        this.defaultPopulation = new HashMap<>();
+        this.predicates = new HashSet<>();
+        this.withLevelGenerator((data, distribution) -> distribution.generateLevel(this.getDistributionWay()));
 
-        this.fillDefaultCandidates();
+        //this.fillDefaultCandidates();
     }
 
     @NotNull
@@ -53,42 +56,61 @@ public class EnchantPopulator {
     }
 
     @NotNull
-    public EnchantPopulator withLevelGenerator(@NotNull Function<ExcellentEnchant, Integer> levelGenerator) {
+    public EnchantPopulator withLevelGenerator(@NotNull BiFunction<EnchantmentData, CustomDistribution, Integer> levelGenerator) {
         this.levelGenerator = levelGenerator;
         return this;
     }
 
     @NotNull
+    public EnchantPopulator withCondition(@NotNull BiFunction<EnchantmentData, CustomDistribution, Boolean> predicate) {
+        this.predicates.add(predicate);
+        return this;
+    }
+
+    @NotNull
     public EnchantPopulator withDefaultPopulation(@NotNull Map<Enchantment, Integer> population) {
-        this.getPopulation().putAll(population);
+        this.defaultPopulation.putAll(population);
+        //this.getPopulation().putAll(population);
         return this;
     }
 
     private void fillDefaultCandidates() {
-        this.plugin.getTierManager().getTiers().forEach(tier -> {
-            Set<ExcellentEnchant> enchants = EnchantRegistry.getOfTier(tier);
+        for (Rarity rarity : Rarity.values()) {
+            Set<EnchantmentData> dataSet = EnchantRegistry.getEnchantments(rarity);
 
-            enchants.removeIf(enchant -> {
-                return !enchant.isObtainable(this.getObtainType()) || !enchant.canEnchantItem(this.getItem());
+            dataSet.removeIf(data -> {
+                CustomDistribution distribution = (CustomDistribution) data.getDistributionOptions();
+
+                // Check if can be distributed.
+                if (!distribution.isDistributable(this.getDistributionWay())) return true;
+
+                // Check for custom conditions.
+                if (!this.predicates.isEmpty() && !this.predicates.stream().allMatch(predicate -> predicate.apply(data, distribution))) return true;
+
+                // Enchanting books is always good.
+                if (this.getItem().getType() == Material.BOOK && this.getDistributionWay() == DistributionWay.ENCHANTING) return false;
+
+                // Check if item can be enchanted.
+                return !data.getEnchantment().canEnchantItem(this.getItem()) && !EnchantUtils.isEnchantedBook(this.getItem());
             });
 
-            this.candidates.put(tier, enchants);
-        });
+            this.candidates.put(rarity, dataSet);
+        }
     }
 
     public boolean isEmpty() {
         return this.getCandidates().isEmpty() || this.getCandidates().values().stream().allMatch(Set::isEmpty);
     }
 
-    public boolean isEmpty(@NotNull Tier tier) {
-        return this.getCandidates(tier).isEmpty();
+    public boolean isEmpty(@NotNull Rarity rarity) {
+        return this.getCandidates(rarity).isEmpty();
     }
 
-    public void purge(@NotNull Tier tier) {
-        this.getCandidates().remove(tier);
+    public void purge(@NotNull Rarity rarity) {
+        this.getCandidates().remove(rarity);
     }
 
-    public void purge(@NotNull Tier tier, @NotNull ExcellentEnchant enchant) {
+    public void purge(@NotNull Rarity tier, @NotNull EnchantmentData enchant) {
         this.getCandidates(tier).remove(enchant);
         this.getCandidates().keySet().removeIf(this::isEmpty);
     }
@@ -99,8 +121,8 @@ public class EnchantPopulator {
     }
 
     @NotNull
-    public ObtainType getObtainType() {
-        return obtainType;
+    public DistributionWay getDistributionWay() {
+        return distributionWay;
     }
 
     @Nullable
@@ -109,89 +131,98 @@ public class EnchantPopulator {
     }
 
     @NotNull
-    public Function<ExcellentEnchant, Integer> getLevelGenerator() {
+    public BiFunction<EnchantmentData, CustomDistribution, Integer> getLevelGenerator() {
         return levelGenerator;
     }
 
     @NotNull
-    public Map<Tier, Set<ExcellentEnchant>> getCandidates() {
+    public Map<Rarity, Set<EnchantmentData>> getCandidates() {
         return this.candidates;
     }
 
     @NotNull
-    public Set<ExcellentEnchant> getCandidates(@NotNull Tier tier) {
-        return this.getCandidates().getOrDefault(tier, new HashSet<>());
-    }
-
-    @NotNull
-    public Map<Enchantment, Integer> getPopulation() {
-        return this.population;
+    public Set<EnchantmentData> getCandidates(@NotNull Rarity rarity) {
+        return this.candidates.getOrDefault(rarity, new HashSet<>());
     }
 
     @Nullable
-    public Tier getTierByChance() {
-        Map<Tier, Double> map = this.getCandidates().keySet().stream()
-            .filter(tier -> tier.getChance(this.getObtainType()) > 0D)
-            .collect(Collectors.toMap(k -> k, v -> v.getChance(this.getObtainType()), (o, n) -> n, HashMap::new));
-        if (map.isEmpty()) return null;
+    public Rarity getRarityByWeight() {
+        Map<Rarity, Double> map = new HashMap<>();
 
-        return Rnd.getByWeight(map);
+        for (Rarity rarity : this.getCandidates().keySet()) {
+            map.put(rarity, (double) rarity.getWeight());
+        }
+
+        return map.isEmpty() ? null : Rnd.getByWeight(map);
     }
 
     @Nullable
-    public ExcellentEnchant getEnchantByChance(@NotNull Tier tier) {
-        Map<ExcellentEnchant, Double> map = this.getCandidates(tier).stream()
-            .collect(Collectors.toMap(k -> k, v -> v.getObtainChance(this.getObtainType())));
+    public EnchantmentData getEnchantmentByWeight(@NotNull Rarity rarity) {
+        Map<EnchantmentData, Double> map = new HashMap<>();
+
+        this.getCandidates(rarity).forEach(enchantmentData -> {
+            CustomDistribution distribution = (CustomDistribution) enchantmentData.getDistributionOptions();
+            map.put(enchantmentData, distribution.getWeight(this.getDistributionWay()));
+        });
+
         return map.isEmpty() ? null : Rnd.getByWeight(map);
     }
 
     @NotNull
     public Map<Enchantment, Integer> createPopulation() {
-        Map<Enchantment, Integer> population = this.getPopulation();
+        this.candidates.clear();
+        this.fillDefaultCandidates();
 
-        ObtainSettings settings = Config.getObtainSettings(this.getObtainType()).orElse(null);
-        if (settings == null || !Rnd.chance(settings.getEnchantsCustomGenerationChance())) return population;
+        Map<Enchantment, Integer> population = new HashMap<>(this.defaultPopulation);
 
-        int enchantsLimit = settings.getEnchantsTotalMax();
-        int enchantsRolled = Rnd.get(settings.getEnchantsCustomMin(), settings.getEnchantsCustomMax());
+        DistributionWaySettings settings = Config.getDistributionWaySettings(this.getDistributionWay()).orElse(null);
+        if (settings == null || !Rnd.chance(settings.getGenerationChance())) return population;
+
+        int enchantsLimit = settings.getMaxEnchantments();
+        int enchantsRolled = settings.rollAmount();
 
         // Try to populate as many as possible.
         while (!this.isEmpty() && enchantsRolled > 0) {
             // Limit reached.
             if (population.size() >= enchantsLimit) break;
 
-            Tier tier = this.getTierByChance();
-            if (tier == null) break; // no tiers left.
+            Rarity rarity = this.getRarityByWeight();
+            if (rarity == null) break; // no tiers left.
 
-            ExcellentEnchant enchant = this.getEnchantByChance(tier);
-            // Remove entire tier if no enchants can be selected.
-            if (enchant == null) {
-                this.purge(tier);
+            EnchantmentData enchantmentData = this.getEnchantmentByWeight(rarity);
+            // Remove entire rarity if no enchants can be selected.
+            if (enchantmentData == null) {
+                this.purge(rarity);
+                continue;
+            }
+
+            if (!(enchantmentData.getDistributionOptions() instanceof CustomDistribution distribution)) {
+                this.purge(rarity, enchantmentData);
                 continue;
             }
 
             // Remove disabled world enchants.
-            if (world != null && enchant.isDisabledInWorld(world)) {
-                this.purge(tier, enchant);
+            if (this.world != null && !enchantmentData.isAvailableToUse(this.world)) {
+                this.purge(rarity, enchantmentData);
                 continue;
             }
 
             // Remove conflicting enchants.
-            if (population.keySet().stream().anyMatch(has -> has.conflictsWith(enchant) || enchant.conflictsWith(has))) {
-                this.purge(tier, enchant);
+            if (population.keySet().stream().anyMatch(has -> has.conflictsWith(enchantmentData.getEnchantment()) || enchantmentData.getEnchantment().conflictsWith(has))) {
+                this.purge(rarity, enchantmentData);
                 continue;
             }
 
             // Level generation failed.
-            int level = this.getLevelGenerator().apply(enchant);
-            if (level < enchant.getStartLevel()) {
-                this.purge(tier, enchant);
+            int level = this.getLevelGenerator().apply(enchantmentData, distribution);
+            if (level < enchantmentData.getMinLevel()) {
+                this.purge(rarity, enchantmentData);
                 continue;
             }
 
             // All good!
-            this.purge(tier, enchant);
-            population.put(enchant, level);
+            this.purge(rarity, enchantmentData);
+            population.put(enchantmentData.getEnchantment(), level);
             enchantsRolled--;
         }
 
@@ -201,12 +232,18 @@ public class EnchantPopulator {
     public boolean populate() {
         ItemStack item = this.getItem();
         AtomicBoolean status = new AtomicBoolean(false);
+        Map<Enchantment, Integer> population = this.createPopulation();//this.getPopulation().isEmpty() ? this.createPopulation() : this.getPopulation();
 
-        var population = this.getPopulation().isEmpty() ? this.createPopulation() : this.getPopulation();
+        boolean singleVillagerBook = this.getDistributionWay() == DistributionWay.VILLAGER
+            && EnchantUtils.isEnchantedBook(item)
+            && Config.DISTRIBUTION_SINGLE_ENCHANT_IN_VILLAGER_BOOKS.get();
 
-        if (this.getObtainType() == ObtainType.VILLAGER && item.getType() == Material.ENCHANTED_BOOK) {
-            if (Config.ENCHANTMENTS_SINGLE_ENCHANT_IN_VILLAGER_BOOKS.get() && !population.isEmpty()) {
-                EnchantUtils.getAll(item).keySet().forEach(enchantment -> EnchantUtils.remove(item, enchantment));
+        if (singleVillagerBook) {
+            if (!population.isEmpty()) {
+                EnchantUtils.removeAll(item);
+            }
+            while (population.size() > 1) {
+                population.remove(Rnd.get(population.keySet()));
             }
         }
 

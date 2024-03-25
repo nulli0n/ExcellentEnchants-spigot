@@ -1,7 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.listener;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,33 +8,29 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.manager.AbstractListener;
-import su.nexmedia.engine.utils.PDCUtil;
-import su.nexmedia.engine.utils.values.UniSound;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.nightcore.util.PDCUtil;
+import su.nightexpress.nightcore.util.wrapper.UniSound;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
-public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
+public class EnchantAnvilListener extends AbstractListener<ExcellentEnchantsPlugin> {
 
-    private static final NamespacedKey RECHARGED = new NamespacedKey(ExcellentEnchantsAPI.PLUGIN, "item.recharged");
-
-    public EnchantAnvilListener(@NotNull ExcellentEnchants plugin) {
+    public EnchantAnvilListener(@NotNull ExcellentEnchantsPlugin plugin) {
         super(plugin);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onAnvilRename(PrepareAnvilEvent event) {
         AnvilInventory inventory = event.getInventory();
-
         ItemStack first = inventory.getItem(0);
         ItemStack second = inventory.getItem(1);
         ItemStack result = event.getResult();
@@ -44,121 +39,140 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         if (second == null) second = new ItemStack(Material.AIR);
         if (result == null) result = new ItemStack(Material.AIR);
 
-        // Check if source item is an enchantable single item.
-        if (first.getType().isAir() || first.getAmount() > 1 || !EnchantUtils.isEnchantable(first)) return;
+        //if (first.getType().isAir() || first.getAmount() > 1 || !EnchantUtils.isEnchantable(first)) return;
 
-        if (this.handleRename(event, first, second, result)) return;
-        if (this.handleRecharge(event, first, second, result)) return;
+        //if (this.handleRename(event, first, second, result)) return;
 
-        this.handleEnchantMerging(event, first, second, result);
+        if (this.handleRecharge(event, first, second)) return;
+
+        this.handleCombine(event, first, second, result);
+
+        this.plugin.runTask(task -> {
+            ItemStack updated = event.getResult();
+            if (updated == null || updated.getType().isAir()) return;
+
+            EnchantUtils.updateDisplay(updated);
+            inventory.setItem(2, updated);
+        });
     }
 
-    private boolean handleRename(@NotNull PrepareAnvilEvent event,
-                                 @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
-
-        if (!second.getType().isAir() && (second.getType() == first.getType() || second.getType() == Material.ENCHANTED_BOOK)) return false;
+    /*private boolean handleRename(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
+        if (!(second.getType().isAir() || second.getType() != first.getType() && !EnchantUtils.isEnchantedBook(second))) return false;
         if (result.getType() != first.getType()) return false;
 
-        ItemStack result2 = new ItemStack(result);
-        EnchantUtils.getExcellents(first).forEach((hasEnch, hasLevel) -> {
-            EnchantUtils.add(result2, hasEnch, hasLevel, true);
-        });
-        EnchantUtils.updateDisplay(result2);
-        event.setResult(result2);
-        return true;
-    }
+        ItemStack renamed = new ItemStack(result);
+        EnchantUtils.getCustomEnchantments(first).forEach((hasEnch, hasLevel) -> EnchantUtils.add(renamed, hasEnch.getEnchantment(), hasLevel, true));
+        EnchantUtils.updateDisplay(renamed);
 
-    private boolean handleRecharge(@NotNull PrepareAnvilEvent event,
-                                   @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
+        event.setResult(renamed);
+        return true;
+    }*/
+
+    private boolean handleRecharge(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second) {
         if (second.getType().isAir()) return false;
 
-        Map<ExcellentEnchant, Integer> chargable = new HashMap<>();
-        EnchantUtils.getExcellents(first).forEach((enchant, level) -> {
-            if (enchant.isChargesEnabled() && enchant.isChargesFuel(second) && !enchant.isFullOfCharges(first)) {
-                chargable.put(enchant, level);
+        Map<EnchantmentData, Integer> chargable = new HashMap<>();
+        EnchantUtils.getCustomEnchantments(first).forEach((data, level) -> {
+            if (data.isChargesEnabled() && data.isChargesFuel(second) && !data.isFullOfCharges(first)) {
+                chargable.put(data, level);
             }
         });
         if (chargable.isEmpty()) return false;
 
-        ItemStack result2 = new ItemStack(first);
-
-        int count = 0;
-        while (count < second.getAmount() && !chargable.keySet().stream().allMatch(en -> en.isFullOfCharges(result2))) {
-            chargable.forEach((enchant, level) -> EnchantUtils.rechargeCharges(result2, enchant, level));
-            count++;
+        int count;
+        ItemStack recharged = new ItemStack(first);
+        for (count = 0; count < second.getAmount() && !chargable.keySet().stream().allMatch(data -> data.isFullOfCharges(recharged)); ++count) {
+            chargable.forEach((enchant, level) -> enchant.fuelCharges(recharged, level));
         }
 
-        PDCUtil.set(result2, RECHARGED, count);
-        EnchantUtils.updateDisplay(result2);
-        event.setResult(result2);
+        PDCUtil.set(recharged, Keys.itemRecharged, count);
+        EnchantUtils.updateDisplay(recharged);
+        event.setResult(recharged);
+
         this.plugin.runTask(task -> event.getInventory().setRepairCost(chargable.size()));
         return true;
     }
 
-    private boolean handleEnchantMerging(@NotNull PrepareAnvilEvent event,
-                                         @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
-        // Validate items in the first two slots.
-        if (second.getType().isAir() || second.getAmount() > 1 || !EnchantUtils.isEnchantable(second)) return false;
-        if (first.getType() == Material.ENCHANTED_BOOK && second.getType() != first.getType()) return false;
+    private boolean handleCombine(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
+        ItemStack merged = new ItemStack(result.getType().isAir() ? first : result);
 
-        ItemStack result2 = new ItemStack(result.getType().isAir() ? first : result);
-        Map<ExcellentEnchant, Integer> enchantments = EnchantUtils.getExcellents(first);
-        Map<ExcellentEnchant, Integer> charges = new HashMap<>(enchantments.keySet().stream().collect(Collectors.toMap(k -> k, v -> v.getCharges(first))));
+        Map<EnchantmentData, Integer> chargesMap = new HashMap<>();
+        EnchantUtils.getCustomEnchantments(result).forEach((data, level) -> {
+            if (!data.isChargesEnabled()) return;
+
+            int chargesFirst = data.getCharges(first);
+            int chargesSecond = data.getCharges(second);
+
+            chargesMap.put(data, chargesFirst + chargesSecond);
+            data.setCharges(merged, level, chargesFirst + chargesSecond);
+        });
+        if (!chargesMap.isEmpty()) {
+            event.setResult(merged);
+            return true;
+        }
+        return false;
+
+        /*
+        if (second.getType().isAir() || second.getAmount() > 1 || !EnchantUtils.isEnchantable(second)) return false;
+        if (EnchantUtils.isEnchantedBook(first) && second.getType() != first.getType()) return false;
+        Map<EnchantmentData, Integer> firstEnchants = EnchantUtils.getCustomEnchantments(first);
+        //Map<EnchantmentData, Integer> secondEnchants = EnchantUtils.getCustomEnchantments(second);
+        Map<EnchantmentData, Integer> charges = new HashMap<>(firstEnchants.keySet().stream().collect(Collectors.toMap(k -> k, v -> v.getCharges(first))));
         AtomicInteger repairCost = new AtomicInteger(event.getInventory().getRepairCost());
 
-        // Merge only if it's Item + Item, Item + Enchanted book or Enchanted Book + Enchanted Book
-        if (second.getType() == Material.ENCHANTED_BOOK || second.getType() == first.getType()) {
-            EnchantUtils.getExcellents(second).forEach((enchant, level) -> {
-                enchantments.merge(enchant, level, (oldLvl, newLvl) -> (oldLvl.equals(newLvl)) ? (Math.min(enchant.getMaxMergeLevel(), oldLvl + 1)) : (Math.max(oldLvl, newLvl)));
-                charges.merge(enchant, enchant.getCharges(second), Integer::sum);
+        if (EnchantUtils.isEnchantedBook(second) || second.getType() == first.getType()) {
+            EnchantUtils.getCustomEnchantments(second).forEach((data, level) -> {
+                int maxMergeLevel = data.getMaxMergeLevel() < 0 ? data.getMaxLevel() : data.getMaxMergeLevel();
+
+                firstEnchants.merge(data, level, (oldLvl, newLvl) -> oldLvl.equals(newLvl) ? Math.min(maxMergeLevel, oldLvl + 1) : Math.max(oldLvl, newLvl));
+                charges.merge(data, data.getCharges(second), Integer::sum);
             });
         }
 
-        // Recalculate operation cost depends on enchantments merge cost.
-        enchantments.forEach((enchant, level) -> {
-            if (EnchantUtils.add(result2, enchant, level, false)) {
-                repairCost.addAndGet(enchant.getAnvilMergeCost(level));
-                EnchantUtils.setCharges(result2, enchant, level, charges.getOrDefault(enchant, 0));
+        firstEnchants.forEach((enchantmentData, level) -> {
+            if (EnchantUtils.add(merged, enchantmentData.getEnchantment(), level, false)) {
+                repairCost.addAndGet(enchantmentData.getAnvilMergeCost(level));
+                enchantmentData.setCharges(merged, level, charges.getOrDefault(enchantmentData, 0));
             }
         });
 
-        if (first.equals(result2)) return false;
+        if (first.equals(merged)) return false;
 
-        EnchantUtils.updateDisplay(result2);
-        event.setResult(result2);
-
-        // NMS ContainerAnvil will set level cost to 0 right after calling the event, need 1 tick delay.
+        EnchantUtils.updateDisplay(merged);
+        event.setResult(merged);
         this.plugin.runTask(task -> event.getInventory().setRepairCost(repairCost.get()));
-        return true;
+        return true;*/
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onClickAnvil(InventoryClickEvent event) {
-        if (!(event.getInventory() instanceof AnvilInventory inventory)) return;
+        Inventory inventory = event.getInventory();
+        if (!(inventory instanceof AnvilInventory anvilInventory)) return;
         if (event.getRawSlot() != 2) return;
 
         ItemStack item = event.getCurrentItem();
         if (item == null) return;
 
-        int count = PDCUtil.getInt(item, RECHARGED).orElse(0);
+        int count = PDCUtil.getInt(item, Keys.itemRecharged).orElse(0);
         if (count == 0) return;
 
         Player player = (Player) event.getWhoClicked();
-        if (player.getLevel() < inventory.getRepairCost()) return;
+        if (player.getLevel() < anvilInventory.getRepairCost()) return;
 
-        player.setLevel(player.getLevel() - inventory.getRepairCost());
-        PDCUtil.remove(item, RECHARGED);
+        player.setLevel(player.getLevel() - anvilInventory.getRepairCost());
+        PDCUtil.remove(item, Keys.itemRecharged);
         event.getView().setCursor(item);
         event.setCancelled(false);
 
         UniSound.of(Sound.BLOCK_ENCHANTMENT_TABLE_USE).play(player);
 
-        ItemStack second = inventory.getItem(1);
+        ItemStack second = anvilInventory.getItem(1);
         if (second != null && !second.getType().isAir()) {
             second.setAmount(second.getAmount() - count);
         }
-        inventory.setItem(0, null);
-        //inventory.setItem(1, null);
-        inventory.setItem(2, null);
+
+        anvilInventory.setItem(0, null);
+        anvilInventory.setItem(2, null);
     }
 }
+

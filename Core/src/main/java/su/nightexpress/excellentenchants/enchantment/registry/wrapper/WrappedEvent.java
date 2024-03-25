@@ -7,12 +7,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
-import su.nightexpress.excellentenchants.config.Config;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
-public class WrappedEvent<E extends Event, T extends IEnchantment> implements Listener, EventExecutor {
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class WrappedEvent<E extends Event, T extends EnchantmentData> implements Listener, EventExecutor {
 
     //private final ExcellentEnchants plugin;
     private final EventPriority     priority;
@@ -20,7 +21,7 @@ public class WrappedEvent<E extends Event, T extends IEnchantment> implements Li
     private final Class<T>          enchantClass;
     private final DataGather<E, T>  dataGather;
 
-    public WrappedEvent(@NotNull ExcellentEnchants plugin,
+    public WrappedEvent(@NotNull ExcellentEnchantsPlugin plugin,
                         @NotNull EventPriority priority,
                         @NotNull Class<E> eventClass,
                         @NotNull Class<T> enchantClass,
@@ -40,18 +41,22 @@ public class WrappedEvent<E extends Event, T extends IEnchantment> implements Li
         LivingEntity entity = this.dataGather.getEntity(event);
         if (entity == null) return;
 
-        Player player = entity instanceof Player p1 ? p1 : null;
+        Player player = entity instanceof Player user ? user : null;
+        AtomicBoolean needUpdate = new AtomicBoolean(false);
 
         this.dataGather.getEnchants(event, this.enchantClass, entity).forEach((item, enchants) -> {
-            enchants.forEach(((enchant, level) -> {
+            enchants.forEach((enchant, level) -> {
+                if (enchant.isChargesEnabled() && this.priority == EventPriority.MONITOR) needUpdate.set(true);
+
                 if (!this.dataGather.checkPriority(enchant, this.priority)) return;
                 if (!enchant.isAvailableToUse(entity)) return;
                 if (enchant.isOutOfCharges(item)) return;
                 if (this.dataGather.useEnchant(event, entity, item, enchant, level)) {
                     enchant.consumeChargesNoUpdate(item, level);
                 }
-            }));
-            if (this.priority == EventPriority.MONITOR && Config.ENCHANTMENTS_CHARGES_ENABLED.get() && player != null) {
+            });
+
+            if (needUpdate.get() && player != null) {
                 EnchantUtils.updateDisplay(item);
             }
         });

@@ -1,9 +1,9 @@
-main: su.nightexpress.excellentenchants.ExcellentEnchants
+main: su.nightexpress.excellentenchants.ExcellentEnchantsPlugin
 version: '${project.version}'
 name: ExcellentEnchants
 author: NightExpress
-desciption: Vanilla-like enchants for your server.
-depend: [ NexEngine ]
+desciption: Enchantments that feel like vanilla ones.
+depend: [ nightcore ]
 softdepend: [ ProtocolLib, NoCheatPlus, PlaceholderAPI, MythicMobs ]
-api-version: 1.18
+api-version: 1.19
 load: STARTUP

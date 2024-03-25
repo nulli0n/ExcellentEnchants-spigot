@@ -7,64 +7,75 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.config.JOption;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.nightcore.config.ConfigValue;
+import su.nightexpress.nightcore.config.FileConfig;
 
-public class CurseOfMisfortuneEnchant extends ExcellentEnchant implements Chanced, BlockBreakEnchant, DeathEnchant {
+import java.io.File;
+
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class CurseOfMisfortuneEnchant extends AbstractEnchantmentData implements ChanceData, BlockBreakEnchant, DeathEnchant {
 
     public static final String ID = "curse_of_misfortune";
 
-    private boolean dropExp;
-    private ChanceImplementation chanceImplementation;
+    private boolean            dropXP;
+    private ChanceSettingsImpl chanceImplementation;
 
-    public CurseOfMisfortuneEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to have no drops from blocks or mobs.");
-        this.getDefaults().setLevelMax(3);
-        this.getDefaults().setTier(0D);
-        this.getDefaults().setConflicts(
+    public CurseOfMisfortuneEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription(ENCHANTMENT_CHANCE + "% chance to have no drops from blocks or mobs.");
+        this.setMaxLevel(3);
+        this.setRarity(Rarity.UNCOMMON);
+        this.setConflicts(
             Enchantment.LOOT_BONUS_BLOCKS.getKey().getKey(),
             Enchantment.LOOT_BONUS_MOBS.getKey().getKey()
         );
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.chanceImplementation = ChanceImplementation.create(this,
-            "20.0 * " + Placeholders.ENCHANTMENT_LEVEL);
-        this.dropExp = JOption.create("Settings.Drop_Exp", false,
-            "When 'true' allows to drop exp from mobs/blocks.").read(cfg);
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chanceImplementation = ChanceSettingsImpl.create(config, Modifier.multiply(7, 1, 1, 100));
+
+        this.dropXP = ConfigValue.create("Settings.Drop_XP",
+            false,
+            "Sets whether or not XP from blocks and mobs can be dropped when enchantment applies."
+        ).read(config);
     }
 
     @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
+    public ChanceSettings getChanceSettings() {
         return chanceImplementation;
     }
 
-    public boolean isDropExp() {
-        return dropExp;
+    public boolean isDropXP() {
+        return dropXP;
     }
 
     @Override
     @NotNull
-    public FitItemType[] getFitItemTypes() {
-        return new FitItemType[] {FitItemType.WEAPON, FitItemType.TOOL};
+    public ItemCategory[] getItemCategories() {
+        return new ItemCategory[] {
+            ItemCategory.SWORD, ItemCategory.BOW, ItemCategory.CROSSBOW, ItemCategory.TRIDENT, ItemCategory.TOOL
+        };
     }
 
     @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.BREAKABLE;
     }
 
@@ -81,7 +92,7 @@ public class CurseOfMisfortuneEnchant extends ExcellentEnchant implements Chance
     }
 
     @Override
-    public boolean isCursed() {
+    public boolean isCurse() {
         return true;
     }
 
@@ -90,7 +101,7 @@ public class CurseOfMisfortuneEnchant extends ExcellentEnchant implements Chance
         if (!this.checkTriggerChance(level)) return false;
 
         event.setDropItems(false);
-        if (!this.isDropExp()) event.setExpToDrop(0);
+        if (!this.isDropXP()) event.setExpToDrop(0);
         return true;
     }
 
@@ -99,12 +110,17 @@ public class CurseOfMisfortuneEnchant extends ExcellentEnchant implements Chance
         if (!this.checkTriggerChance(level)) return false;
 
         event.getDrops().clear();
-        if (!this.isDropExp()) event.setDroppedExp(0);
+        if (!this.isDropXP()) event.setDroppedExp(0);
         return true;
     }
 
     @Override
     public boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level) {
+        return false;
+    }
+
+    @Override
+    public boolean onResurrect(@NotNull EntityResurrectEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
         return false;
     }
 }

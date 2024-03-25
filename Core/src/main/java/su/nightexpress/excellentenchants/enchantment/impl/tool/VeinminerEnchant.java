@@ -10,54 +10,62 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.config.JOption;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
+import su.nightexpress.nightcore.config.ConfigValue;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.BukkitThing;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class VeinminerEnchant extends ExcellentEnchant implements BlockBreakEnchant {
+import static su.nightexpress.excellentenchants.Placeholders.*;
 
-    public static final  String      ID                = "veinminer";
+public class VeinminerEnchant extends AbstractEnchantmentData implements BlockBreakEnchant {
+
+    public static final String ID = "veinminer";
 
     private static final BlockFace[] AREA = {
         BlockFace.UP, BlockFace.DOWN, BlockFace.EAST,
         BlockFace.WEST, BlockFace.SOUTH, BlockFace.NORTH
     };
 
-    private static final String PLACEHOLDER_BLOCK_LIMIT = "%enchantment_block_limit%";
+    private Modifier      blocksLimit;
+    private Set<Material> affectedBlocks;
+    private boolean       disableOnCrouch;
 
-    private EnchantScaler        blocksLimit;
-    private Set<Material> blocksAffected;
+    public VeinminerEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
 
-    public VeinminerEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-
-        this.getDefaults().setDescription("Mines up to " + PLACEHOLDER_BLOCK_LIMIT + " blocks of the ore vein at once.");
-        this.getDefaults().setLevelMax(3);
-        this.getDefaults().setTier(0.3);
-        this.getDefaults().setConflicts(BlastMiningEnchant.ID, TunnelEnchant.ID);
+        this.setDescription("Mines up to " + GENERIC_AMOUNT + " blocks of the ore vein at once.");
+        this.setMaxLevel(3);
+        this.setRarity(Rarity.RARE);
+        this.setConflicts(BlastMiningEnchant.ID, TunnelEnchant.ID);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.disableOnCrouch = ConfigValue.create("Settings.Disable_On_Crouch",
+            true,
+            "Sets whether or not enchantment will have no effect when crouching."
+        ).read(config);
 
-        this.blocksLimit = EnchantScaler.read(this, "Settings.Blocks.Max_At_Once",
-            "6 + " + Placeholders.ENCHANTMENT_LEVEL,
-            "How much amount of blocks can be destroted at single use?");
+        this.blocksLimit = Modifier.read(config, "Settings.Blocks.Limit",
+            Modifier.add(4, 1, 1, 16),
+            "Max. possible amount of blocks to be mined at the same time.");
 
-        this.blocksAffected = JOption.forSet("Settings.Blocks.Affected",
-            str -> Material.getMaterial(str.toUpperCase()),
+        this.affectedBlocks = ConfigValue.forSet("Settings.Blocks.List",
+            BukkitThing::getMaterial,
+            (cfg, path, set) -> cfg.set(path, set.stream().map(Enum::name).toList()),
             () -> {
                 Set<Material> set = new HashSet<>();
                 set.addAll(Tag.COAL_ORES.getValues());
@@ -72,16 +80,15 @@ public class VeinminerEnchant extends ExcellentEnchant implements BlockBreakEnch
                 set.add(Material.NETHER_QUARTZ_ORE);
                 return set;
             },
-            "List of blocks, that will be affected by this enchantment.",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html"
-        ).setWriter((cfg, path, set) -> cfg.set(path, set.stream().map(Enum::name).toList())).read(cfg);
+            "List of blocks affected by this enchantment."
+        ).read(config);
 
-        this.addPlaceholder(PLACEHOLDER_BLOCK_LIMIT, level -> String.valueOf(this.getBlocksLimit(level)));
+        this.addPlaceholder(GENERIC_AMOUNT, level -> String.valueOf(this.getBlocksLimit(level)));
     }
 
     @NotNull
-    public Set<Material> getBlocksAffected() {
-        return this.blocksAffected;
+    public Set<Material> getAffectedBlocks() {
+        return this.affectedBlocks;
     }
 
     public int getBlocksLimit(int level) {
@@ -90,13 +97,13 @@ public class VeinminerEnchant extends ExcellentEnchant implements BlockBreakEnch
 
     @Override
     @NotNull
-    public FitItemType[] getFitItemTypes() {
-        return new FitItemType[]{FitItemType.PICKAXE};
+    public ItemCategory[] getItemCategories() {
+        return new ItemCategory[]{ItemCategory.PICKAXE};
     }
 
     @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.TOOL;
     }
 
@@ -127,10 +134,11 @@ public class VeinminerEnchant extends ExcellentEnchant implements BlockBreakEnch
     public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity entity, @NotNull ItemStack tool, int level) {
         if (!(entity instanceof Player player)) return false;
         if (EnchantUtils.isBusy()) return false;
+        if (this.disableOnCrouch && player.isSneaking()) return false;
 
         Block block = event.getBlock();
         if (block.getDrops(tool, player).isEmpty()) return false;
-        if (!this.getBlocksAffected().contains(block.getType())) return false;
+        if (!this.getAffectedBlocks().contains(block.getType())) return false;
 
         NoCheatPlusHook.exemptBlocks(player);
         this.vein(player, block, level);

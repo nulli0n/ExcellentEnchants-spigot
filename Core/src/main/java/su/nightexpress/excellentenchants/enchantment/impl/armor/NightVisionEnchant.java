@@ -5,50 +5,56 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.PeriodicSettings;
+import su.nightexpress.excellentenchants.api.enchantment.data.PotionData;
+import su.nightexpress.excellentenchants.api.enchantment.data.PotionSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.PeriodImplementation;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.PeriodSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.PotionSettingsImpl;
+import su.nightexpress.nightcore.config.FileConfig;
 
-public class NightVisionEnchant extends ExcellentEnchant implements Potioned, PassiveEnchant {
+import java.io.File;
+
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class NightVisionEnchant extends AbstractEnchantmentData implements PotionData, PassiveEnchant {
 
     public static final String ID = "night_vision";
 
-    private PotionImplementation potionImplementation;
-    private PeriodImplementation periodImplementation;
+    private PotionSettingsImpl potionSettings;
+    private PeriodSettingsImpl periodSettings;
 
-    public NightVisionEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Grants permanent " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " effect.");
-        this.getDefaults().setLevelMax(1);
-        this.getDefaults().setTier(0.7);
+    public NightVisionEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Grants permanent " + ENCHANTMENT_POTION_TYPE + " " + ENCHANTMENT_POTION_LEVEL + " effect.");
+        this.setMaxLevel(1);
+        this.setRarity(Rarity.VERY_RARE);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.potionImplementation = PotionImplementation.create(this, PotionEffectType.NIGHT_VISION, true);
-        this.periodImplementation = PeriodImplementation.create(this, "100");
-    }
-
-    @NotNull
-    @Override
-    public PotionImplementation getPotionImplementation() {
-        return potionImplementation;
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.potionSettings = PotionSettingsImpl.create(this, config, PotionEffectType.NIGHT_VISION, true);
+        this.periodSettings = PeriodSettingsImpl.create(config);
     }
 
     @NotNull
     @Override
-    public PeriodImplementation getPeriodImplementation() {
-        return periodImplementation;
+    public PotionSettings getPotionSettings() {
+        return potionSettings;
+    }
+
+    @NotNull
+    @Override
+    public PeriodicSettings getPeriodSettings() {
+        return periodSettings;
     }
 
     @Override
     @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.ARMOR_HEAD;
     }
 

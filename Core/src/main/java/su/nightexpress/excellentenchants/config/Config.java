@@ -3,159 +3,255 @@ package su.nightexpress.excellentenchants.config;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.utils.Colorizer;
-import su.nexmedia.engine.utils.Colors2;
-import su.nexmedia.engine.utils.StringUtil;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
-import su.nightexpress.excellentenchants.tier.Tier;
+import su.nightexpress.excellentenchants.api.DistributionMode;
+import su.nightexpress.excellentenchants.api.DistributionWay;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.hook.HookId;
+import su.nightexpress.nightcore.config.ConfigValue;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.StringUtil;
+import su.nightexpress.nightcore.util.wrapper.UniInt;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
 public class Config {
 
     public static final String DIR_MENU = "/menu/";
+    public static final String DIR_ENCHANTS = "/enchants/";
 
-    public static final JOption<Long> TASKS_ARROW_TRAIL_TICKS_INTERVAL        = JOption.create("Tasks.Arrow_Trail.Tick_Interval",
+    public static final ConfigValue<Long> CORE_PROJECTILE_PARTICLE_INTERVAL = ConfigValue.create("Core.Projectile_Particles_Tick_Interval",
         1L,
-        "Sets how often (in ticks) arrow trail particle effects will be spawned behind the arrow."
+        "Sets how often (in ticks) enchantment particle effects will be spawned behind projectiles.",
+        "[Increase for performance; Decrease for better visuals]",
+        "[20 ticks = 1 second]",
+        "[Default is 1]"
     );
 
-    public static final JOption<Long> TASKS_PASSIVE_ENCHANTS_TRIGGER_INTERVAL = JOption.create("Tasks.Passive_Enchants.Trigger_Interval",
+    public static final ConfigValue<Long> CORE_PASSIVE_ENCHANTS_TRIGGER_INTERVAL = ConfigValue.create("Core.Passive_Enchants_Trigger_Interval",
         100L,
-        "Sets how often (in ticks) the plugin will attempt to trigger passive enchantment effects on all alive entities.",
-        "For best results it's recommened to keep this value smaller, but at the same rate as enchantment 'Trigger_Interval' settings.",
-        "Examples:",
-        "--- Global: 100 ticks; Regrowth: 100 ticks; Saturation: 100 ticks;",
-        "--- Global: 50 ticks, Regrowth: 100 ticks; Saturation: 150 ticks;"
+        "Sets how often (in ticks) passive enchantment effects will trigger on all alive and loaded entities.",
+        "For best results it's recommened to keep this value lower, but at the same rate as enchantment's 'Trigger_Interval' option.",
+        "=".repeat(15) + " EXAMPLES " + "=".repeat(15),
+        "==> Global (this): 100 ticks; Regrowth: 200 ticks; Saturation: 300 ticks;",
+        "==> Global (this): 50 ticks, Regrowth: 100 ticks; Saturation: 150 ticks;",
+        "[Increase for performance; Decrease for more smooth effect]",
+        "[20 ticks = 1 second]",
+        "[Default is 100]"
     );
 
-    public static final JOption<Boolean> ENCHANTMENTS_CHARGES_ENABLED = JOption.create("Enchantments.Charges.Enabled",
+    public static final ConfigValue<Boolean> CORE_PASSIVE_ENCHANTS_FOR_MOBS = ConfigValue.create("Core.Apply_Passive_Enchants_To_Mobs",
+        true,
+        "Sets whether or not mobs can have passive enchantment effects (such as permanent potion effects, regeneration, etc.).",
+        "[Enable for enhanced gameplay; Disable for performance]",
+        "[Default is true]"
+    );
+
+    public static final ConfigValue<Boolean> CORE_SWORD_ENCHANTS_TO_AXES = ConfigValue.create("Core.Sword_Enchants_To_Axes",
+        true,
+        "Sets whether or not Sword enchantments can be applied on Axes.",
+        "[Default is true]"
+    );
+
+    public static final ConfigValue<Boolean> CORE_BOW_ENCHANTS_TO_CROSSBOW = ConfigValue.create("Core.Bow_Enchants_To_Crossbows",
+        true,
+        "Sets whether or not Bow enchantments can be applied on Crossbows.",
+        "[Default is true]"
+    );
+
+    public static final ConfigValue<Boolean> CORE_CHESTPLATE_ENCHANTS_TO_ELYTRA = ConfigValue.create("Core.Chestplate_Enchants_To_Elytra",
         false,
-        "Enables the enchantment Charges feature.",
-        Placeholders.URL_WIKI + "Charges-System");
+        "Sets whether or not Chestplate enchantments can be applied on Elytras.",
+        "[Default is false]"
+    );
 
-    public static final JOption<TreeMap<Integer, String>> ENCHANTMENTS_CHARGES_FORMAT = new JOption<TreeMap<Integer, String>>("Enchantments.Charges.Format",
-        (cfg, path, def) -> {
-            TreeMap<Integer, String> map = new TreeMap<>();
-            for (String raw : cfg.getSection(path)) {
-                int percent = StringUtil.getInteger(raw, -1);
-                if (percent < 0) continue;
 
-                String format = Colorizer.apply(cfg.getString(path + "." + raw, ""));
-                if (format.isEmpty()) continue;
 
-                map.put(percent, format);
-            }
-            return map;
-        },
+    public static final ConfigValue<Set<String>> ENCHANTMENTS_DISABLED_LIST = ConfigValue.forSet("Enchantments.Disabled.List",
+        String::toLowerCase,
+        FileConfig::set,
+        Set.of("example_name", "custom_sharpness"),
+        "Put here CUSTOM enchantment names that you want to disable and remove completely.",
+        "Enchantment names are equal to their config file names in '" + DIR_ENCHANTS + "' folder.",
+        "[*] You MUST REBOOT your server for disabled enchantments to have effect.",
+        "[*] Once enchantment is disabled, it will be removed from all items in the world on next load!"
+    );
+
+    public static final ConfigValue<Map<String, Set<String>>> ENCHANTMENTS_DISABLED_IN_WORLDS = ConfigValue.forMap("Enchantments.Disabled.ByWorld",
+        String::toLowerCase,
+        (cfg, path, worldName) -> cfg.getStringSet(path + "." + worldName).stream().map(String::toLowerCase).collect(Collectors.toSet()),
+        (cfg, path, map) -> map.forEach((world, enchants) -> cfg.set(path + "." + world, enchants)),
+        () -> Map.of(
+            "your_world_name", Set.of("enchantment_name", "ice_aspect"),
+            "another_world", Set.of("another_enchantment", "ice_aspect")
+        ),
+        "Put here CUSTOM enchantment names that you want to disable in specific worlds.",
+        "To disable all enchantments for a world, use '" + WILDCARD + "' instead of enchantment names.",
+        "Enchantment names are equal to their config file names in '" + DIR_ENCHANTS + "' folder.",
+        VANILLA_DISTRIBUTION_HEADER,
+        "Enchantments will have no effect, but will appear in the world.",
+        CUSTOM_DISTRIBUTION_HEADER,
+        "Enchantments will have no effect and won't appear in the world."
+    );
+
+    public static final ConfigValue<DistributionMode> DISTRIBUTION_MODE = ConfigValue.create("Enchantments.Distribution.Mode",
+        DistributionMode.class, DistributionMode.VANILLA,
+        "Sets in a which way new enchantments will be distributed to the worlds.",
+        "Allowed values: " + StringUtil.inlineEnum(DistributionMode.class, ", "),
+        "=".repeat(15) + " ! WARNING ! " + "=".repeat(15),
+        "You MUST REBOOT your server when changing this. Otherwise result is unpredictable.",
+        VANILLA_DISTRIBUTION_HEADER,
+        "[+] Very simple to use, almost no need to configure anything.",
+        "[+] Handled by the server, automatically supports all possible ways to get enchantments.",
+        "[+] Very accurate generation, repsects all vanilla game mechanics.",
+        "[-] Customization is almost non-existent.",
+        CUSTOM_DISTRIBUTION_HEADER,
+        "[+] Very flexible and customizable.",
+        "[+] Possibility for new ways to generate / obtain enchantments.",
+        "[-] Might be difficult to configure and balance everything.",
+        "[-] Enchantment generation is not such accurate as vanilla does."
+    );
+
+    public static final ConfigValue<Boolean> DISTRIBUTION_SINGLE_ENCHANT_IN_VILLAGER_BOOKS = ConfigValue.create("Enchantments.Distribution.Custom.Single_Enchant_In_Villager_Books",
+        true,
+        "When enabled, enchanted books in villager trades will have no more than 1 enchantment (vanilla or custom one).");
+
+    private static final ConfigValue<Map<DistributionWay, DistributionWaySettings>> DISTRIBUTION_WAY_SETTINGS = ConfigValue.forMap("Enchantments.Distribution.Custom.Ways",
+        id -> StringUtil.getEnum(id, DistributionWay.class).orElse(null),
+        (cfg, path, def) -> DistributionWaySettings.read(cfg, path + "." + def),
+        (cfg, path, map) -> map.forEach((type, settings) -> settings.write(cfg, path + "." + type.name())),
+        () -> Map.of(
+            DistributionWay.ENCHANTING, new DistributionWaySettings(true, 5, 75, UniInt.of(0, 2)),
+            DistributionWay.FISHING, new DistributionWaySettings(true, 4, 45, UniInt.of(0, 2)),
+            DistributionWay.LOOT_GENERATION, new DistributionWaySettings(true, 4, 80, UniInt.of(0, 2)),
+            DistributionWay.MOB_EQUIPMENT, new DistributionWaySettings(true, 4, 35, UniInt.of(0, 2)),
+            DistributionWay.VILLAGER, new DistributionWaySettings(true, 4, 60, UniInt.of(0, 2))
+        ),
+        "Settings for the different ways of obtaining enchantments."
+    );
+
+
+
+    public static final ConfigValue<Integer> ENCHANTMENTS_DISPLAY_MODE = ConfigValue.create("Enchantments.Display.Mode",
+        1,
+        "Sets how enchantment names and descriptions will be handled on items.",
+        "=".repeat(15) + " AVAILABLE VALUES " + "=".repeat(15),
+        "1 = Plain modification of item's lore (lore changes are real and persistent).",
+        "2 = Packet modification of item's lore (no real changes are made to the items). Requires " + HookId.PROTOCOL_LIB + " to be installed.",
+        "",
+        "Plain mode is faster, but may not reflect all changes immediately.",
+        "Packet mode is slower, but instantly reflect all changes. In creative mode, there is a chance for lore duplication."
+    );
+
+    public static final ConfigValue<Boolean> ENCHANTMENTS_DISPLAY_NAME_HIDE_1ST_LEVEL = ConfigValue.create("Enchantments.Display.Name.Hide_1st_Level",
+        true,
+        "Hides enchantment level component from name format for level 1 enchantments.");
+
+    public static final ConfigValue<Map<Rarity, String>> ENCHANTMENTS_DISPLAY_NAME_RARITY_FORMAT = ConfigValue.forMap("Enchantments.Display.Name.Rarity",
+        (id) -> StringUtil.getEnum(id, Rarity.class).orElse(null),
+        (cfg, path, id) -> cfg.getString(path + "." + id, GENERIC_NAME),
+        (cfg, path, map) -> map.forEach((rarity, format) -> cfg.set(path + "." + rarity.name(), format)),
+        () -> Map.of(
+            Rarity.COMMON, WHITE.enclose(GENERIC_NAME),
+            Rarity.UNCOMMON, LIGHT_GREEN.enclose(GENERIC_NAME),
+            Rarity.RARE, LIGHT_CYAN.enclose(GENERIC_NAME),
+            Rarity.VERY_RARE, LIGHT_ORANGE.enclose(GENERIC_NAME)
+        ),
+        "Sets enchantment name format depends on enchantment rarity.");
+
+    public static final ConfigValue<String> ENCHANTMENTS_DISPLAY_NAME_CURSE_FORMAT = ConfigValue.create("Enchantments.Display.Name.Curse",
+        LIGHT_RED.enclose(GENERIC_NAME),
+        "Sets cursed enchantments name format.");
+
+    public static final ConfigValue<String> ENCHANTMENTS_DISPLAY_NAME_FORMAT = ConfigValue.create("Enchantments.Display.Name.Format",
+        ENCHANTMENT_NAME + ENCHANTMENT_LEVEL + ENCHANTMENT_CHARGES,
+        "Enchantment name format created from name components.");
+
+    public static final ConfigValue<String> ENCHANTMENTS_DISPLAY_NAME_COMPONENT_NAME = ConfigValue.create("Enchantments.Display.Name.Component.Name",
+        GENERIC_VALUE,
+        "Enchantment name display component for name format.");
+
+    public static final ConfigValue<String> ENCHANTMENTS_DISPLAY_NAME_COMPONENT_LEVEL = ConfigValue.create("Enchantments.Display.Name.Component.Level",
+        " " + GENERIC_VALUE,
+        "Enchantment level display component for name format.");
+
+    public static final ConfigValue<String> ENCHANTMENTS_DISPLAY_NAME_COMPONENT_CHARGES = ConfigValue.create("Enchantments.Display.Name.Component.Charges",
+        " " + GENERIC_VALUE,
+        "Enchantment charges display component for name format.");
+
+    public static final ConfigValue<Boolean> ENCHANTMENTS_DISPLAY_DESCRIPTION_ENABLED = ConfigValue.create("Enchantments.Display.Description.Enabled",
+        true,
+        "When 'true', adds the enchantment description to item lore under enchantment names.",
+        "For Display-Mode = 2 description is not shown while you're in Creative gamemode.");
+
+    public static final ConfigValue<Boolean> ENCHANTMENTS_DISPLAY_DESCRIPTION_BOOKS_ONLY = ConfigValue.create("Enchantments.Display.Description.Books_Only",
+        false,
+        "Sets whether or not only enchanted books will have enchantment descriptions.");
+
+    public static final ConfigValue<String> ENCHANTMENTS_DISPLAY_DESCRIPTION_FORMAT = ConfigValue.create("Enchantments.Display.Description.Format",
+        LIGHT_GRAY.enclose("• " + GENERIC_DESCRIPTION),
+        "Sets enc" +
+            "hantment description format.");
+
+
+
+
+    public static final ConfigValue<Boolean> ENCHANTMENTS_CHARGES_ENABLED = ConfigValue.create("Enchantments.Charges.Enabled",
+        false,
+        "Enables Enchantment Charges feature.",
+        "When enabled in the first time, make sure to check enchantments configs for new 'Charges' section.",
+        URL_CHRAGES);
+
+    public static final ConfigValue<TreeMap<Integer, String>> ENCHANTMENTS_CHARGES_FORMAT = ConfigValue.forTreeMap("Enchantments.Charges.Format",
+        raw -> NumberUtil.getInteger(raw, 0),
+        (cfg, path, value) -> cfg.getString(path + "." + value, GENERIC_AMOUNT),
+        (cfg, path, map) -> map.forEach((perc, str) -> cfg.set(path + "." + perc, str)),
         () -> {
             TreeMap<Integer, String> map = new TreeMap<>();
-            map.put(0, "#ff9a9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
-            map.put(25, "#ffc39a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
-            map.put(50, "#f6ff9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
-            map.put(75, "#bcff9a(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            map.put(0, LIGHT_RED.enclose("(" + GENERIC_AMOUNT + "⚡)"));
+            map.put(25, LIGHT_ORANGE.enclose("(" + GENERIC_AMOUNT + "⚡)"));
+            map.put(50, LIGHT_YELLOW.enclose("(" + GENERIC_AMOUNT + "⚡)"));
+            map.put(75, LIGHT_GREEN.enclose("(" + GENERIC_AMOUNT + "⚡)"));
             return map;
         },
         "Enchantment charges format depends on amount of charges left (in percent).",
         "If you don't want to display charges, leave only keys with negative values.",
-        "Use '" + Placeholders.GENERIC_AMOUNT + "' placeholder for amount of charges.")
-        .setWriter((cfg, path, map) -> map.forEach((perc, str) -> cfg.set(path + "." + perc, str)));
+        "Use '" + GENERIC_AMOUNT + "' placeholder for charges amount.");
 
-    public static final JOption<Boolean> ENCHANTMENTS_CHARGES_COMPARE_TYPE_ONLY = JOption.create("Enchantments.Charges.Compare_Material_Only", false,
-        "When enabled, only item material will be checked to determine if item can be used as an enchantment fuel.",
-        "When disabled (default), it will compare the whole item meta including name, lore, model data etc.");
+    public static final ConfigValue<Boolean> ENCHANTMENTS_CHARGES_COMPARE_TYPE_ONLY = ConfigValue.create("Enchantments.Charges.Compare_Material_Only",
+        false,
+        "When enabled, only item material will be checked to determine if an item can be used as an enchantment fuel.",
+        "When disabled, it will compare the whole item meta including name, lore, model data etc.",
+        "[Default is false]");
 
-    public static final JOption<ItemStack> ENCHANTMENTS_CHARGES_FUEL_ITEM = JOption.create("Enchantments.Charges.Fuel_Item",
+    public static final ConfigValue<ItemStack> ENCHANTMENTS_CHARGES_FUEL_ITEM = ConfigValue.create("Enchantments.Charges.Fuel_Item",
         new ItemStack(Material.LAPIS_LAZULI),
         "Default item used to recharge item's enchantments on anvils.",
         "If you want different item for certain enchantments, you can do it in that enchantment configs.",
-        "Item Options: " + Placeholders.URL_ENGINE_SCALER)
-        .setWriter(JYML::setItem);
-
-    public static final JOption<Set<String>> ENCHANTMENTS_DISABLED = JOption.create("Enchantments.Disabled",
-        Set.of("enchant_name", "other_enchant"),
-        "A list of enchantments, that will be disabled and removed from the game (server).",
-        "Enchantment names are the same as enchantment file name in /enchants/ folder. ! Must be in lower_case !",
-        "Example: To disable 'Explosive Arrows' you need to add 'explosive_arrows' here.")
-        .mapReader(set -> set.stream().map(String::toLowerCase).collect(Collectors.toSet()));
-
-    public static final JOption<Map<String, Set<String>>> ENCHANTMENTS_DISABLED_IN_WORLDS = new JOption<Map<String, Set<String>>>("Enchantments.Disabled_In_Worlds",
-        (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(k -> k, worldName -> cfg.getStringSet(path + "." + worldName))),
-        () -> Map.of("your_world_name", Set.of("enchantment_name", "ice_aspect")),
-        "Here you can disable certain enchantments in certain worlds.",
-        "Enchantment names are the same as enchantment file name in /enchants/ folder. ! Must be in lower_case !",
-        "To disable all enchantments for a world, use '" + Placeholders.WILDCARD + "' instead of enchantment names.")
-        .setWriter((cfg, path, map) -> map.forEach((world, enchants) -> cfg.set(path + "." + world, enchants)));
-
-    public static final JOption<Integer> ENCHANTMENTS_DISPLAY_MODE = JOption.create("Enchantments.Display.Mode",
-        1,
-        "Sets how enchantment names and descriptions will be handled on items.",
-        "1 = Plain modification of item's lore (lore changes are real and persistent).",
-        "2 = Packet modification of item's lore (no real changes are made to the items). Requires ProtocolLib.",
-        "Plain mode is faster, but may not reflect all changes immediately.",
-        "Packet mode is slower, but instantly reflect all changes. In creative mode, there is a chance for lore duplication.");
-
-    public static final JOption<Boolean> ENCHANTMENTS_DESCRIPTION_ENABLED = JOption.create("Enchantments.Description.Enabled", true,
-        "When 'true', adds the enchantment description to item lore under enchantment names.",
-        "For Display-Mode = 2 description is not shown while you're in Creative gamemode.");
-
-    public static final JOption<String> ENCHANTMENTS_DESCRIPTION_FORMAT = JOption.create("Enchantments.Description.Format",
-        "&8▸ " + Placeholders.GENERIC_DESCRIPTION,
-        "Sets the global enchantment description format.").mapReader(Colorizer::apply);
-
-    public static final JOption<Integer> ENCHANTMENTS_ITEM_CUSTOM_MAX = JOption.create("Enchantments.Item.Max_Custom_Enchants", 3,
-        "How many of custom enchantments the item can contain at the same time?");
-
-    public static final JOption<Boolean> ENCHANTMENTS_ITEM_SWORD_ENCHANTS_TO_AXES = JOption.create("Enchantments.Item.Sword_Enchants_To_Axes", true,
-        "Set this to 'true' to allow Sword enchantments for Axes.");
-
-    public static final JOption<Boolean> ENCHANTMENTS_ITEM_BOW_ENCHANTS_TO_CROSSBOW = JOption.create("Enchantments.Item.Bow_Enchants_To_Crossbows", true,
-        "Set this to 'true' to allow Bow enchantments for Crossbows.");
-
-    public static final JOption<Boolean> ENCHANTMENTS_ITEM_CHESTPLATE_ENCHANTS_TO_ELYTRA = JOption.create("Enchantments.Item.Chestplate_Enchants_To_Elytra", false,
-        "Set this to 'true' to allow Chestplate enchantments for Elytras.");
-
-    public static final JOption<Boolean> ENCHANTMENTS_ENTITY_PASSIVE_FOR_MOBS = JOption.create("Enchantments.Entity.Apply_Passive_Enchants_To_Mobs", true,
-        "When enabled, passive enchantments (permanent potion effects, regeneration, etc.) will be applied to mobs as well.",
-        "Disable this if you're experiencing performance issues.");
-
-    public static final JOption<Boolean> ENCHANTMENTS_SINGLE_ENCHANT_IN_VILLAGER_BOOKS = JOption.create("Enchantments.Single_Enchant_In_Villager_Books", true,
-        "Sets whether or not enchanted books in villager trades will have only 1 enchant, vanilla or custom one.");
-
-    private static final JOption<Map<ObtainType, ObtainSettings>> OBTAIN_SETTINGS = new JOption<Map<ObtainType, ObtainSettings>>("Enchantments.Obtaining",
-        (cfg, path, def) -> Stream.of(ObtainType.values()).collect(Collectors.toMap(k -> k, v -> ObtainSettings.read(cfg, path + "." + v.getPathName()))),
-        () -> Stream.of(ObtainType.values()).collect(Collectors.toMap(k -> k, v -> new ObtainSettings(true, 4, 80D, 0, 2))),
-        "Settings for the different ways of obtaining enchantments.")
-        .setWriter((cfg, path, map) -> map.forEach((type, settings) -> ObtainSettings.write(cfg, path + "." + type.getPathName(), settings)));
+        "Item Options: " + WIKI_ITEMS_URL);
 
     @NotNull
-    public static Optional<ObtainSettings> getObtainSettings(@NotNull ObtainType obtainType) {
-        ObtainSettings settings = OBTAIN_SETTINGS.get().get(obtainType);
+    public static Optional<DistributionWaySettings> getDistributionWaySettings(@NotNull DistributionWay way) {
+        DistributionWaySettings settings = DISTRIBUTION_WAY_SETTINGS.get().get(way);
         return settings == null || !settings.isEnabled() ? Optional.empty() : Optional.of(settings);
     }
 
-    @NotNull
-    public static List<Tier> getDefaultTiers() {
-        List<Tier> list = new ArrayList<>();
-        list.add(new Tier("common", 1, "Common", Colors2.WHITE, getObtainWeight(50D)));
-        list.add(new Tier("rare", 2, "Rare", Colors2.GREEN, getObtainWeight(25D)));
-        list.add(new Tier("unique", 3, "Unique", Colors2.YELLOW, getObtainWeight(15D)));
-        list.add(new Tier("legendary", 4, "Legendary", Colors2.ORANGE, getObtainWeight(5D)));
-        list.add(new Tier("cursed", 0, "Cursed", Colors2.RED, getObtainWeight(5D)));
-        return list;
+    public static void loadRarityWeights(@NotNull FileConfig config) {
+        for (Rarity rarity : Rarity.values()) {
+            int weight = ConfigValue.create("Enchantments.Distribution.Custom.Rarity_Weights." + rarity.name(), rarity.getWeight()).read(config);
+            rarity.setWeight(weight);
+        }
     }
 
-    @NotNull
-    private static Map<ObtainType, Double> getObtainWeight(double weight) {
-        Map<ObtainType, Double> map = new HashMap<>();
-        for (ObtainType obtainType : ObtainType.values()) {
-            map.put(obtainType, weight);
-        }
-        return map;
+    public static boolean isVanillaDistribution() {
+        return Config.DISTRIBUTION_MODE.get() == DistributionMode.VANILLA;
+    }
+
+    public static boolean isCustomDistribution() {
+        return Config.DISTRIBUTION_MODE.get() == DistributionMode.CUSTOM;
     }
 }

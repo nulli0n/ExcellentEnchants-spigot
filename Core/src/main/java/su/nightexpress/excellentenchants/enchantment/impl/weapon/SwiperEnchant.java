@@ -6,40 +6,43 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.NumberUtil;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
+import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
-import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.NumberUtil;
 
-public class SwiperEnchant extends ExcellentEnchant implements CombatEnchant, Chanced {
+import java.io.File;
+
+import static su.nightexpress.excellentenchants.Placeholders.*;
+
+public class SwiperEnchant extends AbstractEnchantmentData implements CombatEnchant, ChanceData {
 
     public static final String ID = "swiper";
 
     public static final String PLACEHOLER_XP_AMOUNT = "%xp_amount%";
 
-    private ChanceImplementation chanceImplementation;
-    private EnchantScaler xpAmount;
+    private ChanceSettingsImpl chanceSettings;
+    private Modifier           xpAmount;
 
-    public SwiperEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to steal " + PLACEHOLER_XP_AMOUNT + " XP from players.");
-        this.getDefaults().setLevelMax(3);
-        this.getDefaults().setTier(0.7);
+    public SwiperEnchant(@NotNull ExcellentEnchantsPlugin plugin, File file) {
+        super(plugin, file);
+        this.setDescription(ENCHANTMENT_CHANCE + "% chance to steal " + PLACEHOLER_XP_AMOUNT + " XP from players.");
+        this.setMaxLevel(3);
+        this.setRarity(Rarity.RARE);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(5, 2.5, 1));
 
-        this.chanceImplementation = ChanceImplementation.create(this,
-            "5.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 2.5");
-
-        this.xpAmount = EnchantScaler.read(this, "Settings.XP_Amount",
-            Placeholders.ENCHANTMENT_LEVEL,
+        this.xpAmount = Modifier.read(config, "Settings.XP_Amount",
+            Modifier.add(0, 1, 1),
             "Amount of XP to be stolen on hit.");
 
         this.addPlaceholder(PLACEHOLER_XP_AMOUNT, level -> NumberUtil.format(this.getXPAmount(level)));
@@ -47,14 +50,14 @@ public class SwiperEnchant extends ExcellentEnchant implements CombatEnchant, Ch
 
     @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.WEAPON;
     }
 
     @NotNull
     @Override
-    public Chanced getChanceImplementation() {
-        return this.chanceImplementation;
+    public ChanceSettings getChanceSettings() {
+        return this.chanceSettings;
     }
 
     public int getXPAmount(int level) {
@@ -68,7 +71,7 @@ public class SwiperEnchant extends ExcellentEnchant implements CombatEnchant, Ch
     }
 
     private void addXP(@NotNull Player player, int amount) {
-        int levelHas = player.getLevel();
+        //int levelHas = player.getLevel();
         int xpHas = player.getTotalExperience();
 
         xpHas = Math.max(0, xpHas + amount);

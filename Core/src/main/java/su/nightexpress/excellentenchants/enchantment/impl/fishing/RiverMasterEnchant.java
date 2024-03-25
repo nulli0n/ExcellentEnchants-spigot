@@ -8,39 +8,42 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.api.manager.EventListener;
-import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
-import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.manager.SimpeListener;
 
-public class RiverMasterEnchant extends ExcellentEnchant implements GenericEnchant, EventListener {
+import java.io.File;
+
+public class RiverMasterEnchant extends AbstractEnchantmentData implements GenericEnchant, SimpeListener {
 
     public static final String ID = "river_master";
 
-    private EnchantScaler distanceMod;
+    private Modifier distanceMod;
 
-    public RiverMasterEnchant(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID);
-        this.getDefaults().setDescription("Increases casting distance.");
-        this.getDefaults().setLevelMax(5);
-        this.getDefaults().setTier(0.1);
+    public RiverMasterEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+        super(plugin, file);
+        this.setDescription("Increases casting distance.");
+        this.setMaxLevel(5);
+        this.setRarity(Rarity.COMMON);
     }
 
     @Override
-    public void loadSettings() {
-        super.loadSettings();
-        this.distanceMod = EnchantScaler.read(this, "Settings.Distance_Modifier",
-            "1.25 + " + Placeholders.ENCHANTMENT_LEVEL + " / 5",
+    protected void loadAdditional(@NotNull FileConfig config) {
+        this.distanceMod = Modifier.read(config, "Settings.Distance_Modifier",
+            Modifier.add(1, 0.25, 1, 3D),
             "Multiplies the casted fish hook's velocity by specified value.",
-            "Setting too high values will result in hook auto removal by vanilla game/server mechanics.");
+            "Setting too high values will result in hook auto removal by vanilla game/server mechanics."
+        );
     }
 
     @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public EnchantmentTarget getCategory() {
         return EnchantmentTarget.FISHING_ROD;
     }
 
@@ -56,7 +59,7 @@ public class RiverMasterEnchant extends ExcellentEnchant implements GenericEncha
         ItemStack rod = EnchantUtils.getFishingRod(player);
         if (rod == null) return;
 
-        int level = EnchantUtils.getLevel(rod, this);
+        int level = EnchantUtils.getLevel(rod, this.getEnchantment());
         if (level < 1) return;
 
         if (this.isOutOfCharges(rod)) return;
