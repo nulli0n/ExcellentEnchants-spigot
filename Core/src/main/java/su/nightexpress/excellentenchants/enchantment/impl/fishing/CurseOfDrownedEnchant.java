@@ -55,6 +55,11 @@ public class CurseOfDrownedEnchant extends AbstractEnchantmentData implements Fi
     }
 
     @Override
+    public boolean isCurse() {
+        return true;
+    }
+
+    @Override
     public boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level) {
         if (event.getState() != PlayerFishEvent.State.CAUGHT_FISH) return false;
         if (!this.checkTriggerChance(level)) return false;
