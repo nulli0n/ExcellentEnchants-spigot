@@ -13,7 +13,7 @@ import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
@@ -24,7 +24,7 @@ public class ProtocolHook {
 
     private static boolean isRegistered = false;
 
-    public static void setup(@NotNull ExcellentEnchantsPlugin plugin) {
+    public static void setup(@NotNull EnchantsPlugin plugin) {
         if (isRegistered) return;
 
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();

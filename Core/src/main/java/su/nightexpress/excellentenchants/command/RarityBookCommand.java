@@ -5,8 +5,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
-import su.nightexpress.excellentenchants.Perms;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
+import su.nightexpress.excellentenchants.config.Perms;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
@@ -24,9 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class RarityBookCommand extends AbstractCommand<ExcellentEnchantsPlugin> {
+public class RarityBookCommand extends AbstractCommand<EnchantsPlugin> {
 
-    public RarityBookCommand(@NotNull ExcellentEnchantsPlugin plugin) {
+    public RarityBookCommand(@NotNull EnchantsPlugin plugin) {
         super(plugin, new String[]{"raritybook"}, Perms.COMMAND_RARITY_BOOK);
         this.setDescription(Lang.COMMAND_RARITY_BOOK_DESC);
         this.setUsage(Lang.COMMAND_RARITY_BOOK_USAGE);
@@ -69,7 +69,7 @@ public class RarityBookCommand extends AbstractCommand<ExcellentEnchantsPlugin> 
         Set<EnchantmentData> enchants = EnchantRegistry.getByRarity(rarity);
         EnchantmentData enchantmentData = enchants.isEmpty() ? null : Rnd.get(enchants);
         if (enchantmentData == null) {
-            Lang.ERROR_NO_ENCHANT.getMessage().send(sender);
+            Lang.ERROR_INVALID_ENCHANT.getMessage().send(sender);
             return;
         }
 

@@ -5,7 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.PeriodicSettings;
@@ -28,7 +28,7 @@ public class SaturationEnchant extends AbstractEnchantmentData implements Passiv
 
     private PeriodSettingsImpl periodSettings;
 
-    public SaturationEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public SaturationEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Restores " + GENERIC_AMOUNT + " food points every few seconds.");
         this.setMaxLevel(3);

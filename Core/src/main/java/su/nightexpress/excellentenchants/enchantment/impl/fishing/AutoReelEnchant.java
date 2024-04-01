@@ -4,7 +4,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
@@ -16,7 +16,7 @@ public class AutoReelEnchant extends AbstractEnchantmentData implements FishingE
 
     public static final String ID = "auto_reel";
 
-    public AutoReelEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public AutoReelEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Automatically reels in a hook on bite.");
         this.setMaxLevel(1);

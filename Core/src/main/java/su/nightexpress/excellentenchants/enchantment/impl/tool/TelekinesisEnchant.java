@@ -7,7 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -27,7 +27,7 @@ public class TelekinesisEnchant extends AbstractEnchantmentData implements Chanc
 
     private ChanceSettingsImpl chanceSettings;
 
-    public TelekinesisEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public TelekinesisEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Moves all blocks loot directly to your inventory.");
         this.setMaxLevel(1);

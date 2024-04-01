@@ -5,7 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.PeriodicSettings;
 import su.nightexpress.excellentenchants.api.enchantment.data.PotionData;
@@ -27,7 +27,7 @@ public class WaterBreathingEnchant extends AbstractEnchantmentData implements Po
     private PotionSettingsImpl potionSettings;
     private PeriodSettingsImpl periodSettings;
 
-    public WaterBreathingEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public WaterBreathingEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setMaxLevel(1);
         this.setRarity(Rarity.UNCOMMON);

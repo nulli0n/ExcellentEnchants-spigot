@@ -12,19 +12,19 @@ import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.DistributionWay;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantPopulator;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
-import su.nightexpress.excellentenchants.hook.HookId;
+import su.nightexpress.excellentenchants.hook.HookPlugin;
 import su.nightexpress.excellentenchants.hook.impl.MythicMobsHook;
 import su.nightexpress.nightcore.manager.AbstractListener;
 import su.nightexpress.nightcore.util.Plugins;
 
-public class EnchantPopulationListener extends AbstractListener<ExcellentEnchantsPlugin> {
+public class EnchantPopulationListener extends AbstractListener<EnchantsPlugin> {
 
-    public EnchantPopulationListener(@NotNull ExcellentEnchantsPlugin plugin) {
+    public EnchantPopulationListener(@NotNull EnchantsPlugin plugin) {
         super(plugin);
     }
 
@@ -113,7 +113,7 @@ public class EnchantPopulationListener extends AbstractListener<ExcellentEnchant
             if (equipment == null) return;
 
             World world = entity.getWorld();
-            boolean isMythic = Plugins.isLoaded(HookId.MYTHIC_MOBS) && MythicMobsHook.isMythicMob(entity);
+            boolean isMythic = Plugins.isLoaded(HookPlugin.MYTHIC_MOBS) && MythicMobsHook.isMythicMob(entity);
             boolean doPopulation = Config.getDistributionWaySettings(DistributionWay.MOB_EQUIPMENT).isPresent() && !isMythic;
 
             for (EquipmentSlot slot : EquipmentSlot.values()) {

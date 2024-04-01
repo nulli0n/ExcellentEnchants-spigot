@@ -13,9 +13,9 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
@@ -23,7 +23,6 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
-import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
 import su.nightexpress.nightcore.util.NumberUtil;
@@ -31,7 +30,8 @@ import su.nightexpress.nightcore.util.NumberUtil;
 import java.io.File;
 import java.util.List;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
+import static su.nightexpress.excellentenchants.Placeholders.GENERIC_RADIUS;
 
 public class BlastMiningEnchant extends AbstractEnchantmentData implements ChanceData, BlockBreakEnchant, SimpeListener {
 
@@ -43,7 +43,7 @@ public class BlastMiningEnchant extends AbstractEnchantmentData implements Chanc
 
     private int explodeLevel;
 
-    public BlastMiningEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public BlastMiningEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to mine blocks by explosion.");
         this.setMaxLevel(5);
@@ -111,9 +111,7 @@ public class BlastMiningEnchant extends AbstractEnchantmentData implements Chanc
         float power = (float) this.getExplosionPower(level);
 
         this.explodeLevel = level;
-        NoCheatPlusHook.exemptBlocks(player);
         boolean exploded = block.getWorld().createExplosion(block.getLocation(), power, false, true, player);
-        NoCheatPlusHook.unexemptBlocks(player);
         this.explodeLevel = -1;
 
         return exploded;

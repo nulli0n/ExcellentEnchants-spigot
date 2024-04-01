@@ -8,7 +8,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
@@ -25,7 +25,7 @@ public class RiverMasterEnchant extends AbstractEnchantmentData implements Gener
 
     private Modifier distanceMod;
 
-    public RiverMasterEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public RiverMasterEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Increases casting distance.");
         this.setMaxLevel(5);

@@ -7,7 +7,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -31,7 +31,7 @@ public class HardenedEnchant extends AbstractEnchantmentData implements ChanceDa
     private ChanceSettingsImpl chanceSettings;
     private PotionSettingsImpl potionSettings;
 
-    public HardenedEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public HardenedEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to get " + ENCHANTMENT_POTION_TYPE + " " + ENCHANTMENT_POTION_LEVEL + " (" + ENCHANTMENT_POTION_DURATION + "s.) when damaged.");
         this.setMaxLevel(3);

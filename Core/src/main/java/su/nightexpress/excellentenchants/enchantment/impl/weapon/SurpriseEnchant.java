@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -38,7 +38,7 @@ public class SurpriseEnchant extends AbstractEnchantmentData implements ChanceDa
     private ChanceSettingsImpl chanceSettings;
     private PotionSettingsImpl potionSettings;
 
-    public SurpriseEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public SurpriseEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to apply random potion effect to enemy on hit.");
         this.setMaxLevel(3);

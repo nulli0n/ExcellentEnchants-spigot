@@ -9,7 +9,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
@@ -33,7 +33,7 @@ public class CurseOfMediocrityEnchant extends AbstractEnchantmentData implements
 
     private ChanceSettingsImpl chanceSettings;
 
-    public CurseOfMediocrityEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public CurseOfMediocrityEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to disenchant item drops.");
         this.setMaxLevel(3);

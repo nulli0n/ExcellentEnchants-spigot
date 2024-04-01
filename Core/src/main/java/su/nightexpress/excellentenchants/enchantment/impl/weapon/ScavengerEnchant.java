@@ -12,7 +12,7 @@ import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.LootTables;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -41,7 +41,7 @@ public class ScavengerEnchant extends AbstractEnchantmentData implements ChanceD
 
     private ChanceSettingsImpl chanceSettings;
 
-    public ScavengerEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public ScavengerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to get additional loot from mobs.");
         this.setMaxLevel(4);

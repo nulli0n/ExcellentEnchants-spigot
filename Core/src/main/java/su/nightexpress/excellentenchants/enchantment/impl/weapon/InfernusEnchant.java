@@ -10,7 +10,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
@@ -30,7 +30,7 @@ public class InfernusEnchant extends AbstractEnchantmentData implements GenericE
 
     private Modifier fireTicks;
 
-    public InfernusEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public InfernusEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Launched trident will ignite the enemy for " + GENERIC_TIME + "s. on hit.");
         this.setMaxLevel(3);

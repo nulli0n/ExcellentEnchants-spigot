@@ -12,7 +12,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
@@ -47,7 +47,7 @@ public class ExplosiveArrowsEnchant extends AbstractEnchantmentData implements C
 
     private Entity lastExploder;
 
-    public ExplosiveArrowsEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public ExplosiveArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to launch an explosive arrow.");
         this.setMaxLevel(3);

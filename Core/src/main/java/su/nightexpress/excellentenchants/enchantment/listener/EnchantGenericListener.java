@@ -16,18 +16,18 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.manager.AbstractListener;
 
-public class EnchantGenericListener extends AbstractListener<ExcellentEnchantsPlugin> {
+public class EnchantGenericListener extends AbstractListener<EnchantsPlugin> {
 
     //private final EnchantManager enchantManager;
 
-    public EnchantGenericListener(@NotNull ExcellentEnchantsPlugin plugin, @NotNull EnchantManager enchantManager) {
+    public EnchantGenericListener(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager enchantManager) {
         super(plugin);
         //this.enchantManager = enchantManager;
     }

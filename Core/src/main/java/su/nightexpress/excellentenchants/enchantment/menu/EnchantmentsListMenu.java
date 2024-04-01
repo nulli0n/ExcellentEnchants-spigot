@@ -6,7 +6,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.api.DistributionWay;
 import su.nightexpress.excellentenchants.config.Config;
@@ -32,7 +32,7 @@ import java.util.stream.IntStream;
 import static su.nightexpress.excellentenchants.Placeholders.*;
 import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
-public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchantsPlugin> implements AutoFilled<EnchantmentData> {
+public class EnchantmentsListMenu extends ConfigMenu<EnchantsPlugin> implements AutoFilled<EnchantmentData> {
 
     private static final String FILE_NAME = "enchants.yml";
 
@@ -51,7 +51,7 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchantsPlugin> im
     private List<String> enchantLoreObtaining;
     private int[] enchantSlots;
 
-    public EnchantmentsListMenu(@NotNull ExcellentEnchantsPlugin plugin) {
+    public EnchantmentsListMenu(@NotNull EnchantsPlugin plugin) {
         super(plugin, FileConfig.loadOrExtract(plugin, Config.DIR_MENU, FILE_NAME));
         this.keyLevel = new NamespacedKey(plugin, "list_display_level");
         this.iconCache = new HashMap<>();

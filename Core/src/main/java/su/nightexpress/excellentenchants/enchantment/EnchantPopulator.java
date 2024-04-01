@@ -6,7 +6,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.DistributionWay;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
@@ -37,7 +37,7 @@ public class EnchantPopulator {
     private World world;
     private BiFunction<EnchantmentData, CustomDistribution, Integer> levelGenerator;
 
-    public EnchantPopulator(@NotNull ExcellentEnchantsPlugin plugin, @NotNull ItemStack item, @NotNull DistributionWay distributionWay) {
+    public EnchantPopulator(@NotNull EnchantsPlugin plugin, @NotNull ItemStack item, @NotNull DistributionWay distributionWay) {
         //this.plugin = plugin;
         this.item = item;
         this.distributionWay = distributionWay;

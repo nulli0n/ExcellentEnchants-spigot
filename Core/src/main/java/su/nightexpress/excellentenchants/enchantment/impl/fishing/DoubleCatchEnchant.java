@@ -6,7 +6,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -26,7 +26,7 @@ public class DoubleCatchEnchant extends AbstractEnchantmentData implements Fishi
 
     private ChanceSettingsImpl chanceSettings;
 
-    public DoubleCatchEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public DoubleCatchEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Increases amount of caught item by x2 with " + ENCHANTMENT_CHANCE + "% chance.");
         this.setMaxLevel(3);

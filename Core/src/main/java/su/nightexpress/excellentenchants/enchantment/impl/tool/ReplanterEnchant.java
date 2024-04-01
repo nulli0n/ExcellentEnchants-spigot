@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -46,7 +46,7 @@ public class ReplanterEnchant extends AbstractEnchantmentData implements ChanceD
         Material.MELON_SEEDS, Material.PUMPKIN_SEEDS,
         Material.POTATO, Material.CARROT, Material.NETHER_WART);
 
-    public ReplanterEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public ReplanterEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Automatically replant crops on right click and when harvest.");
         this.setMaxLevel(1);

@@ -18,7 +18,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ArrowSettings;
@@ -42,7 +42,7 @@ public class FlareEnchant extends AbstractEnchantmentData implements ChanceData,
     private ChanceSettingsImpl chanceSettings;
     private ArrowSettingsImpl  arrowSettings;
 
-    public FlareEnchant(@NotNull ExcellentEnchantsPlugin plugin, File file) {
+    public FlareEnchant(@NotNull EnchantsPlugin plugin, File file) {
         super(plugin, file);
 
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to create a torch where arrow lands.");

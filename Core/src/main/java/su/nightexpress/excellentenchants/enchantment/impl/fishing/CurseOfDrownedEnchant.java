@@ -8,7 +8,7 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -30,7 +30,7 @@ public class CurseOfDrownedEnchant extends AbstractEnchantmentData implements Fi
 
     private ChanceSettingsImpl chanceSettings;
 
-    public CurseOfDrownedEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public CurseOfDrownedEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to fish up a Drowned Zombie.");
         this.setMaxLevel(5);

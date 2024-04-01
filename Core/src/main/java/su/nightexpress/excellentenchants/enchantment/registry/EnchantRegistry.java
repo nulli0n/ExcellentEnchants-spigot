@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
@@ -36,7 +36,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class EnchantRegistry extends SimpleManager<ExcellentEnchantsPlugin> {
+public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
 
     public static final Map<NamespacedKey, EnchantmentData> BY_KEY = new HashMap<>();
     public static final Map<String, EnchantmentData>        BY_ID  = new HashMap<>();
@@ -45,7 +45,7 @@ public class EnchantRegistry extends SimpleManager<ExcellentEnchantsPlugin> {
 
     private boolean isLocked;
 
-    public EnchantRegistry(@NotNull ExcellentEnchantsPlugin plugin) {
+    public EnchantRegistry(@NotNull EnchantsPlugin plugin) {
         super(plugin);
     }
 
@@ -104,7 +104,7 @@ public class EnchantRegistry extends SimpleManager<ExcellentEnchantsPlugin> {
         this.register(ConfusionEnchant.ID, file -> new ConfusionEnchant(plugin, file));
         this.register(CutterEnchant.ID, file -> new CutterEnchant(plugin, file));
         this.register(CurseOfDeathEnchant.ID, file -> new CurseOfDeathEnchant(plugin, file));
-        this.register(EnchantDecapitator.ID, file -> new EnchantDecapitator(plugin, file));
+        this.register(DecapitatorEnchant.ID, file -> new DecapitatorEnchant(plugin, file));
         this.register(DoubleStrikeEnchant.ID, file -> new DoubleStrikeEnchant(plugin, file));
         this.register(ExhaustEnchant.ID, file -> new ExhaustEnchant(plugin, file));
         this.register(WisdomEnchant.ID, file -> new WisdomEnchant(plugin, file));

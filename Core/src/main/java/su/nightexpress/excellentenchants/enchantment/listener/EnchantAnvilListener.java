@@ -11,7 +11,7 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
@@ -22,9 +22,9 @@ import su.nightexpress.nightcore.util.wrapper.UniSound;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EnchantAnvilListener extends AbstractListener<ExcellentEnchantsPlugin> {
+public class EnchantAnvilListener extends AbstractListener<EnchantsPlugin> {
 
-    public EnchantAnvilListener(@NotNull ExcellentEnchantsPlugin plugin) {
+    public EnchantAnvilListener(@NotNull EnchantsPlugin plugin) {
         super(plugin);
     }
 

@@ -18,7 +18,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
@@ -47,7 +47,7 @@ public class FlameWalkerEnchant extends AbstractEnchantmentData implements Gener
 
     private Modifier blockDecayTime;
 
-    public FlameWalkerEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public FlameWalkerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Ability to walk on lava, ignore magma block damage.");
         this.setMaxLevel(3);

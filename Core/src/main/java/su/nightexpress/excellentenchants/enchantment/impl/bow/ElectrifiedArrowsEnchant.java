@@ -12,7 +12,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
@@ -43,7 +43,7 @@ public class ElectrifiedArrowsEnchant extends AbstractEnchantmentData implements
     private Modifier           damageModifier;
     private boolean            thunderstormOnly;
 
-    public ElectrifiedArrowsEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public ElectrifiedArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance for an arrow to strike lightning with " + GENERIC_DAMAGE + "❤ extra damage.");
         this.setMaxLevel(3);

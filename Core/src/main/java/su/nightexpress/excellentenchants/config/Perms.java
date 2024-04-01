@@ -1,6 +1,7 @@
-package su.nightexpress.excellentenchants;
+package su.nightexpress.excellentenchants.config;
 
 import org.bukkit.permissions.PermissionDefault;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.nightcore.util.wrapper.UniPermission;
 
 public class Perms {
@@ -13,7 +14,9 @@ public class Perms {
 
     public static final UniPermission COMMAND_BOOK        = new UniPermission(PREFIX_COMMAND + "book");
     public static final UniPermission COMMAND_ENCHANT     = new UniPermission(PREFIX_COMMAND + "enchant");
-    public static final UniPermission COMMAND_LIST        = new UniPermission(PREFIX_COMMAND + "list", "Allows to use '/eenchants list' command.", PermissionDefault.TRUE);
+    public static final UniPermission COMMAND_GET_FUEL    = new UniPermission(PREFIX_COMMAND + "getfuel");
+    public static final UniPermission COMMAND_LIST        = new UniPermission(PREFIX_COMMAND + "list", PermissionDefault.TRUE);
+    public static final UniPermission COMMAND_LIST_OTHERS        = new UniPermission(PREFIX_COMMAND + "list.others");
     public static final UniPermission COMMAND_RARITY_BOOK = new UniPermission(PREFIX_COMMAND + "raritybook");
     public static final UniPermission COMMAND_RELOAD      = new UniPermission(PREFIX_COMMAND + "reload");
 
@@ -23,7 +26,8 @@ public class Perms {
         COMMAND.addChildren(
             COMMAND_BOOK,
             COMMAND_ENCHANT,
-            COMMAND_LIST,
+            COMMAND_GET_FUEL,
+            COMMAND_LIST, COMMAND_LIST_OTHERS,
             COMMAND_RELOAD,
             COMMAND_RARITY_BOOK
         );

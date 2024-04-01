@@ -11,7 +11,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -33,7 +33,7 @@ public class SniperEnchant extends AbstractEnchantmentData implements BowEnchant
     private ChanceSettingsImpl chanceSettings;
     private Modifier           speedModifier;
 
-    public SniperEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public SniperEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
 
         this.setDescription("Increases projectile speed by " + GENERIC_AMOUNT + "%");

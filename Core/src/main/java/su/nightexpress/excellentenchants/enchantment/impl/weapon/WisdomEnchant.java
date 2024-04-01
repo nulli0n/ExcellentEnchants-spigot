@@ -7,7 +7,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
@@ -25,7 +25,7 @@ public class WisdomEnchant extends AbstractEnchantmentData implements DeathEncha
 
     private Modifier xpModifier;
 
-    public WisdomEnchant(@NotNull ExcellentEnchantsPlugin plugin, File file) {
+    public WisdomEnchant(@NotNull EnchantsPlugin plugin, File file) {
         super(plugin, file);
         this.setDescription("Increases XP dropped from mobs by " + GENERIC_AMOUNT + "%.");
         this.setMaxLevel(5);

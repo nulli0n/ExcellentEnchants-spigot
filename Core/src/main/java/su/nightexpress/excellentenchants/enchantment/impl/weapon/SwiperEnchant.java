@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -30,7 +30,7 @@ public class SwiperEnchant extends AbstractEnchantmentData implements CombatEnch
     private ChanceSettingsImpl chanceSettings;
     private Modifier           xpAmount;
 
-    public SwiperEnchant(@NotNull ExcellentEnchantsPlugin plugin, File file) {
+    public SwiperEnchant(@NotNull EnchantsPlugin plugin, File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to steal " + PLACEHOLER_XP_AMOUNT + " XP from players.");
         this.setMaxLevel(3);

@@ -18,7 +18,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
@@ -53,7 +53,7 @@ public class SilkSpawnerEnchant extends AbstractEnchantmentData implements Chanc
 
     private final NamespacedKey spawnerKey;
 
-    public SilkSpawnerEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public SilkSpawnerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.spawnerKey = new NamespacedKey(plugin, "divine_spawner");
 

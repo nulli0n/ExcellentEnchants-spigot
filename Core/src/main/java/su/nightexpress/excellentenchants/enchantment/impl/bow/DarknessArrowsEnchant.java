@@ -12,7 +12,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.*;
@@ -36,7 +36,7 @@ public class DarknessArrowsEnchant extends AbstractEnchantmentData implements Ch
     private ChanceSettingsImpl chanceSettings;
     private PotionSettingsImpl potionSettings;
 
-    public DarknessArrowsEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public DarknessArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to launch an arrow with " + ENCHANTMENT_POTION_TYPE + " " + ENCHANTMENT_POTION_LEVEL + " (" + ENCHANTMENT_POTION_DURATION + "s.)");
         this.setMaxLevel(3);

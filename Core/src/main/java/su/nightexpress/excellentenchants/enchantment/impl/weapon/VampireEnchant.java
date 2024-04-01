@@ -9,7 +9,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -35,7 +35,7 @@ public class VampireEnchant extends AbstractEnchantmentData implements ChanceDat
     private boolean            healMultiplier;
     private ChanceSettingsImpl chanceSettings;
 
-    public VampireEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public VampireEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to heal for " + GENERIC_AMOUNT + "❤ on hit.");
         this.setMaxLevel(4);

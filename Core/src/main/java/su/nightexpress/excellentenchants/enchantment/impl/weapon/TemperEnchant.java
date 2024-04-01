@@ -6,7 +6,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
@@ -26,7 +26,7 @@ public class TemperEnchant extends AbstractEnchantmentData implements CombatEnch
     private Modifier damageAmount;
     private Modifier damageStep;
 
-    public TemperEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public TemperEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Inflicts " + GENERIC_AMOUNT + "% more damage for each " + GENERIC_RADIUS + "❤ missing.");
         this.setMaxLevel(5);

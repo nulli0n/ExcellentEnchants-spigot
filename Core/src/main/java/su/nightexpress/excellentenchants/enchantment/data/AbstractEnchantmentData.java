@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.DistributionWay;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.distribution.DistributionOptions;
@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 
 import static su.nightexpress.excellentenchants.Placeholders.*;
 
-public abstract class AbstractEnchantmentData extends AbstractFileData<ExcellentEnchantsPlugin> implements EnchantmentData {
+public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsPlugin> implements EnchantmentData {
 
     protected Enchantment enchantment;
 
@@ -76,7 +76,7 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<Excellent
     private final NamespacedKey       chargesKey;
     private final EnchantPlaceholders placeholders;
 
-    public AbstractEnchantmentData(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public AbstractEnchantmentData(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(new ArrayList<>());
         this.setRarity(Rarity.COMMON);

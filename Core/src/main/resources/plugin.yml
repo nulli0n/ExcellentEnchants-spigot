@@ -1,9 +1,9 @@
-main: su.nightexpress.excellentenchants.ExcellentEnchantsPlugin
+main: su.nightexpress.excellentenchants.EnchantsPlugin
 version: '${project.version}'
 name: ExcellentEnchants
 author: NightExpress
-desciption: Enchantments that feel like vanilla ones.
+desciption: Amazing enchantments with seamless integration.
 depend: [ nightcore ]
-softdepend: [ ProtocolLib, NoCheatPlus, PlaceholderAPI, MythicMobs ]
+softdepend: [ ProtocolLib, PlaceholderAPI, MythicMobs ]
 api-version: 1.19
 load: STARTUP

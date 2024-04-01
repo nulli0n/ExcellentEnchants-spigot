@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -33,7 +33,7 @@ public class RestoreEnchant extends AbstractEnchantmentData implements GenericEn
     private ChanceSettingsImpl chanceSettings;
     private Modifier           durabilityRestore;
 
-    public RestoreEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public RestoreEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to save item from breaking back to " + GENERIC_AMOUNT + "%");
         this.setMaxLevel(5);

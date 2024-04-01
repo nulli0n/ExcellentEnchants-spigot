@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.api.DistributionMode;
 import su.nightexpress.excellentenchants.api.DistributionWay;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.hook.HookId;
+import su.nightexpress.excellentenchants.hook.HookPlugin;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
@@ -141,7 +141,7 @@ public class Config {
         "Sets how enchantment names and descriptions will be handled on items.",
         "=".repeat(15) + " AVAILABLE VALUES " + "=".repeat(15),
         "1 = Plain modification of item's lore (lore changes are real and persistent).",
-        "2 = Packet modification of item's lore (no real changes are made to the items). Requires " + HookId.PROTOCOL_LIB + " to be installed.",
+        "2 = Packet modification of item's lore (no real changes are made to the items). Requires " + HookPlugin.PROTOCOL_LIB + " to be installed.",
         "",
         "Plain mode is faster, but may not reflect all changes immediately.",
         "Packet mode is slower, but instantly reflect all changes. In creative mode, there is a chance for lore duplication."

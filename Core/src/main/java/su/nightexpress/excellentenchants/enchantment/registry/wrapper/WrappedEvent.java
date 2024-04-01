@@ -7,7 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
@@ -21,7 +21,7 @@ public class WrappedEvent<E extends Event, T extends EnchantmentData> implements
     private final Class<T>          enchantClass;
     private final DataGather<E, T>  dataGather;
 
-    public WrappedEvent(@NotNull ExcellentEnchantsPlugin plugin,
+    public WrappedEvent(@NotNull EnchantsPlugin plugin,
                         @NotNull EventPriority priority,
                         @NotNull Class<E> eventClass,
                         @NotNull Class<T> enchantClass,

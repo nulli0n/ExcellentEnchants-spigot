@@ -7,7 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -31,7 +31,7 @@ public class CurseOfBreakingEnchant extends AbstractEnchantmentData implements G
     private Modifier           durabilityAmount;
     private ChanceSettingsImpl chanceSettings;
 
-    public CurseOfBreakingEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public CurseOfBreakingEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to consume extra " + GENERIC_AMOUNT + " durability points.");
         this.setMaxLevel(3);

@@ -10,14 +10,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
-import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.BukkitThing;
@@ -28,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
 public class VeinminerEnchant extends AbstractEnchantmentData implements BlockBreakEnchant {
 
@@ -43,7 +42,7 @@ public class VeinminerEnchant extends AbstractEnchantmentData implements BlockBr
     private Set<Material> affectedBlocks;
     private boolean       disableOnCrouch;
 
-    public VeinminerEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public VeinminerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
 
         this.setDescription("Mines up to " + GENERIC_AMOUNT + " blocks of the ore vein at once.");
@@ -140,9 +139,7 @@ public class VeinminerEnchant extends AbstractEnchantmentData implements BlockBr
         if (block.getDrops(tool, player).isEmpty()) return false;
         if (!this.getAffectedBlocks().contains(block.getType())) return false;
 
-        NoCheatPlusHook.exemptBlocks(player);
         this.vein(player, block, level);
-        NoCheatPlusHook.unexemptBlocks(player);
         return true;
     }
 }

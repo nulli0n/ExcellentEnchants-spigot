@@ -10,7 +10,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
@@ -34,7 +34,7 @@ public class CurseOfMisfortuneEnchant extends AbstractEnchantmentData implements
     private boolean            dropXP;
     private ChanceSettingsImpl chanceImplementation;
 
-    public CurseOfMisfortuneEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public CurseOfMisfortuneEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to have no drops from blocks or mobs.");
         this.setMaxLevel(3);

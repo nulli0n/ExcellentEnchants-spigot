@@ -11,7 +11,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -33,7 +33,7 @@ public class BomberEnchant extends AbstractEnchantmentData implements ChanceData
     private Modifier           fuseTicks;
     private ChanceSettingsImpl chanceSettings;
 
-    public BomberEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public BomberEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to launch TNT that explodes in " + GENERIC_TIME + "s.");
         this.setMaxLevel(3);

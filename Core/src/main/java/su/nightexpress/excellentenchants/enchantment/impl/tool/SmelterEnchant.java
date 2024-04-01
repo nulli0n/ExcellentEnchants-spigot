@@ -15,7 +15,7 @@ import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
@@ -47,7 +47,7 @@ public class SmelterEnchant extends AbstractEnchantmentData implements ChanceDat
     private final Set<Material> exemptedBlocks;
     private final Set<FurnaceRecipe> recipes;
 
-    public SmelterEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public SmelterEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Smelts mined blocks with " + ENCHANTMENT_CHANCE + "% chance.");
         this.setMaxLevel(5);

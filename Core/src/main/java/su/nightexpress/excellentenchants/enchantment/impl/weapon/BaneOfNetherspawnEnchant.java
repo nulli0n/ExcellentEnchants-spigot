@@ -7,7 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
@@ -38,7 +38,7 @@ public class BaneOfNetherspawnEnchant extends AbstractEnchantmentData implements
     private boolean  damageModifier;
     private Modifier damageFormula;
 
-    public BaneOfNetherspawnEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public BaneOfNetherspawnEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Inflicts " + GENERIC_DAMAGE + "❤ more damage to nether mobs.");
         this.setMaxLevel(5);

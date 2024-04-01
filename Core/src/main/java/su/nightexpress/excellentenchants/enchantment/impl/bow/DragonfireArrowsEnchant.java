@@ -19,7 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
@@ -50,7 +50,7 @@ public class DragonfireArrowsEnchant extends AbstractEnchantmentData implements 
     private ArrowSettingsImpl  arrowSettings;
     private ChanceSettingsImpl chanceSettings;
 
-    public DragonfireArrowsEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public DragonfireArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to launch an dragonfire arrow (R=" + GENERIC_RADIUS + ", " + GENERIC_DURATION + "s).");
         this.setMaxLevel(3);

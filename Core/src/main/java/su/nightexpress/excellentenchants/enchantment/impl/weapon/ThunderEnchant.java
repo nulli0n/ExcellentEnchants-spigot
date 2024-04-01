@@ -9,7 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -35,7 +35,7 @@ public class ThunderEnchant extends AbstractEnchantmentData implements ChanceDat
     private ChanceSettingsImpl chanceSettings;
     private Modifier           damageModifier;
 
-    public ThunderEnchant(@NotNull ExcellentEnchantsPlugin plugin, File file) {
+    public ThunderEnchant(@NotNull EnchantsPlugin plugin, File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to strike lightning with " + GENERIC_DAMAGE + "❤ extra damage.");
         this.setMaxLevel(5);

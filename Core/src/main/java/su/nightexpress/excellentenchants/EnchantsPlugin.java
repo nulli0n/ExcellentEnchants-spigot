@@ -8,17 +8,15 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.DistributionWay;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.command.BookCommand;
-import su.nightexpress.excellentenchants.command.EnchantCommand;
-import su.nightexpress.excellentenchants.command.ListCommand;
-import su.nightexpress.excellentenchants.command.RarityBookCommand;
+import su.nightexpress.excellentenchants.command.*;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.config.Lang;
+import su.nightexpress.excellentenchants.config.Perms;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.EnchantPopulator;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
-import su.nightexpress.excellentenchants.hook.HookId;
+import su.nightexpress.excellentenchants.hook.HookPlugin;
 import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
 import su.nightexpress.excellentenchants.hook.impl.ProtocolHook;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
@@ -33,7 +31,7 @@ import su.nightexpress.nightcore.config.PluginDetails;
 import su.nightexpress.nightcore.util.Plugins;
 import su.nightexpress.nightcore.util.Version;
 
-public class ExcellentEnchantsPlugin extends NightPlugin {
+public class EnchantsPlugin extends NightPlugin {
 
     private EnchantRegistry registry;
     private EnchantManager  enchantManager;
@@ -62,13 +60,13 @@ public class ExcellentEnchantsPlugin extends NightPlugin {
             return;
         }
 
-        Keys.loadKeys(this);
-        Config.loadRarityWeights(this.getConfig());
-
         this.getLangManager().loadEnum(ItemCategory.class);
         this.getLangManager().loadEnum(EnchantmentTarget.class);
         this.getLangManager().loadEnum(DistributionWay.class);
         this.getLangManager().loadEnum(Rarity.class);
+
+        Keys.loadKeys(this);
+        Config.loadRarityWeights(this.getConfig());
 
         this.registerCommands();
 
@@ -78,11 +76,11 @@ public class ExcellentEnchantsPlugin extends NightPlugin {
         this.enchantManager.setup();
 
         if (Config.ENCHANTMENTS_DISPLAY_MODE.get() == 2) {
-            if (Plugins.isInstalled(HookId.PROTOCOL_LIB)) {
+            if (Plugins.isInstalled(HookPlugin.PROTOCOL_LIB)) {
                 ProtocolHook.setup(this);
             }
             else {
-                this.warn(HookId.PROTOCOL_LIB + " is not installed. Display mode is set to Plain lore.");
+                this.warn(HookPlugin.PROTOCOL_LIB + " is not installed. Display mode is set to Plain lore.");
                 Config.ENCHANTMENTS_DISPLAY_MODE.set(1);
             }
         }
@@ -124,6 +122,9 @@ public class ExcellentEnchantsPlugin extends NightPlugin {
         mainCommand.addChildren(new ListCommand(this));
         mainCommand.addChildren(new RarityBookCommand(this));
         mainCommand.addChildren(new ReloadSubCommand(this, Perms.COMMAND_RELOAD));
+        if (Config.ENCHANTMENTS_CHARGES_ENABLED.get()) {
+            mainCommand.addChildren(new GetFuelCommand(this));
+        }
     }
 
     @NotNull

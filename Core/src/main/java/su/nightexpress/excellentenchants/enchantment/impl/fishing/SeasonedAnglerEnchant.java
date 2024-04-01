@@ -4,7 +4,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
@@ -22,7 +22,7 @@ public class SeasonedAnglerEnchant extends AbstractEnchantmentData implements Fi
 
     private Modifier xpModifier;
 
-    public SeasonedAnglerEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public SeasonedAnglerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Increases amount of XP gained from fishing by " + GENERIC_AMOUNT + "%.");
         this.setMaxLevel(4);

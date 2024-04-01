@@ -7,7 +7,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
 import su.nightexpress.nightcore.util.NumberUtil;
@@ -17,7 +17,7 @@ public class PlaceholderHook {
 
     private static EnchantsExpansion expansion;
 
-    public static void setup(@NotNull ExcellentEnchantsPlugin plugin) {
+    public static void setup(@NotNull EnchantsPlugin plugin) {
         if (expansion == null) {
             expansion = new EnchantsExpansion(plugin);
             expansion.register();
@@ -33,9 +33,9 @@ public class PlaceholderHook {
 
     static class EnchantsExpansion extends PlaceholderExpansion {
 
-        private final ExcellentEnchantsPlugin plugin;
+        private final EnchantsPlugin plugin;
 
-        public EnchantsExpansion(@NotNull ExcellentEnchantsPlugin plugin) {
+        public EnchantsExpansion(@NotNull EnchantsPlugin plugin) {
             this.plugin = plugin;
         }
 

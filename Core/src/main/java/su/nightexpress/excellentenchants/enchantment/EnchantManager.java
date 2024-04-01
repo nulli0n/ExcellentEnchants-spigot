@@ -3,7 +3,7 @@ package su.nightexpress.excellentenchants.enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.config.Config;
@@ -19,13 +19,13 @@ import su.nightexpress.nightcore.util.Pair;
 
 import java.util.*;
 
-public class EnchantManager extends AbstractManager<ExcellentEnchantsPlugin> {
+public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
     private final Set<Pair<PassiveEnchant, EnchantmentData>> passiveEnchants;
 
     private EnchantmentsListMenu enchantmentsListMenu;
 
-    public EnchantManager(@NotNull ExcellentEnchantsPlugin plugin) {
+    public EnchantManager(@NotNull EnchantsPlugin plugin) {
         super(plugin);
         this.passiveEnchants = new HashSet<>();
 

@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
-import su.nightexpress.excellentenchants.Perms;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
+import su.nightexpress.excellentenchants.config.Perms;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
@@ -19,9 +19,9 @@ import su.nightexpress.nightcore.util.random.Rnd;
 import java.util.Arrays;
 import java.util.List;
 
-public class EnchantCommand extends AbstractCommand<ExcellentEnchantsPlugin> {
+public class EnchantCommand extends AbstractCommand<EnchantsPlugin> {
 
-    public EnchantCommand(@NotNull ExcellentEnchantsPlugin plugin) {
+    public EnchantCommand(@NotNull EnchantsPlugin plugin) {
         super(plugin, new String[]{"enchant"}, Perms.COMMAND_ENCHANT);
         this.setDescription(Lang.COMMAND_ENCHANT_DESC);
         this.setUsage(Lang.COMMAND_ENCHANT_USAGE);
@@ -54,7 +54,7 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchantsPlugin> {
 
         Enchantment enchantment = BukkitThing.getEnchantment(result.getArg(1));
         if (enchantment == null) {
-            Lang.ERROR_NO_ENCHANT.getMessage().send(sender);
+            Lang.ERROR_INVALID_ENCHANT.getMessage().send(sender);
             return;
         }
 

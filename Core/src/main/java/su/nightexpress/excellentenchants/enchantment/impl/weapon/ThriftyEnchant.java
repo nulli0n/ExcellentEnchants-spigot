@@ -9,7 +9,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -18,7 +18,7 @@ import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
-import su.nightexpress.excellentenchants.hook.HookId;
+import su.nightexpress.excellentenchants.hook.HookPlugin;
 import su.nightexpress.excellentenchants.hook.impl.MythicMobsHook;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
@@ -43,7 +43,7 @@ public class ThriftyEnchant extends AbstractEnchantmentData implements ChanceDat
 
     private ChanceSettingsImpl chanceSettings;
 
-    public ThriftyEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public ThriftyEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance for mobs to drop spawn egg.");
         this.setMaxLevel(3);
@@ -103,7 +103,7 @@ public class ThriftyEnchant extends AbstractEnchantmentData implements ChanceDat
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, ItemStack weapon, int level) {
         if (this.ignoredEntityTypes.contains(entity.getType())) return false;
-        if (this.ignoreMythicMobs && Plugins.isLoaded(HookId.MYTHIC_MOBS) && MythicMobsHook.isMythicMob(entity)) return false;
+        if (this.ignoreMythicMobs && Plugins.isLoaded(HookPlugin.MYTHIC_MOBS) && MythicMobsHook.isMythicMob(entity)) return false;
 
         SpawnReason spawnReason = EnchantUtils.getSpawnReason(entity);
         if (spawnReason != null && this.ignoredSpawnReasons.contains(spawnReason)) return false;

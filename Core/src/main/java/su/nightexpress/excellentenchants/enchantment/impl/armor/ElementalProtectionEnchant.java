@@ -7,7 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
@@ -36,7 +36,7 @@ public class ElementalProtectionEnchant extends AbstractEnchantmentData implemen
     private double   protectionCapacity;
     private boolean  protectionAsModifier;
 
-    public ElementalProtectionEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public ElementalProtectionEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Reduces Poison, Magic, Wither, Lightning, Freeze damage by " + GENERIC_AMOUNT + "%.");
         this.setMaxLevel(5);

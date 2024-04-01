@@ -19,12 +19,12 @@ public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
     public static final String GENERIC_AMOUNT      = "%amount%";
     public static final String GENERIC_DESCRIPTION = "%description%";
     public static final String GENERIC_ENCHANT     = "%enchant%";
-    public static final String GENERIC_RADIUS = "%radius%";
-    public static final String GENERIC_DURATION = "%duration%";
-    public static final String GENERIC_DAMAGE = "%damage%";
-    public static final String GENERIC_MIN = "%min%";
-    public static final String GENERIC_MAX = "%max%";
-    public static final String GENERIC_TIME = "%time%";
+    public static final String GENERIC_RADIUS      = "%radius%";
+    public static final String GENERIC_DURATION    = "%duration%";
+    public static final String GENERIC_DAMAGE      = "%damage%";
+    public static final String GENERIC_MIN         = "%min%";
+    public static final String GENERIC_MAX         = "%max%";
+    public static final String GENERIC_TIME        = "%time%";
 
     public static final String ENCHANTMENT_CHANCE                        = "%enchantment_trigger_chance%";
     public static final String ENCHANTMENT_INTERVAL                      = "%enchantment_trigger_interval%";

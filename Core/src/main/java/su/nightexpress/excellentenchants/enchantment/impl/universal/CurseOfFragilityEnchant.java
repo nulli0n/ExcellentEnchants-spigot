@@ -11,7 +11,7 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
@@ -25,7 +25,7 @@ public class CurseOfFragilityEnchant extends AbstractEnchantmentData implements 
 
     public static final String ID = "curse_of_fragility";
 
-    public CurseOfFragilityEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public CurseOfFragilityEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Prevents an item from being grindstoned or anviled.");
         this.setMaxLevel(1);

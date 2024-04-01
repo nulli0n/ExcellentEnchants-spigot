@@ -20,7 +20,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
@@ -46,7 +46,7 @@ public class SilkChestEnchant extends AbstractEnchantmentData implements BlockDr
     private       List<String>  chestLore;
     private final NamespacedKey keyChest;
 
-    public SilkChestEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public SilkChestEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription("Drop chests and saves all its content.");
         this.setMaxLevel(1);

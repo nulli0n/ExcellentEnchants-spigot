@@ -6,7 +6,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -28,7 +28,7 @@ public class StoppingForceEnchant extends AbstractEnchantmentData implements Cha
     private ChanceSettingsImpl chanceSettings;
     private Modifier           knockbackModifier;
 
-    public StoppingForceEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public StoppingForceEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to resist knockback in combat by " + GENERIC_AMOUNT + "%.");
         this.setMaxLevel(3);

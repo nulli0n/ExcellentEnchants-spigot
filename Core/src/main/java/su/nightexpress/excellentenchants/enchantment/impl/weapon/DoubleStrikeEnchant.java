@@ -8,7 +8,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
@@ -30,7 +30,7 @@ public class DoubleStrikeEnchant extends AbstractEnchantmentData implements Chan
 
     private ChanceSettingsImpl chanceSettings;
 
-    public DoubleStrikeEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public DoubleStrikeEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to inflict double damage.");
         this.setMaxLevel(4);

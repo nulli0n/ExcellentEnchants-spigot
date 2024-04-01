@@ -7,7 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
@@ -28,7 +28,7 @@ public class VillageDefenderEnchant extends AbstractEnchantmentData implements C
     private boolean  damageMultiplier;
     private Modifier damageAmount;
 
-    public VillageDefenderEnchant(@NotNull ExcellentEnchantsPlugin plugin, File file) {
+    public VillageDefenderEnchant(@NotNull EnchantsPlugin plugin, File file) {
         super(plugin, file);
         this.setDescription("Inflicts " + GENERIC_AMOUNT + "❤ more damage to all pillagers.");
         this.setMaxLevel(5);

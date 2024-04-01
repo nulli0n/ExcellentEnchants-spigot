@@ -9,13 +9,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
-import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 
@@ -38,7 +37,7 @@ public class TunnelEnchant extends AbstractEnchantmentData implements BlockBreak
 
     private boolean disableOnSneak;
 
-    public TunnelEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public TunnelEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
 
         this.setDescription("Mines multiple blocks at once in a certain shape.");
@@ -92,8 +91,6 @@ public class TunnelEnchant extends AbstractEnchantmentData implements BlockBreak
         else if (level == 2) blocksBroken = 5;
         else if (level >= 3) blocksBroken = 9;
 
-        NoCheatPlusHook.exemptBlocks(player);
-
         for (int i = 0; i < blocksBroken; i++) {
             if (item.getType().isAir()) break;
 
@@ -121,8 +118,6 @@ public class TunnelEnchant extends AbstractEnchantmentData implements BlockBreak
 
             EnchantUtils.safeBusyBreak(player, blockAdd);
         }
-
-        NoCheatPlusHook.unexemptBlocks(player);
         return true;
     }
 }

@@ -5,7 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.ExcellentEnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
@@ -28,7 +28,7 @@ public class LuckyMinerEnchant extends AbstractEnchantmentData implements Chance
     private Modifier           xpModifier;
     private ChanceSettingsImpl chanceSettings;
 
-    public LuckyMinerEnchant(@NotNull ExcellentEnchantsPlugin plugin, @NotNull File file) {
+    public LuckyMinerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to gain " + GENERIC_AMOUNT + "% more XP from ores.");
         this.setMaxLevel(5);
