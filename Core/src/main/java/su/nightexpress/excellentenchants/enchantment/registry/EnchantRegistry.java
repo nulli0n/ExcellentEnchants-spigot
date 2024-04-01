@@ -29,7 +29,6 @@ import su.nightexpress.excellentenchants.enchantment.registry.wrapper.WrappedEve
 import su.nightexpress.nightcore.manager.SimpleManager;
 import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.FileUtil;
-import su.nightexpress.nightcore.util.Version;
 
 import java.io.File;
 import java.util.*;
@@ -156,10 +155,8 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
         this.register(PoisonedArrowsEnchant.ID, file -> new PoisonedArrowsEnchant(plugin, file));
         this.register(VampiricArrowsEnchant.ID, file -> new VampiricArrowsEnchant(plugin, file));
         this.register(WitheredArrowsEnchant.ID, file -> new WitheredArrowsEnchant(plugin, file));
-        if (Version.isAbove(Version.V1_18_R2)) {
-            this.register(DarknessArrowsEnchant.ID, file -> new DarknessArrowsEnchant(plugin, file));
-            this.register(DarknessCloakEnchant.ID, file -> new DarknessCloakEnchant(plugin, file));
-        }
+        this.register(DarknessArrowsEnchant.ID, file -> new DarknessArrowsEnchant(plugin, file));
+        this.register(DarknessCloakEnchant.ID, file -> new DarknessCloakEnchant(plugin, file));
 
         // Universal
         this.register(CurseOfFragilityEnchant.ID, file -> new CurseOfFragilityEnchant(plugin, file));
