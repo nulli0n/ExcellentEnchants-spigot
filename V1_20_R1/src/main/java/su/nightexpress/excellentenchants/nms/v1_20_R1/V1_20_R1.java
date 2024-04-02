@@ -62,6 +62,7 @@ public class V1_20_R1 implements EnchantNMS {
     @Override
     public void registerEnchantment(@NotNull EnchantmentData data) {
         CustomEnchantment customEnchantment = new CustomEnchantment(data);
+        BuiltInRegistries.ENCHANTMENT.createIntrusiveHolder(customEnchantment);
         Registry.register(BuiltInRegistries.ENCHANTMENT, data.getId(), customEnchantment);
 
         CraftEnchantment craftEnchantment = new CraftEnchantment(customEnchantment);
