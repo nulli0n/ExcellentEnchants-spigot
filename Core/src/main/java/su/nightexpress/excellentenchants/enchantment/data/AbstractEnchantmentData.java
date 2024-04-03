@@ -160,10 +160,11 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
 
         //int costAdjust = Math.max(7, 42 - this.getMaxLevel() * 7);
         double costBase = Config.isVanillaDistribution() ? 45D : 30D;
+        double costMaxBase = Config.isVanillaDistribution() ? Rnd.get(6, 8) : 0;
         double costAdjust = costBase / this.getMaxLevel();
 
         this.setMinCost(Modifier.read(cfg, "Distribution." + DistributionWay.ENCHANTING.getPathName() + ".Min_Cost",
-            Modifier.add(1 - costAdjust, costAdjust, 1),
+            Modifier.add(1 - costAdjust, costAdjust - 1, 1),
             VANILLA_DISTRIBUTION_HEADER,
             "Sets min. **modified** level cost for this enchantment to be selected in enchanting table.",
             "Explanation: https://minecraft.wiki/w/Enchanting_mechanics#How_enchantments_are_chosen",
@@ -173,7 +174,7 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
         );
 
         this.setMaxCost(Modifier.read(cfg, "Distribution." + DistributionWay.ENCHANTING.getPathName() + ".Max_Cost",
-            Modifier.add(12 - costAdjust, costAdjust, 1),
+            Modifier.add(costMaxBase, costAdjust, 1),
             VANILLA_DISTRIBUTION_HEADER,
             "Sets max. **modified** level cost for this enchantment to be selected in enchanting table.",
             "Explanation: https://minecraft.wiki/w/Enchanting_mechanics#How_enchantments_are_chosen",
@@ -360,10 +361,7 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
 
     @Override
     public boolean checkItemCategory(@NotNull ItemStack item) {
-        ItemCategory[] itemCategories = this.getItemCategories();
-        if (itemCategories.length == 0) return false;
-
-        return Stream.of(itemCategories).anyMatch(itemCategory -> itemCategory.isIncluded(item));
+        return !this.hasItemCategory() || Stream.of(this.getItemCategories()).anyMatch(itemCategory -> itemCategory.isIncluded(item));
     }
 
     public int generateLevel() {

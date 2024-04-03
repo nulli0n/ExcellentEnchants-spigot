@@ -11,6 +11,7 @@ import su.nightexpress.excellentenchants.enchantment.impl.armor.FlameWalkerEncha
 import su.nightexpress.excellentenchants.enchantment.listener.EnchantAnvilListener;
 import su.nightexpress.excellentenchants.enchantment.listener.EnchantGenericListener;
 import su.nightexpress.excellentenchants.enchantment.listener.EnchantPopulationListener;
+import su.nightexpress.excellentenchants.enchantment.listener.EnchantVanillaListener;
 import su.nightexpress.excellentenchants.enchantment.menu.EnchantmentsListMenu;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
@@ -44,8 +45,12 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         this.addListener(new EnchantAnvilListener(this.plugin));
 
         if (Config.isCustomDistribution()) {
-            this.plugin.info("Using custom distribution system...");
+            this.plugin.info("Using custom distribution system. Applying patches...");
             this.addListener(new EnchantPopulationListener(this.plugin));
+        }
+        else {
+            this.plugin.info("Using vanilla distribution. Applying enchanting table patches...");
+            this.addListener(new EnchantVanillaListener(this.plugin));
         }
 
         this.addTask(this.plugin.createAsyncTask(this::displayProjectileTrails).setTicksInterval(Config.CORE_PROJECTILE_PARTICLE_INTERVAL.get()));

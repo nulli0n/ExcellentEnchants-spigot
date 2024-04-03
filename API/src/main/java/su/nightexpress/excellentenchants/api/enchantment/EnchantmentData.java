@@ -36,6 +36,10 @@ public interface EnchantmentData {
 
     boolean checkItemCategory(@NotNull ItemStack item);
 
+    default boolean hasItemCategory() {
+        return this.getItemCategories().length != 0;
+    }
+
     @NotNull DistributionOptions getDistributionOptions();
 
     @NotNull Rarity getRarity();

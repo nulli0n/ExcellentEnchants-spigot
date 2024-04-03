@@ -4,13 +4,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -26,22 +30,26 @@ import org.bukkit.craftbukkit.v1_19_R3.entity.CraftFishHook;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
+import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.Reflex;
+import su.nightexpress.nightcore.util.random.Rnd;
 
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Set;
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class V1_19_R3 implements EnchantNMS {
 
@@ -67,6 +75,47 @@ public class V1_19_R3 implements EnchantNMS {
         CraftEnchantment craftEnchantment = new CraftEnchantment(customEnchantment);
         Enchantment.registerEnchantment(craftEnchantment);
         data.setEnchantment(craftEnchantment);
+    }
+
+    private static final Method GET_ENCHANTS_LIST = Reflex.getMethod(EnchantmentMenu.class, "a", net.minecraft.world.item.ItemStack.class, Integer.TYPE, Integer.TYPE);
+
+    @SuppressWarnings("unchecked")
+    @NotNull
+    @Override
+    public Map<Integer, Map<Enchantment, Integer>> getEnchantLists(@NotNull Inventory inventory, @NotNull ItemStack bukkitItem) {
+        Map<Integer, Map<Enchantment, Integer>> map = new HashMap<>();
+
+        // Returns SimpleContainer class assigned to 'enchantSlots' field.
+        Container container = ((CraftInventory) inventory).getInventory();
+
+        // Get parent (real EnchantmentMenu) object from SimpleContainer obtained above.
+        EnchantmentMenu enchantmentMenu = (EnchantmentMenu) Reflex.getFieldValue(container, "this$0");
+
+        net.minecraft.world.item.ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
+
+        for (int button = 0; button < 3; button++) {
+            int cost = enchantmentMenu.costs[button];
+            List<EnchantmentInstance> list = (List<EnchantmentInstance>) Reflex.invokeMethod(GET_ENCHANTS_LIST, enchantmentMenu, itemStack, button, cost);
+
+            Map<Enchantment, Integer> enchantments = new HashMap<>();
+
+            if (list != null && !list.isEmpty()) {
+                EnchantmentInstance random = Rnd.get(list);
+                enchantmentMenu.enchantClue[button] = BuiltInRegistries.ENCHANTMENT.getId(random.enchantment);
+                enchantmentMenu.levelClue[button] = random.level;
+
+                for (EnchantmentInstance instance : list) {
+                    ResourceLocation location = BuiltInRegistries.ENCHANTMENT.getKey(instance.enchantment);
+                    if (location == null) continue;
+
+                    enchantments.put(BukkitThing.getEnchantment(CraftNamespacedKey.fromMinecraft(location).getKey()), instance.level);
+                }
+            }
+
+            map.put(button, enchantments);
+        }
+
+        return map;
     }
 
     @Override

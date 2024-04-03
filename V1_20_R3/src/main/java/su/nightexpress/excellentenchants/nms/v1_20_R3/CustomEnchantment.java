@@ -11,6 +11,7 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftEquipmentSlot;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftNamespacedKey;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.api.EnchantingBridge;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.api.enchantment.distribution.VanillaOptions;
 
@@ -66,11 +67,17 @@ public class CustomEnchantment extends Enchantment {
 
     @Override
     public boolean canEnchant(ItemStack item) {
-        org.bukkit.inventory.ItemStack bukkitStack = CraftItemStack.asBukkitCopy(item);
-        if (this.enchantmentData.checkEnchantCategory(bukkitStack)) return true;
-        if (this.enchantmentData.checkItemCategory(bukkitStack)) return true;
+        if (!super.canEnchant(item)) return false;
 
-        return super.canEnchant(item);
+        return this.canEnchant(CraftItemStack.asBukkitCopy(item));
+    }
+
+    public boolean canEnchant(@NotNull org.bukkit.inventory.ItemStack bukkitItem) {
+        if (!this.enchantmentData.hasItemCategory()) {
+            if (this.enchantmentData.checkEnchantCategory(bukkitItem)) return true;
+        }
+
+        return this.enchantmentData.checkItemCategory(bukkitItem);
     }
 
     @Override
@@ -90,6 +97,11 @@ public class CustomEnchantment extends Enchantment {
 
     @Override
     public boolean isDiscoverable() {
+        org.bukkit.inventory.ItemStack bukkitItem = EnchantingBridge.getEnchantingItem();
+        if (bukkitItem != null && !this.canEnchant(bukkitItem)) {
+            return false;
+        }
+
         return this.vanillaOptions != null && this.vanillaOptions.isDiscoverable();
     }
 
