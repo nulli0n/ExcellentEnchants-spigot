@@ -51,6 +51,11 @@ public class Config {
         "[Default is true]"
     );
 
+    public static final ConfigValue<Integer> CORE_ITEM_ENCHANT_LIMIT = ConfigValue.create("Core.Item_Enchantments_Limit",
+        3,
+        "Sets max. amount of custom enchantments per item.",
+        "[Default is 3]");
+
     public static final ConfigValue<Boolean> CORE_SWORD_ENCHANTS_TO_AXES = ConfigValue.create("Core.Sword_Enchants_To_Axes",
         true,
         "Sets whether or not Sword enchantments can be applied on Axes.",

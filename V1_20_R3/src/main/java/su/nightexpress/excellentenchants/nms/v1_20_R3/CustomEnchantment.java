@@ -73,6 +73,8 @@ public class CustomEnchantment extends Enchantment {
     }
 
     public boolean canEnchant(@NotNull org.bukkit.inventory.ItemStack bukkitItem) {
+        if (!this.enchantmentData.checkEnchantLimit(bukkitItem)) return false;
+
         if (!this.enchantmentData.hasItemCategory()) {
             if (this.enchantmentData.checkEnchantCategory(bukkitItem)) return true;
         }

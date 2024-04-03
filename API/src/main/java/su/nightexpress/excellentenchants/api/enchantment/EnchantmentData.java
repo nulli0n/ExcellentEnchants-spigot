@@ -32,6 +32,8 @@ public interface EnchantmentData {
 
     boolean isAvailableToUse(@NotNull World world);
 
+    boolean checkEnchantLimit(@NotNull ItemStack item);
+
     boolean checkEnchantCategory(@NotNull ItemStack item);
 
     boolean checkItemCategory(@NotNull ItemStack item);

@@ -344,6 +344,14 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
     }
 
     @Override
+    public boolean checkEnchantLimit(@NotNull ItemStack item) {
+        int limit = Config.CORE_ITEM_ENCHANT_LIMIT.get();
+        int has = EnchantUtils.countCustomEnchantments(item);
+
+        return has < limit;
+    }
+
+    @Override
     public final boolean checkEnchantCategory(@NotNull ItemStack item) {
         EnchantmentTarget category = this.getCategory();
 
