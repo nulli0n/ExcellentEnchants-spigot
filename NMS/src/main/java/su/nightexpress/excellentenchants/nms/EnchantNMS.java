@@ -8,6 +8,7 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,7 @@ public interface EnchantNMS {
 
     void sendAttackPacket(@NotNull Player player, int id);
 
-    void retrieveHook(@NotNull FishHook hook, @NotNull ItemStack item);
+    void retrieveHook(@NotNull FishHook hook, @NotNull ItemStack item, @NotNull EquipmentSlot slot);
 
     @NotNull Map<Integer, Map<Enchantment, Integer>> getEnchantLists(@NotNull Inventory inventory, @NotNull ItemStack bukkitItem);
 

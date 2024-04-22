@@ -207,6 +207,18 @@ public class EnchantUtils {
         return null;
     }
 
+    @Nullable
+    public static EquipmentSlot getItemHand(@NotNull Player player, @NotNull Material material) {
+        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HAND, EquipmentSlot.OFF_HAND}) {
+            ItemStack itemStack = player.getInventory().getItem(slot);
+            if (itemStack != null && itemStack.getType() == material) {
+                return slot;
+            }
+        }
+
+        return null;
+    }
+
     @NotNull
     public static Map<Enchantment, Integer> getEnchantments(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();

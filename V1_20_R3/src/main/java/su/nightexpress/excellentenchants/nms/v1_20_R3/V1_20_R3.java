@@ -40,6 +40,7 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -120,13 +121,64 @@ public class V1_20_R3 implements EnchantNMS {
         ServerPlayer entity = craftPlayer.getHandle();
         ClientboundAnimatePacket packet = new ClientboundAnimatePacket(entity, id);
         craftPlayer.getHandle().connection.send(packet);
+
+        player.spigot().sendMessage();
+    }
+
+    /*public ItemStack setItemLore(@NotNull ItemStack item, @NotNull List<String> lore) {
+        lore.add("<translate>enchantment.level.5</translate>");
+
+        CraftItemStack craftItem = ensureCraftItemStack(item);
+        net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(craftItem);
+
+        CompoundTag tag = nmsItem.getTag() == null ? new CompoundTag() : nmsItem.getTag();
+        if (!tag.contains(net.minecraft.world.item.ItemStack.TAG_DISPLAY)) {
+            tag.put(net.minecraft.world.item.ItemStack.TAG_DISPLAY, new CompoundTag());
+        }
+
+        CompoundTag displayTag = tag.getCompound(net.minecraft.world.item.ItemStack.TAG_DISPLAY);
+        ListTag loreTag = new ListTag();
+        for (int index = 0; index < lore.size(); index++) {
+            String text = lore.get(index);
+            System.out.println("text = " + text);
+            String json = ComponentSerializer.toString(NightMessage.create(text).parseIfAbsent());
+            System.out.println("json = " + json);
+
+            Component component = CraftChatMessage.fromJSON(json);
+            System.out.println("component = " + component);
+            String fromComponent = CraftChatMessage.toJSON(component);
+            System.out.println("fromComponent = " + fromComponent);
+
+
+            loreTag.add(index, StringTag.valueOf(fromComponent));
+        }
+
+        displayTag.put(net.minecraft.world.item.ItemStack.TAG_LORE, loreTag);
+        return CraftItemStack.asBukkitCopy(nmsItem);
+    }*/
+
+    private CraftItemStack ensureCraftItemStack(ItemStack item) {
+        return item instanceof CraftItemStack craftItem ? craftItem : CraftItemStack.asCraftCopy(item);
     }
 
     @Override
-    public void retrieveHook(@NotNull FishHook hook, @NotNull ItemStack item) {
+    public void retrieveHook(@NotNull FishHook hook, @NotNull ItemStack item, @NotNull EquipmentSlot slot) {
         CraftFishHook craftFishHook = (CraftFishHook) hook;
         FishingHook handle = craftFishHook.getHandle();
-        handle.retrieve(CraftItemStack.asNMSCopy(item));
+
+        net.minecraft.world.entity.player.Player owner = handle.getPlayerOwner();
+        if (owner == null) return;
+
+        int result = handle.retrieve(CraftItemStack.asNMSCopy(item));
+
+        net.minecraft.world.entity.EquipmentSlot hand = slot == EquipmentSlot.HAND ? net.minecraft.world.entity.EquipmentSlot.MAINHAND : net.minecraft.world.entity.EquipmentSlot.OFFHAND;
+
+        net.minecraft.world.item.ItemStack itemStack = owner.getItemBySlot(hand);
+        if (itemStack == null) return;
+
+        itemStack.hurtAndBreak(result, handle.getPlayerOwner(), player -> {
+            player.broadcastBreakEvent(hand);
+        });
     }
 
     /*@Override

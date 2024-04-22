@@ -17,6 +17,7 @@ public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
     public static final String GENERIC_ITEM        = "%item%";
     public static final String GENERIC_LEVEL       = "%level%";
     public static final String GENERIC_AMOUNT      = "%amount%";
+    public static final String GENERIC_MODIFIER = "%modifier%";
     public static final String GENERIC_DESCRIPTION = "%description%";
     public static final String GENERIC_ENCHANT     = "%enchant%";
     public static final String GENERIC_RADIUS      = "%radius%";

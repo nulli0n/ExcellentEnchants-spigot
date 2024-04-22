@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.registry.wrapper;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -18,7 +19,6 @@ import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantedProjectile;
-import su.nightexpress.nightcore.util.Version;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -352,9 +352,7 @@ public class DataGathers {
         @NotNull
         @Override
         public EquipmentSlot[] getEnchantSlots(@NotNull PlayerFishEvent event) {
-            if (Version.isBehind(Version.V1_19_R3)) return new EquipmentSlot[] {EquipmentSlot.HAND};
-
-            return event.getHand() == null ? new EquipmentSlot[] {EquipmentSlot.HAND} : new EquipmentSlot[]{event.getHand()};
+            return event.getHand() == null ? new EquipmentSlot[] {EnchantUtils.getItemHand(event.getPlayer(), Material.FISHING_ROD)} : new EquipmentSlot[]{event.getHand()};
         }
 
         @Override

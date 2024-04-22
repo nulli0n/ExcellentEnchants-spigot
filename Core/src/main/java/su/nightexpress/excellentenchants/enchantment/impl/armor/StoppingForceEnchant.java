@@ -30,7 +30,7 @@ public class StoppingForceEnchant extends AbstractEnchantmentData implements Cha
 
     public StoppingForceEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to resist knockback in combat by " + GENERIC_AMOUNT + "%.");
+        this.setDescription(ENCHANTMENT_CHANCE + "% chance to get only " + GENERIC_AMOUNT + "% of knockback in combat.");
         this.setMaxLevel(3);
         this.setRarity(Rarity.UNCOMMON);
     }

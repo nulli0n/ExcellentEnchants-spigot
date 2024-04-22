@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.nightcore.util.text.NightMessage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -105,7 +106,7 @@ public class ProtocolHook {
         }
         enchants.forEach((enchant, level) -> {
             int charges = enchant.getCharges(meta);
-            lore.add(0, enchant.getNameFormatted(level, charges));
+            lore.add(0, NightMessage.asLegacy(enchant.getNameFormatted(level, charges)));
         });
 
         meta.setLore(lore);

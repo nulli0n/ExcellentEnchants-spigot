@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -40,6 +41,7 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -127,10 +129,23 @@ public class V1_20_R2 implements EnchantNMS {
     }
 
     @Override
-    public void retrieveHook(@NotNull FishHook hook, @NotNull ItemStack item) {
+    public void retrieveHook(@NotNull FishHook hook, @NotNull ItemStack item, @NotNull EquipmentSlot slot) {
         CraftFishHook craftFishHook = (CraftFishHook) hook;
         FishingHook handle = craftFishHook.getHandle();
-        handle.retrieve(CraftItemStack.asNMSCopy(item));
+
+        net.minecraft.world.entity.player.Player owner = handle.getPlayerOwner();
+        if (owner == null) return;
+
+        int result = handle.retrieve(CraftItemStack.asNMSCopy(item));
+
+        net.minecraft.world.entity.EquipmentSlot hand = slot == EquipmentSlot.HAND ? net.minecraft.world.entity.EquipmentSlot.MAINHAND : net.minecraft.world.entity.EquipmentSlot.OFFHAND;
+
+        net.minecraft.world.item.ItemStack itemStack = owner.getItemBySlot(hand);
+        if (itemStack == null) return;
+
+        itemStack.hurtAndBreak(result, handle.getPlayerOwner(), player -> {
+            player.broadcastBreakEvent(hand);
+        });
     }
 
     @NotNull

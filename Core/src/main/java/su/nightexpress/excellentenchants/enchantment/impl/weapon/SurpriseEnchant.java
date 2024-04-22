@@ -24,6 +24,7 @@ import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
 import su.nightexpress.excellentenchants.enchantment.data.PotionSettingsImpl;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.BukkitThing;
+import su.nightexpress.nightcore.util.Version;
 import su.nightexpress.nightcore.util.random.Rnd;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
@@ -43,6 +44,15 @@ public class SurpriseEnchant extends AbstractEnchantmentData implements ChanceDa
         this.setDescription(ENCHANTMENT_CHANCE + "% chance to apply random potion effect to enemy on hit.");
         this.setMaxLevel(3);
         this.setRarity(Rarity.RARE);
+    }
+
+    @Override
+    public boolean checkServerRequirements() {
+        if (Version.isBehind(Version.V1_20_R2)) {
+            this.error("Enchantment is available for 1.20.2+ only.");
+            return false;
+        }
+        return true;
     }
 
     @Override

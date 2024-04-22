@@ -1,23 +1,23 @@
 package su.nightexpress.excellentenchants.enchantment.listener;
 
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.block.Chest;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.enchantment.EnchantItemEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantRecipe;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
@@ -106,5 +106,34 @@ public class EnchantGenericListener extends AbstractListener<EnchantsPlugin> {
 
             inventory.setItem(0, result);
         });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEnchantDisplayUpdateVillagerAcquire(VillagerAcquireTradeEvent event) {
+        if (Config.isCustomDistribution()) return;
+
+        MerchantRecipe origin = event.getRecipe();
+        ItemStack result = origin.getResult();
+        if (!EnchantUtils.isEnchantable(result)) return;
+
+        EnchantUtils.updateDisplay(result);
+
+        event.setRecipe(origin);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEnchantDisplayUpdateLoot(LootGenerateEvent event) {
+        if (Config.isCustomDistribution()) return;
+
+        Entity entity = event.getEntity();
+        InventoryHolder holder = event.getInventoryHolder();
+
+        if (entity instanceof Minecart || holder instanceof Chest) {
+            event.getLoot().forEach(item -> {
+                if (item != null && EnchantUtils.isEnchantable(item)) {
+                    EnchantUtils.updateDisplay(item);
+                }
+            });
+        }
     }
 }

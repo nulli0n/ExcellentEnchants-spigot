@@ -27,7 +27,7 @@ public class WisdomEnchant extends AbstractEnchantmentData implements DeathEncha
 
     public WisdomEnchant(@NotNull EnchantsPlugin plugin, File file) {
         super(plugin, file);
-        this.setDescription("Increases XP dropped from mobs by " + GENERIC_AMOUNT + "%.");
+        this.setDescription("Mobs drops x" + GENERIC_MODIFIER + " more XP.");
         this.setMaxLevel(5);
         this.setRarity(Rarity.UNCOMMON);
     }
@@ -39,6 +39,7 @@ public class WisdomEnchant extends AbstractEnchantmentData implements DeathEncha
             "Exp modifier value. The original exp amount will be multiplied on this value.");
 
         this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getXPModifier(level) * 100D - 100D));
+        this.addPlaceholder(GENERIC_MODIFIER, level -> NumberUtil.format(this.getXPModifier(level)));
     }
 
     public final double getXPModifier(int level) {
@@ -53,10 +54,10 @@ public class WisdomEnchant extends AbstractEnchantmentData implements DeathEncha
 
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, ItemStack weapon, int level) {
-        double expModifier = this.getXPModifier(level);
-        double expFinal = Math.ceil((double) event.getDroppedExp() * expModifier);
+        double xpModifier = this.getXPModifier(level);
+        double xpFinal = Math.ceil((double) event.getDroppedExp() * xpModifier);
 
-        event.setDroppedExp((int) expFinal);
+        event.setDroppedExp((int) xpFinal);
         return true;
     }
 
