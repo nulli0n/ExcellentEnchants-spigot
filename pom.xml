@@ -7,20 +7,21 @@
     <groupId>su.nightexpress.excellentenchants</groupId>
     <artifactId>ExcellentEnchants</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.4</version>
+    <version>4.0.5</version>
     <modules>
+        <module>API</module>
         <module>Core</module>
         <module>NMS</module>
         <module>V1_19_R3</module>
         <module>V1_20_R1</module>
         <module>V1_20_R2</module>
         <module>V1_20_R3</module>
-        <module>API</module>
+        <module>MC_1_20_6</module>
     </modules>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -28,7 +29,7 @@
         <dependency>
             <groupId>su.nightexpress.nightcore</groupId>
             <artifactId>nightcore</artifactId>
-            <version>2.5.1</version>
+            <version>2.6.1</version>
         </dependency>
     </dependencies>
 

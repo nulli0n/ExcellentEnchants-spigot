@@ -75,7 +75,7 @@ public class RarityBookCommand extends AbstractCommand<EnchantsPlugin> {
 
         int level = result.getInt(3, -1);
         if (level < 1) {
-            level = Rnd.get(enchantmentData.getMinLevel(), enchantmentData.getMaxLevel());
+            level = Rnd.get(1, enchantmentData.getMaxLevel());
         }
 
         ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);

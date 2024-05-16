@@ -302,7 +302,7 @@ public class DataGathers {
         @NotNull
         @Override
         public EquipmentSlot[] getEnchantSlots(@NotNull EntityDeathEvent event) {
-            return EquipmentSlot.values();
+            return EnchantUtils.EQUIPMENT_SLOTS;
         }
 
         @Override
@@ -327,7 +327,7 @@ public class DataGathers {
         @NotNull
         @Override
         public EquipmentSlot[] getEnchantSlots(@NotNull EntityResurrectEvent event) {
-            return EquipmentSlot.values();
+            return EnchantUtils.EQUIPMENT_SLOTS;
         }
 
         @Override

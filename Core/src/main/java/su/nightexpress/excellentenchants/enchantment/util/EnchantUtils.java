@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 public class EnchantUtils {
 
+    public static final EquipmentSlot[] EQUIPMENT_SLOTS = {EquipmentSlot.HAND, EquipmentSlot.OFF_HAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
     private static final Map<UUID, EnchantedProjectile> ENCHANTED_PROJECTILE_MAP = new ConcurrentHashMap<>();
 
     private static boolean busyBreak = false;
@@ -241,6 +242,10 @@ public class EnchantUtils {
         return getLevel(item, enchantment) > 0;
     }
 
+    public static boolean hasMaximumEnchants(@NotNull ItemStack item) {
+        return countCustomEnchantments(item) >= Config.CORE_ITEM_ENCHANT_LIMIT.get();
+    }
+
     public static int getLevel(@NotNull ItemStack item, @NotNull Enchantment enchant) {
         return getEnchantments(item).getOrDefault(enchant, 0);
     }
@@ -289,7 +294,7 @@ public class EnchantUtils {
 
     @NotNull
     public static Map<EquipmentSlot, ItemStack> getEnchantedEquipment(@NotNull LivingEntity entity) {
-        return getEnchantedEquipment(entity, EquipmentSlot.values());
+        return getEnchantedEquipment(entity, EQUIPMENT_SLOTS);
     }
 
     @NotNull
@@ -317,7 +322,7 @@ public class EnchantUtils {
     @NotNull
     public static <T extends EnchantmentData> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,
                                                                                        @NotNull Class<T> clazz) {
-        return getEquipped(entity, clazz, EquipmentSlot.values());
+        return getEquipped(entity, clazz, EQUIPMENT_SLOTS);
     }
 
     @NotNull

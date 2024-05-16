@@ -215,7 +215,7 @@ public class EnchantPopulator {
 
             // Level generation failed.
             int level = this.getLevelGenerator().apply(enchantmentData, distribution);
-            if (level < enchantmentData.getMinLevel()) {
+            if (level < 1) {
                 this.purge(rarity, enchantmentData);
                 continue;
             }

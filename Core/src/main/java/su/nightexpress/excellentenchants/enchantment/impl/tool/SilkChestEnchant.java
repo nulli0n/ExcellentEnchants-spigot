@@ -36,6 +36,7 @@ import su.nightexpress.nightcore.util.Plugins;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 public class SilkChestEnchant extends AbstractEnchantmentData implements BlockDropEnchant, SimpeListener {
@@ -123,9 +124,12 @@ public class SilkChestEnchant extends AbstractEnchantmentData implements BlockDr
 
         if (!(state instanceof Chest chest)) return false;
 
-        // Добавляем в сундук обратно предметы из дроп листа, кроме самого сундука.
-        event.getItems().removeIf(drop -> drop.getItemStack().getType() == state.getType() && drop.getItemStack().getAmount() == 1);
+        // Remove original chest from drops to prevent duplication.
+        AtomicBoolean originRemoved = new AtomicBoolean(false);
+        event.getItems().removeIf(drop -> drop.getItemStack().getType() == state.getType() && drop.getItemStack().getAmount() == 1 && !originRemoved.getAndSet(true));
+        // Add chest content back to the chest.
         chest.getBlockInventory().addItem(event.getItems().stream().map(Item::getItemStack).toList().toArray(new ItemStack[0]));
+        // Drop nothing of chest content.
         event.getItems().clear();
 
         if (chest.getBlockInventory().isEmpty()) {

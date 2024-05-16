@@ -106,6 +106,11 @@ public class ScavengerEnchant extends AbstractEnchantmentData implements ChanceD
         }
     }
 
+    @Override
+    public void clear() {
+        this.lootTables.clear();
+    }
+
     @NotNull
     @Override
     public ChanceSettings getChanceSettings() {

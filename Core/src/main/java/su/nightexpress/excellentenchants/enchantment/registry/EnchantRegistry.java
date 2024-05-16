@@ -68,7 +68,10 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
 
         // Prevent to register enchantments during the runtime.
         if (this.isLocked) {
-            BY_ID.values().forEach(this::load);
+            getRegistered().forEach(data -> {
+                data.clear();
+                this.load(data);
+            });
             return;
         }
 
@@ -165,13 +168,14 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
         this.register(RestoreEnchant.ID, file -> new RestoreEnchant(plugin, file));
 
         this.plugin.getEnchantNMS().freezeRegistry();
-        this.plugin.info("Enchantments Registered: " + EnchantRegistry.getRegistered().size());
+        this.plugin.info("Enchantments Registered: " + BY_ID.size());
         this.isLocked = true;
     }
 
     @Override
     protected void onShutdown() {
         if (!isLocked) {
+            getRegistered().forEach(EnchantmentData::clear);
             ENCHANTS_MAP.clear();
         }
     }
@@ -231,8 +235,8 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
         this.plugin.info("Registered enchantment: " + enchantmentData.getId());
     }
 
-    private void load(@NotNull EnchantmentData enchant) {
-        enchant.load();
+    private void load(@NotNull EnchantmentData enchantmentData) {
+        enchantmentData.load();
     }
 
     @NotNull
@@ -278,6 +282,6 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
 
     @NotNull
     public static Collection<EnchantmentData> getRegistered() {
-        return BY_ID.values();
+        return new HashSet<>(BY_ID.values());
     }
 }

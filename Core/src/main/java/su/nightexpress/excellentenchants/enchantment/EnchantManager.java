@@ -60,12 +60,13 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         }
     }
 
+    @Override
     protected void onShutdown() {
         if (this.enchantmentsListMenu != null) this.enchantmentsListMenu.clear();
 
-        if (EnchantRegistry.isRegistered(FlameWalkerEnchant.ID)) {
+        /*if (EnchantRegistry.isRegistered(FlameWalkerEnchant.ID)) {
             FlameWalkerEnchant.clear();
-        }
+        }*/
     }
 
     @NotNull

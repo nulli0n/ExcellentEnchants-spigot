@@ -41,12 +41,16 @@ public class SurvivalistEnchant extends AbstractEnchantmentData implements Fishi
     protected void loadAdditional(@NotNull FileConfig config) {
         this.chanceSettings = ChanceSettingsImpl.create(config);
 
-        this.cookingRecipes.clear();
         this.plugin.getServer().recipeIterator().forEachRemaining(recipe -> {
             if (recipe instanceof CookingRecipe<?> cookingRecipe && cookingRecipe.getInput().getType().isItem()) {
                 this.cookingRecipes.add(cookingRecipe);
             }
         });
+    }
+
+    @Override
+    public void clear() {
+        this.cookingRecipes.clear();
     }
 
     @NotNull

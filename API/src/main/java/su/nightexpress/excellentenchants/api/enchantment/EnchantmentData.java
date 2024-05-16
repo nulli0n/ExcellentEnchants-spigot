@@ -20,6 +20,10 @@ import java.util.Set;
 
 public interface EnchantmentData {
 
+    default void clear() {
+
+    }
+
     @NotNull PlaceholderMap getPlaceholders(int level);
 
     @NotNull FileConfig getConfig();
@@ -81,13 +85,7 @@ public interface EnchantmentData {
 
     @NotNull Set<String> getConflicts();
 
-    int getMinLevel();
-
     int getMaxLevel();
-
-    //int getMaxMergeLevel();
-
-    //int getAnvilMergeCost(int level);
 
     int getMinCost(int level);
 
@@ -153,23 +151,19 @@ public interface EnchantmentData {
 
     void setTreasure(boolean treasure);
 
-    void setStartLevel(int levelMin);
-
     void setMaxLevel(int levelMax);
 
-    //void setMaxMergeLevel(int maxMergeLevel);
+    @NotNull Cost getMinCost();
 
-    @NotNull Modifier getMinCost();
+    void setMinCost(@NotNull Cost minCost);
 
-    void setMinCost(@NotNull Modifier minCost);
+    @NotNull Cost getMaxCost();
 
-    @NotNull Modifier getMaxCost();
+    void setMaxCost(@NotNull Cost maxCost);
 
-    void setMaxCost(@NotNull Modifier maxCost);
+    int getAnvilCost();
 
-    //@NotNull Modifier getAnvilMergeCost();
-
-    //void setAnvilMergeCost(@NotNull Modifier anvilMergeCost);
+    void setAnvilCost(int anvilCost);
 
     default void setConflicts(@NotNull String... conflicts) {
         this.setConflicts(Lists.newSet(conflicts));

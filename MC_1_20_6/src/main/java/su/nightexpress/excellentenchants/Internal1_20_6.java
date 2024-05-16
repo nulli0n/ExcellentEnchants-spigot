@@ -1,4 +1,4 @@
-package su.nightexpress.excellentenchants.nms.v1_20_R3;
+package su.nightexpress.excellentenchants;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -9,14 +9,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -26,17 +24,17 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlockType;
-import org.bukkit.craftbukkit.v1_20_R3.enchantments.CraftEnchantment;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftFishHook;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R3.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_20_R4.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R4.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R4.block.CraftBlockType;
+import org.bukkit.craftbukkit.v1_20_R4.enchantments.CraftEnchantment;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftFishHook;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R4.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R4.util.CraftNamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
@@ -55,7 +53,7 @@ import su.nightexpress.nightcore.util.random.Rnd;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class V1_20_R3 implements EnchantNMS {
+public class Internal1_20_6 implements EnchantNMS {
 
     @Override
     public void unfreezeRegistry() {
@@ -69,7 +67,7 @@ public class V1_20_R3 implements EnchantNMS {
     }
 
     public void registerEnchantment(@NotNull EnchantmentData data) {
-        CustomEnchantment enchantment = new CustomEnchantment(data);
+        CustomEnchantment enchantment = CustomEnchantment.from(data);
         Registry.register(BuiltInRegistries.ENCHANTMENT, data.getId(), enchantment);
 
         Enchantment bukkitEnchant = CraftEnchantment.minecraftToBukkit(enchantment);
@@ -123,6 +121,8 @@ public class V1_20_R3 implements EnchantNMS {
         ServerPlayer entity = craftPlayer.getHandle();
         ClientboundAnimatePacket packet = new ClientboundAnimatePacket(entity, id);
         craftPlayer.getHandle().connection.send(packet);
+
+        player.spigot().sendMessage();
     }
 
     /*@NotNull
@@ -160,21 +160,15 @@ public class V1_20_R3 implements EnchantNMS {
         net.minecraft.world.entity.player.Player owner = handle.getPlayerOwner();
         if (owner == null) return;
 
-        InteractionHand hand = slot == EquipmentSlot.HAND ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
-        Items.FISHING_ROD.use(owner.level(), owner, hand);
+        int result = handle.retrieve(CraftItemStack.asNMSCopy(item));
+
+        net.minecraft.world.entity.EquipmentSlot hand = slot == EquipmentSlot.HAND ? net.minecraft.world.entity.EquipmentSlot.MAINHAND : net.minecraft.world.entity.EquipmentSlot.OFFHAND;
+
+        net.minecraft.world.item.ItemStack itemStack = owner.getItemBySlot(hand);
+        if (itemStack == null) return;
+
+        itemStack.hurtAndBreak(result, handle.getPlayerOwner(), hand);
     }
-
-    /*@Override
-    @Nullable
-    public ItemStack getSpawnEgg(@NotNull LivingEntity entity) {
-        CraftLivingEntity craftLivingEntity = (CraftLivingEntity) entity;
-        net.minecraft.world.entity.LivingEntity livingEntity = craftLivingEntity.getHandle();
-
-        SpawnEggItem eggItem = SpawnEggItem.byId(livingEntity.getType());
-        if (eggItem == null) return null;
-
-        return CraftItemStack.asBukkitCopy(eggItem.getDefaultInstance());
-    }*/
 
     @NotNull
     @Override

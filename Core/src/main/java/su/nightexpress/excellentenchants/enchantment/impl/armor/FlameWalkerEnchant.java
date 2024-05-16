@@ -62,7 +62,8 @@ public class FlameWalkerEnchant extends AbstractEnchantmentData implements Gener
             "Sets up to how long (in seconds) blocks will stay before turn back to lava.");
     }
 
-    public static void clear() {
+    @Override
+    public void clear() {
         BLOCKS_TO_DESTROY.keySet().forEach(location -> location.getBlock().setType(Material.LAVA));
         BLOCKS_TO_DESTROY.clear();
     }

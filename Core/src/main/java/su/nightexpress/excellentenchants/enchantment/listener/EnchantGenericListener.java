@@ -116,9 +116,20 @@ public class EnchantGenericListener extends AbstractListener<EnchantsPlugin> {
         ItemStack result = origin.getResult();
         if (!EnchantUtils.isEnchantable(result)) return;
 
+        int uses = origin.getUses();
+        int maxUses = origin.getMaxUses();
+        boolean expReward = origin.hasExperienceReward();
+        int villagerExperience = origin.getVillagerExperience();
+        float priceMultiplier = origin.getPriceMultiplier();
+        int demand = origin.getDemand();
+        int specialPrice = origin.getSpecialPrice();
+
         EnchantUtils.updateDisplay(result);
 
-        event.setRecipe(origin);
+        MerchantRecipe recipe = new MerchantRecipe(result, uses, maxUses, expReward, villagerExperience,
+            priceMultiplier, demand, specialPrice);
+        recipe.setIngredients(origin.getIngredients());
+        event.setRecipe(recipe);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

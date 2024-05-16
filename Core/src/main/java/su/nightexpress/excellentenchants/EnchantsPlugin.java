@@ -110,6 +110,7 @@ public class EnchantsPlugin extends NightPlugin {
             case V1_20_R1 -> new V1_20_R1();
             case V1_20_R2 -> new V1_20_R2();
             case V1_20_R3 -> new V1_20_R3();
+            case MC_1_20_6 -> new Internal1_20_6();
             default -> null;
         };
         return this.enchantNMS != null;

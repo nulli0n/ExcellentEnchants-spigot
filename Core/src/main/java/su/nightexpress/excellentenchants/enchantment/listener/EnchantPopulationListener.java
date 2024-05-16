@@ -116,7 +116,7 @@ public class EnchantPopulationListener extends AbstractListener<EnchantsPlugin> 
             boolean isMythic = Plugins.isLoaded(HookPlugin.MYTHIC_MOBS) && MythicMobsHook.isMythicMob(entity);
             boolean doPopulation = Config.getDistributionWaySettings(DistributionWay.MOB_EQUIPMENT).isPresent() && !isMythic;
 
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
+            for (EquipmentSlot slot : EnchantUtils.EQUIPMENT_SLOTS) {
                 ItemStack item = equipment.getItem(slot);
                 if (EnchantUtils.isEnchantable(item)) {
                     if (doPopulation) {

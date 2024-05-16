@@ -31,11 +31,6 @@ public class CustomEnchantment extends Enchantment {
     }
 
     @Override
-    public int getMinLevel() {
-        return this.enchantmentData.getMinLevel();
-    }
-
-    @Override
     public int getMaxLevel() {
         return this.enchantmentData.getMaxLevel();
     }

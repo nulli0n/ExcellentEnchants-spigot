@@ -17,6 +17,7 @@ import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentDat
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.Lists;
 
 import java.io.File;
 import java.util.HashSet;
@@ -76,7 +77,7 @@ public class TunnelEnchant extends AbstractEnchantmentData implements BlockBreak
         if (block.getDrops(item).isEmpty()) return false;
 
 
-        final List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 10);
+        final List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(Lists.newSet(Material.AIR, Material.WATER, Material.LAVA), 10);
         if (lastTwoTargetBlocks.size() != 2 || !lastTwoTargetBlocks.get(1).getType().isOccluding()) {
             return false;
         }

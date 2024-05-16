@@ -79,6 +79,11 @@ public class TreasureHunterEnchant extends AbstractEnchantmentData implements Ch
         }
     }
 
+    @Override
+    public void clear() {
+        this.lootTables.clear();
+    }
+
     @NotNull
     @Override
     public ChanceSettings getChanceSettings() {

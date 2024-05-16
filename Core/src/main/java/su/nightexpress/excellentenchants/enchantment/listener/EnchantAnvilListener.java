@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.manager.AbstractListener;
@@ -95,6 +96,10 @@ public class EnchantAnvilListener extends AbstractListener<EnchantsPlugin> {
 
     private boolean handleCombine(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
         ItemStack merged = new ItemStack(result.getType().isAir() ? first : result);
+        if (EnchantUtils.countCustomEnchantments(merged) > Config.CORE_ITEM_ENCHANT_LIMIT.get()) {
+            event.setResult(null);
+            return false;
+        }
 
         Map<EnchantmentData, Integer> chargesMap = new HashMap<>();
         EnchantUtils.getCustomEnchantments(result).forEach((data, level) -> {

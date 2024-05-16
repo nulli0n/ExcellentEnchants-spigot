@@ -3,9 +3,7 @@ package su.nightexpress.excellentenchants.hook.impl;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.events.*;
 import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +27,15 @@ public class ProtocolHook {
         if (isRegistered) return;
 
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+        // Not worked :(
+        manager.addPacketListener(new PacketAdapter(plugin, PacketType.Login.Server.SUCCESS) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
+                PacketContainer packet = event.getPacket();
+                packet.getBooleans().write(0, false);
+            }
+        });
+
         manager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.SET_SLOT) {
             @Override
             public void onPacketSending(PacketEvent event) {

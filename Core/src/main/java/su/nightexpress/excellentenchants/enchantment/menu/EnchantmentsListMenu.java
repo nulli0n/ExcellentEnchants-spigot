@@ -153,12 +153,9 @@ public class EnchantmentsListMenu extends ConfigMenu<EnchantsPlugin> implements 
             ItemStack currentItem = event.getCurrentItem();
             if (currentItem == null) return;
 
-            int levelHas = PDCUtil.getInt(currentItem, this.keyLevel).orElse(0);
-            if (levelHas == 0) {
-                levelHas = enchantmentData.getMinLevel();
-            }
+            int levelHas = PDCUtil.getInt(currentItem, this.keyLevel).orElse(1);
             if (++levelHas > enchantmentData.getMaxLevel()) {
-                levelHas = enchantmentData.getMinLevel();
+                levelHas = 1;
             }
             currentItem = this.getEnchantIcon(enchantmentData, levelHas);
             PDCUtil.set(currentItem, this.keyLevel, levelHas);

@@ -27,6 +27,7 @@ import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.BukkitThing;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.LocationUtil;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 import su.nightexpress.nightcore.util.wrapper.UniSound;
@@ -44,7 +45,7 @@ public class SmelterEnchant extends AbstractEnchantmentData implements ChanceDat
     private boolean            disableOnCrouch;
     private ChanceSettingsImpl chanceSettings;
 
-    private final Set<Material> exemptedBlocks;
+    private final Set<Material>      exemptedItems;
     private final Set<FurnaceRecipe> recipes;
 
     public SmelterEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
@@ -57,18 +58,12 @@ public class SmelterEnchant extends AbstractEnchantmentData implements ChanceDat
             Enchantment.SILK_TOUCH.getKey().getKey()
         );
 
-        this.exemptedBlocks = new HashSet<>();
+        this.exemptedItems = new HashSet<>();
         this.recipes = new HashSet<>();
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.plugin.getServer().recipeIterator().forEachRemaining(recipe -> {
-            if (recipe instanceof FurnaceRecipe furnaceRecipe && furnaceRecipe.getInput().getType().isBlock()) {
-                this.recipes.add(furnaceRecipe);
-            }
-        });
-
         this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(10, 8, 1, 100));
 
         this.disableOnCrouch = ConfigValue.create("Settings.Disable_On_Crouch",
@@ -82,12 +77,26 @@ public class SmelterEnchant extends AbstractEnchantmentData implements ChanceDat
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html"
         ).read(config);
 
-        this.exemptedBlocks.addAll(ConfigValue.forSet("Settings.Exempted_Blocks",
+        this.exemptedItems.addAll(ConfigValue.forSet("Settings.Exempted_Blocks",
             BukkitThing::getMaterial,
-            (cfg, path, set) -> cfg.set(path, set.stream().map(material -> material.getKey().getKey()).toList()),
-            Set.of(Material.STONE),
-            "List of blocks that are immune to smelter effect."
+            (cfg, path, set) -> cfg.set(path, set.stream().map(BukkitThing::toString).toList()),
+            Lists.newSet(Material.COBBLESTONE),
+            "List of blocks / items that are immune to the Smelter effect."
         ).read(config));
+
+        this.plugin.getServer().recipeIterator().forEachRemaining(recipe -> {
+            if (!(recipe instanceof FurnaceRecipe furnaceRecipe)) return;
+
+            if (!this.exemptedItems.contains(furnaceRecipe.getInput().getType())) {
+                this.recipes.add(furnaceRecipe);
+            }
+        });
+    }
+
+    @Override
+    public void clear() {
+        this.recipes.clear();
+        this.exemptedItems.clear();
     }
 
     @NotNull
@@ -113,8 +122,7 @@ public class SmelterEnchant extends AbstractEnchantmentData implements ChanceDat
         if (this.disableOnCrouch && entity instanceof Player player && player.isSneaking()) return false;
 
         BlockState state = event.getBlockState();
-        if (state instanceof Container || this.exemptedBlocks.contains(state.getType())) return false;
-
+        if (state instanceof Container) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         List<ItemStack> smelts = new ArrayList<>();
@@ -122,14 +130,20 @@ public class SmelterEnchant extends AbstractEnchantmentData implements ChanceDat
             FurnaceRecipe recipe = this.recipes.stream().filter(rec -> rec.getInputChoice().test(drop.getItemStack())).findFirst().orElse(null);
             if (recipe == null) return false;
 
-            smelts.add(recipe.getResult());
+            // Copy amount of the origin drop item. Fixes Fortune compatibility and overall original drop amount.
+            // Hopefully furnaces will not require multiple input items in the future, otherwise we'll suck here :D
+            int amount = drop.getItemStack().getAmount();
+            ItemStack result = new ItemStack(recipe.getResult());
+            result.setAmount(amount);
+
+            smelts.add(result);
             return true;
         });
         if (smelts.isEmpty()) return false;
 
         smelts.forEach(itemStack -> this.plugin.populateResource(event, itemStack));
 
-        Block block = event.getBlockState().getBlock();
+        Block block = state.getBlock();
         if (this.hasVisualEffects()) {
             Location location = LocationUtil.getCenter(block.getLocation(), true);
             UniParticle.of(Particle.FLAME).play(location, 0.25, 0.05, 20);

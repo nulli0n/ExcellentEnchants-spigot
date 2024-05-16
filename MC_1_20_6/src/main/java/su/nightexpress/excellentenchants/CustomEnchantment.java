@@ -1,18 +1,21 @@
-package su.nightexpress.excellentenchants.nms.v1_19_R3;
+package su.nightexpress.excellentenchants;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_19_R3.CraftEquipmentSlot;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_20_R4.CraftEquipmentSlot;
+import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R4.util.CraftNamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.api.EnchantingBridge;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.distribution.VanillaOptions;
 
 public class CustomEnchantment extends Enchantment {
@@ -21,28 +24,27 @@ public class CustomEnchantment extends Enchantment {
 
     private VanillaOptions vanillaOptions;
 
-    public CustomEnchantment(@NotNull EnchantmentData enchantmentData) {
-        super(nmsRarity(enchantmentData), nmsCategory(enchantmentData), nmsSlots(enchantmentData));
+    @NotNull
+    public static CustomEnchantment from(@NotNull EnchantmentData enchantmentData) {
+        TagKey<Item> category = nmsCategory(enchantmentData);
+        int weight = enchantmentData.getRarity().getWeight();
+        int maxLevel = enchantmentData.getMaxLevel();
+        Cost minCost = new Cost(enchantmentData.getMinCost().base(), enchantmentData.getMinCost().perLevel());
+        Cost maxCost = new Cost(enchantmentData.getMaxCost().base(), enchantmentData.getMaxCost().perLevel());
+        int anvilCost = enchantmentData.getAnvilCost();
+        EquipmentSlot[] slots = nmsSlots(enchantmentData);
+
+        EnchantmentDefinition definition = Enchantment.definition(category, weight, maxLevel, minCost, maxCost, anvilCost, slots);
+        return new CustomEnchantment(enchantmentData, definition);
+    }
+
+    public CustomEnchantment(@NotNull EnchantmentData enchantmentData, @NotNull EnchantmentDefinition definition) {
+        super(definition);
         this.enchantmentData = enchantmentData;
 
         if (enchantmentData.getDistributionOptions() instanceof VanillaOptions options) {
             this.vanillaOptions = options;
         }
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return this.enchantmentData.getMaxLevel();
-    }
-
-    @Override
-    public int getMinCost(int level) {
-        return this.enchantmentData.getMinCost(level);
-    }
-
-    @Override
-    public int getMaxCost(int level) {
-        return this.enchantmentData.getMaxCost(level);
     }
 
     @Override
@@ -112,22 +114,22 @@ public class CustomEnchantment extends Enchantment {
     }
 
     @NotNull
-    public static EnchantmentCategory nmsCategory(@NotNull EnchantmentData data) {
+    public static TagKey<Item> nmsCategory(@NotNull EnchantmentData data) {
         return switch (data.getCategory()) {
-            case WEAPON -> EnchantmentCategory.WEAPON;
-            case TOOL -> EnchantmentCategory.DIGGER;
-            case ARMOR -> EnchantmentCategory.ARMOR;
-            case BOW -> EnchantmentCategory.BOW;
-            case TRIDENT -> EnchantmentCategory.TRIDENT;
-            case CROSSBOW -> EnchantmentCategory.CROSSBOW;
-            case WEARABLE -> EnchantmentCategory.WEARABLE;
-            case BREAKABLE -> EnchantmentCategory.BREAKABLE;
-            case ARMOR_FEET -> EnchantmentCategory.ARMOR_FEET;
-            case ARMOR_HEAD -> EnchantmentCategory.ARMOR_HEAD;
-            case ARMOR_LEGS -> EnchantmentCategory.ARMOR_LEGS;
-            case ARMOR_TORSO -> EnchantmentCategory.ARMOR_CHEST;
-            case VANISHABLE -> EnchantmentCategory.VANISHABLE;
-            case FISHING_ROD -> EnchantmentCategory.FISHING_ROD;
+            case WEAPON -> ItemTags.WEAPON_ENCHANTABLE;
+            case TOOL -> ItemTags.MINING_ENCHANTABLE;
+            case ARMOR -> ItemTags.ARMOR_ENCHANTABLE;
+            case BOW -> ItemTags.BOW_ENCHANTABLE;
+            case TRIDENT -> ItemTags.TRIDENT_ENCHANTABLE;
+            case CROSSBOW -> ItemTags.CROSSBOW_ENCHANTABLE;
+            case WEARABLE -> ItemTags.EQUIPPABLE_ENCHANTABLE;
+            case BREAKABLE -> ItemTags.DURABILITY_ENCHANTABLE;
+            case ARMOR_FEET -> ItemTags.FOOT_ARMOR_ENCHANTABLE;
+            case ARMOR_HEAD -> ItemTags.HEAD_ARMOR_ENCHANTABLE;
+            case ARMOR_LEGS -> ItemTags.LEG_ARMOR_ENCHANTABLE;
+            case ARMOR_TORSO -> ItemTags.CHEST_ARMOR_ENCHANTABLE;
+            case VANISHABLE -> ItemTags.VANISHING_ENCHANTABLE;
+            case FISHING_ROD -> ItemTags.FISHING_ENCHANTABLE;
             default -> throw new IllegalStateException("Unexpected value: " + data.getCategory());
         };
     }

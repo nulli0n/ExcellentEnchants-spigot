@@ -1,13 +1,72 @@
-# Tranlsated by @qsefthuopq
-# Last updated:2021-03-15
 Command:
+  List:
+    Desc: '自定义附魔列表.'
+    Usage: '[player]'
+    DoneOthers: <light_gray>为玩家<light_yellow>%player_name%</light_yellow>打开GUI.</light_gray>
+  GetFuel:
+    Desc: '获得充能物品.'
+    Usage: <enchant> [amount]
+    Done: <light_gray>你获得了<light_yellow>x%amount% %name%</light_yellow>.</light_gray>
   Enchant:
-    Usage: <附魔名> <等级>
-    Desc: 附魔你手中的物品。
-    Done: '&a附魔成功！'
+    Usage: <enchant> <level> [player] [slot]
+    Desc: '附魔手上的物品.'
+    Done:
+      Self: <light_gray><light_yellow>%item%</light_yellow>的附魔是<light_yellow>%enchant% %level%</light_yellow>!</light_gray>
+      Others: <light_gray><light_yellow>%player_display_name%</light_yellow>的<light_yellow>%item%</light_yellow>的附魔是<light_yellow>%enchant% %level%</light_yellow>!</light_gray>
+    Error:
+      NoItem: <red>没有要附魔的物品!</red>
   Book:
-    Usage: <玩家> <附魔名> <等级>
-    Desc: 给予自定义附魔书。
-    Done: 已给予&6%player%&6%enchant%&7附魔书。
+    Usage: <player> <enchant> <level>
+    Desc: '给予自定义附魔书.'
+    Done: <light_gray>将<light_yellow>%enchant%</light_yellow>附魔书给予<light_yellow>%player_display_name%</light_yellow>.</light_gray>
+  RarityBook:
+    Usage: <player> <tier> <level>
+    Desc: '给予指定品质的附魔书'
+    Done: <light_gray>将<light_yellow>%name%</light_yellow>附魔书给予<light_yellow>%player_display_name%</light_yellow>.</light_gray>
 Error:
-  NoEnchant: '&c没有这种附魔'
+  InvalidEnchantment: <red>无效的参数.</red>
+  InvalidRarity: <red>无效的品质类型!</red>
+ItemCategory:
+  HELMET: '头盔'
+  CHESTPLATE: '胸甲'
+  LEGGINGS: '护腿'
+  BOOTS: '靴子'
+  ELYTRA: '鞘翅'
+  SWORD: '剑'
+  TRIDENT: '三叉戟'
+  AXE: '斧头'
+  BOW: '弓'
+  CROSSBOW: '弩'
+  HOE: '锄头'
+  PICKAXE: '镐子'
+  SHOVEL: '铲子'
+  FISHING_ROD: '钓鱼竿'
+  SHIELD: '盾牌'
+  TOOL: '工具'
+EnchantmentTarget:
+  ALL: '全部'
+  ARMOR: '装备'
+  ARMOR_FEET: '靴子'
+  ARMOR_LEGS: '护腿'
+  ARMOR_TORSO: '胸甲'
+  ARMOR_HEAD: '头盔'
+  WEAPON: '武器'
+  TOOL: '工具'
+  BOW: '弓'
+  FISHING_ROD: '钓鱼竿'
+  BREAKABLE: '耐久'
+  WEARABLE: '穿戴'
+  TRIDENT: '三叉戟'
+  CROSSBOW: '弩'
+  VANISHABLE: '隐身'
+DistributionWay:
+  ENCHANTING: '附魔'
+  VILLAGER: '村民'
+  LOOT_GENERATION: '战利品'
+  FISHING: '钓鱼'
+  MOB_EQUIPMENT: '怪物装备'
+Rarity:
+  COMMON: '<white>普通</white>'
+  UNCOMMON: '<light_green>勇者</light_green>'
+  RARE: '<purple>史诗</purple>'
+  VERY_RARE: '<red>神话</red>'

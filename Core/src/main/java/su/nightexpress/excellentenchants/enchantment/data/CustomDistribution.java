@@ -123,7 +123,7 @@ public class CustomDistribution implements DistributionOptions {
         int levelCapMin = this.getMinLevel(distributionWay);
         int levelCapMax = this.getMaxLevel(distributionWay);
 
-        if (levelCapMin <= 0 || levelCapMin < this.enchantmentData.getMinLevel()) levelCapMin = this.enchantmentData.getMinLevel();
+        if (levelCapMin < 1) levelCapMin = 1;
         if (levelCapMax <= 0 || levelCapMax > this.enchantmentData.getMaxLevel()) levelCapMax = this.enchantmentData.getMaxLevel();
 
         return Rnd.get(levelCapMin, levelCapMax);
@@ -132,7 +132,7 @@ public class CustomDistribution implements DistributionOptions {
     public int getLevelByEnchantCost(int xpLevel) {
         int get = 0;
 
-        for (int level = this.enchantmentData.getMaxLevel(); level > this.enchantmentData.getMinLevel() - 1; level--) {
+        for (int level = this.enchantmentData.getMaxLevel(); level > 0; level--) {
             if (xpLevel >= this.enchantmentData.getMinCost(level) && xpLevel <= this.enchantmentData.getMaxCost(level)) {
                 get = level;
                 break;
