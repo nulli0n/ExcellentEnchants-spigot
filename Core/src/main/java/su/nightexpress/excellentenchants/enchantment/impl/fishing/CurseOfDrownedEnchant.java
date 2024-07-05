@@ -2,7 +2,6 @@ package su.nightexpress.excellentenchants.enchantment.impl.fishing;
 
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Drowned;
 import org.bukkit.entity.FishHook;
 import org.bukkit.event.player.PlayerFishEvent;
@@ -10,19 +9,21 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 import su.nightexpress.nightcore.util.wrapper.UniSound;
 
 import java.io.File;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
 public class CurseOfDrownedEnchant extends AbstractEnchantmentData implements FishingEnchant, ChanceData {
 
@@ -48,11 +49,17 @@ public class CurseOfDrownedEnchant extends AbstractEnchantmentData implements Fi
         return chanceSettings;
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.FISHING_ROD;
+    @NotNull
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.FISHING_ROD;
     }
+
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.FISHING_ROD;
+//    }
 
     @Override
     public boolean isCurse() {

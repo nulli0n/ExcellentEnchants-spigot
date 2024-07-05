@@ -1,7 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.impl.bow;
 
 import org.bukkit.Particle;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -14,13 +13,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.*;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ArrowSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.PotionSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.*;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
@@ -74,11 +71,17 @@ public class WitheredArrowsEnchant extends AbstractEnchantmentData implements Ch
         return potionSettings;
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.BOW;
+    @NotNull
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.BOWS;
     }
+
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.BOW;
+//    }
 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {

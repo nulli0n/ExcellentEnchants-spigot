@@ -6,7 +6,7 @@
     <parent>
         <groupId>su.nightexpress.excellentenchants</groupId>
         <artifactId>ExcellentEnchants</artifactId>
-        <version>4.0.5</version>
+        <version>4.1.0</version>
     </parent>
 
     <artifactId>MC_1_20_6</artifactId>
@@ -28,13 +28,13 @@
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>API</artifactId>
-            <version>4.0.5</version>
+            <version>4.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>NMS</artifactId>
-            <version>4.0.5</version>
+            <version>4.1.0</version>
         </dependency>
     </dependencies>
 

@@ -6,6 +6,7 @@ import su.nightexpress.nightcore.util.random.Rnd;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 public enum Rarity {
 
     COMMON(10),

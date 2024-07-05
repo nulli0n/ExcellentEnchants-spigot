@@ -5,7 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,9 +19,11 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
@@ -107,9 +108,15 @@ public class FlameWalkerEnchant extends AbstractEnchantmentData implements Gener
 
     @Override
     @NotNull
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.ARMOR_FEET;
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.BOOTS;
     }
+
+//    @Override
+//    @NotNull
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.ARMOR_FEET;
+//    }
 
     public double getBlockDecayTime(int level) {
         return this.blockDecayTime.getValue(level);

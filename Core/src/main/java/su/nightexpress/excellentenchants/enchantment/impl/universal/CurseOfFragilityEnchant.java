@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.enchantment.impl.universal;
 
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -12,9 +11,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
@@ -37,11 +38,23 @@ public class CurseOfFragilityEnchant extends AbstractEnchantmentData implements 
 
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.BREAKABLE;
+    @NotNull
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.BREAKABLE;
     }
+
+//    @Override
+//    @NotNull
+//    public ItemsCategory getPrimaryItems() {
+//        return ItemCategories.PICKAXE;
+//    }
+//
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.BREAKABLE;
+//    }
 
     @Override
     public boolean isCurse() {

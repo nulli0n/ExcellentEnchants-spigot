@@ -5,7 +5,6 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,6 +18,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ArrowSettings;
@@ -28,12 +28,13 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ArrowSettingsImpl;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
 import java.io.File;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
 public class FlareEnchant extends AbstractEnchantmentData implements ChanceData, ArrowData, BowEnchant {
 
@@ -56,11 +57,17 @@ public class FlareEnchant extends AbstractEnchantmentData implements ChanceData,
         this.arrowSettings = ArrowSettingsImpl.create(config, UniParticle.of(Particle.FIREWORKS_SPARK));
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.BOW;
+    @NotNull
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.BOWS;
     }
+
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.BOW;
+//    }
 
     @NotNull
     @Override

@@ -47,6 +47,7 @@ public class EnchantVanillaListener extends AbstractListener<EnchantsPlugin> {
         Inventory inventory = event.getInventory();
         if (inventory.getType() != InventoryType.ENCHANTING) return;
 
+        // ======== NOT VALID FOR 1.20.5+ ========
         // I don't know if Mojang is stupid or something
         // they use "enchantment.category.canEnchant(item) instead of enchantment.canEnchant(item)
         // which fuck ups all custom changes in that overridden method.

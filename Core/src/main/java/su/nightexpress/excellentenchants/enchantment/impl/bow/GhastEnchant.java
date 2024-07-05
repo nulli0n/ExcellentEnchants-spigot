@@ -1,7 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.impl.bow;
 
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -14,12 +13,14 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
@@ -81,9 +82,15 @@ public class GhastEnchant extends AbstractEnchantmentData implements ChanceData,
 
     @Override
     @NotNull
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.BOW;
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.BOWS;
     }
+
+//    @Override
+//    @NotNull
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.BOW;
+//    }
 
     @NotNull
     @Override

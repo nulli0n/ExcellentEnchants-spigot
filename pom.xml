@@ -7,7 +7,7 @@
     <groupId>su.nightexpress.excellentenchants</groupId>
     <artifactId>ExcellentEnchants</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.5</version>
+    <version>4.1.0</version>
     <modules>
         <module>API</module>
         <module>Core</module>
@@ -17,6 +17,7 @@
         <module>V1_20_R2</module>
         <module>V1_20_R3</module>
         <module>MC_1_20_6</module>
+        <module>MC_1_21</module>
     </modules>
 
     <properties>
@@ -29,7 +30,7 @@
         <dependency>
             <groupId>su.nightexpress.nightcore</groupId>
             <artifactId>nightcore</artifactId>
-            <version>2.6.1</version>
+            <version>2.6.2</version>
         </dependency>
     </dependencies>
 

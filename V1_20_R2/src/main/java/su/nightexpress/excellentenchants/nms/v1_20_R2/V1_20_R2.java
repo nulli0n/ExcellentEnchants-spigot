@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -67,6 +66,12 @@ public class V1_20_R2 implements EnchantNMS {
     public void freezeRegistry() {
         Enchantment.stopAcceptingRegistrations();
         BuiltInRegistries.ENCHANTMENT.freeze();
+    }
+
+    @Override
+    public boolean isEnchantable(@NotNull ItemStack bukkitItem) {
+        net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(bukkitItem);
+        return nmsItem.getItem().isEnchantable(nmsItem);
     }
 
     @Override

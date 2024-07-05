@@ -1,23 +1,21 @@
 package su.nightexpress.excellentenchants.enchantment.listener;
 
-import org.bukkit.block.Chest;
-import org.bukkit.entity.*;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.enchantment.EnchantItemEvent;
-import org.bukkit.event.entity.*;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.world.LootGenerateEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MerchantRecipe;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
-import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
@@ -30,6 +28,27 @@ public class EnchantGenericListener extends AbstractListener<EnchantsPlugin> {
     public EnchantGenericListener(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager enchantManager) {
         super(plugin);
         //this.enchantManager = enchantManager;
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDisplayGameMode(PlayerGameModeChangeEvent event) {
+        Player player = event.getPlayer();
+        GameMode current = player.getGameMode();
+        GameMode changed = event.getNewGameMode();
+
+        // When enter Creative gamemode, force update all inventory to flush item's lore so they don't have enchant descriptions.
+        if (changed == GameMode.CREATIVE) {
+            EnchantUtils.doIgnoreDisplayUpdate(player, player::updateInventory);
+        }
+        else if (current == GameMode.CREATIVE) {
+            this.plugin.runTask(task -> player.updateInventory());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDisplayQuit(PlayerQuitEvent event) {
+        EnchantUtils.removeIgnoreDisplayUpdate(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -51,7 +70,7 @@ public class EnchantGenericListener extends AbstractListener<EnchantsPlugin> {
         });
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    /*@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEnchantDisplayUpdateGrindstoneClick(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
         if (inventory.getType() != InventoryType.GRINDSTONE) return;
@@ -86,7 +105,7 @@ public class EnchantGenericListener extends AbstractListener<EnchantsPlugin> {
         if (EnchantUtils.updateDisplay(itemStack)) {
             item.setItemStack(itemStack);
         }
-    }
+    }*/
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEnchantDisplayUpdateEnchanting(EnchantItemEvent event) {
@@ -102,13 +121,13 @@ public class EnchantGenericListener extends AbstractListener<EnchantsPlugin> {
                     enchant.restoreCharges(result, level);
                 }
             });
-            EnchantUtils.updateDisplay(result);
+            //EnchantUtils.updateDisplay(result);
 
             inventory.setItem(0, result);
         });
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    /*@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEnchantDisplayUpdateVillagerAcquire(VillagerAcquireTradeEvent event) {
         if (Config.isCustomDistribution()) return;
 
@@ -146,5 +165,5 @@ public class EnchantGenericListener extends AbstractListener<EnchantsPlugin> {
                 }
             });
         }
-    }
+    }*/
 }

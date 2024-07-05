@@ -17,6 +17,7 @@ import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.manager.AbstractManager;
 import su.nightexpress.nightcore.util.Pair;
+import su.nightexpress.nightcore.util.Version;
 
 import java.util.*;
 
@@ -48,7 +49,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
             this.plugin.info("Using custom distribution system. Applying patches...");
             this.addListener(new EnchantPopulationListener(this.plugin));
         }
-        else {
+        else if (Version.isBehind(Version.MC_1_21)) {
             this.plugin.info("Using vanilla distribution. Applying enchanting table patches...");
             this.addListener(new EnchantVanillaListener(this.plugin));
         }

@@ -1,23 +1,25 @@
 package su.nightexpress.excellentenchants.enchantment.impl.weapon;
 
 import org.bukkit.attribute.Attribute;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.EntityUtil;
 import su.nightexpress.nightcore.util.NumberUtil;
 
 import java.io.File;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
+import static su.nightexpress.excellentenchants.Placeholders.GENERIC_RADIUS;
 
 public class TemperEnchant extends AbstractEnchantmentData implements CombatEnchant {
 
@@ -57,11 +59,17 @@ public class TemperEnchant extends AbstractEnchantmentData implements CombatEnch
         return this.damageStep.getValue(level);
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.WEAPON;
+    @NotNull
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.WEAPON;
     }
+//
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.WEAPON;
+//    }
 
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {

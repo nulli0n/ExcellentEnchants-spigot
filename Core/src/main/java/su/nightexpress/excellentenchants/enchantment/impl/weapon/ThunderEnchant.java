@@ -4,19 +4,20 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.LocationUtil;
@@ -25,7 +26,8 @@ import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
 import java.io.File;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
+import static su.nightexpress.excellentenchants.Placeholders.GENERIC_DAMAGE;
 
 public class ThunderEnchant extends AbstractEnchantmentData implements ChanceData, CombatEnchant {
 
@@ -75,9 +77,15 @@ public class ThunderEnchant extends AbstractEnchantmentData implements ChanceDat
 
     @Override
     @NotNull
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.WEAPON;
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.WEAPON;
     }
+
+//    @Override
+//    @NotNull
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.WEAPON;
+//    }
 
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {

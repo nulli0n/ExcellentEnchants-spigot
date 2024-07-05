@@ -1,23 +1,25 @@
 package su.nightexpress.excellentenchants.enchantment.impl.armor;
 
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.PeriodicSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.excellentenchants.enchantment.data.PeriodSettingsImpl;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 
 import java.io.File;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
+import static su.nightexpress.excellentenchants.Placeholders.GENERIC_MAX;
 
 public class SaturationEnchant extends AbstractEnchantmentData implements PassiveEnchant {
 
@@ -59,9 +61,15 @@ public class SaturationEnchant extends AbstractEnchantmentData implements Passiv
 
     @Override
     @NotNull
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.ARMOR_HEAD;
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.HELMET;
     }
+
+//    @Override
+//    @NotNull
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.ARMOR_HEAD;
+//    }
 
     public final int getFeedAmount(int level) {
         return (int) this.feedAmount.getValue(level);

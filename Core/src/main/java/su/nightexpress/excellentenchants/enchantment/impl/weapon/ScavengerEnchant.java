@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.enchantment.impl.weapon;
 
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,12 +13,14 @@ import org.bukkit.loot.LootTables;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
@@ -27,9 +28,12 @@ import su.nightexpress.nightcore.util.StringUtil;
 import su.nightexpress.nightcore.util.random.Rnd;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
 public class ScavengerEnchant extends AbstractEnchantmentData implements ChanceData, DeathEnchant {
 
@@ -119,9 +123,15 @@ public class ScavengerEnchant extends AbstractEnchantmentData implements ChanceD
 
     @Override
     @NotNull
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.WEAPON;
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.WEAPON;
     }
+
+//    @Override
+//    @NotNull
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.WEAPON;
+//    }
 
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, @NotNull ItemStack weapon, int level) {

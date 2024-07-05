@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.enchantment.impl.armor;
 
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,12 +12,14 @@ import org.bukkit.loot.LootTables;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
@@ -27,9 +28,12 @@ import su.nightexpress.nightcore.util.StringUtil;
 import su.nightexpress.nightcore.util.random.Rnd;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
 public class TreasureHunterEnchant extends AbstractEnchantmentData implements ChanceData, GenericEnchant, SimpeListener {
 
@@ -92,9 +96,15 @@ public class TreasureHunterEnchant extends AbstractEnchantmentData implements Ch
 
     @Override
     @NotNull
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.ARMOR_HEAD;
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.HELMET;
     }
+
+//    @Override
+//    @NotNull
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.ARMOR_HEAD;
+//    }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onLootExplore(LootGenerateEvent event) {

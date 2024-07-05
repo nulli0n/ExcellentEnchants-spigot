@@ -66,6 +66,12 @@ public class Internal1_20_6 implements EnchantNMS {
         BuiltInRegistries.ENCHANTMENT.freeze();
     }
 
+    @Override
+    public boolean isEnchantable(@NotNull ItemStack bukkitItem) {
+        net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(bukkitItem);
+        return nmsItem.getItem().isEnchantable(nmsItem);
+    }
+
     public void registerEnchantment(@NotNull EnchantmentData data) {
         CustomEnchantment enchantment = CustomEnchantment.from(data);
         Registry.register(BuiltInRegistries.ENCHANTMENT, data.getId(), enchantment);

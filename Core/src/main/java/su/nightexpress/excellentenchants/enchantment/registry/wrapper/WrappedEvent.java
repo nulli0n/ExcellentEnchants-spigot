@@ -9,9 +9,6 @@ import org.bukkit.plugin.EventExecutor;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WrappedEvent<E extends Event, T extends EnchantmentData> implements Listener, EventExecutor {
 
@@ -42,11 +39,11 @@ public class WrappedEvent<E extends Event, T extends EnchantmentData> implements
         if (entity == null) return;
 
         Player player = entity instanceof Player user ? user : null;
-        AtomicBoolean needUpdate = new AtomicBoolean(false);
+        //AtomicBoolean needUpdate = new AtomicBoolean(false);
 
         this.dataGather.getEnchants(event, this.enchantClass, entity).forEach((item, enchants) -> {
             enchants.forEach((enchant, level) -> {
-                if (enchant.isChargesEnabled() && this.priority == EventPriority.MONITOR) needUpdate.set(true);
+                //if (enchant.isChargesEnabled() && this.priority == EventPriority.MONITOR) needUpdate.set(true);
 
                 if (!this.dataGather.checkPriority(enchant, this.priority)) return;
                 if (!enchant.isAvailableToUse(entity)) return;
@@ -56,9 +53,9 @@ public class WrappedEvent<E extends Event, T extends EnchantmentData> implements
                 }
             });
 
-            if (needUpdate.get() && player != null) {
+            /*if (needUpdate.get() && player != null) {
                 EnchantUtils.updateDisplay(item);
-            }
+            }*/
         });
     }
 }

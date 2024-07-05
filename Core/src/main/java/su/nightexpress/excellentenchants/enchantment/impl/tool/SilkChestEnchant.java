@@ -4,7 +4,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,10 +21,11 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
@@ -80,15 +80,27 @@ public class SilkChestEnchant extends AbstractEnchantmentData implements BlockDr
 
     @Override
     @NotNull
-    public ItemCategory[] getItemCategories() {
-        return new ItemCategory[]{ItemCategory.AXE};
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.TOOL;
     }
 
     @Override
     @NotNull
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.TOOL;
+    public ItemsCategory getPrimaryItems() {
+        return ItemCategories.AXE;
     }
+
+//    @Override
+//    @NotNull
+//    public ItemCategory[] getItemCategories() {
+//        return new ItemCategory[]{ItemCategory.AXE};
+//    }
+//
+//    @Override
+//    @NotNull
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.TOOL;
+//    }
 
     public boolean isSilkChest(@NotNull ItemStack item) {
         return PDCUtil.getBoolean(item, this.keyChest).isPresent();

@@ -253,9 +253,9 @@ public class EnchantPopulator {
             }
         });
 
-        if (status.get()) {
+        /*if (status.get()) {
             EnchantUtils.updateDisplay(item);
-        }
+        }*/
 
         return status.get();
     }

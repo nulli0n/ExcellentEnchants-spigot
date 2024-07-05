@@ -72,11 +72,12 @@ public class CustomEnchantment extends Enchantment {
     public boolean canEnchant(@NotNull org.bukkit.inventory.ItemStack bukkitItem) {
         if (!this.enchantmentData.checkEnchantLimit(bukkitItem)) return false;
 
-        if (!this.enchantmentData.hasItemCategory()) {
+        /*if (!this.enchantmentData.hasItemCategory()) {
             if (this.enchantmentData.checkEnchantCategory(bukkitItem)) return true;
         }
 
-        return this.enchantmentData.checkItemCategory(bukkitItem);
+        return this.enchantmentData.checkItemCategory(bukkitItem);*/
+        return this.enchantmentData.isSupportedItem(bukkitItem);
     }
 
     @Override
@@ -97,7 +98,7 @@ public class CustomEnchantment extends Enchantment {
     @Override
     public boolean isDiscoverable() {
         org.bukkit.inventory.ItemStack bukkitItem = EnchantingBridge.getEnchantingItem();
-        if (bukkitItem != null && !this.canEnchant(bukkitItem)) {
+        if (bukkitItem != null && !this.enchantmentData.isPrimaryItem(bukkitItem)) {
             return false;
         }
 
@@ -115,7 +116,7 @@ public class CustomEnchantment extends Enchantment {
 
     @NotNull
     public static TagKey<Item> nmsCategory(@NotNull EnchantmentData data) {
-        return switch (data.getCategory()) {
+        return switch (data.getSupportedItems().getTarget()) {
             case WEAPON -> ItemTags.WEAPON_ENCHANTABLE;
             case TOOL -> ItemTags.MINING_ENCHANTABLE;
             case ARMOR -> ItemTags.ARMOR_ENCHANTABLE;
@@ -130,12 +131,12 @@ public class CustomEnchantment extends Enchantment {
             case ARMOR_TORSO -> ItemTags.CHEST_ARMOR_ENCHANTABLE;
             case VANISHABLE -> ItemTags.VANISHING_ENCHANTABLE;
             case FISHING_ROD -> ItemTags.FISHING_ENCHANTABLE;
-            default -> throw new IllegalStateException("Unexpected value: " + data.getCategory());
+            default -> throw new IllegalStateException("Unexpected value: " + data.getSupportedItems().getTarget());
         };
     }
 
     public static EquipmentSlot[] nmsSlots(@NotNull EnchantmentData data) {
-        org.bukkit.inventory.EquipmentSlot[] slots = data.getSlots();
+        org.bukkit.inventory.EquipmentSlot[] slots = data.getSupportedItems().getSlots();
         EquipmentSlot[] nmsSlots = new EquipmentSlot[slots.length];
 
         for (int index = 0; index < nmsSlots.length; index++) {

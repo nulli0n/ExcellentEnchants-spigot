@@ -1,20 +1,21 @@
 package su.nightexpress.excellentenchants.enchantment.impl.fishing;
 
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 
 import java.io.File;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
 public class SeasonedAnglerEnchant extends AbstractEnchantmentData implements FishingEnchant {
 
@@ -42,11 +43,17 @@ public class SeasonedAnglerEnchant extends AbstractEnchantmentData implements Fi
         return (int) this.xpModifier.getValue(level);
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.FISHING_ROD;
+    @NotNull
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.FISHING_ROD;
     }
+
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.FISHING_ROD;
+//    }
 
     @Override
     public boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level) {

@@ -16,7 +16,7 @@ public class Perms {
     public static final UniPermission COMMAND_ENCHANT     = new UniPermission(PREFIX_COMMAND + "enchant");
     public static final UniPermission COMMAND_GET_FUEL    = new UniPermission(PREFIX_COMMAND + "getfuel");
     public static final UniPermission COMMAND_LIST        = new UniPermission(PREFIX_COMMAND + "list", PermissionDefault.TRUE);
-    public static final UniPermission COMMAND_LIST_OTHERS        = new UniPermission(PREFIX_COMMAND + "list.others");
+    public static final UniPermission COMMAND_LIST_OTHERS = new UniPermission(PREFIX_COMMAND + "list.others");
     public static final UniPermission COMMAND_RARITY_BOOK = new UniPermission(PREFIX_COMMAND + "raritybook");
     public static final UniPermission COMMAND_RELOAD      = new UniPermission(PREFIX_COMMAND + "reload");
 

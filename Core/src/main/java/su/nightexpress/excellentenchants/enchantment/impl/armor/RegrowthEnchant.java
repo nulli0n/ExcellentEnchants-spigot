@@ -2,12 +2,12 @@ package su.nightexpress.excellentenchants.enchantment.impl.armor;
 
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
@@ -15,6 +15,7 @@ import su.nightexpress.excellentenchants.api.enchantment.data.PeriodicSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.excellentenchants.enchantment.data.PeriodSettingsImpl;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.EntityUtil;
@@ -81,11 +82,17 @@ public class RegrowthEnchant extends AbstractEnchantmentData implements ChanceDa
         return periodSettings;
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.ARMOR_TORSO;
+    @NotNull
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.TORSO;
     }
+
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.ARMOR_TORSO;
+//    }
 
     public double getHealAmount(int level) {
         return this.healAmount.getValue(level);

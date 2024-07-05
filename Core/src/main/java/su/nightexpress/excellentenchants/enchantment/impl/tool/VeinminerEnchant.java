@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -12,10 +11,11 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
@@ -96,15 +96,27 @@ public class VeinminerEnchant extends AbstractEnchantmentData implements BlockBr
 
     @Override
     @NotNull
-    public ItemCategory[] getItemCategories() {
-        return new ItemCategory[]{ItemCategory.PICKAXE};
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.TOOL;
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.TOOL;
+    @NotNull
+    public ItemsCategory getPrimaryItems() {
+        return ItemCategories.PICKAXE;
     }
+
+//    @Override
+//    @NotNull
+//    public ItemCategory[] getItemCategories() {
+//        return new ItemCategory[]{ItemCategory.PICKAXE};
+//    }
+//
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.TOOL;
+//    }
 
     @NotNull
     private Set<Block> getNearby(@NotNull Block block) {

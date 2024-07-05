@@ -1,6 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.impl.fishing;
 
-import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.Material;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,9 +10,11 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
@@ -41,11 +43,17 @@ public class RiverMasterEnchant extends AbstractEnchantmentData implements Gener
         );
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.FISHING_ROD;
+    @NotNull
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.FISHING_ROD;
     }
+
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.FISHING_ROD;
+//    }
 
     public double getDistanceMod(int level) {
         return this.distanceMod.getValue(level);
@@ -56,7 +64,7 @@ public class RiverMasterEnchant extends AbstractEnchantmentData implements Gener
         if (!(event.getEntity() instanceof FishHook hook)) return;
         if (!(hook.getShooter() instanceof Player player)) return;
 
-        ItemStack rod = EnchantUtils.getFishingRod(player);
+        ItemStack rod = EnchantUtils.getHandItem(player, Material.FISHING_ROD);
         if (rod == null) return;
 
         int level = EnchantUtils.getLevel(rod, this.getEnchantment());

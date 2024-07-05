@@ -4,9 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +14,6 @@ import su.nightexpress.excellentenchants.api.DistributionWay;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.Cost;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
-import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.PeriodicData;
@@ -41,7 +38,6 @@ import java.io.File;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static su.nightexpress.excellentenchants.Placeholders.*;
 
@@ -184,24 +180,11 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
         // TODO Check what actually does
         this.setAnvilCost(ConfigValue.create("Anvil.Cost",
             Rnd.get(8) + 1,
-            "Sets enchantment anvil cost.",
+            "The cost when applying this enchantment using an anvil. Halved when adding to a book, multiplied by the level of the enchantment.",
             "[*] Works for 1.20.6+ only!"
         ).read(cfg));
 
         this.distributionOptions.load(cfg);
-
-
-
-        /*this.setAnvilMergeCost(Modifier.read(cfg, "Anvil.Merge.Cost",
-            Modifier.add(1, 1, 1),
-            "Sets XP cost to apply or transfer this enchantment using anvils."
-        ));
-
-        this.setMaxMergeLevel(ConfigValue.create("Anvil.Merge.Max_Level",
-            -1,
-            "Max. enchantment level that can be obtained by combining 2 items with this enchantment.",
-            "Set to '-1' to remove limit and cap to max. enchantment level."
-        ).read(cfg));*/
 
 
 
@@ -250,11 +233,7 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
             .add(ENCHANTMENT_LEVEL_MIN, () -> String.valueOf(1))
             .add(ENCHANTMENT_LEVEL_MAX, () -> String.valueOf(this.getMaxLevel()))
             .add(ENCHANTMENT_RARITY, () -> plugin.getLangManager().getEnum(this.getRarity()))
-            .add(ENCHANTMENT_FIT_ITEM_TYPES, () -> {
-                if (this.getItemCategories().length == 0) return plugin.getLangManager().getEnum(this.getCategory());
-
-                return String.join(", ", Stream.of(this.getItemCategories()).map(type -> plugin.getLangManager().getEnum(type)).toList());
-            })
+            .add(ENCHANTMENT_FIT_ITEM_TYPES, () -> this.getSupportedItems().getLocalized())
             .add(ENCHANTMENT_CHARGES_MAX_AMOUNT, level -> NumberUtil.format(this.getChargesMax(level)))
             .add(ENCHANTMENT_CHARGES_CONSUME_AMOUNT, level -> NumberUtil.format(this.getChargesConsumeAmount(level)))
             .add(ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, level -> NumberUtil.format(this.getChargesRechargeAmount(level)))
@@ -316,13 +295,13 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
         this.placeholders.add(key, replacer);
     }
 
-    @Override
-    @NotNull
-    public ItemCategory[] getItemCategories() {
-        return new ItemCategory[0];
-    }
+//    @Override
+//    @NotNull
+//    public ItemCategory[] getItemCategories() {
+//        return new ItemCategory[0];
+//    }
 
-    @Override
+    /*@Override
     public EquipmentSlot[] getSlots() {
         return switch (this.getCategory()) {
             case BOW, CROSSBOW, TRIDENT, FISHING_ROD, WEAPON, TOOL -> new EquipmentSlot[]{EquipmentSlot.HAND};
@@ -335,7 +314,7 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
             case VANISHABLE -> EnchantUtils.EQUIPMENT_SLOTS;
             default -> throw new IllegalStateException("Unexpected value: " + this.getCategory());
         };
-    }
+    }*/
 
     @Override
     public boolean isAvailableToUse(@NotNull World world) {
@@ -358,7 +337,7 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
         return !EnchantUtils.hasMaximumEnchants(item);
     }
 
-    @Override
+    /*@Override
     public final boolean checkEnchantCategory(@NotNull ItemStack item) {
         EnchantmentTarget category = this.getCategory();
 
@@ -377,7 +356,7 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
     @Override
     public boolean checkItemCategory(@NotNull ItemStack item) {
         return !this.hasItemCategory() || Stream.of(this.getItemCategories()).anyMatch(itemCategory -> itemCategory.isIncluded(item));
-    }
+    }*/
 
     public int generateLevel() {
         return Rnd.get(1, this.getMaxLevel());
@@ -386,28 +365,9 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
     @Override
     @NotNull
     public String getNameFormatted(int level, int charges) {
-        String rarityFormat = this.isCurse() ? Config.ENCHANTMENTS_DISPLAY_NAME_CURSE_FORMAT.get() : Config.ENCHANTMENTS_DISPLAY_NAME_RARITY_FORMAT.get().getOrDefault(this.getRarity(), GENERIC_NAME);
-        String chargesFormat = "";
-        boolean showLevel = !Config.ENCHANTMENTS_DISPLAY_NAME_HIDE_1ST_LEVEL.get() || level > 1;
-        boolean showCharges = this.isChargesEnabled() && charges >= 0;
-
-        if (showCharges) {
-            int chargesMax = this.getChargesMax(level);
-            int percent = (int) Math.ceil((double) charges / (double) chargesMax * 100D);
-            Map.Entry<Integer, String> entry = Config.ENCHANTMENTS_CHARGES_FORMAT.get().floorEntry(percent);
-            if (entry != null) {
-                chargesFormat = entry.getValue().replace(GENERIC_AMOUNT, String.valueOf(charges));
-            }
-        }
-
-        String compName = Config.ENCHANTMENTS_DISPLAY_NAME_COMPONENT_NAME.get().replace(GENERIC_VALUE, this.getName());
-        String compLevel = showLevel ? Config.ENCHANTMENTS_DISPLAY_NAME_COMPONENT_LEVEL.get().replace(GENERIC_VALUE, NumberUtil.toRoman(level)) : "";
-        String compChrages = showCharges ? Config.ENCHANTMENTS_DISPLAY_NAME_COMPONENT_CHARGES.get().replace(GENERIC_VALUE, chargesFormat) : "";
-
-        String nameFormat = Config.ENCHANTMENTS_DISPLAY_NAME_FORMAT.get().
-            replace(ENCHANTMENT_NAME, compName)
-            .replace(ENCHANTMENT_LEVEL, compLevel)
-            .replace(ENCHANTMENT_CHARGES, compChrages);
+        String rarityFormat = this.isCurse() ? Config.ENCHANTMENTS_DISPLAY_NAME_CURSE_FORMAT.get() : Config.ENCHANTMENTS_DISPLAY_NAME_RARITY_FORMAT.get()
+            .getOrDefault(this.getRarity(), GENERIC_NAME);
+        String nameFormat = this.formatComponents(Config.ENCHANTMENTS_DISPLAY_NAME_FORMAT.get(), level, charges);
 
         return rarityFormat.replace(GENERIC_NAME, nameFormat);
     }
@@ -423,9 +383,40 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
     @Override
     @NotNull
     public List<String> getDescriptionReplaced(int level) {
+        return this.getDescriptionReplaced(level, 0);
+    }
+
+    @Override
+    @NotNull
+    public List<String> getDescriptionReplaced(int level, int charges) {
         List<String> description = new ArrayList<>(this.getDescriptionFormatted());
-        description.replaceAll(this.getPlaceholders(level).replacer());
+        description.replaceAll(line -> this.getPlaceholders(level).replacer().apply(this.formatComponents(line, level, charges)));
         return description;
+    }
+
+    @NotNull
+    private String formatComponents(@NotNull String string, int level, int charges) {
+        String chargesFormat = "";
+        boolean showLevel = this.getMaxLevel() > 1;
+        boolean showCharges = this.isChargesEnabled() && charges >= 0;
+
+        if (showCharges) {
+            int chargesMax = this.getChargesMax(level);
+            int percent = (int) Math.ceil((double) charges / (double) chargesMax * 100D);
+            Map.Entry<Integer, String> entry = Config.ENCHANTMENTS_CHARGES_FORMAT.get().floorEntry(percent);
+            if (entry != null) {
+                chargesFormat = entry.getValue().replace(GENERIC_AMOUNT, String.valueOf(charges));
+            }
+        }
+
+        String compName = Config.ENCHANTMENTS_DISPLAY_NAME_COMPONENT_NAME.get().replace(GENERIC_VALUE, this.getName());
+        String compLevel = showLevel ? Config.ENCHANTMENTS_DISPLAY_NAME_COMPONENT_LEVEL.get().replace(GENERIC_VALUE, NumberUtil.toRoman(level)) : "";
+        String compChrages = showCharges ? Config.ENCHANTMENTS_DISPLAY_NAME_COMPONENT_CHARGES.get().replace(GENERIC_VALUE, chargesFormat) : "";
+
+        return string
+            .replace(ENCHANTMENT_NAME, compName)
+            .replace(ENCHANTMENT_LEVEL, compLevel)
+            .replace(ENCHANTMENT_CHARGES, compChrages);
     }
 
     @Override
@@ -525,7 +516,7 @@ public abstract class AbstractEnchantmentData extends AbstractFileData<EnchantsP
         if (!this.isChargesEnabled()) return;
 
         this.consumeChargesNoUpdate(item, level);
-        EnchantUtils.updateDisplay(item);
+        //EnchantUtils.updateDisplay(item);
     }
 
     @Override

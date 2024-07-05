@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.api;
 
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
 public enum DistributionWay {
 
     ENCHANTING("Enchanting_Table"),

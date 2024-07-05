@@ -6,6 +6,7 @@ import su.nightexpress.excellentenchants.EnchantsPlugin;
 
 public class Keys {
 
+    @Deprecated
     public static NamespacedKey loreSize;
 
     public static NamespacedKey itemRecharged;

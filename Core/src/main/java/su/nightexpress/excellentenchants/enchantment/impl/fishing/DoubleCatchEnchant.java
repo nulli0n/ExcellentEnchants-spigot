@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.enchantment.impl.fishing;
 
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerFishEvent;
@@ -8,17 +7,19 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 
 import java.io.File;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
 public class DoubleCatchEnchant extends AbstractEnchantmentData implements FishingEnchant, ChanceData {
 
@@ -38,11 +39,17 @@ public class DoubleCatchEnchant extends AbstractEnchantmentData implements Fishi
         this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(4, 2, 1, 100));
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.FISHING_ROD;
+    @NotNull
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.FISHING_ROD;
     }
+
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.FISHING_ROD;
+//    }
 
     @NotNull
     @Override

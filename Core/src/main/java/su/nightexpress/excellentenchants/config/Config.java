@@ -141,6 +141,7 @@ public class Config {
 
 
 
+    @Deprecated
     public static final ConfigValue<Integer> ENCHANTMENTS_DISPLAY_MODE = ConfigValue.create("Enchantments.Display.Mode",
         1,
         "Sets how enchantment names and descriptions will be handled on items.",
@@ -152,6 +153,7 @@ public class Config {
         "Packet mode is slower, but instantly reflect all changes. In creative mode, there is a chance for lore duplication."
     );
 
+    @Deprecated
     public static final ConfigValue<Boolean> ENCHANTMENTS_DISPLAY_NAME_HIDE_1ST_LEVEL = ConfigValue.create("Enchantments.Display.Name.Hide_1st_Level",
         true,
         "Hides enchantment level component from name format for level 1 enchantments.");
@@ -198,9 +200,8 @@ public class Config {
         "Sets whether or not only enchanted books will have enchantment descriptions.");
 
     public static final ConfigValue<String> ENCHANTMENTS_DISPLAY_DESCRIPTION_FORMAT = ConfigValue.create("Enchantments.Display.Description.Format",
-        LIGHT_GRAY.enclose("• " + GENERIC_DESCRIPTION),
-        "Sets enc" +
-            "hantment description format.");
+        LIGHT_GRAY.enclose("• " + ENCHANTMENT_NAME + " " + ENCHANTMENT_CHARGES +  ": " +  GENERIC_DESCRIPTION),
+        "Sets enchantment description format.");
 
 
 

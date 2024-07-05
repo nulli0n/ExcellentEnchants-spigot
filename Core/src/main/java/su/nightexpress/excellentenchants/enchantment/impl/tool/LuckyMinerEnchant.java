@@ -1,25 +1,26 @@
 package su.nightexpress.excellentenchants.enchantment.impl.tool;
 
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 
 import java.io.File;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
+import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
 public class LuckyMinerEnchant extends AbstractEnchantmentData implements ChanceData, BlockBreakEnchant {
 
@@ -59,15 +60,27 @@ public class LuckyMinerEnchant extends AbstractEnchantmentData implements Chance
 
     @Override
     @NotNull
-    public ItemCategory[] getItemCategories() {
-        return new ItemCategory[]{ItemCategory.PICKAXE};
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.TOOL;
     }
 
     @Override
     @NotNull
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.TOOL;
+    public ItemsCategory getPrimaryItems() {
+        return ItemCategories.PICKAXE;
     }
+
+//    @Override
+//    @NotNull
+//    public ItemCategory[] getItemCategories() {
+//        return new ItemCategory[]{ItemCategory.PICKAXE};
+//    }
+//
+//    @Override
+//    @NotNull
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.TOOL;
+//    }
 
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity player, @NotNull ItemStack item, int level) {

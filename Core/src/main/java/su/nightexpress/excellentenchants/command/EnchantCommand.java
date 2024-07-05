@@ -82,7 +82,7 @@ public class EnchantCommand extends AbstractCommand<EnchantsPlugin> {
         }
         else EnchantUtils.remove(item, enchantment);
 
-        EnchantUtils.updateDisplay(item);
+        //EnchantUtils.updateDisplay(item);
         player.getInventory().setItem(slot, item);
 
         (sender == player ? Lang.COMMAND_ENCHANT_DONE_SELF : Lang.COMMAND_ENCHANT_DONE_OTHERS).getMessage()

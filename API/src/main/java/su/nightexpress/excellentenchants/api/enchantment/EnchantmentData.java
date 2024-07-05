@@ -2,9 +2,7 @@ package su.nightexpress.excellentenchants.api.enchantment;
 
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -38,12 +36,24 @@ public interface EnchantmentData {
 
     boolean checkEnchantLimit(@NotNull ItemStack item);
 
-    boolean checkEnchantCategory(@NotNull ItemStack item);
+    default boolean isSupportedItem(@NotNull ItemStack itemStack) {
+        return this.getSupportedItems().is(itemStack);
+    }
 
-    boolean checkItemCategory(@NotNull ItemStack item);
+    default boolean isPrimaryItem(@NotNull ItemStack itemStack) {
+        return this.getPrimaryItems().is(itemStack);
+    }
 
-    default boolean hasItemCategory() {
-        return this.getItemCategories().length != 0;
+    /**
+     * Items on which this enchantment can be applied using an anvil or using the /enchant command.
+     */
+    @NotNull ItemsCategory getSupportedItems();
+
+    /**
+     * Items for which this enchantment appears in an enchanting table.
+     */
+    @NotNull default ItemsCategory getPrimaryItems() {
+        return this.getSupportedItems();
     }
 
     @NotNull DistributionOptions getDistributionOptions();
@@ -56,11 +66,13 @@ public interface EnchantmentData {
 
     @NotNull String getName();
 
+    @Deprecated
     @NotNull
     default String getNameFormatted(int level) {
         return this.getNameFormatted(level, -1);
     }
 
+    @Deprecated
     @NotNull String getNameFormatted(int level, int charges);
 
     @NotNull List<String> getDescription();
@@ -69,15 +81,11 @@ public interface EnchantmentData {
 
     @NotNull List<String> getDescriptionReplaced(int level);
 
-    @NotNull EnchantmentTarget getCategory();
+    @NotNull List<String> getDescriptionReplaced(int level, int charges);
 
     @NotNull Enchantment getEnchantment();
 
     void setEnchantment(@NotNull Enchantment enchantment);
-
-    ItemCategory[] getItemCategories();
-
-    EquipmentSlot[] getSlots();
 
     default boolean hasConflicts() {
         return !this.getConflicts().isEmpty();

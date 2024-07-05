@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.wrapper.UniInt;
 
+@Deprecated
 public class DistributionWaySettings {
 
     private final boolean enabled;

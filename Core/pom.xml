@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ExcellentEnchants</artifactId>
         <groupId>su.nightexpress.excellentenchants</groupId>
-        <version>4.0.5</version>
+        <version>4.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -67,37 +67,42 @@
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>API</artifactId>
-            <version>4.0.5</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>NMS</artifactId>
-            <version>4.0.5</version>
+            <version>4.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>su.nightexpress.excellentenchants</groupId>
+            <artifactId>MC_1_21</artifactId>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>MC_1_20_6</artifactId>
-            <version>4.0.5</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_20_R3</artifactId>
-            <version>4.0.5</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_20_R2</artifactId>
-            <version>4.0.5</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_20_R1</artifactId>
-            <version>4.0.5</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>V1_19_R3</artifactId>
-            <version>4.0.5</version>
+            <version>4.1.0</version>
         </dependency>
     </dependencies>
 

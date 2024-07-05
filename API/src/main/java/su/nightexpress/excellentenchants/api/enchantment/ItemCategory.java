@@ -7,6 +7,7 @@ import su.nightexpress.nightcore.util.ItemUtil;
 
 import java.util.function.Predicate;
 
+@Deprecated
 public enum ItemCategory {
 
     HELMET(ItemUtil::isHelmet),

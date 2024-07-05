@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +23,14 @@ public interface EnchantNMS {
     void unfreezeRegistry();
 
     void freezeRegistry();
+
+    //void registerEnchantments(@NotNull List<EnchantmentData> list);
+
+    boolean isEnchantable(@NotNull ItemStack bukkitItem);
+
+    default void addExclusives(@NotNull EnchantmentData data) {
+
+    }
 
     void registerEnchantment(@NotNull EnchantmentData enchantment);
 

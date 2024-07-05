@@ -167,6 +167,10 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
         this.register(SoulboundEnchant.ID, file -> new SoulboundEnchant(plugin, file));
         this.register(RestoreEnchant.ID, file -> new RestoreEnchant(plugin, file));
 
+        getRegistered().forEach(data -> {
+            plugin.getEnchantNMS().addExclusives(data);
+        });
+
         this.plugin.getEnchantNMS().freezeRegistry();
         this.plugin.info("Enchantments Registered: " + BY_ID.size());
         this.isLocked = true;

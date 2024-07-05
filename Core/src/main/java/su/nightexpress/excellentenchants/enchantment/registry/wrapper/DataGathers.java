@@ -19,6 +19,7 @@ import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantedProjectile;
+import su.nightexpress.nightcore.util.EntityUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -302,7 +303,7 @@ public class DataGathers {
         @NotNull
         @Override
         public EquipmentSlot[] getEnchantSlots(@NotNull EntityDeathEvent event) {
-            return EnchantUtils.EQUIPMENT_SLOTS;
+            return EntityUtil.EQUIPMENT_SLOTS;
         }
 
         @Override
@@ -327,7 +328,7 @@ public class DataGathers {
         @NotNull
         @Override
         public EquipmentSlot[] getEnchantSlots(@NotNull EntityResurrectEvent event) {
-            return EnchantUtils.EQUIPMENT_SLOTS;
+            return EntityUtil.EQUIPMENT_SLOTS;
         }
 
         @Override

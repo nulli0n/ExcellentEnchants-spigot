@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.enchantment.impl.tool;
 
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -10,8 +9,8 @@ import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
@@ -19,13 +18,14 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.ItemUtil;
 
 import java.io.File;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
 public class CurseOfMediocrityEnchant extends AbstractEnchantmentData implements ChanceData, BlockDropEnchant, DeathEnchant {
 
@@ -45,19 +45,31 @@ public class CurseOfMediocrityEnchant extends AbstractEnchantmentData implements
         this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.multiply(15, 1, 1, 100));
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.BREAKABLE;
+    @NotNull
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.BREAKABLE;
     }
 
     @Override
     @NotNull
-    public ItemCategory[] getItemCategories() {
-        return new ItemCategory[] {
-            ItemCategory.SWORD, ItemCategory.BOW, ItemCategory.CROSSBOW, ItemCategory.TRIDENT, ItemCategory.TOOL
-        };
+    public ItemsCategory getPrimaryItems() {
+        return ItemCategories.ALL_RANGE_WEAPON;
     }
+
+//    @NotNull
+//    @Override
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.BREAKABLE;
+//    }
+//
+//    @Override
+//    @NotNull
+//    public ItemCategory[] getItemCategories() {
+//        return new ItemCategory[] {
+//            ItemCategory.SWORD, ItemCategory.BOW, ItemCategory.CROSSBOW, ItemCategory.TRIDENT, ItemCategory.TOOL
+//        };
+//    }
 
     @NotNull
     @Override

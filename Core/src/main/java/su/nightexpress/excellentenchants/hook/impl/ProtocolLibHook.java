@@ -3,8 +3,9 @@ package su.nightexpress.excellentenchants.hook.impl;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.*;
-import org.bukkit.GameMode;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
@@ -14,12 +15,13 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.nightcore.util.Version;
 import su.nightexpress.nightcore.util.text.NightMessage;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProtocolHook {
+public class ProtocolLibHook {
 
     private static boolean isRegistered = false;
 
@@ -27,23 +29,15 @@ public class ProtocolHook {
         if (isRegistered) return;
 
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-        // Not worked :(
-        manager.addPacketListener(new PacketAdapter(plugin, PacketType.Login.Server.SUCCESS) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                PacketContainer packet = event.getPacket();
-                packet.getBooleans().write(0, false);
-            }
-        });
 
         manager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.SET_SLOT) {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
+                if (EnchantUtils.isIgnoringDisplayUpdate(event.getPlayer())) return;
 
                 ItemStack item = packet.getItemModifier().read(0);
-                boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
-                packet.getItemModifier().write(0, update(item, isCreative));
+                packet.getItemModifier().write(0, update(item));
             }
         });
 
@@ -51,11 +45,11 @@ public class ProtocolHook {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
+                if (EnchantUtils.isIgnoringDisplayUpdate(event.getPlayer())) return;
 
                 List<ItemStack> items = packet.getItemListModifier().readSafely(0);
-                boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
+                items.replaceAll(ProtocolLibHook::update);
 
-                items.replaceAll(itemStack -> update(itemStack, isCreative));
                 packet.getItemListModifier().write(0, items);
             }
         });
@@ -64,17 +58,18 @@ public class ProtocolHook {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
+                if (EnchantUtils.isIgnoringDisplayUpdate(event.getPlayer())) return;
 
                 List<MerchantRecipe> list = new ArrayList<>();
-                boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
                 packet.getMerchantRecipeLists().read(0).forEach(recipe -> {
-                    ItemStack result = update(recipe.getResult(), isCreative);
+                    ItemStack result = update(recipe.getResult());
                     if (result == null) return;
 
                     MerchantRecipe r2 = new MerchantRecipe(result, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(), recipe.getVillagerExperience(), recipe.getPriceMultiplier(), recipe.getDemand(), recipe.getSpecialPrice());
                     r2.setIngredients(recipe.getIngredients());
                     list.add(r2);
                 });
+
                 packet.getMerchantRecipeLists().write(0, list);
             }
         });
@@ -83,7 +78,7 @@ public class ProtocolHook {
     }
 
     @Nullable
-    public static ItemStack update(@Nullable ItemStack item, boolean isCreative) {
+    public static ItemStack update(@Nullable ItemStack item) {
         if (item == null || item.getType().isAir()) return item;
 
         ItemStack copy = new ItemStack(item);
@@ -98,23 +93,20 @@ public class ProtocolHook {
         if (enchants.isEmpty()) return item;
 
         List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
-        if (!lore.isEmpty()) {
-            enchants.keySet().forEach(enchant -> lore.removeIf(line -> line.contains(enchant.getName())));
-            if (isCreative) {
-                enchants.forEach((enchant, level) -> {
-                    lore.removeAll(enchant.getDescriptionReplaced(level));
-                });
-            }
-        }
-        if (EnchantUtils.canHaveDescription(item) && !isCreative) {
+
+        if (EnchantUtils.canHaveDescription(item)) {
             enchants.forEach((enchant, level) -> {
-                lore.addAll(0, enchant.getDescriptionReplaced(level));
+                int charges = enchant.getCharges(meta);
+                lore.addAll(0, NightMessage.asLegacy(enchant.getDescriptionReplaced(level, charges)));
             });
         }
-        enchants.forEach((enchant, level) -> {
-            int charges = enchant.getCharges(meta);
-            lore.add(0, NightMessage.asLegacy(enchant.getNameFormatted(level, charges)));
-        });
+
+        if (Version.isBehind(Version.MC_1_21)) {
+            enchants.forEach((enchant, level) -> {
+                int charges = enchant.getCharges(meta);
+                lore.addFirst(NightMessage.asLegacy(enchant.getNameFormatted(level, charges)));
+            });
+        }
 
         meta.setLore(lore);
         copy.setItemMeta(meta);

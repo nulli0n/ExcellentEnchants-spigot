@@ -80,7 +80,7 @@ public class RarityBookCommand extends AbstractCommand<EnchantsPlugin> {
 
         ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
         EnchantUtils.add(item, enchantmentData.getEnchantment(), level, true);
-        EnchantUtils.updateDisplay(item);
+        //EnchantUtils.updateDisplay(item);
         Players.addItem(player, item);
 
         Lang.COMMAND_RARITY_BOOK_DONE.getMessage()

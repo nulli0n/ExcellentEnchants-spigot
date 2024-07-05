@@ -68,6 +68,12 @@ public class V1_20_R3 implements EnchantNMS {
         BuiltInRegistries.ENCHANTMENT.freeze();
     }
 
+    @Override
+    public boolean isEnchantable(@NotNull ItemStack bukkitItem) {
+        net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(bukkitItem);
+        return nmsItem.getItem().isEnchantable(nmsItem);
+    }
+
     public void registerEnchantment(@NotNull EnchantmentData data) {
         CustomEnchantment enchantment = new CustomEnchantment(data);
         Registry.register(BuiltInRegistries.ENCHANTMENT, data.getId(), enchantment);
@@ -163,18 +169,6 @@ public class V1_20_R3 implements EnchantNMS {
         InteractionHand hand = slot == EquipmentSlot.HAND ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
         Items.FISHING_ROD.use(owner.level(), owner, hand);
     }
-
-    /*@Override
-    @Nullable
-    public ItemStack getSpawnEgg(@NotNull LivingEntity entity) {
-        CraftLivingEntity craftLivingEntity = (CraftLivingEntity) entity;
-        net.minecraft.world.entity.LivingEntity livingEntity = craftLivingEntity.getHandle();
-
-        SpawnEggItem eggItem = SpawnEggItem.byId(livingEntity.getType());
-        if (eggItem == null) return null;
-
-        return CraftItemStack.asBukkitCopy(eggItem.getDefaultInstance());
-    }*/
 
     @NotNull
     @Override

@@ -71,4 +71,31 @@ public class Lang extends CoreLang {
     public static final LangText ERROR_INVALID_RARITY = LangText.of("Error.InvalidRarity",
         RED.enclose("Invalid rarity!"));
 
+    public static final LangString ITEM_CATEGORY_HELMET     = LangString.of("ItemCategory.Helmet", "Helmet");
+    public static final LangString ITEM_CATEGORY_CHESTPLATE = LangString.of("ItemCategory.Chestplate", "Chestplate");
+    public static final LangString ITEM_CATEGORY_LEGGINGS   = LangString.of("ItemCategory.Leggings", "Leggings");
+    public static final LangString ITEM_CATEGORY_BOOTS      = LangString.of("ItemCategory.Boots", "Boots");
+    public static final LangString ITEM_CATEGORY_ELYTRA     = LangString.of("ItemCategory.Elytra", "Elytra");
+
+    public static final LangString ITEM_CATEGORY_SWORD       = LangString.of("ItemCategory.Sword", "Sword");
+    public static final LangString ITEM_CATEGORY_AXE         = LangString.of("ItemCategory.Axe", "Axe");
+    public static final LangString ITEM_CATEGORY_HOE         = LangString.of("ItemCategory.Hoe", "Hoe");
+    public static final LangString ITEM_CATEGORY_PICKAXE     = LangString.of("ItemCategory.Pickaxe", "Pickaxe");
+    public static final LangString ITEM_CATEGORY_SHOVEL      = LangString.of("ItemCategory.Shovel", "Shovel");
+    public static final LangString ITEM_CATEGORY_TRIDENT     = LangString.of("ItemCategory.Trident", "Trident");
+    public static final LangString ITEM_CATEGORY_BOW         = LangString.of("ItemCategory.Bow", "Bow");
+    public static final LangString ITEM_CATEGORY_CROSSBOW    = LangString.of("ItemCategory.Crossbow", "Crossbow");
+    public static final LangString ITEM_CATEGORY_FISHING_ROD = LangString.of("ItemCategory.FishingRod", "FishingRod");
+    public static final LangString ITEM_CATEGORY_SHIELD      = LangString.of("ItemCategory.Shield", "Shield");
+
+    public static final LangString ITEM_CATEGORY_BREAKABLE    = LangString.of("ItemCategory.Breakable", "Breakable");
+    public static final LangString ITEM_CATEGORY_ARMOR        = LangString.of("ItemCategory.Armor", "Armor");
+    public static final LangString ITEM_CATEGORY_TOOL         = LangString.of("ItemCategory.Tool", "Tool");
+    public static final LangString ITEM_CATEGORY_WEAPON       = LangString.of("ItemCategory.Weapon", "Sword/Axe");
+    public static final LangString ITEM_CATEGORY_BOWS         = LangString.of("ItemCategory.Bows", "Bow/Crossbow");
+    public static final LangString ITEM_CATEGORY_TORSO        = LangString.of("ItemCategory.Torso", "Chestplate/Elytra");
+    public static final LangString ITEM_CATEGORY_ALL_WEAPON   = LangString.of("ItemCategory.AllWeapon", "All Weapon");
+    public static final LangString ITEM_CATEGORY_MINING_TOOLS = LangString.of("ItemCategory.MiningTools", "Mining Tools");
+
+
 }

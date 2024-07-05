@@ -69,7 +69,7 @@ public class BookCommand extends AbstractCommand<EnchantsPlugin> {
 
         ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
         EnchantUtils.add(item, enchantment, level, true);
-        EnchantUtils.updateDisplay(item);
+        //EnchantUtils.updateDisplay(item);
         Players.addItem(player, item);
 
         Lang.COMMAND_BOOK_DONE.getMessage()

@@ -20,6 +20,7 @@ import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.HookPlugin;
 import su.nightexpress.excellentenchants.hook.impl.MythicMobsHook;
 import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.nightcore.util.EntityUtil;
 import su.nightexpress.nightcore.util.Plugins;
 
 public class EnchantPopulationListener extends AbstractListener<EnchantsPlugin> {
@@ -116,7 +117,7 @@ public class EnchantPopulationListener extends AbstractListener<EnchantsPlugin> 
             boolean isMythic = Plugins.isLoaded(HookPlugin.MYTHIC_MOBS) && MythicMobsHook.isMythicMob(entity);
             boolean doPopulation = Config.getDistributionWaySettings(DistributionWay.MOB_EQUIPMENT).isPresent() && !isMythic;
 
-            for (EquipmentSlot slot : EnchantUtils.EQUIPMENT_SLOTS) {
+            for (EquipmentSlot slot : EntityUtil.EQUIPMENT_SLOTS) {
                 ItemStack item = equipment.getItem(slot);
                 if (EnchantUtils.isEnchantable(item)) {
                     if (doPopulation) {

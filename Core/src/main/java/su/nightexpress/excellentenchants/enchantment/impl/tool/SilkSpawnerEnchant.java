@@ -7,7 +7,6 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +19,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemCategory;
+import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
 import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
@@ -28,6 +27,7 @@ import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
 import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.language.LangAssets;
@@ -35,11 +35,13 @@ import su.nightexpress.nightcore.manager.SimpeListener;
 import su.nightexpress.nightcore.util.LocationUtil;
 import su.nightexpress.nightcore.util.PDCUtil;
 import su.nightexpress.nightcore.util.Plugins;
+import su.nightexpress.nightcore.util.text.NightMessage;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
 import java.io.File;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
+import static su.nightexpress.excellentenchants.Placeholders.GENERIC_TYPE;
 import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
 public class SilkSpawnerEnchant extends AbstractEnchantmentData implements ChanceData, BlockBreakEnchant, BlockDropEnchant, SimpeListener {
@@ -91,15 +93,27 @@ public class SilkSpawnerEnchant extends AbstractEnchantmentData implements Chanc
 
     @Override
     @NotNull
-    public ItemCategory[] getItemCategories() {
-        return new ItemCategory[]{ItemCategory.PICKAXE};
+    public ItemsCategory getSupportedItems() {
+        return ItemCategories.TOOL;
     }
 
     @Override
     @NotNull
-    public EnchantmentTarget getCategory() {
-        return EnchantmentTarget.TOOL;
+    public ItemsCategory getPrimaryItems() {
+        return ItemCategories.PICKAXE;
     }
+
+//    @Override
+//    @NotNull
+//    public ItemCategory[] getItemCategories() {
+//        return new ItemCategory[]{ItemCategory.PICKAXE};
+//    }
+//
+//    @Override
+//    @NotNull
+//    public EnchantmentTarget getCategory() {
+//        return EnchantmentTarget.TOOL;
+//    }
 
     @NotNull
     public ItemStack getSpawner(@NotNull CreatureSpawner spawnerBlock) {
@@ -111,7 +125,7 @@ public class SilkSpawnerEnchant extends AbstractEnchantmentData implements Chanc
         spawnerItem.setSpawnedType(spawnerBlock.getSpawnedType());
         spawnerItem.update(true);
         stateItem.setBlockState(spawnerItem);
-        stateItem.setDisplayName(this.spawnerName.replace(GENERIC_TYPE, LangAssets.get(spawnerBlock.getSpawnedType())));
+        stateItem.setDisplayName(NightMessage.asLegacy(this.spawnerName.replace(GENERIC_TYPE, LangAssets.get(spawnerBlock.getSpawnedType()))));
         itemSpawner.setItemMeta(stateItem);
 
         PDCUtil.set(itemSpawner, this.spawnerKey, true);

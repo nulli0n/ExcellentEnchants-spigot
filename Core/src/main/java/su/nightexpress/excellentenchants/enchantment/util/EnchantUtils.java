@@ -1,39 +1,46 @@
 package su.nightexpress.excellentenchants.enchantment.util;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
 import su.nightexpress.nightcore.language.LangAssets;
 import su.nightexpress.nightcore.util.*;
-import su.nightexpress.nightcore.util.text.NightMessage;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
 public class EnchantUtils {
 
-    public static final EquipmentSlot[] EQUIPMENT_SLOTS = {EquipmentSlot.HAND, EquipmentSlot.OFF_HAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+    //@Deprecated
+    //public static final EquipmentSlot[] EQUIPMENT_SLOTS = {EquipmentSlot.HAND, EquipmentSlot.OFF_HAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+
+    private static final Set<UUID>                      IGNORE_DISPLAY_UPDATE    = new HashSet<>();
     private static final Map<UUID, EnchantedProjectile> ENCHANTED_PROJECTILE_MAP = new ConcurrentHashMap<>();
 
-    private static boolean busyBreak = false;
+    private static EnchantsPlugin plugin;
+    private static boolean busyBreak;
+
+    public static void hook(@NotNull EnchantsPlugin plugin) {
+        EnchantUtils.plugin = plugin;
+        EnchantUtils.busyBreak = false;
+    }
 
     public static boolean isBusyByOthers() {
         return false;
@@ -59,6 +66,24 @@ public class EnchantUtils {
         }
     }
 
+    public static boolean isIgnoringDisplayUpdate(@NotNull Player player) {
+        return IGNORE_DISPLAY_UPDATE.contains(player.getUniqueId()) || player.getGameMode() == GameMode.CREATIVE;
+    }
+
+    public static void doIgnoreDisplayUpdate(@NotNull Player player, @NotNull Runnable runnable) {
+        addIgnoreDisplayUpdate(player);
+        runnable.run();
+        removeIgnoreDisplayUpdate(player);
+    }
+
+    public static void addIgnoreDisplayUpdate(@NotNull Player player) {
+        IGNORE_DISPLAY_UPDATE.add(player.getUniqueId());
+    }
+
+    public static void removeIgnoreDisplayUpdate(@NotNull Player player) {
+        IGNORE_DISPLAY_UPDATE.remove(player.getUniqueId());
+    }
+
     /*@NotNull
     public static NamespacedKey createKey(@NotNull String id) {
         return NamespacedKey.minecraft(id.toLowerCase());
@@ -80,9 +105,10 @@ public class EnchantUtils {
     }
 
     public static boolean isEnchantable(@NotNull ItemStack item) {
-        if (item.getType().isAir()) return false;
-
-        return item.getType() == Material.ENCHANTED_BOOK || Stream.of(EnchantmentTarget.values()).anyMatch(target -> target.includes(item));
+        return plugin.getEnchantNMS().isEnchantable(item);
+//        if (item.getType().isAir()) return false;
+//
+//        return item.getType() == Material.ENCHANTED_BOOK || Stream.of(EnchantmentTarget.values()).anyMatch(target -> target.includes(item));
     }
 
     public static boolean isEnchantedBook(@NotNull ItemStack item) {
@@ -109,23 +135,33 @@ public class EnchantUtils {
     }
 
     public static void removeAll(@NotNull ItemStack item) {
-        if (Version.isAtLeast(Version.V1_20_R3)) {
-            item.removeEnchantments();
-        }
-        else {
-            getEnchantments(item).keySet().forEach(item::removeEnchantment);
-        }
+        //ItemMeta meta = item.getItemMeta();
+        //if (meta == null) return;
+
+        ItemUtil.editMeta(item, meta -> {
+            getEnchantments(meta).keySet().forEach(enchantment -> remove(meta, enchantment));
+        });
+//        if (Version.isAtLeast(Version.V1_20_R3)) {
+//            item.removeEnchantments();
+//        }
+//        else {
+        //getEnchantments(meta).keySet().forEach(enchantment -> remove(meta, enchantment));
+//        }
     }
 
     public static void remove(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
-        ItemMeta meta = item.getItemMeta();
+        ItemUtil.editMeta(item, meta -> {
+            remove(meta, enchantment);
+        });
+    }
+
+    public static void remove(@NotNull ItemMeta meta, @NotNull Enchantment enchantment) {
         if (meta instanceof EnchantmentStorageMeta storageMeta) {
             storageMeta.removeStoredEnchant(enchantment);
         }
         else {
             meta.removeEnchant(enchantment);
         }
-        item.setItemMeta(meta);
     }
 
     /*public static void updateChargesDisplay(@NotNull ItemStack item) {
@@ -144,8 +180,9 @@ public class EnchantUtils {
         return true;
     }
 
+    @Deprecated
     public static boolean updateDisplay(@NotNull ItemStack item) {
-        if (Config.ENCHANTMENTS_DISPLAY_MODE.get() != 1) return false;
+        /*if (Config.ENCHANTMENTS_DISPLAY_MODE.get() != 1) return false;
 
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return false;
@@ -193,17 +230,18 @@ public class EnchantUtils {
         }
         else PDCUtil.remove(meta, Keys.loreSize);
 
-        item.setItemMeta(meta);
+        item.setItemMeta(meta);*/
         return true;
     }
 
     @Nullable
-    public static ItemStack getFishingRod(@NotNull Player player) {
-        ItemStack main = player.getInventory().getItem(EquipmentSlot.HAND);
-        if (main != null && main.getType() == Material.FISHING_ROD) return main;
-
-        ItemStack off = player.getInventory().getItem(EquipmentSlot.OFF_HAND);
-        if (off != null && off.getType() == Material.FISHING_ROD) return off;
+    public static ItemStack getHandItem(@NotNull Player player, @NotNull Material material) {
+        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HAND, EquipmentSlot.OFF_HAND}) {
+            ItemStack itemStack = player.getInventory().getItem(slot);
+            if (itemStack != null && itemStack.getType() == material) {
+                return itemStack;
+            }
+        }
 
         return null;
     }
@@ -239,7 +277,12 @@ public class EnchantUtils {
     }
 
     public static boolean contains(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
-        return getLevel(item, enchantment) > 0;
+        ItemMeta meta = item.getItemMeta();
+        return meta != null && contains(meta, enchantment);
+    }
+
+    public static boolean contains(@NotNull ItemMeta meta, @NotNull Enchantment enchantment) {
+        return (meta instanceof EnchantmentStorageMeta storageMeta) ? storageMeta.hasStoredEnchant(enchantment) : meta.hasEnchant(enchantment);
     }
 
     public static boolean hasMaximumEnchants(@NotNull ItemStack item) {
@@ -247,7 +290,12 @@ public class EnchantUtils {
     }
 
     public static int getLevel(@NotNull ItemStack item, @NotNull Enchantment enchant) {
-        return getEnchantments(item).getOrDefault(enchant, 0);
+        ItemMeta meta = item.getItemMeta();
+        return meta == null ? 0 : getLevel(meta, enchant);
+    }
+
+    public static int getLevel(@NotNull ItemMeta meta, @NotNull Enchantment enchant) {
+        return meta instanceof EnchantmentStorageMeta storageMeta ? storageMeta.getStoredEnchantLevel(enchant) : meta.getEnchantLevel(enchant);
     }
 
     public static int countEnchantments(@NotNull ItemStack item) {
@@ -292,26 +340,28 @@ public class EnchantUtils {
         return map;
     }
 
-    @NotNull
-    public static Map<EquipmentSlot, ItemStack> getEnchantedEquipment(@NotNull LivingEntity entity) {
+    /*@NotNull
+    private static Map<EquipmentSlot, ItemStack> getEnchantedEquipment(@NotNull LivingEntity entity) {
         return getEnchantedEquipment(entity, EQUIPMENT_SLOTS);
-    }
+    }*/
 
     @NotNull
-    public static Map<EquipmentSlot, ItemStack> getEnchantedEquipment(@NotNull LivingEntity entity, @NotNull EquipmentSlot... slots) {
+    private static Map<EquipmentSlot, ItemStack> getEnchantedEquipment(@NotNull LivingEntity entity, @NotNull EquipmentSlot... slots) {
         Map<EquipmentSlot, ItemStack> equipment = EntityUtil.getEquippedItems(entity, slots);
-        equipment.entrySet().removeIf(entry -> {
-            ItemStack item = entry.getValue();
-            EquipmentSlot slot = entry.getKey();
-            if (item == null || item.getType().isAir() || item.getType() == Material.ENCHANTED_BOOK) return true;
-            if ((slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND) && ItemUtil.isArmor(item)) return true;
-            return !item.hasItemMeta();
-        });
+        equipment.values().removeIf(item -> item == null || isEnchantedBook(item) || !item.hasItemMeta());
+
+//        equipment.entrySet().removeIf(entry -> {
+//            ItemStack item = entry.getValue();
+//            EquipmentSlot slot = entry.getKey();
+//            if (item == null || item.getType().isAir() || item.getType() == Material.ENCHANTED_BOOK) return true;
+//            if ((slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND) && ItemUtil.isArmor(item)) return true;
+//            return !item.hasItemMeta();
+//        });
         return equipment;
     }
 
-    @NotNull
-    public static Map<ItemStack, Map<EnchantmentData, Integer>> getEquipped(@NotNull LivingEntity entity) {
+    /*@NotNull
+    private static Map<ItemStack, Map<EnchantmentData, Integer>> getEquipped(@NotNull LivingEntity entity) {
         Map<ItemStack, Map<EnchantmentData, Integer>> map = new HashMap<>();
         getEnchantedEquipment(entity).values().forEach(item -> {
             map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(getCustomEnchantments(item));
@@ -320,15 +370,14 @@ public class EnchantUtils {
     }
 
     @NotNull
-    public static <T extends EnchantmentData> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,
-                                                                                       @NotNull Class<T> clazz) {
+    public static <T extends EnchantmentData> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity, @NotNull Class<T> clazz) {
         return getEquipped(entity, clazz, EQUIPMENT_SLOTS);
-    }
+    }*/
 
     @NotNull
     public static <T extends EnchantmentData> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,
-                                                                                       @NotNull Class<T> clazz,
-                                                                                       @NotNull EquipmentSlot... slots) {
+                                                                                          @NotNull Class<T> clazz,
+                                                                                          @NotNull EquipmentSlot... slots) {
         Map<ItemStack, Map<T, Integer>> map = new HashMap<>();
         getEnchantedEquipment(entity, slots).values().forEach(item -> {
             map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(getCustomEnchantments(item, clazz));
@@ -337,10 +386,10 @@ public class EnchantUtils {
     }
 
     @NotNull
-    public static Map<ItemStack, Integer> getEquipped(@NotNull LivingEntity entity, @NotNull EnchantmentData enchantmentData) {
+    public static Map<ItemStack, Integer> getEquipped(@NotNull LivingEntity entity, @NotNull EnchantmentData data) {
         Map<ItemStack, Integer> map = new HashMap<>();
-        getEnchantedEquipment(entity).values().forEach(item -> {
-            int level = getLevel(item, enchantmentData.getEnchantment());
+        getEnchantedEquipment(entity, data.getSupportedItems().getSlots()).values().forEach(item -> {
+            int level = getLevel(item, data.getEnchantment());
             if (level > 0) {
                 map.put(item, level);
             }

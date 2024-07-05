@@ -48,13 +48,13 @@ public class EnchantAnvilListener extends AbstractListener<EnchantsPlugin> {
 
         this.handleCombine(event, first, second, result);
 
-        this.plugin.runTask(task -> {
+        /*this.plugin.runTask(task -> {
             ItemStack updated = event.getResult();
             if (updated == null || updated.getType().isAir()) return;
 
             EnchantUtils.updateDisplay(updated);
             inventory.setItem(2, updated);
-        });
+        });*/
     }
 
     /*private boolean handleRename(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
@@ -87,7 +87,7 @@ public class EnchantAnvilListener extends AbstractListener<EnchantsPlugin> {
         }
 
         PDCUtil.set(recharged, Keys.itemRecharged, count);
-        EnchantUtils.updateDisplay(recharged);
+        //EnchantUtils.updateDisplay(recharged);
         event.setResult(recharged);
 
         this.plugin.runTask(task -> event.getInventory().setRepairCost(chargable.size()));
@@ -96,6 +96,14 @@ public class EnchantAnvilListener extends AbstractListener<EnchantsPlugin> {
 
     private boolean handleCombine(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
         ItemStack merged = new ItemStack(result.getType().isAir() ? first : result);
+
+        /*AtomicInteger repairCost = new AtomicInteger(event.getInventory().getRepairCost());
+        EnchantUtils.getCustomEnchantments(first).forEach((data, level) -> {
+            if (EnchantUtils.add(merged, data.getEnchantment(), level, false)) {
+                repairCost.addAndGet(data.getAnvilCost());
+            }
+        });*/
+
         if (EnchantUtils.countCustomEnchantments(merged) > Config.CORE_ITEM_ENCHANT_LIMIT.get()) {
             event.setResult(null);
             return false;
@@ -111,10 +119,14 @@ public class EnchantAnvilListener extends AbstractListener<EnchantsPlugin> {
             chargesMap.put(data, chargesFirst + chargesSecond);
             data.setCharges(merged, level, chargesFirst + chargesSecond);
         });
-        if (!chargesMap.isEmpty()) {
+
+        //this.plugin.runTask(task -> event.getInventory().setRepairCost(repairCost.get()));
+
+        if (!chargesMap.isEmpty()/* || repairCost.get() != event.getInventory().getRepairCost()*/) {
             event.setResult(merged);
             return true;
         }
+
         return false;
 
         /*
