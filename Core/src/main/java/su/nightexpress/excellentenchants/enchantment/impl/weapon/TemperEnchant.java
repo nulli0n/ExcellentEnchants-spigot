@@ -87,7 +87,7 @@ public class TemperEnchant extends AbstractEnchantmentData implements CombatEnch
         double percent = this.getDamageAmount(level) / 100D;
         double damagePercent = percent * steps;
 
-        event.setDamage(event.getDamage() * damagePercent);
+        event.setDamage(event.getDamage() * (1 + damagePercent));
         return true;
     }
 
