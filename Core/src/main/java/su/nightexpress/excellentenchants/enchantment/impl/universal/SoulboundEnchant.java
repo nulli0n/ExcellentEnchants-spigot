@@ -10,47 +10,46 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
+import su.nightexpress.nightcore.util.BukkitThing;
+import su.nightexpress.nightcore.util.Lists;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SoulboundEnchant extends AbstractEnchantmentData implements GenericEnchant, SimpeListener {
+public class SoulboundEnchant extends GameEnchantment implements GenericEnchant, SimpeListener {
 
     public static final String ID = "soulbound";
 
     public SoulboundEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Protects from being dropped on death.");
-        this.setMaxLevel(1);
-        this.setRarity(Rarity.VERY_RARE);
-        this.setConflicts(Enchantment.VANISHING_CURSE.getKey().getKey());
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.TAIGA_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Protects from being dropped on death.",
+            EnchantRarity.MYTHIC,
+            1,
+            ItemCategories.BREAKABLE,
+            Lists.newSet(BukkitThing.toString(Enchantment.VANISHING_CURSE))
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
 
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BREAKABLE;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.BREAKABLE;
-//    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(@NotNull PlayerDeathEvent deathEvent) {
@@ -63,7 +62,7 @@ public class SoulboundEnchant extends AbstractEnchantmentData implements Generic
         World world = player.getWorld();
 
         deathEvent.getDrops().removeIf(drop -> {
-            if (EnchantUtils.getLevel(drop, this.getEnchantment()) > 0) {
+            if (EnchantUtils.getLevel(drop, this.getBukkitEnchantment()) > 0) {
                 if (this.isOutOfCharges(drop)) return false;
 
                 saveList.add(drop);
@@ -80,7 +79,7 @@ public class SoulboundEnchant extends AbstractEnchantmentData implements Generic
                     world.dropItemNaturally(location, save);
                 }
                 else {
-                    this.consumeChargesNoUpdate(save, EnchantUtils.getLevel(save, this.getEnchantment()));
+                    this.consumeChargesNoUpdate(save, EnchantUtils.getLevel(save, this.getBukkitEnchantment()));
                     player.getInventory().addItem(save);
                 }
             });

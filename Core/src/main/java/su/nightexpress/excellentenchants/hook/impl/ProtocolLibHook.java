@@ -13,20 +13,20 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
-import su.nightexpress.nightcore.util.Version;
+import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.util.text.NightMessage;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class ProtocolLibHook {
 
-    private static boolean isRegistered = false;
+    private static boolean registered = false;
 
     public static void setup(@NotNull EnchantsPlugin plugin) {
-        if (isRegistered) return;
+        if (registered) return;
 
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 
@@ -34,7 +34,7 @@ public class ProtocolLibHook {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
-                if (EnchantUtils.isIgnoringDisplayUpdate(event.getPlayer())) return;
+                if (!EnchantUtils.canUpdateDisplay(event.getPlayer())) return;
 
                 ItemStack item = packet.getItemModifier().read(0);
                 packet.getItemModifier().write(0, update(item));
@@ -45,7 +45,7 @@ public class ProtocolLibHook {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
-                if (EnchantUtils.isIgnoringDisplayUpdate(event.getPlayer())) return;
+                if (!EnchantUtils.canUpdateDisplay(event.getPlayer())) return;
 
                 List<ItemStack> items = packet.getItemListModifier().readSafely(0);
                 items.replaceAll(ProtocolLibHook::update);
@@ -58,7 +58,7 @@ public class ProtocolLibHook {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
-                if (EnchantUtils.isIgnoringDisplayUpdate(event.getPlayer())) return;
+                if (!EnchantUtils.canUpdateDisplay(event.getPlayer())) return;
 
                 List<MerchantRecipe> list = new ArrayList<>();
                 packet.getMerchantRecipeLists().read(0).forEach(recipe -> {
@@ -74,39 +74,27 @@ public class ProtocolLibHook {
             }
         });
 
-        isRegistered = true;
+        registered = true;
     }
 
     @Nullable
     public static ItemStack update(@Nullable ItemStack item) {
-        if (item == null || item.getType().isAir()) return item;
+        if (item == null || item.getType().isAir() || !EnchantUtils.canHaveDescription(item)) return item;
 
         ItemStack copy = new ItemStack(item);
         ItemMeta meta = copy.getItemMeta();
         if (meta == null || meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) return item;
 
-        Map<EnchantmentData, Integer> enchants = EnchantUtils.getCustomEnchantments(meta)
-            .entrySet().stream()
-            .sorted(Comparator.comparing((Map.Entry<EnchantmentData, Integer> entry) -> entry.getKey().getRarity().getWeight())
-                .thenComparing(entry -> entry.getKey().getName()))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old,nev) -> nev, LinkedHashMap::new));
+        Map<CustomEnchantment, Integer> enchants = EnchantUtils.getCustomEnchantments(meta);
         if (enchants.isEmpty()) return item;
 
-        List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
+        List<String> metaLore = meta.getLore();
+        List<String> lore = metaLore == null ? new ArrayList<>() : metaLore;
 
-        if (EnchantUtils.canHaveDescription(item)) {
-            enchants.forEach((enchant, level) -> {
-                int charges = enchant.getCharges(meta);
-                lore.addAll(0, NightMessage.asLegacy(enchant.getDescriptionReplaced(level, charges)));
-            });
-        }
-
-        if (Version.isBehind(Version.MC_1_21)) {
-            enchants.forEach((enchant, level) -> {
-                int charges = enchant.getCharges(meta);
-                lore.addFirst(NightMessage.asLegacy(enchant.getNameFormatted(level, charges)));
-            });
-        }
+        enchants.forEach((enchant, level) -> {
+            int chargesAmount = enchant.getCharges(meta);
+            lore.addAll(NightMessage.asLegacy(enchant.getDescription(level, chargesAmount)));
+        });
 
         meta.setLore(lore);
         copy.setItemMeta(meta);

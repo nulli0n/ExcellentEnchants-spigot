@@ -5,9 +5,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 
-public interface InteractEnchant extends EnchantmentData {
+public interface InteractEnchant extends CustomEnchantment {
 
     boolean onInteract(@NotNull PlayerInteractEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level);
 

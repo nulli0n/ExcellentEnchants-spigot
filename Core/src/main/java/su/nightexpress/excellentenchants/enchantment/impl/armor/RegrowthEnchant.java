@@ -7,16 +7,16 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
-import su.nightexpress.excellentenchants.api.enchantment.data.PeriodicSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Period;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.data.PeriodSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.EntityUtil;
 import su.nightexpress.nightcore.util.NumberUtil;
@@ -26,7 +26,7 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.*;
 
-public class RegrowthEnchant extends AbstractEnchantmentData implements ChanceData, PassiveEnchant {
+public class RegrowthEnchant extends GameEnchantment implements ChanceMeta, PassiveEnchant {
 
     public static final String ID = "regrowth";
 
@@ -34,21 +34,24 @@ public class RegrowthEnchant extends AbstractEnchantmentData implements ChanceDa
     private Modifier maxHealth;
     private Modifier healAmount;
 
-    private ChanceSettingsImpl chanceSettings;
-    private PeriodSettingsImpl periodSettings;
-
     public RegrowthEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Restores " + GENERIC_AMOUNT + "❤ every few seconds.");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.VERY_RARE);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.TAIGA_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Restores " + GENERIC_AMOUNT + "❤ every few seconds.",
+            EnchantRarity.MYTHIC,
+            5,
+            ItemCategories.TORSO
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(100, 0, 1, 100));
-
-        this.periodSettings = PeriodSettingsImpl.create(config);
+        this.meta.setProbability(Probability.create(config, Modifier.add(100, 0, 1, 100)));
+        this.meta.setPeriod(Period.create(config));
 
         this.minHealth = Modifier.read(config, "Settings.Heal.Min_Health",
             Modifier.add(0.5, 0, 0),
@@ -69,30 +72,6 @@ public class RegrowthEnchant extends AbstractEnchantmentData implements ChanceDa
         this.addPlaceholder(GENERIC_MIN, level -> NumberUtil.format(this.getMinHealthToHeal(level)));
         this.addPlaceholder(GENERIC_MAX, level -> NumberUtil.format(this.getMaxHealthToHeal(level)));
     }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @NotNull
-    @Override
-    public PeriodicSettings getPeriodSettings() {
-        return periodSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TORSO;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.ARMOR_TORSO;
-//    }
 
     public double getHealAmount(int level) {
         return this.healAmount.getValue(level);

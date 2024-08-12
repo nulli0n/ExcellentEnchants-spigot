@@ -11,64 +11,53 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.BukkitThing;
+import su.nightexpress.nightcore.util.Lists;
 
 import java.io.File;
 
-public class EnderBowEnchant extends AbstractEnchantmentData implements ChanceData, BowEnchant {
+public class EnderBowEnchant extends GameEnchantment implements ChanceMeta, BowEnchant {
 
     public static final String ID = "ender_bow";
 
-    private ChanceSettingsImpl chanceSettings;
-
     public EnderBowEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Shoots ender pearls instead of arrows.");
-        this.setMaxLevel(1);
-        this.setRarity(Rarity.VERY_RARE);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.PLAINS_SPECIAL));
+    }
 
-        this.setConflicts(
-            BomberEnchant.ID, GhastEnchant.ID,
-            ExplosiveArrowsEnchant.ID, PoisonedArrowsEnchant.ID, ConfusingArrowsEnchant.ID,
-            WitheredArrowsEnchant.ID, ElectrifiedArrowsEnchant.ID, DragonfireArrowsEnchant.ID,
-            DarknessArrowsEnchant.ID, VampiricArrowsEnchant.ID,
-            HoverEnchant.ID, FlareEnchant.ID,
-            Enchantment.ARROW_FIRE.getKey().getKey(),
-            Enchantment.ARROW_KNOCKBACK.getKey().getKey(),
-            Enchantment.ARROW_DAMAGE.getKey().getKey()
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Shoots ender pearls instead of arrows.",
+            EnchantRarity.MYTHIC,
+            1,
+            ItemCategories.BOWS,
+            Lists.newSet(
+                BomberEnchant.ID, GhastEnchant.ID,
+                ExplosiveArrowsEnchant.ID, PoisonedArrowsEnchant.ID, ConfusingArrowsEnchant.ID,
+                WitheredArrowsEnchant.ID, ElectrifiedArrowsEnchant.ID, DragonfireArrowsEnchant.ID,
+                DarknessArrowsEnchant.ID, VampiricArrowsEnchant.ID,
+                HoverEnchant.ID, FlareEnchant.ID,
+                BukkitThing.toString(Enchantment.FLAME),
+                BukkitThing.toString(Enchantment.PUNCH),
+                BukkitThing.toString(Enchantment.POWER)
+            )
         );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config);
+        this.meta.setProbability(Probability.create(config));
     }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BOWS;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.BOW;
-//    }
 
     @NotNull
     @Override

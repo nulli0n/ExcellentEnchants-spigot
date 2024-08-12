@@ -8,11 +8,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 
@@ -21,17 +23,24 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_MODIFIER;
 
-public class WisdomEnchant extends AbstractEnchantmentData implements DeathEnchant {
+public class WisdomEnchant extends GameEnchantment implements DeathEnchant {
 
     public static final String ID = "exp_hunter";
 
     private Modifier xpModifier;
 
     public WisdomEnchant(@NotNull EnchantsPlugin plugin, File file) {
-        super(plugin, file);
-        this.setDescription("Mobs drops x" + GENERIC_MODIFIER + " more XP.");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.UNCOMMON);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.JUNGLE_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Mobs drops x" + GENERIC_MODIFIER + " more XP.",
+            EnchantRarity.RARE,
+            5,
+            ItemCategories.WEAPON
+        );
     }
 
     @Override
@@ -47,18 +56,6 @@ public class WisdomEnchant extends AbstractEnchantmentData implements DeathEncha
     public final double getXPModifier(int level) {
         return this.xpModifier.getValue(level);
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
 
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, ItemStack weapon, int level) {

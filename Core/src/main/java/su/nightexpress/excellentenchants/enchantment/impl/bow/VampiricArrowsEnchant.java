@@ -15,19 +15,20 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ArrowSettings;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowEffects;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ArrowSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.EntityUtil;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
@@ -36,27 +37,32 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
-public class VampiricArrowsEnchant extends AbstractEnchantmentData implements BowEnchant, ArrowData, ChanceData {
+public class VampiricArrowsEnchant extends GameEnchantment implements BowEnchant, ArrowMeta, ChanceMeta {
 
     public static final String ID = "vampiric_arrows";
 
-    private ArrowSettingsImpl  arrowSettings;
-    private ChanceSettingsImpl chanceSettings;
-    private Modifier           healAmount;
+    private Modifier healAmount;
 
     public VampiricArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to restore " + GENERIC_AMOUNT + "❤ on arrow hit.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.RARE);
-        this.setConflicts(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.SAVANNA_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to restore " + GENERIC_AMOUNT + "❤ on arrow hit.",
+            EnchantRarity.LEGENDARY,
+            3,
+            ItemCategories.BOWS,
+            Lists.newSet(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID)
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.arrowSettings = ArrowSettingsImpl.create(config, UniParticle.redstone(Color.RED, 1f));
+        this.meta.setArrowEffects(ArrowEffects.create(config, UniParticle.redstone(Color.RED, 1f)));
 
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(8, 4, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(8, 4, 1, 100)));
 
         this.healAmount = Modifier.read(config, "Settings.Heal_Amount",
             Modifier.add(0, 1, 1, 10),
@@ -64,30 +70,6 @@ public class VampiricArrowsEnchant extends AbstractEnchantmentData implements Bo
         );
 
         this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getHealAmount(level)));
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BOWS;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.BOW;
-//    }
-
-    @NotNull
-    @Override
-    public ArrowSettings getArrowSettings() {
-        return this.arrowSettings;
-    }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return this.chanceSettings;
     }
 
     public double getHealAmount(int level) {

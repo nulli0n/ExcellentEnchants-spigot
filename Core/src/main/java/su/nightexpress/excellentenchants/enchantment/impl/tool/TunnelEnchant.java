@@ -9,12 +9,14 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.Lists;
@@ -24,7 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class TunnelEnchant extends AbstractEnchantmentData implements BlockBreakEnchant {
+public class TunnelEnchant extends GameEnchantment implements BlockBreakEnchant {
 
     public static final String   ID                   = "tunnel";
     // X and Z offsets for each block AoE mined
@@ -39,12 +41,19 @@ public class TunnelEnchant extends AbstractEnchantmentData implements BlockBreak
     private boolean disableOnSneak;
 
     public TunnelEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.SWAMP_SPECIAL));
+    }
 
-        this.setDescription("Mines multiple blocks at once in a certain shape.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.VERY_RARE);
-        this.setConflicts(VeinminerEnchant.ID, BlastMiningEnchant.ID);
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            Lists.newList("Mines multiple blocks at once in a certain shape."),
+            EnchantRarity.MYTHIC,
+            3,
+            ItemCategories.TOOL,
+            ItemCategories.PICKAXE,
+            Lists.newSet(VeinminerEnchant.ID, BlastMiningEnchant.ID)
+        );
     }
 
     @Override
@@ -53,30 +62,6 @@ public class TunnelEnchant extends AbstractEnchantmentData implements BlockBreak
             true,
             "Sets whether or not enchantment will have no effect when crouching.").read(config);
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TOOL;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getPrimaryItems() {
-        return ItemCategories.PICKAXE;
-    }
-
-//    @Override
-//    @NotNull
-//    public ItemCategory[] getItemCategories() {
-//        return new ItemCategory[]{ItemCategory.PICKAXE, ItemCategory.SHOVEL};
-//    }
-//
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.TOOL;
-//    }
 
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {

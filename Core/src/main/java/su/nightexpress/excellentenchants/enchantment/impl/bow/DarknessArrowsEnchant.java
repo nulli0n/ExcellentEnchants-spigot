@@ -13,75 +13,57 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.*;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.PotionMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowEffects;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.api.enchantment.meta.PotionEffects;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.*;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
 import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.*;
 
-public class DarknessArrowsEnchant extends AbstractEnchantmentData implements ChanceData, ArrowData, PotionData, BowEnchant {
+public class DarknessArrowsEnchant extends GameEnchantment implements ChanceMeta, ArrowMeta, PotionMeta, BowEnchant {
 
     public static final String ID = "darkness_arrows";
 
-    private ArrowSettingsImpl  arrowSettings;
-    private ChanceSettingsImpl chanceSettings;
-    private PotionSettingsImpl potionSettings;
-
     public DarknessArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to launch an arrow with " + ENCHANTMENT_POTION_TYPE + " " + ENCHANTMENT_POTION_LEVEL + " (" + ENCHANTMENT_POTION_DURATION + "s.)");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.COMMON);
-        this.setConflicts(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.SNOW_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to launch an arrow with " + ENCHANTMENT_POTION_TYPE + " " + ENCHANTMENT_POTION_LEVEL + " (" + ENCHANTMENT_POTION_DURATION + "s.)",
+            EnchantRarity.COMMON,
+            3,
+            ItemCategories.BOWS,
+            Lists.newSet(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID)
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.arrowSettings = ArrowSettingsImpl.create(config, UniParticle.of(Particle.ASH));
+        this.meta.setArrowEffects(ArrowEffects.create(config, UniParticle.of(Particle.ASH)));
 
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(8, 4, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(8, 4, 1, 100)));
 
-        this.potionSettings = PotionSettingsImpl.create(this, config, PotionEffectType.DARKNESS, false,
+        this.meta.setPotionEffects(PotionEffects.create(this, config, PotionEffectType.DARKNESS, false,
             Modifier.add(3.5, 1.5, 1, 300),
             Modifier.add(0, 1, 1, 5)
-        );
+        ));
     }
-
-    @NotNull
-    @Override
-    public ArrowSettings getArrowSettings() {
-        return arrowSettings;
-    }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @NotNull
-    @Override
-    public PotionSettings getPotionSettings() {
-        return potionSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BOWS;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.BOW;
-//    }
 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {

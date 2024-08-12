@@ -8,11 +8,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
@@ -22,7 +24,7 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
-public class VillageDefenderEnchant extends AbstractEnchantmentData implements CombatEnchant {
+public class VillageDefenderEnchant extends GameEnchantment implements CombatEnchant {
 
     public static final String ID = "village_defender";
 
@@ -30,10 +32,17 @@ public class VillageDefenderEnchant extends AbstractEnchantmentData implements C
     private Modifier damageAmount;
 
     public VillageDefenderEnchant(@NotNull EnchantsPlugin plugin, File file) {
-        super(plugin, file);
-        this.setDescription("Inflicts " + GENERIC_AMOUNT + "❤ more damage to all pillagers.");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.COMMON);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.SAVANNA_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Inflicts " + GENERIC_AMOUNT + "❤ more damage to all pillagers.",
+            EnchantRarity.COMMON,
+            5,
+            ItemCategories.WEAPON
+        );
     }
 
     @Override
@@ -59,18 +68,6 @@ public class VillageDefenderEnchant extends AbstractEnchantmentData implements C
     }
 
     @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
-
-    @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!(victim instanceof Illager)) return false;
 
@@ -81,7 +78,7 @@ public class VillageDefenderEnchant extends AbstractEnchantmentData implements C
         event.setDamage(damageFinal);
 
         if (this.hasVisualEffects()) {
-            UniParticle.of(Particle.VILLAGER_ANGRY).play(victim.getEyeLocation(), 0.25, 0.1, 30);
+            UniParticle.of(Particle.ANGRY_VILLAGER).play(victim.getEyeLocation(), 0.25, 0.1, 30);
         }
         return true;
     }

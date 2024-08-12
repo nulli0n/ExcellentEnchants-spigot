@@ -16,15 +16,16 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.InteractEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.wrapper.UniSound;
@@ -32,14 +33,12 @@ import su.nightexpress.nightcore.util.wrapper.UniSound;
 import java.io.File;
 import java.util.Set;
 
-public class ReplanterEnchant extends AbstractEnchantmentData implements ChanceData, InteractEnchant, BlockBreakEnchant {
+public class ReplanterEnchant extends GameEnchantment implements ChanceMeta, InteractEnchant, BlockBreakEnchant {
 
     public static final String ID = "replanter";
 
     private boolean replantOnRightClick;
     private boolean replantOnPlantBreak;
-
-    private ChanceSettingsImpl chanceSettings;
 
     private static final Set<Material> CROPS = Set.of(
         Material.WHEAT_SEEDS, Material.BEETROOT_SEEDS,
@@ -47,15 +46,23 @@ public class ReplanterEnchant extends AbstractEnchantmentData implements ChanceD
         Material.POTATO, Material.CARROT, Material.NETHER_WART);
 
     public ReplanterEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Automatically replant crops on right click and when harvest.");
-        this.setMaxLevel(1);
-        this.setRarity(Rarity.RARE);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.DESERT_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Automatically replant crops on right click and when harvest.",
+            EnchantRarity.LEGENDARY,
+            1,
+            ItemCategories.TOOL,
+            ItemCategories.HOE
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config);
+        this.meta.setProbability(Probability.create(config));
 
         this.replantOnRightClick = ConfigValue.create("Settings.Replant.On_Right_Click",
             true,
@@ -66,12 +73,6 @@ public class ReplanterEnchant extends AbstractEnchantmentData implements ChanceD
             true,
             "When 'true', crops will be automatically replanted when player break plants with enchanted tool in hand."
         ).read(config);
-    }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
     }
 
     public boolean isReplantOnPlantBreak() {
@@ -97,30 +98,6 @@ public class ReplanterEnchant extends AbstractEnchantmentData implements ChanceD
         seed.setAmount(seed.getAmount() - 1);
         return true;
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TOOL;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getPrimaryItems() {
-        return ItemCategories.HOE;
-    }
-
-//    @Override
-//    @NotNull
-//    public ItemCategory[] getItemCategories() {
-//        return new ItemCategory[]{ItemCategory.HOE};
-//    }
-//
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.TOOL;
-//    }
 
     @NotNull
     @Override

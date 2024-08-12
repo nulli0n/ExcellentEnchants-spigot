@@ -1,41 +1,17 @@
 package su.nightexpress.excellentenchants.api.enchantment;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.nightcore.util.random.Rnd;
+import su.nightexpress.nightcore.config.FileConfig;
 
-import java.util.HashMap;
-import java.util.Map;
+public interface Rarity {
 
-@Deprecated
-public enum Rarity {
+    void write(@NotNull FileConfig config, @NotNull String path);
 
-    COMMON(10),
-    UNCOMMON(5),
-    RARE(2),
-    VERY_RARE(1);
+    @NotNull String getId();
 
-    private int weight;
+    @NotNull String getName();
 
-    Rarity(int weight) {
-        this.weight = weight;
-    }
+    @NotNull String getNameFormat();
 
-    public int getWeight() {
-        return this.weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    @NotNull
-    public static Rarity getByWeight() {
-        Map<Rarity, Double> map = new HashMap<>();
-
-        for (Rarity rarity : Rarity.values()) {
-            map.put(rarity, (double) rarity.getWeight());
-        }
-
-        return Rnd.getByWeight(map);
-    }
+    int getWeight();
 }

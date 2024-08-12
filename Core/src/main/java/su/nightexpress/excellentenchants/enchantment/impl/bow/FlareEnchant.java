@@ -18,17 +18,17 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ArrowSettings;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowEffects;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ArrowSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
@@ -36,55 +36,34 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
-public class FlareEnchant extends AbstractEnchantmentData implements ChanceData, ArrowData, BowEnchant {
+public class FlareEnchant extends GameEnchantment implements ChanceMeta, ArrowMeta, BowEnchant {
 
     public static final String ID = "flare";
 
-    private ChanceSettingsImpl chanceSettings;
-    private ArrowSettingsImpl  arrowSettings;
-
     public FlareEnchant(@NotNull EnchantsPlugin plugin, File file) {
-        super(plugin, file);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.SNOW_COMMON));
+    }
 
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to create a torch where arrow lands.");
-        this.setMaxLevel(1);
-        this.setRarity(Rarity.RARE);
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to create a torch where arrow lands.",
+            EnchantRarity.LEGENDARY,
+            1,
+            ItemCategories.BOWS
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config);
-        this.arrowSettings = ArrowSettingsImpl.create(config, UniParticle.of(Particle.FIREWORKS_SPARK));
+        this.meta.setProbability(Probability.create(config));
+        this.meta.setArrowEffects(ArrowEffects.create(config, UniParticle.of(Particle.ELECTRIC_SPARK)));
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BOWS;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.BOW;
-//    }
 
     @NotNull
     @Override
     public EventPriority getHitPriority() {
         return EventPriority.HIGHEST;
-    }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return this.chanceSettings;
-    }
-
-    @NotNull
-    @Override
-    public ArrowSettings getArrowSettings() {
-        return this.arrowSettings;
     }
 
     @Override

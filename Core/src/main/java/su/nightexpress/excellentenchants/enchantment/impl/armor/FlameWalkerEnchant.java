@@ -19,69 +19,88 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.api.enchantment.bridge.FlameWalker;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
-import su.nightexpress.nightcore.util.Pair;
-import su.nightexpress.nightcore.util.random.Rnd;
+import su.nightexpress.nightcore.util.BukkitThing;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-public class FlameWalkerEnchant extends AbstractEnchantmentData implements GenericEnchant, SimpeListener {
+public class FlameWalkerEnchant extends GameEnchantment implements GenericEnchant, FlameWalker, SimpeListener {
 
-    public static final String ID = "flame_walker";
+    private static final BlockFace[] FACES = {BlockFace.SOUTH, BlockFace.NORTH, BlockFace.EAST, BlockFace.WEST};
 
-    private static final BlockFace[]                        FACES             = {BlockFace.SOUTH, BlockFace.NORTH, BlockFace.EAST, BlockFace.WEST};
-    private static final Map<Location, Pair<Long, Integer>> BLOCKS_TO_DESTROY = new ConcurrentHashMap<>();
-
+    private Modifier radius;
     private Modifier blockDecayTime;
 
     public FlameWalkerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Ability to walk on lava, ignore magma block damage.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.RARE);
-        this.setConflicts(Enchantment.FROST_WALKER.getKey().getKey());
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.DESERT_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            Lists.newList("Ability to walk on lava, ignore magma block damage."),
+            EnchantRarity.LEGENDARY,
+            3,
+            ItemCategories.BOOTS,
+            null,
+            Lists.newSet(BukkitThing.toString(Enchantment.FROST_WALKER))
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
+        this.radius = Modifier.read(config, "Settings.Radius",
+            Modifier.add(3.0, 1.0, 1, 16),
+            "Sets max radius."
+        );
+
         this.blockDecayTime = Modifier.read(config, "Settings.Block_Decay",
             Modifier.add(8, 1, 1, 120),
-            "Sets up to how long (in seconds) blocks will stay before turn back to lava.");
+            "Sets up to how long (in seconds) blocks will stay before turn back into lava."
+        );
+    }
+
+    @NotNull
+    @Override
+    public Modifier getRadius() {
+        return radius;
+    }
+
+    @Override
+    public double getBlockDecayTime(int level) {
+        return this.blockDecayTime.getValue(level);
     }
 
     @Override
     public void clear() {
-        BLOCKS_TO_DESTROY.keySet().forEach(location -> location.getBlock().setType(Material.LAVA));
-        BLOCKS_TO_DESTROY.clear();
-    }
-
-    public static void addBlock(@NotNull Block block, double seconds) {
-        BLOCKS_TO_DESTROY.put(block.getLocation(), Pair.of(System.currentTimeMillis() + (long) seconds * 1000L, Rnd.get(1000)));
+        MAGMA_BLOCKS.keySet().forEach(location -> location.getBlock().setType(Material.LAVA));
+        MAGMA_BLOCKS.clear();
     }
 
     public static boolean isBlock(@NotNull Block block) {
-        return BLOCKS_TO_DESTROY.containsKey(block.getLocation());
+        return MAGMA_BLOCKS.containsKey(block.getLocation());
     }
 
     public static void tickBlocks() {
         long now = System.currentTimeMillis();
 
-        BLOCKS_TO_DESTROY.keySet().removeIf(location -> location.getBlock().isLiquid() || location.getBlock().getType() != Material.MAGMA_BLOCK);
-        BLOCKS_TO_DESTROY.forEach((location, pair) -> {
+        MAGMA_BLOCKS.keySet().removeIf(location -> location.getBlock().isLiquid() || location.getBlock().getType() != Material.MAGMA_BLOCK);
+        MAGMA_BLOCKS.forEach((location, pair) -> {
             Block block = location.getBlock();
             long time = pair.getFirst();
             if (now >= time) {
@@ -106,22 +125,6 @@ public class FlameWalkerEnchant extends AbstractEnchantmentData implements Gener
         });
     }
 
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BOOTS;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.ARMOR_FEET;
-//    }
-
-    public double getBlockDecayTime(int level) {
-        return this.blockDecayTime.getValue(level);
-    }
-
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
@@ -135,20 +138,35 @@ public class FlameWalkerEnchant extends AbstractEnchantmentData implements Gener
         ItemStack boots = player.getInventory().getBoots();
         if (boots == null || boots.getType().isAir()) return;
 
-        int level = EnchantUtils.getLevel(boots, this.getEnchantment());
+        int level = EnchantUtils.getLevel(boots, this.getBukkitEnchantment());
         if (level <= 0) return;
 
         Block bTo = to.getBlock().getRelative(BlockFace.DOWN);
         boolean hasLava = Stream.of(FACES).anyMatch(face -> bTo.getRelative(face).getType() == Material.LAVA);
         if (!hasLava) return;
 
-        Set<Block> blocks = plugin.getEnchantNMS().handleFlameWalker(player, player.getLocation(), level);
-        blocks.forEach(block -> {
-            addBlock(block, Rnd.getDouble(this.getBlockDecayTime(level)) + 1);
-        });
-        if (!blocks.isEmpty()) {
+        if (plugin.getEnchantNMS().handleFlameWalker(this, player, level)) {
             this.consumeCharges(boots, level);
         }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onMagmaDamage(EntityDamageEvent event) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.HOT_FLOOR) return;
+        if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
+        if (!this.isAvailableToUse(livingEntity)) return;
+
+        EntityEquipment equipment = livingEntity.getEquipment();
+        if (equipment == null) return;
+
+        ItemStack boots = equipment.getBoots();
+        if (boots == null || boots.getType().isAir()) return;
+
+        int level = EnchantUtils.getLevel(boots, this.getBukkitEnchantment());
+        if (level <= 0) return;
+
+        event.setCancelled(true);
+        this.consumeCharges(boots, level);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -178,24 +196,5 @@ public class FlameWalkerEnchant extends AbstractEnchantmentData implements Gener
             }
             return false;
         });
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onMagmaDamage(EntityDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.HOT_FLOOR) return;
-        if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
-        if (!this.isAvailableToUse(livingEntity)) return;
-
-        EntityEquipment equipment = livingEntity.getEquipment();
-        if (equipment == null) return;
-
-        ItemStack boots = equipment.getBoots();
-        if (boots == null || boots.getType().isAir()) return;
-
-        int level = EnchantUtils.getLevel(boots, this.getEnchantment());
-        if (level <= 0) return;
-
-        event.setCancelled(true);
-        this.consumeCharges(boots, level);
     }
 }

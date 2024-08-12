@@ -11,15 +11,18 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.BukkitThing;
+import su.nightexpress.nightcore.util.Lists;
 
 import java.io.File;
 import java.util.HashSet;
@@ -29,7 +32,7 @@ import java.util.stream.Stream;
 
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
-public class VeinminerEnchant extends AbstractEnchantmentData implements BlockBreakEnchant {
+public class VeinminerEnchant extends GameEnchantment implements BlockBreakEnchant {
 
     public static final String ID = "veinminer";
 
@@ -43,12 +46,19 @@ public class VeinminerEnchant extends AbstractEnchantmentData implements BlockBr
     private boolean       disableOnCrouch;
 
     public VeinminerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.PLAINS_SPECIAL));
+    }
 
-        this.setDescription("Mines up to " + GENERIC_AMOUNT + " blocks of the ore vein at once.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.RARE);
-        this.setConflicts(BlastMiningEnchant.ID, TunnelEnchant.ID);
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            Lists.newList("Mines up to " + GENERIC_AMOUNT + " blocks of the ore vein at once."),
+            EnchantRarity.LEGENDARY,
+            3,
+            ItemCategories.TOOL,
+            ItemCategories.PICKAXE,
+            Lists.newSet(BlastMiningEnchant.ID, TunnelEnchant.ID)
+        );
     }
 
     @Override
@@ -93,30 +103,6 @@ public class VeinminerEnchant extends AbstractEnchantmentData implements BlockBr
     public int getBlocksLimit(int level) {
         return (int) this.blocksLimit.getValue(level);
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TOOL;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getPrimaryItems() {
-        return ItemCategories.PICKAXE;
-    }
-
-//    @Override
-//    @NotNull
-//    public ItemCategory[] getItemCategories() {
-//        return new ItemCategory[]{ItemCategory.PICKAXE};
-//    }
-//
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.TOOL;
-//    }
 
     @NotNull
     private Set<Block> getNearby(@NotNull Block block) {

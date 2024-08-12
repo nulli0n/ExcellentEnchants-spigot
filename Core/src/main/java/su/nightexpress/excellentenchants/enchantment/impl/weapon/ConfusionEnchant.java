@@ -9,17 +9,17 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
-import su.nightexpress.excellentenchants.api.enchantment.data.PotionData;
-import su.nightexpress.excellentenchants.api.enchantment.data.PotionSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.PotionMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.api.enchantment.meta.PotionEffects;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.data.PotionSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
@@ -27,52 +27,33 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.*;
 
-public class ConfusionEnchant extends AbstractEnchantmentData implements ChanceData, PotionData, CombatEnchant {
+public class ConfusionEnchant extends GameEnchantment implements ChanceMeta, PotionMeta, CombatEnchant {
 
     public static final String ID = "confusion";
 
-    private ChanceSettingsImpl chanceSettings;
-    private PotionSettingsImpl potionSettings;
-
     public ConfusionEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to apply " + ENCHANTMENT_POTION_TYPE + " " + ENCHANTMENT_POTION_LEVEL + " (" + ENCHANTMENT_POTION_DURATION + "s.) on hit.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.COMMON);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.SWAMP_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to apply " + ENCHANTMENT_POTION_TYPE + " " + ENCHANTMENT_POTION_LEVEL + " (" + ENCHANTMENT_POTION_DURATION + "s.) on hit.",
+            EnchantRarity.COMMON,
+            3,
+            ItemCategories.WEAPON
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(15, 5, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(15, 5, 1, 100)));
 
-        this.potionSettings = PotionSettingsImpl.create(this, config, PotionEffectType.CONFUSION, false,
+        this.meta.setPotionEffects(PotionEffects.create(this, config, PotionEffectType.NAUSEA, false,
             Modifier.add(7, 1, 1, 300),
-            Modifier.add(0, 1, 1, 10));
+            Modifier.add(0, 1, 1, 10)
+        ));
     }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @NotNull
-    @Override
-    public PotionSettings getPotionSettings() {
-        return potionSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
 
     @NotNull
     @Override

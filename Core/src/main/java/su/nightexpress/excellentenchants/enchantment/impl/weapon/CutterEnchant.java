@@ -13,14 +13,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
@@ -33,25 +34,31 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_DAMAGE;
 
-public class CutterEnchant extends AbstractEnchantmentData implements ChanceData, CombatEnchant {
+public class CutterEnchant extends GameEnchantment implements ChanceMeta, CombatEnchant {
 
     public static final String ID = "cutter";
 
-    private Modifier           durabilityReduction;
-    private ChanceSettingsImpl chanceSettings;
-    private boolean            allowPlayers;
-    private boolean            allowMobs;
+    private Modifier durabilityReduction;
+    private boolean  allowPlayers;
+    private boolean  allowMobs;
 
     public CutterEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to throw away enemy''s armor and damage it for " + GENERIC_DAMAGE + "%.");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.RARE);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.PLAINS_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to throw away enemy''s armor and damage it for " + GENERIC_DAMAGE + "%.",
+            EnchantRarity.LEGENDARY,
+            5,
+            ItemCategories.WEAPON
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(1, 0.5, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(1, 0.5, 1, 100)));
 
         this.durabilityReduction = Modifier.read(config, "Settings.Item.Durability_Reduction",
             Modifier.add(0, 0.01, 1, 1D),
@@ -68,27 +75,9 @@ public class CutterEnchant extends AbstractEnchantmentData implements ChanceData
         this.addPlaceholder(GENERIC_DAMAGE, level -> NumberUtil.format(this.getDurabilityReduction(level) * 100D));
     }
 
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
     public final double getDurabilityReduction(int level) {
         return this.durabilityReduction.getValue(level);
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
 
     @NotNull
     @Override

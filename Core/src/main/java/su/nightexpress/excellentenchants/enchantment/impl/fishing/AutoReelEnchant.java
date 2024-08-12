@@ -7,43 +7,40 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.FileConfig;
 
 import java.io.File;
 
-public class AutoReelEnchant extends AbstractEnchantmentData implements FishingEnchant {
+public class AutoReelEnchant extends GameEnchantment implements FishingEnchant {
 
     public static final String ID = "auto_reel";
 
     public AutoReelEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Automatically reels in a hook on bite.");
-        this.setMaxLevel(1);
-        this.setRarity(Rarity.VERY_RARE);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.JUNGLE_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Automatically reels in a hook on bite.",
+            EnchantRarity.MYTHIC,
+            1,
+            ItemCategories.FISHING_ROD
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
 
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.FISHING_ROD;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.FISHING_ROD;
-//    }
 
     @Override
     public boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level) {

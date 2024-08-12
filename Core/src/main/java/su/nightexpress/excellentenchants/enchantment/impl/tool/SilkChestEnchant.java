@@ -21,11 +21,13 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
@@ -39,7 +41,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
-public class SilkChestEnchant extends AbstractEnchantmentData implements BlockDropEnchant, SimpeListener {
+public class SilkChestEnchant extends GameEnchantment implements BlockDropEnchant, SimpeListener {
 
     public static final String ID = "silk_chest";
 
@@ -48,12 +50,20 @@ public class SilkChestEnchant extends AbstractEnchantmentData implements BlockDr
     private final NamespacedKey keyChest;
 
     public SilkChestEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Drop chests and saves all its content.");
-        this.setMaxLevel(1);
-        this.setRarity(Rarity.VERY_RARE);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.PLAINS_SPECIAL));
 
         this.keyChest = new NamespacedKey(plugin, ID + ".item");
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Drop chests and saves all its content.",
+            EnchantRarity.MYTHIC,
+            1,
+            ItemCategories.TOOL,
+            ItemCategories.AXE
+        );
     }
 
     @Override
@@ -77,30 +87,6 @@ public class SilkChestEnchant extends AbstractEnchantmentData implements BlockDr
             "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount."
         ).read(config);
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TOOL;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getPrimaryItems() {
-        return ItemCategories.AXE;
-    }
-
-//    @Override
-//    @NotNull
-//    public ItemCategory[] getItemCategories() {
-//        return new ItemCategory[]{ItemCategory.AXE};
-//    }
-//
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.TOOL;
-//    }
 
     public boolean isSilkChest(@NotNull ItemStack item) {
         return PDCUtil.getBoolean(item, this.keyChest).isPresent();

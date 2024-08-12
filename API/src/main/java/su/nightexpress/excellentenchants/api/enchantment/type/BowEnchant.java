@@ -8,9 +8,9 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 
-public interface BowEnchant extends EnchantmentData {
+public interface BowEnchant extends CustomEnchantment {
 
     boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level);
 

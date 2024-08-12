@@ -14,14 +14,15 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
@@ -31,26 +32,32 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
-public class KamikadzeEnchant extends AbstractEnchantmentData implements ChanceData, DeathEnchant, SimpeListener {
+public class KamikadzeEnchant extends GameEnchantment implements ChanceMeta, DeathEnchant, SimpeListener {
 
     public static final String ID = "self_destruction";
 
-    private Modifier           explosionSize;
-    private boolean            applyOnResurrect;
-    private ChanceSettingsImpl chanceSettings;
+    private Modifier explosionSize;
+    private boolean  applyOnResurrect;
 
     private Entity exploder;
 
     public KamikadzeEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to create an explosion on death.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.UNCOMMON);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.JUNGLE_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to create an explosion on death.",
+            EnchantRarity.RARE,
+            3,
+            ItemCategories.TORSO
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(0, 5, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(0, 5, 1, 100)));
 
         this.applyOnResurrect = ConfigValue.create("Settings.Apply_On_Resurrect",
             true,
@@ -62,24 +69,6 @@ public class KamikadzeEnchant extends AbstractEnchantmentData implements ChanceD
             "A size of the explosion. The more size - the bigger the damage."
         );
     }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TORSO;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.ARMOR_TORSO;
-//    }
 
     public boolean isApplyOnResurrect() {
         return this.applyOnResurrect;
@@ -99,7 +88,7 @@ public class KamikadzeEnchant extends AbstractEnchantmentData implements ChanceD
         this.exploder = null;
 
         if (exploded && this.hasVisualEffects()) {
-            UniParticle.of(Particle.SMOKE_NORMAL).play(entity.getEyeLocation(), 0.5, 0.1, 60);
+            UniParticle.of(Particle.SMOKE).play(entity.getEyeLocation(), 0.5, 0.1, 60);
             UniParticle.of(Particle.LAVA).play(entity.getEyeLocation(), 1.25, 0.1, 100);
         }
 

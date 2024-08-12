@@ -2,7 +2,6 @@ package su.nightexpress.excellentenchants.api.enchantment;
 
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -19,13 +18,13 @@ public class ItemsCategory {
 
     private final Supplier<Set<Material>> supplier;
     private final EquipmentSlot[]         slots;
-    private final EnchantmentTarget       target;
+//    private final EnchantmentTarget       target;
     private final String                  localized;
 
-    public ItemsCategory(@NotNull Supplier<Set<Material>> supplier, EquipmentSlot[] slots, @Nullable EnchantmentTarget target, @Nullable String localized) {
+    public ItemsCategory(@NotNull Supplier<Set<Material>> supplier, EquipmentSlot[] slots/*, @Nullable EnchantmentTarget target*/, @Nullable String localized) {
         this.supplier = supplier;
         this.slots = slots;
-        this.target = target;
+//        this.target = target;
         this.localized = localized;
     }
 
@@ -63,47 +62,22 @@ public class ItemsCategory {
         return slots;
     }
 
-    /**
-     * Only for compatibility reasons with versions < 1.21
-     */
-    public EnchantmentTarget getTarget() {
-        return target;
-    }
+//    /**
+//     * Only for compatibility reasons with versions < 1.21
+//     */
+//    public EnchantmentTarget getTarget() {
+//        return target;
+//    }
 
     public String getLocalized() {
         return localized;
     }
 
-    /*@NotNull
-    public static ItemsCategory create(@NotNull Set<Material> materials, EquipmentSlot... slots) {
-        return new ItemsCategory(() -> materials);
-    }
-
-    @NotNull
-    public static ItemsCategory create(Material... materials) {
-        return create(Stream.of(materials).collect(Collectors.toSet()));
-    }
-
-    @SafeVarargs
-    @NotNull
-    public static ItemsCategory create(Tag<Material>... tags) {
-        return create(Stream.of(tags).flatMap(tag -> tag.getValues().stream()).collect(Collectors.toSet()));
-    }*/
-
-//    @NotNull
-//    @Deprecated
-//    public static ItemsCategory fusion(ItemsCategory... categories) {
-//        Set<Supplier<Set<Material>>> suppliers = Stream.of(categories).map(category -> category.supplier).collect(Collectors.toSet());
-//        Supplier<Set<Material>> result = () -> suppliers.stream().flatMap(supplier -> supplier.get().stream()).collect(Collectors.toSet());
-//
-//        return new ItemsCategory(result, categories[0].getSlots(), categories[0].target, categories[0].localized);
-//    }
-
     public static class Builder {
 
         private Supplier<Set<Material>> supplier;
         private EquipmentSlot[] slots;
-        private EnchantmentTarget target;
+//        private EnchantmentTarget target;
         private String localized;
 
         public Builder() {
@@ -113,7 +87,7 @@ public class ItemsCategory {
 
         @NotNull
         public ItemsCategory build() {
-            return new ItemsCategory(this.supplier, this.slots, this.target, this.localized);
+            return new ItemsCategory(this.supplier, this.slots, /*this.target,*/ this.localized);
         }
 
         @NotNull
@@ -128,11 +102,12 @@ public class ItemsCategory {
             return this;
         }
 
-        @NotNull
-        public Builder target(EnchantmentTarget target) {
-            this.target = target;
-            return this;
-        }
+//        @NotNull
+//        @Deprecated
+//        public Builder target(EnchantmentTarget target) {
+//            this.target = target;
+//            return this;
+//        }
 
         @NotNull
         public Builder localized(@NotNull LangString localized) {

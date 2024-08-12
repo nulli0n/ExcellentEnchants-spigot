@@ -7,14 +7,15 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 
@@ -23,23 +24,29 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
-public class StoppingForceEnchant extends AbstractEnchantmentData implements ChanceData, CombatEnchant {
+public class StoppingForceEnchant extends GameEnchantment implements ChanceMeta, CombatEnchant {
 
     public static final String ID = "stopping_force";
 
-    private ChanceSettingsImpl chanceSettings;
-    private Modifier           knockbackModifier;
+    private Modifier knockbackModifier;
 
     public StoppingForceEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to get only " + GENERIC_AMOUNT + "% of knockback in combat.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.UNCOMMON);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.DESERT_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to get only " + GENERIC_AMOUNT + "% of knockback in combat.",
+            EnchantRarity.RARE,
+            3,
+            ItemCategories.LEGGINGS
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(100, 0, 0, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(100, 0, 0, 100)));
 
         this.knockbackModifier = Modifier.read(config, "Settings.Knockback_Modifier",
             Modifier.add(0.9, -0.2, 1),
@@ -52,28 +59,10 @@ public class StoppingForceEnchant extends AbstractEnchantmentData implements Cha
         return this.knockbackModifier.getValue(level);
     }
 
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.ARMOR_LEGS;
-//    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.LEGGINGS;
-    }
-
     @NotNull
     @Override
     public EventPriority getProtectPriority() {
         return EventPriority.HIGHEST;
-    }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return this.chanceSettings;
     }
 
     @Override

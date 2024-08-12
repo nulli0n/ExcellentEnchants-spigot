@@ -1,23 +1,28 @@
 package su.nightexpress.excellentenchants;
 
+import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.PeriodMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.PotionMeta;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.util.EnchantPlaceholders;
+import su.nightexpress.nightcore.language.LangAssets;
+import su.nightexpress.nightcore.util.ItemUtil;
+import su.nightexpress.nightcore.util.NumberUtil;
+
 public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
 
-    public static final String URL_WIKI         = "https://nightexpress.gitbook.io/excellentenchants";
-    public static final String URL_PLACEHOLDERS = "https://nightexpress.gitbook.io/excellentenchants/utility/placeholders";
-    public static final String URL_CHRAGES      = "https://nightexpress.gitbook.io/excellentenchants/features/charges";
-
-    public static final String VANILLA_DISTRIBUTION_NAME = "Vanilla Distribution Mode";
-    public static final String CUSTOM_DISTRIBUTION_NAME  = "Custom Distribution Mode";
-
-    public static final String VANILLA_DISTRIBUTION_HEADER = "=".repeat(15) + " " + VANILLA_DISTRIBUTION_NAME + " " + "=".repeat(15);
-    public static final String CUSTOM_DISTRIBUTION_HEADER  = "=".repeat(15) + " " + CUSTOM_DISTRIBUTION_NAME + " " + "=".repeat(15);
+    public static final String WIKI_URL          = "https://nightexpress.gitbook.io/excellentenchants/";
+    public static final String WIKI_PLACEHOLDERS = WIKI_URL + "utility/placeholders";
+    public static final String WIKI_CHRAGES      = WIKI_URL + "features/charges";
 
     public static final String GENERIC_TYPE        = "%type%";
     public static final String GENERIC_NAME        = "%name%";
     public static final String GENERIC_ITEM        = "%item%";
     public static final String GENERIC_LEVEL       = "%level%";
     public static final String GENERIC_AMOUNT      = "%amount%";
-    public static final String GENERIC_MODIFIER = "%modifier%";
+    public static final String GENERIC_CHARGES     = "%charges%";
+    public static final String GENERIC_MODIFIER    = "%modifier%";
     public static final String GENERIC_DESCRIPTION = "%description%";
     public static final String GENERIC_ENCHANT     = "%enchant%";
     public static final String GENERIC_RADIUS      = "%radius%";
@@ -34,24 +39,54 @@ public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
     public static final String ENCHANTMENT_POTION_TYPE                   = "%enchantment_potion_type%";
     public static final String ENCHANTMENT_ID                            = "%enchantment_id%";
     public static final String ENCHANTMENT_NAME                          = "%enchantment_name%";
-    public static final String ENCHANTMENT_NAME_FORMATTED                = "%enchantment_name_formatted%";
     public static final String ENCHANTMENT_DESCRIPTION                   = "%enchantment_description%";
-    public static final String ENCHANTMENT_DESCRIPTION_FORMATTED         = "%enchantment_description_formatted%";
+    //public static final String ENCHANTMENT_DESCRIPTION_FORMATTED         = "%enchantment_description_formatted%";
     public static final String ENCHANTMENT_DESCRIPTION_REPLACED          = "%enchantment_description_replaced%";
     public static final String ENCHANTMENT_LEVEL                         = "%enchantment_level%";
     public static final String ENCHANTMENT_LEVEL_MIN                     = "%enchantment_level_min%";
     public static final String ENCHANTMENT_LEVEL_MAX                     = "%enchantment_level_max%";
     public static final String ENCHANTMENT_RARITY                        = "%enchantment_rarity%";
     public static final String ENCHANTMENT_FIT_ITEM_TYPES                = "%enchantment_fit_item_types%";
-    public static final String ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING      = "%enchantment_obtain_chance_enchanting%";
-    public static final String ENCHANTMENT_OBTAIN_CHANCE_VILLAGER        = "%enchantment_obtain_chance_villager%";
-    public static final String ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION = "%enchantment_obtain_chance_loot_generation%";
-    public static final String ENCHANTMENT_OBTAIN_CHANCE_FISHING         = "%enchantment_obtain_chance_fishing%";
-    public static final String ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING    = "%enchantment_obtain_chance_mob_spawning%";
     public static final String ENCHANTMENT_CHARGES                       = "%enchantment_charges%";
     public static final String ENCHANTMENT_CHARGES_MAX_AMOUNT            = "%enchantment_charges_max_amount%";
     public static final String ENCHANTMENT_CHARGES_CONSUME_AMOUNT        = "%enchantment_charges_consume_amount%";
     public static final String ENCHANTMENT_CHARGES_RECHARGE_AMOUNT       = "%enchantment_charges_recharge_amount%";
     public static final String ENCHANTMENT_CHARGES_FUEL_ITEM             = "%enchantment_charges_fuel_item%";
+
+    public static EnchantPlaceholders forEnchant(@NotNull GameEnchantment enchantment) {
+        EnchantPlaceholders placeholders = new EnchantPlaceholders();
+
+        placeholders
+            .add(ENCHANTMENT_ID, enchantment::getId)
+            .add(ENCHANTMENT_NAME, enchantment::getDisplayName)
+            .add(ENCHANTMENT_DESCRIPTION, () -> String.join("\n", enchantment.getDescription()))
+            //.add(ENCHANTMENT_DESCRIPTION_FORMATTED, () -> String.join("\n", enchantment.getDescriptionFormatted()))
+            .add(ENCHANTMENT_DESCRIPTION_REPLACED, level -> String.join("\n", enchantment.getDescription(level)))
+            .add(ENCHANTMENT_LEVEL, NumberUtil::toRoman)
+            .add(ENCHANTMENT_LEVEL_MIN, () -> String.valueOf(1))
+            .add(ENCHANTMENT_LEVEL_MAX, () -> String.valueOf(enchantment.getDefinition().getMaxLevel()))
+            .add(ENCHANTMENT_RARITY, () -> enchantment.getDefinition().getRarity().getName())
+            .add(ENCHANTMENT_FIT_ITEM_TYPES, () -> enchantment.getDefinition().getSupportedItems().getLocalized())
+            .add(ENCHANTMENT_CHARGES_MAX_AMOUNT, level -> NumberUtil.format(enchantment.getCharges().getMaxAmount(level)))
+            .add(ENCHANTMENT_CHARGES_CONSUME_AMOUNT, level -> NumberUtil.format(enchantment.getCharges().getConsumeAmount(level)))
+            .add(ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, level -> NumberUtil.format(enchantment.getCharges().getRechargeAmount(level)))
+            .add(ENCHANTMENT_CHARGES_FUEL_ITEM, () -> ItemUtil.getItemName(enchantment.getCharges().getFuel()));
+
+        if (enchantment instanceof ChanceMeta chanceMeta) {
+            placeholders.add(ENCHANTMENT_CHANCE, level -> NumberUtil.format(chanceMeta.getTriggerChance(level)));
+        }
+
+        if (enchantment instanceof PeriodMeta periodMeta) {
+            placeholders.add(ENCHANTMENT_INTERVAL, () -> NumberUtil.format(periodMeta.getInterval() / 20D));
+        }
+
+        if (enchantment instanceof PotionMeta potionMeta) {
+            placeholders.add(ENCHANTMENT_POTION_LEVEL, level -> NumberUtil.toRoman(potionMeta.getEffectAmplifier(level)));
+            placeholders.add(ENCHANTMENT_POTION_DURATION, level -> NumberUtil.format(potionMeta.getEffectDuration(level) / 20D));
+            placeholders.add(ENCHANTMENT_POTION_TYPE, () -> LangAssets.get(potionMeta.getEffectType()));
+        }
+
+        return placeholders;
+    }
 }
 

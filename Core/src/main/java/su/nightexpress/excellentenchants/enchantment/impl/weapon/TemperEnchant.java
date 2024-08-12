@@ -7,11 +7,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.EntityUtil;
 import su.nightexpress.nightcore.util.NumberUtil;
@@ -21,7 +23,7 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_RADIUS;
 
-public class TemperEnchant extends AbstractEnchantmentData implements CombatEnchant {
+public class TemperEnchant extends GameEnchantment implements CombatEnchant {
 
     public static final String ID = "temper";
 
@@ -29,10 +31,17 @@ public class TemperEnchant extends AbstractEnchantmentData implements CombatEnch
     private Modifier damageStep;
 
     public TemperEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Inflicts " + GENERIC_AMOUNT + "% more damage for each " + GENERIC_RADIUS + "❤ missing.");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.UNCOMMON);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.SNOW_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Inflicts " + GENERIC_AMOUNT + "% more damage for each " + GENERIC_RADIUS + "❤ missing.",
+            EnchantRarity.MYTHIC,
+            5,
+            ItemCategories.WEAPON
+        );
     }
 
     @Override
@@ -58,18 +67,6 @@ public class TemperEnchant extends AbstractEnchantmentData implements CombatEnch
     public double getDamageStep(int level) {
         return this.damageStep.getValue(level);
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-//
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
 
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {

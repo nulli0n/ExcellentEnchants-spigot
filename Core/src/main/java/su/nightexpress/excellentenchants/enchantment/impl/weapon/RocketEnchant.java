@@ -11,14 +11,15 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.random.Rnd;
 import su.nightexpress.nightcore.util.wrapper.UniSound;
@@ -27,50 +28,38 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
-public class RocketEnchant extends AbstractEnchantmentData implements ChanceData, CombatEnchant {
+public class RocketEnchant extends GameEnchantment implements ChanceMeta, CombatEnchant {
 
     public static final String ID = "rocket";
 
-    private Modifier           fireworkPower;
-    private ChanceSettingsImpl chanceSettings;
+    private Modifier fireworkPower;
 
     public RocketEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to launch your enemy into the space.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.RARE);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.PLAINS_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to launch your enemy into the space.",
+            EnchantRarity.LEGENDARY,
+            3,
+            ItemCategories.WEAPON
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.multiply(2, 1, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.multiply(2, 1, 1, 100)));
 
         this.fireworkPower = Modifier.read(config, "Settings.Firework_Power",
             Modifier.multiply(1, 0.25, 1, 3),
             "Firework power. The more power = the higher fly distance.");
     }
 
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
     public final double getFireworkPower(int level) {
         return this.fireworkPower.getValue(level);
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
 
     @NotNull
     @Override
@@ -95,7 +84,7 @@ public class RocketEnchant extends AbstractEnchantmentData implements ChanceData
 
     @NotNull
     private Firework createRocket(@NotNull World world, @NotNull Location location, int level) {
-        Firework firework = (Firework) world.spawnEntity(location, EntityType.FIREWORK);
+        Firework firework = (Firework) world.spawnEntity(location, EntityType.FIREWORK_ROCKET);
         FireworkMeta meta = firework.getFireworkMeta();
         FireworkEffect.Type type = Rnd.get(FireworkEffect.Type.values());
         Color color = Color.fromBGR(Rnd.nextInt(255), Rnd.nextInt(255), Rnd.nextInt(255));

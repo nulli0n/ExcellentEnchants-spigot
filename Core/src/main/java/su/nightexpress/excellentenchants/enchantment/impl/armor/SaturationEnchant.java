@@ -6,13 +6,14 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.PeriodicSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.data.PeriodSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Period;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 
@@ -21,25 +22,30 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_MAX;
 
-public class SaturationEnchant extends AbstractEnchantmentData implements PassiveEnchant {
+public class SaturationEnchant extends GameEnchantment implements PassiveEnchant {
 
     public static final String ID = "saturation";
 
     private Modifier feedAmount;
     private Modifier maxFoodLevel;
 
-    private PeriodSettingsImpl periodSettings;
-
     public SaturationEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Restores " + GENERIC_AMOUNT + " food points every few seconds.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.RARE);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.SAVANNA_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Restores " + GENERIC_AMOUNT + " food points every few seconds.",
+            EnchantRarity.LEGENDARY,
+            3,
+            ItemCategories.HELMET
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.periodSettings = PeriodSettingsImpl.create(config);
+        this.meta.setPeriod(Period.create(config));
 
         this.feedAmount = Modifier.read(config, "Settings.Saturation.Amount",
             Modifier.add(0, 1, 1, 10),
@@ -52,24 +58,6 @@ public class SaturationEnchant extends AbstractEnchantmentData implements Passiv
         this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getFeedAmount(level)));
         this.addPlaceholder(GENERIC_MAX, level -> NumberUtil.format(this.getMaxFoodLevel(level)));
     }
-
-    @NotNull
-    @Override
-    public PeriodicSettings getPeriodSettings() {
-        return periodSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.HELMET;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.ARMOR_HEAD;
-//    }
 
     public final int getFeedAmount(int level) {
         return (int) this.feedAmount.getValue(level);

@@ -9,15 +9,16 @@ import org.bukkit.inventory.meta.Damageable;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
 import su.nightexpress.nightcore.util.NumberUtil;
@@ -28,23 +29,29 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
-public class RestoreEnchant extends AbstractEnchantmentData implements GenericEnchant, ChanceData, SimpeListener {
+public class RestoreEnchant extends GameEnchantment implements GenericEnchant, ChanceMeta, SimpeListener {
 
     public static final String ID = "restore";
 
-    private ChanceSettingsImpl chanceSettings;
-    private Modifier           durabilityRestore;
+    private Modifier durabilityRestore;
 
     public RestoreEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to save item from breaking back to " + GENERIC_AMOUNT + "%");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.RARE);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.SNOW_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to save item from breaking back to " + GENERIC_AMOUNT + "%",
+            EnchantRarity.LEGENDARY,
+            5,
+            ItemCategories.BREAKABLE
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(20, 6, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(20, 6, 1, 100)));
 
         this.durabilityRestore = Modifier.read(config, "Settings.Durability_Restoration",
             Modifier.add(25, 5, 1, 100),
@@ -52,24 +59,6 @@ public class RestoreEnchant extends AbstractEnchantmentData implements GenericEn
 
         this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getDurabilityRestore(level)));
     }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BREAKABLE;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.BREAKABLE;
-//    }
 
     public double getDurabilityRestore(int level) {
         return this.durabilityRestore.getValue(level);
@@ -84,7 +73,7 @@ public class RestoreEnchant extends AbstractEnchantmentData implements GenericEn
         int maxDurability = item.getType().getMaxDurability();
         if (damageable.getDamage() + damage < maxDurability) return;
 
-        int level = EnchantUtils.getLevel(item, this.getEnchantment());
+        int level = EnchantUtils.getLevel(item, this.getBukkitEnchantment());
         if (level <= 0) return;
 
         if (this.isOutOfCharges(item)) return;
@@ -98,7 +87,7 @@ public class RestoreEnchant extends AbstractEnchantmentData implements GenericEn
 
         damageable.setDamage(restored);
         item.setItemMeta(damageable);
-        EnchantUtils.remove(item, this.getEnchantment());
+        EnchantUtils.remove(item, this.getBukkitEnchantment());
 
         if (this.hasVisualEffects()) {
             UniSound.of(Sound.ITEM_TOTEM_USE).play(event.getPlayer());

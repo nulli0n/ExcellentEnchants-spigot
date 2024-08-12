@@ -19,19 +19,21 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.language.LangAssets;
 import su.nightexpress.nightcore.manager.SimpeListener;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.LocationUtil;
 import su.nightexpress.nightcore.util.PDCUtil;
 import su.nightexpress.nightcore.util.Plugins;
@@ -44,25 +46,31 @@ import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_TYPE;
 import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
-public class SilkSpawnerEnchant extends AbstractEnchantmentData implements ChanceData, BlockBreakEnchant, BlockDropEnchant, SimpeListener {
+public class SilkSpawnerEnchant extends GameEnchantment implements ChanceMeta, BlockBreakEnchant, BlockDropEnchant, SimpeListener {
 
     public static final String ID = "divine_touch";
 
-    private String             spawnerName;
-    private ChanceSettingsImpl chanceSettings;
+    private String spawnerName;
 
     private Location handleSpawner;
 
     private final NamespacedKey spawnerKey;
 
     public SilkSpawnerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.JUNGLE_SPECIAL));
         this.spawnerKey = new NamespacedKey(plugin, "divine_spawner");
+    }
 
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to mine spawner.");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.VERY_RARE);
-        this.setConflicts(SmelterEnchant.ID);
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            Lists.newList(ENCHANTMENT_CHANCE + "% chance to mine spawner."),
+            EnchantRarity.MYTHIC,
+            5,
+            ItemCategories.TOOL,
+            ItemCategories.PICKAXE,
+            Lists.newSet(SmelterEnchant.ID)
+        );
     }
 
     @Override
@@ -76,7 +84,7 @@ public class SilkSpawnerEnchant extends AbstractEnchantmentData implements Chanc
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.multiply(10, 1, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.multiply(10, 1, 1, 100)));
 
         this.spawnerName = ConfigValue.create("Settings.Spawner_Item.Name",
             YELLOW.enclose("Mob Spawner " + GRAY.enclose("(" + WHITE.enclose(GENERIC_TYPE) + ")")),
@@ -84,36 +92,6 @@ public class SilkSpawnerEnchant extends AbstractEnchantmentData implements Chanc
             "Use '" + GENERIC_TYPE + "' for the mob name."
         ).read(config);
     }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TOOL;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getPrimaryItems() {
-        return ItemCategories.PICKAXE;
-    }
-
-//    @Override
-//    @NotNull
-//    public ItemCategory[] getItemCategories() {
-//        return new ItemCategory[]{ItemCategory.PICKAXE};
-//    }
-//
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.TOOL;
-//    }
 
     @NotNull
     public ItemStack getSpawner(@NotNull CreatureSpawner spawnerBlock) {
@@ -145,7 +123,7 @@ public class SilkSpawnerEnchant extends AbstractEnchantmentData implements Chanc
 
         if (this.hasVisualEffects()) {
             Location location = LocationUtil.getCenter(block.getLocation());
-            UniParticle.of(Particle.VILLAGER_HAPPY).play(location, 0.3, 0.15, 30);
+            UniParticle.of(Particle.HAPPY_VILLAGER).play(location, 0.3, 0.15, 30);
         }
         return true;
     }

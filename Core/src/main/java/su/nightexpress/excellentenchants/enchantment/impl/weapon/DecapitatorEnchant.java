@@ -18,14 +18,15 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.excellentenchants.hook.HookPlugin;
 import su.nightexpress.excellentenchants.hook.impl.MythicMobsHook;
 import su.nightexpress.nightcore.config.ConfigValue;
@@ -46,30 +47,36 @@ import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_TYPE;
 import static su.nightexpress.nightcore.util.text.tag.Tags.LIGHT_YELLOW;
 
-public class DecapitatorEnchant extends AbstractEnchantmentData implements ChanceData, DeathEnchant {
+public class DecapitatorEnchant extends GameEnchantment implements ChanceMeta, DeathEnchant {
 
     public static final String ID = "decapitator";
 
-    private boolean ignoreMythicMobs;
+    private boolean                 ignoreMythicMobs;
     private Set<EntityType>         ignoredEntityTypes;
     private String                  headName;
     private Map<EntityType, String> headTextures;
-    private ChanceSettingsImpl      chanceSettings;
 
     private final NamespacedKey skullKey;
 
     public DecapitatorEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to obtain player''s or mob''s head.");
-        this.setMaxLevel(4);
-        this.setRarity(Rarity.RARE);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.SAVANNA_COMMON));
 
         this.skullKey = new NamespacedKey(plugin, this.getId() + ".entity_type");
     }
 
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to obtain player's or mob's head.",
+            EnchantRarity.LEGENDARY,
+            4,
+            ItemCategories.WEAPON
+        );
+    }
+
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(5, 1.75, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(5, 1.75, 1, 100)));
 
         this.ignoreMythicMobs = ConfigValue.create("Settings.Ignore_Mythic_Mobs",
             true,
@@ -124,7 +131,7 @@ public class DecapitatorEnchant extends AbstractEnchantmentData implements Chanc
                 map.put(EntityType.LLAMA, "9f7d90b305aa64313c8d4404d8d652a96eba8a754b67f4347dcccdd5a6a63398");
                 map.put(EntityType.MAGMA_CUBE, "38957d5023c937c4c41aa2412d43410bda23cf79a9f6ab36b76fef2d7c429");
                 map.put(EntityType.MULE, "a0486a742e7dda0bae61ce2f55fa13527f1c3b334c57c034bb4cf132fb5f5f");
-                map.put(EntityType.MUSHROOM_COW, "45603d539f666fdf0f7a0fe20b81dfef3abe6c51da34b9525a5348432c5523b2");
+                map.put(EntityType.MOOSHROOM, "45603d539f666fdf0f7a0fe20b81dfef3abe6c51da34b9525a5348432c5523b2");
                 map.put(EntityType.OCELOT, "5657cd5c2989ff97570fec4ddcdc6926a68a3393250c1be1f0b114a1db1");
                 map.put(EntityType.PANDA, "8018a1771d69c11b8dad42cd310375ba2d827932b25ef357f7e572c1bd0f9");
                 map.put(EntityType.PARROT, "a4ba8d66fecb1992e94b8687d6ab4a5320ab7594ac194a2615ed4df818edbc3");
@@ -139,7 +146,7 @@ public class DecapitatorEnchant extends AbstractEnchantmentData implements Chanc
                 map.put(EntityType.SHEEP, "a723893df4cfb9c7240fc47b560ccf6ddeb19da9183d33083f2c71f46dad290a");
                 map.put(EntityType.SILVERFISH, "da91dab8391af5fda54acd2c0b18fbd819b865e1a8f1d623813fa761e924540");
                 map.put(EntityType.SLIME, "a5acd8b24f7389a40404348f4344eec2235d4ca718453be9803b60b71a125891");
-                map.put(EntityType.SNOWMAN, "8e8d206f61e6de8a79d0cb0bcd98aced464cbfefc921b4160a25282163112a");
+                map.put(EntityType.SNOW_GOLEM, "8e8d206f61e6de8a79d0cb0bcd98aced464cbfefc921b4160a25282163112a");
                 map.put(EntityType.SPIDER, "cd541541daaff50896cd258bdbdd4cf80c3ba816735726078bfe393927e57f1");
                 map.put(EntityType.SQUID, "d8705624daa2956aa45956c81bab5f4fdb2c74a596051e24192039aea3a8b8");
                 map.put(EntityType.STRAY, "9e391c6e535f7aa5a2b6ee6d137f59f2d7c60def88853ba611ceb2d16a7e7c73");
@@ -165,24 +172,6 @@ public class DecapitatorEnchant extends AbstractEnchantmentData implements Chanc
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html"
         ).read(config);
     }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
 
     @Override
     public boolean onDeath(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, ItemStack item, int level) {

@@ -12,14 +12,15 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 
@@ -27,24 +28,29 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
-public class SniperEnchant extends AbstractEnchantmentData implements BowEnchant, ChanceData {
+public class SniperEnchant extends GameEnchantment implements BowEnchant, ChanceMeta {
 
     public static final String ID = "sniper";
 
-    private ChanceSettingsImpl chanceSettings;
-    private Modifier           speedModifier;
+    private Modifier speedModifier;
 
     public SniperEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.PLAINS_SPECIAL));
+    }
 
-        this.setDescription("Increases projectile speed by " + GENERIC_AMOUNT + "%");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.UNCOMMON);
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Increases projectile speed by " + GENERIC_AMOUNT + "%",
+            EnchantRarity.RARE,
+            5,
+            ItemCategories.BOWS
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config);
+        this.meta.setProbability(Probability.create(config));
 
         this.speedModifier = Modifier.read(config, "Settings.Speed_Modifier",
             Modifier.add(1, 0.2, 1, 3D),
@@ -53,27 +59,9 @@ public class SniperEnchant extends AbstractEnchantmentData implements BowEnchant
         this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getSpeedModifier(level) * 100D));
     }
 
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return this.chanceSettings;
-    }
-
     public double getSpeedModifier(int level) {
         return this.speedModifier.getValue(level);
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BOWS;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.BOW;
-//    }
 
     @NotNull
     @Override

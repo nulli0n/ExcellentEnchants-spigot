@@ -11,12 +11,14 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
 import su.nightexpress.nightcore.util.NumberUtil;
@@ -25,17 +27,24 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_TIME;
 
-public class InfernusEnchant extends AbstractEnchantmentData implements GenericEnchant, SimpeListener {
+public class InfernusEnchant extends GameEnchantment implements GenericEnchant, SimpeListener {
 
     public static final String ID = "infernus";
 
     private Modifier fireTicks;
 
     public InfernusEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Launched trident will ignite the enemy for " + GENERIC_TIME + "s. on hit.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.COMMON);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.DESERT_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Launched trident will ignite the enemy for " + GENERIC_TIME + "s. on hit.",
+            EnchantRarity.COMMON,
+            3,
+            ItemCategories.TRIDENT
+        );
     }
 
     @Override
@@ -51,18 +60,6 @@ public class InfernusEnchant extends AbstractEnchantmentData implements GenericE
         return (int) this.fireTicks.getValue(level);
     }
 
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TRIDENT;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.TRIDENT;
-//    }
-
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onInfernusTridentLaunch(ProjectileLaunchEvent event) {
         Entity entity = event.getEntity();
@@ -72,7 +69,7 @@ public class InfernusEnchant extends AbstractEnchantmentData implements GenericE
 
         ItemStack item = trident.getItem();
 
-        int level = EnchantUtils.getLevel(item, this.getEnchantment());
+        int level = EnchantUtils.getLevel(item, this.getBukkitEnchantment());
         if (level <= 0) return;
 
         trident.setFireTicks(Integer.MAX_VALUE);
@@ -85,7 +82,7 @@ public class InfernusEnchant extends AbstractEnchantmentData implements GenericE
 
         ItemStack item = trident.getItem();
 
-        int level = EnchantUtils.getLevel(item, this.getEnchantment());
+        int level = EnchantUtils.getLevel(item, this.getBukkitEnchantment());
         if (level <= 0 || trident.getFireTicks() <= 0) return;
 
         int ticks = this.getFireTicks(level);

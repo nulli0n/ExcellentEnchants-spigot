@@ -4,9 +4,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 
-public interface FishingEnchant extends EnchantmentData {
+public interface FishingEnchant extends CustomEnchantment {
 
     boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level);
 

@@ -8,70 +8,50 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
-import su.nightexpress.excellentenchants.api.enchantment.data.PotionData;
-import su.nightexpress.excellentenchants.api.enchantment.data.PotionSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.PotionMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.api.enchantment.meta.PotionEffects;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.data.PotionSettingsImpl;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.nightcore.config.FileConfig;
 
 import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.*;
 
-public class HardenedEnchant extends AbstractEnchantmentData implements ChanceData, PotionData, CombatEnchant {
+public class HardenedEnchant extends GameEnchantment implements ChanceMeta, PotionMeta, CombatEnchant {
 
     public static final String ID = "hardened";
 
-    private ChanceSettingsImpl chanceSettings;
-    private PotionSettingsImpl potionSettings;
-
     public HardenedEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to get " + ENCHANTMENT_POTION_TYPE + " " + ENCHANTMENT_POTION_LEVEL + " (" + ENCHANTMENT_POTION_DURATION + "s.) when damaged.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.UNCOMMON);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.PLAINS_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to get " + ENCHANTMENT_POTION_TYPE + " " + ENCHANTMENT_POTION_LEVEL + " (" + ENCHANTMENT_POTION_DURATION + "s.) when damaged.",
+            EnchantRarity.RARE,
+            3,
+            ItemCategories.TORSO
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(2, 2, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(2, 2, 1, 100)));
 
-        this.potionSettings = PotionSettingsImpl.create(this, config, PotionEffectType.DAMAGE_RESISTANCE, false,
+        this.meta.setPotionEffects(PotionEffects.create(this, config, PotionEffectType.RESISTANCE, false,
             Modifier.add(2, 1, 1, 300),
             Modifier.add(0, 1, 1.5, 5)
-        );
+        ));
     }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @NotNull
-    @Override
-    public PotionSettings getPotionSettings() {
-        return potionSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TORSO;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.ARMOR_TORSO;
-//    }
 
     @NotNull
     @Override

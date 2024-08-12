@@ -7,14 +7,15 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 
@@ -22,49 +23,37 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
-public class SwiperEnchant extends AbstractEnchantmentData implements CombatEnchant, ChanceData {
+public class SwiperEnchant extends GameEnchantment implements CombatEnchant, ChanceMeta {
 
     public static final String ID = "swiper";
 
     public static final String PLACEHOLER_XP_AMOUNT = "%xp_amount%";
 
-    private ChanceSettingsImpl chanceSettings;
-    private Modifier           xpAmount;
+    private Modifier xpAmount;
 
     public SwiperEnchant(@NotNull EnchantsPlugin plugin, File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to steal " + PLACEHOLER_XP_AMOUNT + " XP from players.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.RARE);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.JUNGLE_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to steal " + PLACEHOLER_XP_AMOUNT + " XP from players.",
+            EnchantRarity.LEGENDARY,
+            3,
+            ItemCategories.WEAPON
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(5, 2.5, 1));
+        this.meta.setProbability(Probability.create(config, Modifier.add(5, 2.5, 1)));
 
         this.xpAmount = Modifier.read(config, "Settings.XP_Amount",
             Modifier.add(0, 1, 1),
             "Amount of XP to be stolen on hit.");
 
         this.addPlaceholder(PLACEHOLER_XP_AMOUNT, level -> NumberUtil.format(this.getXPAmount(level)));
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return this.chanceSettings;
     }
 
     public int getXPAmount(int level) {

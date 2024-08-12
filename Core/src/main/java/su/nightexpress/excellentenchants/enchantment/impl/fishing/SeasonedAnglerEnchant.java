@@ -5,11 +5,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 
@@ -17,17 +19,24 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
-public class SeasonedAnglerEnchant extends AbstractEnchantmentData implements FishingEnchant {
+public class SeasonedAnglerEnchant extends GameEnchantment implements FishingEnchant {
 
     public static final String ID = "seasoned_angler";
 
     private Modifier xpModifier;
 
     public SeasonedAnglerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Increases amount of XP gained from fishing by " + GENERIC_AMOUNT + "%.");
-        this.setMaxLevel(4);
-        this.setRarity(Rarity.UNCOMMON);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.TAIGA_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Increases amount of XP gained from fishing by " + GENERIC_AMOUNT + "%.",
+            EnchantRarity.RARE,
+            4,
+            ItemCategories.FISHING_ROD
+        );
     }
 
     @Override
@@ -42,18 +51,6 @@ public class SeasonedAnglerEnchant extends AbstractEnchantmentData implements Fi
     public int getXPPercent(int level) {
         return (int) this.xpModifier.getValue(level);
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.FISHING_ROD;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.FISHING_ROD;
-//    }
 
     @Override
     public boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level) {

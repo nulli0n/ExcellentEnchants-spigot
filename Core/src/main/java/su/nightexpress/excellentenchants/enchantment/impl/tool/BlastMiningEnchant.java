@@ -14,17 +14,19 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.NumberUtil;
 
 import java.io.File;
@@ -33,27 +35,34 @@ import java.util.List;
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_RADIUS;
 
-public class BlastMiningEnchant extends AbstractEnchantmentData implements ChanceData, BlockBreakEnchant, SimpeListener {
+public class BlastMiningEnchant extends GameEnchantment implements ChanceMeta, BlockBreakEnchant, SimpeListener {
 
     public static final String ID = "blast_mining";
 
-    private Modifier           explosionPower;
-    private Modifier           minBlockStrength;
-    private ChanceSettingsImpl chanceSettings;
+    private Modifier explosionPower;
+    private Modifier minBlockStrength;
 
     private int explodeLevel;
 
     public BlastMiningEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to mine blocks by explosion.");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.RARE);
-        this.setConflicts(VeinminerEnchant.ID, TunnelEnchant.ID);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.SAVANNA_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            Lists.newList(ENCHANTMENT_CHANCE + "% chance to mine blocks by explosion."),
+            EnchantRarity.LEGENDARY,
+            5,
+            ItemCategories.TOOL,
+            ItemCategories.PICKAXE,
+            Lists.newSet(VeinminerEnchant.ID, TunnelEnchant.ID)
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.multiply(10, 1, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.multiply(10, 1, 1, 100)));
 
         this.explosionPower = Modifier.read(config, "Settings.Explosion.Power",
             Modifier.add(3, 0.75, 1, 8),
@@ -68,12 +77,6 @@ public class BlastMiningEnchant extends AbstractEnchantmentData implements Chanc
         this.addPlaceholder(GENERIC_RADIUS, level -> NumberUtil.format(this.getExplosionPower(level)));
     }
 
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
     public double getExplosionPower(int level) {
         return this.explosionPower.getValue(level);
     }
@@ -86,30 +89,6 @@ public class BlastMiningEnchant extends AbstractEnchantmentData implements Chanc
         float strength = block.getType().getHardness();
         return (strength >= this.getMinBlockStrength(level));
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TOOL;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getPrimaryItems() {
-        return ItemCategories.PICKAXE;
-    }
-
-//    @Override
-//    @NotNull
-//    public ItemCategory[] getItemCategories() {
-//        return new ItemCategory[]{ItemCategory.PICKAXE};
-//    }
-//
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.TOOL;
-//    }
 
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {

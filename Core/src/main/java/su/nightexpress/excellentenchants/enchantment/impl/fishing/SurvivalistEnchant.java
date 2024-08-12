@@ -7,43 +7,49 @@ import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SurvivalistEnchant extends AbstractEnchantmentData implements FishingEnchant, ChanceData {
+public class SurvivalistEnchant extends GameEnchantment implements FishingEnchant, ChanceMeta {
 
     public static final String ID = "survivalist";
 
     private final Set<CookingRecipe<?>> cookingRecipes;
 
-    private ChanceSettingsImpl chanceSettings;
-
     public SurvivalistEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Automatically cooks fish if what is caught is raw.");
-        this.setMaxLevel(1);
-        this.setRarity(Rarity.UNCOMMON);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.SNOW_SPECIAL));
 
         this.cookingRecipes = new HashSet<>();
     }
 
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Automatically cooks fish if what is caught is raw.",
+            EnchantRarity.RARE,
+            1,
+            ItemCategories.FISHING_ROD
+        );
+    }
+
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config);
+        this.meta.setProbability(Probability.create(config));
 
         this.plugin.getServer().recipeIterator().forEachRemaining(recipe -> {
-            if (recipe instanceof CookingRecipe<?> cookingRecipe && cookingRecipe.getInput().getType().isItem()) {
+            if (recipe instanceof CookingRecipe<?> cookingRecipe && cookingRecipe.getInput().getType().isItem() && !cookingRecipe.getResult().getType().isAir()) {
                 this.cookingRecipes.add(cookingRecipe);
             }
         });
@@ -53,24 +59,6 @@ public class SurvivalistEnchant extends AbstractEnchantmentData implements Fishi
     public void clear() {
         this.cookingRecipes.clear();
     }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.FISHING_ROD;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.FISHING_ROD;
-//    }
 
     @NotNull
     @Override

@@ -8,8 +8,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
+import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
+import su.nightexpress.excellentenchants.registry.EnchantRegistry;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.StringUtil;
 
@@ -48,7 +48,7 @@ public class PlaceholderHook {
         @Override
         @NotNull
         public String getAuthor() {
-            return this.plugin.getDescription().getAuthors().get(0);
+            return this.plugin.getDescription().getAuthors().getFirst();
         }
 
         @Override
@@ -75,7 +75,7 @@ public class PlaceholderHook {
                 ItemStack item = player.getInventory().getItem(slot);
                 if (item == null || item.getType().isAir()) return "-";
 
-                EnchantmentData enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[1].toLowerCase()));
+                CustomEnchantment enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[1].toLowerCase()));
                 if (enchant == null) return null;
 
                 return String.valueOf(enchant.getCharges(item));
@@ -85,12 +85,12 @@ public class PlaceholderHook {
                 String[] chargesSplit = params.substring("charges_maximum_".length()).split(":");
                 if (chargesSplit.length < 2) return null;
 
-                EnchantmentData enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[0].toLowerCase()));
+                CustomEnchantment enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[0].toLowerCase()));
                 if (enchant == null) return null;
 
                 int level = NumberUtil.getInteger(chargesSplit[1], 1);
 
-                return String.valueOf(enchant.getChargesMax(level));
+                return String.valueOf(enchant.getCharges().getMaxAmount(level));
             }
 
             return super.onPlaceholderRequest(player, params);

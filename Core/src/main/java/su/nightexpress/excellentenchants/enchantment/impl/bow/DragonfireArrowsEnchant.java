@@ -20,19 +20,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ArrowSettings;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowEffects;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ArrowSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.ItemUtil;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.Version;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
@@ -41,29 +42,33 @@ import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.*;
 
-public class DragonfireArrowsEnchant extends AbstractEnchantmentData implements ChanceData, ArrowData, BowEnchant {
+public class DragonfireArrowsEnchant extends GameEnchantment implements ChanceMeta, ArrowMeta, BowEnchant {
 
     public static final String ID = "dragonfire_arrows";
 
     private Modifier fireDuration;
     private Modifier fireRadius;
 
-    private ArrowSettingsImpl  arrowSettings;
-    private ChanceSettingsImpl chanceSettings;
-
     public DragonfireArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to launch an dragonfire arrow (R=" + GENERIC_RADIUS + ", " + GENERIC_DURATION + "s).");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.RARE);
-        this.setConflicts(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.SAVANNA_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to launch an dragonfire arrow (R=" + GENERIC_RADIUS + ", " + GENERIC_DURATION + "s).",
+            EnchantRarity.LEGENDARY,
+            3,
+            ItemCategories.BOWS,
+            Lists.newSet(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID)
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.arrowSettings = ArrowSettingsImpl.create(config, UniParticle.of(Particle.DRAGON_BREATH));
+        this.meta.setArrowEffects(ArrowEffects.create(config, UniParticle.of(Particle.DRAGON_BREATH)));
 
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(3, 3, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(3, 3, 1, 100)));
 
         this.fireDuration = Modifier.read(config, "Settings.Fire.Duration",
             Modifier.multiply(100, 1, 1, 60 * 20),
@@ -76,30 +81,6 @@ public class DragonfireArrowsEnchant extends AbstractEnchantmentData implements 
         this.addPlaceholder(GENERIC_DURATION, level -> NumberUtil.format(this.getFireDuration(level) / 20D));
         this.addPlaceholder(GENERIC_RADIUS, level -> NumberUtil.format(this.getFireRadius(level)));
     }
-
-    @NotNull
-    @Override
-    public ArrowSettings getArrowSettings() {
-        return arrowSettings;
-    }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BOWS;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.BOW;
-//    }
 
     public int getFireDuration(int level) {
         return (int) this.fireDuration.getValue(level);
@@ -140,7 +121,7 @@ public class DragonfireArrowsEnchant extends AbstractEnchantmentData implements 
         ItemStack item = new ItemStack(Material.LINGERING_POTION);
         ItemUtil.editMeta(item, meta -> {
             if (meta instanceof PotionMeta potionMeta) {
-                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 20, 0), true);
+                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 20, 0), true);
             }
         });
 
@@ -155,7 +136,7 @@ public class DragonfireArrowsEnchant extends AbstractEnchantmentData implements 
         cloud.setRadius((float) this.getFireRadius(level));
         cloud.setDuration(this.getFireDuration(level));
         cloud.setRadiusPerTick((7.0F - cloud.getRadius()) / (float) cloud.getDuration());
-        cloud.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 1, 1), true);
+        cloud.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 1, 1), true);
 
         LingeringPotionSplashEvent splashEvent;
 

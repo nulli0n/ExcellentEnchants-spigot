@@ -16,14 +16,15 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.BukkitThing;
@@ -40,34 +41,41 @@ import java.util.Set;
 
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
-public class SmelterEnchant extends AbstractEnchantmentData implements ChanceData, BlockDropEnchant {
+public class SmelterEnchant extends GameEnchantment implements ChanceMeta, BlockDropEnchant {
 
     public static final String ID = "smelter";
 
-    private UniSound           sound;
-    private boolean            disableOnCrouch;
-    private ChanceSettingsImpl chanceSettings;
+    private UniSound sound;
+    private boolean  disableOnCrouch;
 
     private final Set<Material>      exemptedItems;
     private final Set<FurnaceRecipe> recipes;
 
     public SmelterEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Smelts mined blocks with " + ENCHANTMENT_CHANCE + "% chance.");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.UNCOMMON);
-        this.setConflicts(
-            SilkSpawnerEnchant.ID,
-            Enchantment.SILK_TOUCH.getKey().getKey()
-        );
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.PLAINS_COMMON));
 
         this.exemptedItems = new HashSet<>();
         this.recipes = new HashSet<>();
     }
 
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            Lists.newList("Smelts mined blocks with " + ENCHANTMENT_CHANCE + "% chance."),
+            EnchantRarity.RARE,
+            5,
+            ItemCategories.TOOL,
+            ItemCategories.MINING_TOOLS,
+            Lists.newSet(
+                SilkSpawnerEnchant.ID,
+                BukkitThing.toString(Enchantment.SILK_TOUCH)
+            )
+        );
+    }
+
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(10, 8, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(10, 8, 1, 100)));
 
         this.disableOnCrouch = ConfigValue.create("Settings.Disable_On_Crouch",
             true,
@@ -102,36 +110,6 @@ public class SmelterEnchant extends AbstractEnchantmentData implements ChanceDat
         this.exemptedItems.clear();
     }
 
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.TOOL;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getPrimaryItems() {
-        return ItemCategories.MINING_TOOLS;
-    }
-
-//    @Override
-//    @NotNull
-//    public ItemCategory[] getItemCategories() {
-//        return new ItemCategory[]{ItemCategory.PICKAXE, ItemCategory.AXE, ItemCategory.SHOVEL};
-//    }
-//
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.TOOL;
-//    }
-
     @Override
     public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
         if (this.disableOnCrouch && entity instanceof Player player && player.isSneaking()) return false;
@@ -160,7 +138,7 @@ public class SmelterEnchant extends AbstractEnchantmentData implements ChanceDat
 
         Block block = state.getBlock();
         if (this.hasVisualEffects()) {
-            Location location = LocationUtil.getCenter(block.getLocation(), true);
+            Location location = LocationUtil.setCenter3D(block.getLocation());
             UniParticle.of(Particle.FLAME).play(location, 0.25, 0.05, 20);
             this.sound.play(location);
         }

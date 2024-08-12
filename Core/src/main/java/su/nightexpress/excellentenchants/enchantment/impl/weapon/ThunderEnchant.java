@@ -10,14 +10,15 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.LocationUtil;
@@ -29,24 +30,30 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_DAMAGE;
 
-public class ThunderEnchant extends AbstractEnchantmentData implements ChanceData, CombatEnchant {
+public class ThunderEnchant extends GameEnchantment implements ChanceMeta, CombatEnchant {
 
     public static final String ID = "thunder";
 
-    private boolean            thunderstormOnly;
-    private ChanceSettingsImpl chanceSettings;
-    private Modifier           damageModifier;
+    private boolean  thunderstormOnly;
+    private Modifier damageModifier;
 
     public ThunderEnchant(@NotNull EnchantsPlugin plugin, File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to strike lightning with " + GENERIC_DAMAGE + "❤ extra damage.");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.UNCOMMON);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.TAIGA_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to strike lightning with " + GENERIC_DAMAGE + "❤ extra damage.",
+            EnchantRarity.RARE,
+            5,
+            ItemCategories.WEAPON
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(5, 2, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(5, 2, 1, 100)));
 
         this.thunderstormOnly = ConfigValue.create("Settings.During_Thunderstorm_Only",
             false,
@@ -61,12 +68,6 @@ public class ThunderEnchant extends AbstractEnchantmentData implements ChanceDat
         this.addPlaceholder(GENERIC_DAMAGE, level -> NumberUtil.format(this.getDamage(level)));
     }
 
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
     public boolean isDuringThunderstormOnly() {
         return thunderstormOnly;
     }
@@ -74,18 +75,6 @@ public class ThunderEnchant extends AbstractEnchantmentData implements ChanceDat
     public double getDamage(int level) {
         return this.damageModifier.getValue(level);
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
 
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
@@ -100,7 +89,7 @@ public class ThunderEnchant extends AbstractEnchantmentData implements ChanceDat
             Block block = location.getBlock().getRelative(BlockFace.DOWN);
             Location center = LocationUtil.getCenter(location);
             UniParticle.blockCrack(block.getType()).play(center, 0.5, 0.1, 100);
-            UniParticle.of(Particle.FIREWORKS_SPARK).play(center, 0.75, 0.05, 120);
+            UniParticle.of(Particle.ELECTRIC_SPARK).play(center, 0.75, 0.05, 120);
         }
 
         event.setDamage(event.getDamage() + this.getDamage(level));

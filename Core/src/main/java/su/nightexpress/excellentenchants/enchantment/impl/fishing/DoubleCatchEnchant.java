@@ -7,60 +7,48 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
 
 import java.io.File;
 
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
-public class DoubleCatchEnchant extends AbstractEnchantmentData implements FishingEnchant, ChanceData {
+public class DoubleCatchEnchant extends GameEnchantment implements FishingEnchant, ChanceMeta {
 
     public static final String ID = "double_catch";
 
-    private ChanceSettingsImpl chanceSettings;
-
     public DoubleCatchEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Increases amount of caught item by x2 with " + ENCHANTMENT_CHANCE + "% chance.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.RARE);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.PLAINS_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Increases amount of caught item by x2 with " + ENCHANTMENT_CHANCE + "% chance.",
+            EnchantRarity.LEGENDARY,
+            3,
+            ItemCategories.FISHING_ROD
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(4, 2, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(4, 2, 1, 100)));
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.FISHING_ROD;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.FISHING_ROD;
-//    }
 
     @NotNull
     @Override
     public EventPriority getFishingPriority() {
         return EventPriority.HIGHEST;
-    }
-
-    @Override
-    @NotNull
-    public ChanceSettings getChanceSettings() {
-        return this.chanceSettings;
     }
 
     @Override

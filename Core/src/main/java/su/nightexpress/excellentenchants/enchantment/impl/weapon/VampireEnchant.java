@@ -10,14 +10,15 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.EntityUtil;
@@ -29,24 +30,30 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
 
-public class VampireEnchant extends AbstractEnchantmentData implements ChanceData, CombatEnchant {
+public class VampireEnchant extends GameEnchantment implements ChanceMeta, CombatEnchant {
 
     public static final String ID = "vampire";
 
-    private Modifier           healAmount;
-    private boolean            healMultiplier;
-    private ChanceSettingsImpl chanceSettings;
+    private Modifier healAmount;
+    private boolean  healMultiplier;
 
     public VampireEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to heal for " + GENERIC_AMOUNT + "❤ on hit.");
-        this.setMaxLevel(4);
-        this.setRarity(Rarity.RARE);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.PLAINS_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to heal for " + GENERIC_AMOUNT + "❤ on hit.",
+            EnchantRarity.LEGENDARY,
+            4,
+            ItemCategories.WEAPON
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(5, 2.5, 1));
+        this.meta.setProbability(Probability.create(config, Modifier.add(5, 2.5, 1)));
 
         this.healAmount = Modifier.read(config, "Settings.Heal.Amount",
             Modifier.add(0, 0.25, 1, 100),
@@ -60,12 +67,6 @@ public class VampireEnchant extends AbstractEnchantmentData implements ChanceDat
         this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.isHealMultiplier() ? getHealAmount(level) * 100D : getHealAmount(level)));
     }
 
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
     public double getHealAmount(int level) {
         return this.healAmount.getValue(level);
     }
@@ -73,18 +74,6 @@ public class VampireEnchant extends AbstractEnchantmentData implements ChanceDat
     public boolean isHealMultiplier() {
         return healMultiplier;
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
 
     @NotNull
     @Override

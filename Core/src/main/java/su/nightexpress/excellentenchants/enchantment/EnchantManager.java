@@ -4,79 +4,58 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.api.ConfigBridge;
+import su.nightexpress.excellentenchants.api.EnchantmentID;
+import su.nightexpress.excellentenchants.api.enchantment.meta.PeriodMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.impl.armor.FlameWalkerEnchant;
-import su.nightexpress.excellentenchants.enchantment.listener.EnchantAnvilListener;
-import su.nightexpress.excellentenchants.enchantment.listener.EnchantGenericListener;
-import su.nightexpress.excellentenchants.enchantment.listener.EnchantPopulationListener;
-import su.nightexpress.excellentenchants.enchantment.listener.EnchantVanillaListener;
-import su.nightexpress.excellentenchants.enchantment.menu.EnchantmentsListMenu;
-import su.nightexpress.excellentenchants.enchantment.registry.EnchantRegistry;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.listener.AnvilListener;
+import su.nightexpress.excellentenchants.enchantment.listener.GenericListener;
+import su.nightexpress.excellentenchants.enchantment.menu.EnchantsMenu;
+import su.nightexpress.excellentenchants.registry.EnchantRegistry;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.manager.AbstractManager;
-import su.nightexpress.nightcore.util.Pair;
-import su.nightexpress.nightcore.util.Version;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
-    private final Set<Pair<PassiveEnchant, EnchantmentData>> passiveEnchants;
+    private final Set<PassiveEnchant> passiveEnchants;
 
-    private EnchantmentsListMenu enchantmentsListMenu;
+
+    private EnchantsMenu enchantsMenu;
 
     public EnchantManager(@NotNull EnchantsPlugin plugin) {
         super(plugin);
-        this.passiveEnchants = new HashSet<>();
 
-        EnchantRegistry.getEnchantments(PassiveEnchant.class).forEach(passiveEnchant -> {
-            EnchantmentData enchantmentData = EnchantRegistry.getById(passiveEnchant.getId());
-            if (enchantmentData == null) return;
-
-            this.passiveEnchants.add(Pair.of(passiveEnchant, enchantmentData));
-        });
+        this.passiveEnchants = new HashSet<>(EnchantRegistry.getEnchantments(PassiveEnchant.class));
     }
 
     protected void onLoad() {
-        this.enchantmentsListMenu = new EnchantmentsListMenu(this.plugin);
+        this.enchantsMenu = new EnchantsMenu(this.plugin);
 
-        this.addListener(new EnchantGenericListener(this.plugin, this));
-        this.addListener(new EnchantAnvilListener(this.plugin));
-
-        if (Config.isCustomDistribution()) {
-            this.plugin.info("Using custom distribution system. Applying patches...");
-            this.addListener(new EnchantPopulationListener(this.plugin));
-        }
-        else if (Version.isBehind(Version.MC_1_21)) {
-            this.plugin.info("Using vanilla distribution. Applying enchanting table patches...");
-            this.addListener(new EnchantVanillaListener(this.plugin));
-        }
+        this.addListener(new GenericListener(this.plugin, this));
+        this.addListener(new AnvilListener(this.plugin));
 
         this.addTask(this.plugin.createAsyncTask(this::displayProjectileTrails).setTicksInterval(Config.CORE_PROJECTILE_PARTICLE_INTERVAL.get()));
-        this.addTask(this.plugin.createTask(this::updatePassiveEnchantEffects).setTicksInterval(Config.CORE_PASSIVE_ENCHANTS_TRIGGER_INTERVAL.get()));
-        if (EnchantRegistry.isRegistered(FlameWalkerEnchant.ID)) {
+        if (!this.passiveEnchants.isEmpty()) {
+            this.addTask(this.plugin.createTask(this::updatePassiveEnchantEffects).setTicksInterval(ConfigBridge.getEnchantsTickInterval()));
+        }
+        if (EnchantRegistry.isRegistered(EnchantmentID.FLAME_WALKER)) {
             this.addTask(this.plugin.createTask(FlameWalkerEnchant::tickBlocks).setSecondsInterval(1));
         }
     }
 
     @Override
     protected void onShutdown() {
-        if (this.enchantmentsListMenu != null) this.enchantmentsListMenu.clear();
-
-        /*if (EnchantRegistry.isRegistered(FlameWalkerEnchant.ID)) {
-            FlameWalkerEnchant.clear();
-        }*/
-    }
-
-    @NotNull
-    public EnchantmentsListMenu getEnchantmentsListMenu() {
-        return enchantmentsListMenu;
+        if (this.enchantsMenu != null) this.enchantsMenu.clear();
     }
 
     public void openEnchantsMenu(@NotNull Player player) {
-        this.enchantmentsListMenu.open(player);
+        this.enchantsMenu.open(player);
     }
 
     private void displayProjectileTrails() {
@@ -91,17 +70,17 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
     }
 
     private void updatePassiveEnchantEffects() {
-        if (this.passiveEnchants.isEmpty()) return;
+        Set<PassiveEnchant> readyEnchants = this.passiveEnchants.stream()
+            .peek(PeriodMeta::consumeTicks)
+            .filter(PeriodMeta::isTriggerTime)
+            .collect(Collectors.toSet());
+        if (readyEnchants.isEmpty()) return;
 
         Set<LivingEntity> entities = this.getPassiveEnchantEntities();
 
-        this.passiveEnchants.forEach(pair -> {
-            PassiveEnchant enchant = pair.getFirst();
-            EnchantmentData enchantmentData = pair.getSecond();
-            if (!enchant.isTriggerTime()) return;
-
+        readyEnchants.forEach(enchant -> {
             for (LivingEntity entity : entities) {
-                EnchantUtils.getEquipped(entity, enchantmentData).forEach((item, level) -> {
+                EnchantUtils.getEquipped(entity, enchant).forEach((item, level) -> {
                     if (!enchant.isAvailableToUse(entity)) return;
                     if (enchant.isOutOfCharges(item)) return;
                     if (enchant.onTrigger(entity, item, level)) {

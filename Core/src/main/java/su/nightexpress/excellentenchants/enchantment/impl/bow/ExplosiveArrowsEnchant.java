@@ -13,20 +13,21 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ArrowSettings;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowEffects;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ArrowSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
@@ -35,7 +36,7 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_RADIUS;
 
-public class ExplosiveArrowsEnchant extends AbstractEnchantmentData implements ChanceData, ArrowData, BowEnchant, SimpeListener {
+public class ExplosiveArrowsEnchant extends GameEnchantment implements ChanceMeta, ArrowMeta, BowEnchant, SimpeListener {
 
     public static final String ID = "explosive_arrows";
 
@@ -44,24 +45,28 @@ public class ExplosiveArrowsEnchant extends AbstractEnchantmentData implements C
     private boolean  explosionDamageBlocks;
     private Modifier explosionSize;
 
-    private ArrowSettingsImpl  arrowSettings;
-    private ChanceSettingsImpl chanceSettings;
-
     private Entity lastExploder;
 
     public ExplosiveArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance to launch an explosive arrow.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.RARE);
-        this.setConflicts(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.TAIGA_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance to launch an explosive arrow.",
+            EnchantRarity.LEGENDARY,
+            3,
+            ItemCategories.BOWS,
+            Lists.newSet(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID)
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.arrowSettings = ArrowSettingsImpl.create(config, UniParticle.of(Particle.SMOKE_NORMAL));
+        this.meta.setArrowEffects(ArrowEffects.create(config, UniParticle.of(Particle.SMOKE)));
 
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(3, 2, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(3, 2, 1, 100)));
 
         this.explosionFireSpread = ConfigValue.create("Settings.Explosion.Fire_Spread",
             true,
@@ -81,30 +86,6 @@ public class ExplosiveArrowsEnchant extends AbstractEnchantmentData implements C
 
         this.addPlaceholder(GENERIC_RADIUS, level -> NumberUtil.format(this.getExplosionSize(level)));
     }
-
-    @NotNull
-    @Override
-    public ArrowSettings getArrowSettings() {
-        return arrowSettings;
-    }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BOWS;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.BOW;
-//    }
 
     public final double getExplosionSize(int level) {
         return this.explosionSize.getValue(level);

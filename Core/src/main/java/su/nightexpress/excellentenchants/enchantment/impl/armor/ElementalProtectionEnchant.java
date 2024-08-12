@@ -8,53 +8,66 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
 import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
 import su.nightexpress.nightcore.util.EntityUtil;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.NumberUtil;
 
 import java.io.File;
 import java.util.Set;
 
-import static su.nightexpress.excellentenchants.Placeholders.GENERIC_AMOUNT;
-import static su.nightexpress.excellentenchants.Placeholders.GENERIC_MAX;
+import static su.nightexpress.excellentenchants.Placeholders.*;
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-public class ElementalProtectionEnchant extends AbstractEnchantmentData implements SimpeListener, GenericEnchant {
+public class ElementalProtectionEnchant extends GameEnchantment implements SimpeListener, GenericEnchant {
 
     public static final String ID = "elemental_protection";
 
-    private static final Set<EntityDamageEvent.DamageCause> DAMAGE_CAUSES = Set.of(
-        EntityDamageEvent.DamageCause.POISON, EntityDamageEvent.DamageCause.WITHER,
-        EntityDamageEvent.DamageCause.MAGIC, EntityDamageEvent.DamageCause.FREEZE,
-        EntityDamageEvent.DamageCause.LIGHTNING);
+    private static final Set<DamageCause> DAMAGE_CAUSES = Lists.newSet(
+        DamageCause.POISON, DamageCause.WITHER,
+        DamageCause.MAGIC, DamageCause.FREEZE,
+        DamageCause.LIGHTNING
+    );
 
     private Modifier protectionAmount;
     private double   protectionCapacity;
     private boolean  protectionAsModifier;
 
     public ElementalProtectionEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription("Reduces Poison, Magic, Wither, Lightning, Freeze damage by " + GENERIC_AMOUNT + "%.");
-        this.setMaxLevel(5);
-        this.setRarity(Rarity.COMMON);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.SWAMP_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            "Reduces Poison, Magic, Wither, Lightning, Freeze damage by " + GENERIC_AMOUNT + "%.",
+            EnchantRarity.COMMON,
+            5,
+            ItemCategories.ARMOR
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
         this.protectionAmount = Modifier.read(config, "Settings.Protection.Amount",
-            Modifier.add(0, 5, 1, 100),
-            "Protection amount given by enchantment.");
+            Modifier.add(0, 4, 1, 100),
+            "Protection amount given by enchantment."
+        );
 
         this.protectionCapacity = ConfigValue.create("Settings.Protection.Capacity",
             100D,
-            "Maximal possible protection value from all armor pieces together.").read(config);
+            "Maximal possible protection value from all armor pieces together."
+        ).read(config);
 
         this.protectionAsModifier = ConfigValue.create("Settings.Protection.As_Modifier",
             true,
@@ -64,18 +77,6 @@ public class ElementalProtectionEnchant extends AbstractEnchantmentData implemen
         this.addPlaceholder(GENERIC_AMOUNT, level -> NumberUtil.format(this.getProtectionAmount(level)));
         this.addPlaceholder(GENERIC_MAX, level -> NumberUtil.format(this.getProtectionCapacity()));
     }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.ARMOR;
-    }
-
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.ARMOR;
-//    }
 
     public double getProtectionAmount(int level) {
         return this.protectionAmount.getValue(level);
@@ -95,13 +96,11 @@ public class ElementalProtectionEnchant extends AbstractEnchantmentData implemen
         if (!(event.getEntity() instanceof LivingEntity entity)) return;
         if (!this.isAvailableToUse(entity)) return;
 
-        // TODO Work as percent to ignore damage
-
         double protectionAmount = 0D;
         for (ItemStack armor : EntityUtil.getEquippedArmor(entity).values()) {
             if (armor == null || armor.getType().isAir()) continue;
 
-            int level = EnchantUtils.getLevel(armor, this.getEnchantment());
+            int level = EnchantUtils.getLevel(armor, this.getBukkitEnchantment());
             if (level <= 0) continue;
 
             protectionAmount += this.getProtectionAmount(level);

@@ -10,15 +10,16 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
-import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.HookPlugin;
 import su.nightexpress.excellentenchants.hook.impl.MythicMobsHook;
 import su.nightexpress.nightcore.config.ConfigValue;
@@ -34,7 +35,7 @@ import java.util.Set;
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 
-public class ThriftyEnchant extends AbstractEnchantmentData implements ChanceData, DeathEnchant {
+public class ThriftyEnchant extends GameEnchantment implements ChanceMeta, DeathEnchant {
 
     public static final String ID = "thrifty";
 
@@ -42,13 +43,18 @@ public class ThriftyEnchant extends AbstractEnchantmentData implements ChanceDat
     private Set<SpawnReason> ignoredSpawnReasons;
     private boolean          ignoreMythicMobs;
 
-    private ChanceSettingsImpl chanceSettings;
-
     public ThriftyEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance for mobs to drop spawn egg.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.RARE);
+        super(plugin, file, definition(), EnchantDistribution.treasure(TradeType.SWAMP_SPECIAL));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance for mobs to drop spawn egg.",
+            EnchantRarity.LEGENDARY,
+            3,
+            ItemCategories.WEAPON
+        );
     }
 
     @Override
@@ -62,7 +68,7 @@ public class ThriftyEnchant extends AbstractEnchantmentData implements ChanceDat
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(1, 1, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(1, 1, 1, 100)));
 
         this.ignoredEntityTypes = ConfigValue.forSet("Settings.Ignored_Mobs",
             BukkitThing::getEntityType,
@@ -88,24 +94,6 @@ public class ThriftyEnchant extends AbstractEnchantmentData implements ChanceDat
             "Sets whether or not MythicMobs should be exempted from this enchantment."
         ).read(config);
     }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.WEAPON;
-    }
-
-//    @Override
-//    @NotNull
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.WEAPON;
-//    }
 
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, ItemStack weapon, int level) {

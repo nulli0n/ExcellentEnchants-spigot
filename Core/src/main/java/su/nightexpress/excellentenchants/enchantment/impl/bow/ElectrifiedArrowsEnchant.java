@@ -13,19 +13,20 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.excellentenchants.api.enchantment.ItemsCategory;
-import su.nightexpress.excellentenchants.api.enchantment.Rarity;
-import su.nightexpress.excellentenchants.api.enchantment.data.ArrowData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ArrowSettings;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceData;
-import su.nightexpress.excellentenchants.api.enchantment.data.ChanceSettings;
+import su.nightexpress.excellentenchants.api.enchantment.TradeType;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowEffects;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.enchantment.data.AbstractEnchantmentData;
-import su.nightexpress.excellentenchants.enchantment.data.ArrowSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ChanceSettingsImpl;
-import su.nightexpress.excellentenchants.enchantment.data.ItemCategories;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
+import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
+import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
+import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.LocationUtil;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
@@ -35,28 +36,33 @@ import java.io.File;
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_DAMAGE;
 
-public class ElectrifiedArrowsEnchant extends AbstractEnchantmentData implements ChanceData, ArrowData, BowEnchant {
+public class ElectrifiedArrowsEnchant extends GameEnchantment implements ChanceMeta, ArrowMeta, BowEnchant {
 
     public static final String ID = "electrified_arrows";
 
-    private ArrowSettingsImpl  arrowSettings;
-    private ChanceSettingsImpl chanceSettings;
-    private Modifier           damageModifier;
-    private boolean            thunderstormOnly;
+    private Modifier damageModifier;
+    private boolean  thunderstormOnly;
 
     public ElectrifiedArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
-        super(plugin, file);
-        this.setDescription(ENCHANTMENT_CHANCE + "% chance for an arrow to strike lightning with " + GENERIC_DAMAGE + "❤ extra damage.");
-        this.setMaxLevel(3);
-        this.setRarity(Rarity.UNCOMMON);
-        this.setConflicts(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID);
+        super(plugin, file, definition(), EnchantDistribution.regular(TradeType.PLAINS_COMMON));
+    }
+
+    @NotNull
+    private static EnchantDefinition definition() {
+        return EnchantDefinition.create(
+            ENCHANTMENT_CHANCE + "% chance for an arrow to strike lightning with " + GENERIC_DAMAGE + "❤ extra damage.",
+            EnchantRarity.RARE,
+            3,
+            ItemCategories.BOWS,
+            Lists.newSet(EnderBowEnchant.ID, GhastEnchant.ID, BomberEnchant.ID)
+        );
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.arrowSettings = ArrowSettingsImpl.create(config, UniParticle.of(Particle.FIREWORKS_SPARK));
+        this.meta.setArrowEffects(ArrowEffects.create(config, UniParticle.of(Particle.ELECTRIC_SPARK)));
 
-        this.chanceSettings = ChanceSettingsImpl.create(config, Modifier.add(0, 5, 1, 100));
+        this.meta.setProbability(Probability.create(config, Modifier.add(0, 5, 1, 100)));
 
         this.thunderstormOnly = ConfigValue.create("Settings.During_Thunderstorm_Only",
             false,
@@ -71,18 +77,6 @@ public class ElectrifiedArrowsEnchant extends AbstractEnchantmentData implements
         this.addPlaceholder(GENERIC_DAMAGE, level -> NumberUtil.format(this.getDamage(level)));
     }
 
-    @NotNull
-    @Override
-    public ArrowSettings getArrowSettings() {
-        return arrowSettings;
-    }
-
-    @NotNull
-    @Override
-    public ChanceSettings getChanceSettings() {
-        return chanceSettings;
-    }
-
     public boolean isDuringThunderstormOnly() {
         return thunderstormOnly;
     }
@@ -91,26 +85,14 @@ public class ElectrifiedArrowsEnchant extends AbstractEnchantmentData implements
         return this.damageModifier.getValue(level);
     }
 
-    @Override
-    @NotNull
-    public ItemsCategory getSupportedItems() {
-        return ItemCategories.BOWS;
-    }
-//
-//    @NotNull
-//    @Override
-//    public EnchantmentTarget getCategory() {
-//        return EnchantmentTarget.BOW;
-//    }
-
     private void summonLightning(@NotNull Block block) {
         Location location = block.getLocation();
         block.getWorld().strikeLightningEffect(location);
 
         if (this.hasVisualEffects()) {
-            Location center = LocationUtil.getCenter(location.add(0, 1, 0), false);
+            Location center = LocationUtil.setCenter2D(location.add(0, 1, 0));
             UniParticle.blockCrack(block.getType()).play(center, 0.5, 0.1, 100);
-            UniParticle.of(Particle.FIREWORKS_SPARK).play(center, 0.75, 0.05, 120);
+            UniParticle.of(Particle.ELECTRIC_SPARK).play(center, 0.75, 0.05, 120);
         }
     }
 

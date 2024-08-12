@@ -1,7 +1,7 @@
 package su.nightexpress.excellentenchants.api.enchantment.type;
 
-import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 
-public interface GenericEnchant extends EnchantmentData {
+public interface GenericEnchant extends CustomEnchantment {
 
 }

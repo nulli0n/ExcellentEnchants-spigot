@@ -26,8 +26,15 @@ public class Cost {
 
     @NotNull
     public static Cost read(@NotNull FileConfig config, @NotNull String path) {
-        int base = ConfigValue.create(path + ".Base", 0).read(config);
-        int perLevel = ConfigValue.create(path + ".Per_Level", 0).read(config);
+        int base = ConfigValue.create(path + ".Base",
+            0,
+            "The cost for a level I enchantment."
+        ).read(config);
+
+        int perLevel = ConfigValue.create(path + ".Per_Level",
+            0,
+            "The amount of levels added to the Base for each level above level I"
+        ).read(config);
 
         return new Cost(base, perLevel);
     }

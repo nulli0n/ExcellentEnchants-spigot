@@ -5,9 +5,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.api.enchantment.EnchantmentData;
+import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 
-public interface CombatEnchant extends EnchantmentData {
+public interface CombatEnchant extends CustomEnchantment {
 
     boolean onAttack(@NotNull EntityDamageByEntityEvent event,
                      @NotNull LivingEntity damager, @NotNull LivingEntity victim,
