@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ExcellentEnchants</artifactId>
         <groupId>su.nightexpress.excellentenchants</groupId>
-        <version>4.2.0</version>
+        <version>4.2.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -44,6 +44,11 @@
             <url>http://mvn.lumine.io/repository/maven-snapshots/</url>
         </repository>
 
+        <repository>
+            <id>codemc-releases</id>
+            <url>https://repo.codemc.io/repository/maven-releases/</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -69,6 +74,13 @@
         </dependency>
 
         <dependency>
+            <groupId>com.github.retrooper</groupId>
+            <artifactId>packetevents-spigot</artifactId>
+            <version>2.4.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.11.2</version>
@@ -78,19 +90,19 @@
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>API</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>NMS</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>MC_1_21</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.1</version>
         </dependency>
 
     </dependencies>

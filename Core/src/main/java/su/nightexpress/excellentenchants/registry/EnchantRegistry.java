@@ -116,7 +116,7 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
         this.register(WisdomEnchant.ID, file -> new WisdomEnchant(plugin, file));
         this.register(IceAspectEnchant.ID, file -> new IceAspectEnchant(plugin, file));
         this.register(InfernusEnchant.ID, file -> new InfernusEnchant(plugin, file));
-        this.register(NimbleEnchant.ID, file -> new NimbleEnchant(plugin, file));
+        this.register(EnchantmentID.NIMBLE, file -> new NimbleEnchant(plugin, file));
         this.register(ParalyzeEnchant.ID, file -> new ParalyzeEnchant(plugin, file));
         this.register(CureEnchant.ID, file -> new CureEnchant(plugin, file));
         this.register(RageEnchant.ID, file -> new RageEnchant(plugin, file));
@@ -145,6 +145,7 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
         this.register(RegrowthEnchant.ID, file -> new RegrowthEnchant(plugin, file));
         this.register(SaturationEnchant.ID, file -> new SaturationEnchant(plugin, file));
         this.register(KamikadzeEnchant.ID, file -> new KamikadzeEnchant(plugin, file));
+        this.register(EnchantmentID.REBOUND, file -> new ReboundEnchant(plugin, file));
         this.register(StoppingForceEnchant.ID, file -> new StoppingForceEnchant(plugin, file));
         this.register(SpeedyEnchant.ID, file -> new SpeedyEnchant(plugin, file));
 
@@ -155,6 +156,7 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
         this.register(ElectrifiedArrowsEnchant.ID, file -> new ElectrifiedArrowsEnchant(plugin, file));
         this.register(EnderBowEnchant.ID, file -> new EnderBowEnchant(plugin, file));
         this.register(ExplosiveArrowsEnchant.ID, file -> new ExplosiveArrowsEnchant(plugin, file));
+        this.register(EnchantmentID.LINGERING, file -> new LingeringEnchant(plugin, file));
         this.register(FlareEnchant.ID, file -> new FlareEnchant(plugin, file));
         this.register(GhastEnchant.ID, file -> new GhastEnchant(plugin, file));
         this.register(HoverEnchant.ID, file -> new HoverEnchant(plugin, file));

@@ -3,6 +3,7 @@ package su.nightexpress.excellentenchants.rarity;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.Rarity;
+import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.Lists;
@@ -31,7 +32,7 @@ public class EnchantRarity implements Rarity {
         this.id = id;
         this.name = name;
         this.nameFormat = nameFormat;
-        this.weight = weight;
+        this.weight = Math.min(weight, EnchantUtils.WEIGHT_CAP);
     }
 
     @NotNull
@@ -49,8 +50,10 @@ public class EnchantRarity implements Rarity {
 
         int weight = ConfigValue.create(path + ".Weight",
             10,
-            "Controls the probability of enchantment with this rarity when enchanting",
-            "The probability is determined 'weight / total weight * 100%', where 'total_weight' is the sum of the weights of all available enchantments.",
+            "Value between 1 and 1024.",
+            "Controls the probability of enchantment with this rarity when enchanting.",
+            "The probability is determined 'weight / total weight * 100%', where 'total_weight' is the sum of the weights of all available enchantments INCLUDING vanilla ones.",
+            "Vanilla enchantment weights: https://minecraft.wiki/w/Enchanting#Summary_of_enchantments",
             "[*] Reboot required when changed!"
         ).read(config);
 

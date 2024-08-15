@@ -60,23 +60,6 @@ public class SwiperEnchant extends GameEnchantment implements CombatEnchant, Cha
         return (int) this.xpAmount.getValue(level);
     }
 
-    private int getExpRequired(int level) {
-        if (level <= 15) return 2 * level + 7;
-        if (level <= 30) return 5 * level - 38;
-        return 9 * level - 158;
-    }
-
-    private void addXP(@NotNull Player player, int amount) {
-        //int levelHas = player.getLevel();
-        int xpHas = player.getTotalExperience();
-
-        xpHas = Math.max(0, xpHas + amount);
-        player.setExp(0F);
-        player.setTotalExperience(0);
-        player.setLevel(0);
-        player.giveExp(xpHas);
-    }
-
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!(damager instanceof Player attacker)) return false;
@@ -87,8 +70,8 @@ public class SwiperEnchant extends GameEnchantment implements CombatEnchant, Cha
         int amount = this.getXPAmount(level);
         if (defender.getTotalExperience() < amount) amount = defender.getTotalExperience();
 
-        this.addXP(defender, -amount);
-        this.addXP(attacker, amount);
+        defender.giveExp(-amount);
+        attacker.giveExp(amount);
         return true;
     }
 

@@ -16,17 +16,18 @@ import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.spawner.Spawner;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
 import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
@@ -41,6 +42,7 @@ import su.nightexpress.nightcore.util.text.NightMessage;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
 import java.io.File;
+import java.util.HashSet;
 
 import static su.nightexpress.excellentenchants.Placeholders.ENCHANTMENT_CHANCE;
 import static su.nightexpress.excellentenchants.Placeholders.GENERIC_TYPE;
@@ -100,8 +102,10 @@ public class SilkSpawnerEnchant extends GameEnchantment implements ChanceMeta, B
         if (stateItem == null || spawnerBlock.getSpawnedType() == null) return itemSpawner;
 
         CreatureSpawner spawnerItem = (CreatureSpawner) stateItem.getBlockState();
-        spawnerItem.setSpawnedType(spawnerBlock.getSpawnedType());
+
+        this.transferSettings(spawnerBlock, spawnerItem);
         spawnerItem.update(true);
+
         stateItem.setBlockState(spawnerItem);
         stateItem.setDisplayName(NightMessage.asLegacy(this.spawnerName.replace(GENERIC_TYPE, LangAssets.get(spawnerBlock.getSpawnedType()))));
         itemSpawner.setItemMeta(stateItem);
@@ -122,7 +126,7 @@ public class SilkSpawnerEnchant extends GameEnchantment implements ChanceMeta, B
         this.plugin.populateResource(event, this.getSpawner(spawnerBlock));
 
         if (this.hasVisualEffects()) {
-            Location location = LocationUtil.getCenter(block.getLocation());
+            Location location = LocationUtil.setCenter3D(block.getLocation());
             UniParticle.of(Particle.HAPPY_VILLAGER).play(location, 0.3, 0.15, 30);
         }
         return true;
@@ -148,13 +152,31 @@ public class SilkSpawnerEnchant extends GameEnchantment implements ChanceMeta, B
 
         Player player = event.getPlayer();
         ItemStack spawner = player.getInventory().getItem(event.getHand());
-        if (spawner == null || spawner.getType() != Material.SPAWNER || !(spawner.getItemMeta() instanceof BlockStateMeta meta)) return;
+        if (spawner == null || spawner.getType() != Material.SPAWNER || !(spawner.getItemMeta() instanceof BlockStateMeta stateMeta)) return;
         if (PDCUtil.getBoolean(spawner, this.spawnerKey).isEmpty()) return;
 
-        CreatureSpawner spawnerItem = (CreatureSpawner) meta.getBlockState();
+        CreatureSpawner spawnerItem = (CreatureSpawner) stateMeta.getBlockState();
         CreatureSpawner spawnerBlock = (CreatureSpawner) block.getState();
 
-        spawnerBlock.setSpawnedType(spawnerItem.getSpawnedType());
-        spawnerBlock.update();
+        this.transferSettings(spawnerItem, spawnerBlock);
+        spawnerBlock.update(true);
+    }
+
+    private void transferSettings(@NotNull Spawner from, @NotNull Spawner to) {
+        to.setPotentialSpawns(new HashSet<>());
+
+        if (from.getPotentialSpawns().isEmpty()) {
+            to.setSpawnedType(from.getSpawnedType());
+        }
+        else {
+            from.getPotentialSpawns().forEach(to::addPotentialSpawn);
+        }
+        to.setDelay(from.getDelay());
+        to.setMinSpawnDelay(from.getMinSpawnDelay());
+        to.setMaxSpawnDelay(from.getMaxSpawnDelay());
+        to.setMaxNearbyEntities(from.getMaxNearbyEntities());
+        to.setRequiredPlayerRange(from.getRequiredPlayerRange());
+        to.setSpawnCount(from.getSpawnCount());
+        to.setSpawnRange(from.getSpawnRange());
     }
 }

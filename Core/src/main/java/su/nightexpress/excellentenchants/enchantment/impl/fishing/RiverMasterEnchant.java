@@ -70,7 +70,6 @@ public class RiverMasterEnchant extends GameEnchantment implements GenericEnchan
 
         int level = EnchantUtils.getLevel(rod, this.getBukkitEnchantment());
         if (level < 1) return;
-
         if (this.isOutOfCharges(rod)) return;
 
         hook.setVelocity(hook.getVelocity().multiply(this.getDistanceMod(level)));

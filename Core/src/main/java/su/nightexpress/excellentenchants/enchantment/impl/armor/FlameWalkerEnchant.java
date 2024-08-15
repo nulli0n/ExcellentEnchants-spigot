@@ -14,7 +14,7 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
@@ -140,6 +140,7 @@ public class FlameWalkerEnchant extends GameEnchantment implements GenericEnchan
 
         int level = EnchantUtils.getLevel(boots, this.getBukkitEnchantment());
         if (level <= 0) return;
+        if (this.isOutOfCharges(boots)) return;
 
         Block bTo = to.getBlock().getRelative(BlockFace.DOWN);
         boolean hasLava = Stream.of(FACES).anyMatch(face -> bTo.getRelative(face).getType() == Material.LAVA);
@@ -153,17 +154,15 @@ public class FlameWalkerEnchant extends GameEnchantment implements GenericEnchan
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onMagmaDamage(EntityDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.HOT_FLOOR) return;
-        if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
-        if (!this.isAvailableToUse(livingEntity)) return;
+        if (!(event.getEntity() instanceof LivingEntity entity)) return;
+        if (!this.isAvailableToUse(entity)) return;
 
-        EntityEquipment equipment = livingEntity.getEquipment();
-        if (equipment == null) return;
-
-        ItemStack boots = equipment.getBoots();
+        ItemStack boots = EnchantUtils.getEquipped(entity, EquipmentSlot.FEET);
         if (boots == null || boots.getType().isAir()) return;
 
         int level = EnchantUtils.getLevel(boots, this.getBukkitEnchantment());
         if (level <= 0) return;
+        if (this.isOutOfCharges(boots)) return;
 
         event.setCancelled(true);
         this.consumeCharges(boots, level);

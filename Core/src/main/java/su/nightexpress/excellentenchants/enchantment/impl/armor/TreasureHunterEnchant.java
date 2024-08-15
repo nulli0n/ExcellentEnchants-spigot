@@ -107,6 +107,7 @@ public class TreasureHunterEnchant extends GameEnchantment implements ChanceMeta
         int level = EnchantUtils.getLevel(helmet, this.getBukkitEnchantment());
         if (level < 1) return;
 
+        if (this.isOutOfCharges(helmet)) return;
         if (!this.checkTriggerChance(level)) return;
 
         InventoryHolder holder = event.getInventoryHolder();

@@ -71,6 +71,7 @@ public class InfernusEnchant extends GameEnchantment implements GenericEnchant, 
 
         int level = EnchantUtils.getLevel(item, this.getBukkitEnchantment());
         if (level <= 0) return;
+        if (this.isOutOfCharges(item)) return;
 
         trident.setFireTicks(Integer.MAX_VALUE);
     }

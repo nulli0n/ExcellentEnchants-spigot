@@ -9,7 +9,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,6 +25,7 @@ import su.nightexpress.excellentenchants.registry.EnchantRegistry;
 import su.nightexpress.nightcore.language.LangAssets;
 import su.nightexpress.nightcore.util.*;
 import su.nightexpress.nightcore.util.random.Rnd;
+import su.nightexpress.nightcore.util.text.NightMessage;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -121,6 +124,30 @@ public class EnchantUtils {
             .replace(GENERIC_NAME, compName)
             .replace(GENERIC_LEVEL, compLevel)
             .replace(GENERIC_CHARGES, compChrages);
+    }
+
+    @Nullable
+    public static ItemStack addDescription(@Nullable ItemStack item) {
+        if (item == null || item.getType().isAir() || !canHaveDescription(item)) return item;
+
+        ItemStack copy = new ItemStack(item);
+        ItemMeta meta = copy.getItemMeta();
+        if (meta == null || meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) return item;
+
+        Map<CustomEnchantment, Integer> enchants = getCustomEnchantments(meta);
+        if (enchants.isEmpty()) return item;
+
+        List<String> metaLore = meta.getLore();
+        List<String> lore = metaLore == null ? new ArrayList<>() : metaLore;
+
+        enchants.forEach((enchant, level) -> {
+            int chargesAmount = enchant.getCharges(meta);
+            lore.addAll(NightMessage.asLegacy(enchant.getDescription(level, chargesAmount)));
+        });
+
+        meta.setLore(lore);
+        copy.setItemMeta(meta);
+        return copy;
     }
 
     public static boolean isEnchantedBook(@NotNull ItemStack item) {
@@ -294,6 +321,19 @@ public class EnchantUtils {
     public static <T extends EnchantmentData> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity, @NotNull Class<T> clazz) {
         return getEquipped(entity, clazz, EQUIPMENT_SLOTS);
     }*/
+
+    @Nullable
+    public static ItemStack getEquipped(@NotNull LivingEntity entity, @NotNull EquipmentSlot slot) {
+        EntityEquipment equipment = entity.getEquipment();
+        if (equipment == null) return null;
+
+        return equipment.getItem(slot);
+    }
+
+    public static int getEquippedLevel(@NotNull LivingEntity entity, @NotNull Enchantment enchantment, @NotNull EquipmentSlot slot) {
+        ItemStack itemStack = getEquipped(entity, slot);
+        return itemStack == null ? 0 : getLevel(itemStack, enchantment);
+    }
 
     @NotNull
     public static <T extends CustomEnchantment> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,

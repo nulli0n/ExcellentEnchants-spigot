@@ -6,6 +6,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
@@ -18,6 +20,7 @@ import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.excellentenchants.util.ItemCategories;
+import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
@@ -33,6 +36,7 @@ public class FireShieldEnchant extends GameEnchantment implements ChanceMeta, Co
     public static final String ID = "fire_shield";
 
     private Modifier fireDuration;
+    private boolean addFireImmune;
 
     public FireShieldEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file) {
         super(plugin, file, definition(), EnchantDistribution.regular(TradeType.DESERT_COMMON));
@@ -56,7 +60,13 @@ public class FireShieldEnchant extends GameEnchantment implements ChanceMeta, Co
             Modifier.multiply(2, 1, 1, 600),
             "Sets the fire duration (in seconds).",
             "If entity's current fire ticks amount is less than this value, it will be set to this value.",
-            "If entity's current fire ticks amount is greater than this value, it won't be changed.");
+            "If entity's current fire ticks amount is greater than this value, it won't be changed."
+        );
+
+        this.addFireImmune = ConfigValue.create("Settings.Fire.AddImmune",
+            true,
+            "Sets whether or not to add Fire Resistance effect to the enchantment's wearer as well."
+        ).read(config);
 
         this.addPlaceholder(GENERIC_DURATION, level -> NumberUtil.format(this.getFireDuration(level)));
     }
@@ -78,20 +88,27 @@ public class FireShieldEnchant extends GameEnchantment implements ChanceMeta, Co
 
     @Override
     public boolean onProtect(@NotNull EntityDamageByEntityEvent event,
-                             @NotNull LivingEntity damager, @NotNull LivingEntity victim,
-                             @NotNull ItemStack weapon, int level) {
+                             @NotNull LivingEntity damager,
+                             @NotNull LivingEntity victim,
+                             @NotNull ItemStack weapon,
+                             int level) {
         if (!this.checkTriggerChance(level)) return false;
 
-        int ticksToSet = (int) (this.getFireDuration(level) * 20);
-        int ticksHas = damager.getFireTicks();
-        if (ticksHas >= ticksToSet) return false;
+        int fireTicks = (int) (this.getFireDuration(level) * 20);
+
+        if (this.addFireImmune) {
+            victim.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, fireTicks, 0));
+        }
+
+        int damagerFireTicks = damager.getFireTicks();
+        if (damagerFireTicks >= fireTicks) return false;
 
         if (this.hasVisualEffects()) {
             UniParticle.of(Particle.FLAME).play(victim.getEyeLocation(), 0.5, 0.1, 35);
             UniSound.of(Sound.ITEM_FIRECHARGE_USE).play(victim.getLocation());
         }
 
-        damager.setFireTicks(ticksToSet);
+        damager.setFireTicks(fireTicks);
         return true;
     }
 }

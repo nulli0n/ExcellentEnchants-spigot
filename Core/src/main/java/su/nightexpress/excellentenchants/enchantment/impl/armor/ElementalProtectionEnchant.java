@@ -102,6 +102,7 @@ public class ElementalProtectionEnchant extends GameEnchantment implements Simpe
 
             int level = EnchantUtils.getLevel(armor, this.getBukkitEnchantment());
             if (level <= 0) continue;
+            if (this.isOutOfCharges(armor)) continue;
 
             protectionAmount += this.getProtectionAmount(level);
             this.consumeCharges(armor, level);

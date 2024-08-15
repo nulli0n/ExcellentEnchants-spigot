@@ -48,7 +48,8 @@ public class TemperEnchant extends GameEnchantment implements CombatEnchant {
     protected void loadAdditional(@NotNull FileConfig config) {
         this.damageAmount = Modifier.read(config, "Settings.Damage.Amount",
             Modifier.add(0, 5, 1, 100),
-            "Extra damage (in %)");
+            "Extra damage (in %)"
+        );
 
         this.damageStep = Modifier.read(config, "Settings.Damage.Step",
             Modifier.add(0.5, 0, 0),
@@ -81,10 +82,9 @@ public class TemperEnchant extends GameEnchantment implements CombatEnchant {
         double steps = Math.floor(missingHealth / step);
         if (steps == 0) return false;
 
-        double percent = this.getDamageAmount(level) / 100D;
-        double damagePercent = percent * steps;
+        double percent = 1D + (this.getDamageAmount(level) * steps / 100D);
 
-        event.setDamage(event.getDamage() * damagePercent);
+        event.setDamage(event.getDamage() * percent);
         return true;
     }
 

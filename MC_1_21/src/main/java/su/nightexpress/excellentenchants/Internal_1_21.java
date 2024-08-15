@@ -212,20 +212,21 @@ public class Internal_1_21 implements EnchantNMS {
             if (distribution.isOnTradedEquipment()) {
                 addInTag(EnchantmentTags.ON_TRADED_EQUIPMENT, reference);
             }
-
-            if (!experimentalTrades) {
-                if (distribution.isTradable()) {
-                    addInTag(EnchantmentTags.TRADEABLE, reference);
-                }
-                else removeFromTag(EnchantmentTags.TRADEABLE, reference);
-            }
         }
 
-        // Any enchantment can be on rebalanced trades.
-        if (experimentalTrades && distribution.isTradable()) {
-            distribution.getTrades().forEach(tradeType -> {
-                addInTag(getTradeKey(tradeType), reference);
-            });
+        // Any enchantment can be tradable.
+        if (experimentalTrades) {
+            if (distribution.isTradable()) {
+                distribution.getTrades().forEach(tradeType -> {
+                    addInTag(getTradeKey(tradeType), reference);
+                });
+            }
+        }
+        else {
+            if (distribution.isTradable()) {
+                addInTag(EnchantmentTags.TRADEABLE, reference);
+            }
+            else removeFromTag(EnchantmentTags.TRADEABLE, reference);
         }
 
         if (enchantment.isCurse()) {

@@ -89,8 +89,7 @@ public class EnchantDistribution implements Distribution {
         this.tradable = ConfigValue.create("Distribution.Tradeable",
             this.tradable,
             "Tradable enchantments are those that can be generated on Enchanted Books sold by librarians.",
-            "[*] Reboot required when changed.",
-            "[**] Has no effect if 'Treasure' is set on 'true' and Villager Trade Rebalance is disabled."
+            "[*] Reboot required when changed."
         ).read(config);
 
         this.tradeTypes = ConfigValue.forSet("Distribution.TradeTypes",
