@@ -52,6 +52,15 @@ public class BaseCommands {
             .executes((context, arguments) -> enchantItem(plugin, context, arguments))
         );
 
+        rootNode.addChildren(DirectNode.builder(plugin, "disenchant")
+            .description(Lang.COMMAND_DISENCHANT_DESC)
+            .permission(Perms.COMMAND_DISENCHANT)
+            .withArgument(CommandArguments.enchantArgument(CommandArguments.ENCHANT).required())
+            .withArgument(ArgumentTypes.player(CommandArguments.PLAYER))
+            .withArgument(CommandArguments.slotArgument(CommandArguments.SLOT))
+            .executes((context, arguments) -> disenchantItem(plugin, context, arguments))
+        );
+
         rootNode.addChildren(DirectNode.builder(plugin, "list")
             .playerOnly()
             .description(Lang.COMMAND_LIST_DESC)
@@ -85,7 +94,7 @@ public class BaseCommands {
 
     private static int getLevel(@NotNull Enchantment enchantment, @NotNull ParsedArguments arguments) {
         int level = arguments.getIntArgument(CommandArguments.LEVEL, -1);
-        if (level < 1) {
+        if (level <= 0) {
             level = EnchantUtils.randomLevel(enchantment);
         }
         return level;
@@ -128,15 +137,36 @@ public class BaseCommands {
         if (level > 0) {
             EnchantUtils.add(item, enchantment, level, true);
         }
-        else EnchantUtils.remove(item, enchantment);
-
-        //player.getInventory().setItem(slot, item);
 
         (context.getSender() == player ? Lang.COMMAND_ENCHANT_DONE_SELF : Lang.COMMAND_ENCHANT_DONE_OTHERS).getMessage()
             .replace(Placeholders.forPlayer(player))
             .replace(Placeholders.GENERIC_ITEM, ItemUtil.getItemName(item))
             .replace(Placeholders.GENERIC_ENCHANT, EnchantUtils.getLocalized(enchantment))
             .replace(Placeholders.GENERIC_LEVEL, NumberUtil.toRoman(level))
+            .send(context.getSender());
+
+        return true;
+    }
+
+    public static boolean disenchantItem(@NotNull EnchantsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+        Player player = CommandUtil.getPlayerOrSender(context, arguments, CommandArguments.PLAYER);
+        if (player == null) return false;
+
+        EquipmentSlot slot = arguments.getArgument(CommandArguments.SLOT, EquipmentSlot.class, EquipmentSlot.HAND);
+
+        ItemStack item = player.getInventory().getItem(slot);
+        if (item == null || item.getType().isAir()) {
+            Lang.COMMAND_ENCHANT_ERROR_NO_ITEM.getMessage().send(context.getSender());
+            return false;
+        }
+
+        Enchantment enchantment = arguments.getEnchantmentArgument(CommandArguments.ENCHANT);
+        EnchantUtils.remove(item, enchantment);
+
+        (context.getSender() == player ? Lang.COMMAND_DISENCHANT_DONE_SELF : Lang.COMMAND_DISENCHANT_DONE_OTHERS).getMessage()
+            .replace(Placeholders.forPlayer(player))
+            .replace(Placeholders.GENERIC_ITEM, ItemUtil.getItemName(item))
+            .replace(Placeholders.GENERIC_ENCHANT, EnchantUtils.getLocalized(enchantment))
             .send(context.getSender());
 
         return true;

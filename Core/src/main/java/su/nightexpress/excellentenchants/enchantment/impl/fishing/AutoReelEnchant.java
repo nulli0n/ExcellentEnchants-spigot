@@ -54,6 +54,7 @@ public class AutoReelEnchant extends GameEnchantment implements FishingEnchant {
 
         this.plugin.runTask(task -> {
             if (event.isCancelled()) return;
+            if (!event.getHook().isValid()) return;
 
             plugin.getEnchantNMS().sendAttackPacket(event.getPlayer(), id);
             plugin.getEnchantNMS().retrieveHook(event.getHook(), item, slot);

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ExcellentEnchants</artifactId>
         <groupId>su.nightexpress.excellentenchants</groupId>
-        <version>4.2.1</version>
+        <version>4.2.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -48,7 +48,6 @@
             <id>codemc-releases</id>
             <url>https://repo.codemc.io/repository/maven-releases/</url>
         </repository>
-
     </repositories>
 
     <dependencies>
@@ -90,19 +89,19 @@
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>API</artifactId>
-            <version>4.2.1</version>
+            <version>4.2.2</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>NMS</artifactId>
-            <version>4.2.1</version>
+            <version>4.2.2</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>MC_1_21</artifactId>
-            <version>4.2.1</version>
+            <version>4.2.2</version>
         </dependency>
 
     </dependencies>

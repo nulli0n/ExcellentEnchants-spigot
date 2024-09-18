@@ -346,8 +346,6 @@ public class Internal_1_21 implements EnchantNMS {
         ServerPlayer entity = craftPlayer.getHandle();
         ClientboundAnimatePacket packet = new ClientboundAnimatePacket(entity, id);
         craftPlayer.getHandle().connection.send(packet);
-
-        player.spigot().sendMessage();
     }
 
     @Override

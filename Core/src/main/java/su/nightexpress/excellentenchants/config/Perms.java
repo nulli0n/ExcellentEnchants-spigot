@@ -13,6 +13,7 @@ public class Perms {
 
     public static final UniPermission COMMAND_BOOK        = new UniPermission(PREFIX_COMMAND + "book");
     public static final UniPermission COMMAND_ENCHANT     = new UniPermission(PREFIX_COMMAND + "enchant");
+    public static final UniPermission COMMAND_DISENCHANT  = new UniPermission(PREFIX_COMMAND + "disenchant");
     public static final UniPermission COMMAND_GET_FUEL    = new UniPermission(PREFIX_COMMAND + "getfuel");
     public static final UniPermission COMMAND_LIST        = new UniPermission(PREFIX_COMMAND + "list");
     public static final UniPermission COMMAND_LIST_OTHERS = new UniPermission(PREFIX_COMMAND + "list.others");
@@ -25,6 +26,7 @@ public class Perms {
         COMMAND.addChildren(
             COMMAND_BOOK,
             COMMAND_ENCHANT,
+            COMMAND_DISENCHANT,
             COMMAND_GET_FUEL,
             COMMAND_LIST, COMMAND_LIST_OTHERS,
             COMMAND_RELOAD,

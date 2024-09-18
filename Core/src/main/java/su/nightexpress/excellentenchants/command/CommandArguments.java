@@ -18,12 +18,12 @@ import java.util.Arrays;
 
 public class CommandArguments {
 
-    public static final String PLAYER = "player";
-    public static final String AMOUNT = "amount";
-    public static final String LEVEL = "level";
+    public static final String PLAYER  = "player";
+    public static final String AMOUNT  = "amount";
+    public static final String LEVEL   = "level";
     public static final String ENCHANT = "enchant";
-    public static final String SLOT = "slot";
-    public static final String RARITY = "rarity";
+    public static final String SLOT    = "slot";
+    public static final String RARITY  = "rarity";
 
     @NotNull
     public static ArgumentBuilder<Enchantment> enchantArgument(@NotNull String name) {

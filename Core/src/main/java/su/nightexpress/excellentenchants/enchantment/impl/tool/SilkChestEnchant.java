@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.impl.tool;
 
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -158,23 +159,38 @@ public class SilkChestEnchant extends GameEnchantment implements BlockDropEnchan
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onSilkChestStore(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
-        if (inventory.getType() == InventoryType.CRAFTING || inventory.getType() == InventoryType.CREATIVE) return;
+        if (inventory.getType() != InventoryType.CRAFTING) {
+            int hotkey = event.getHotbarButton();
+            if (hotkey >= 0) {
+                Player player = (Player) event.getWhoClicked();
+                ItemStack hotItem = player.getInventory().getItem(hotkey);
+                if (hotItem != null && this.isSilkChest(hotItem)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
 
-        Player player = (Player) event.getWhoClicked();
-        ItemStack item;
-        if (event.getHotbarButton() >= 0) {
-            item = player.getInventory().getItem(event.getHotbarButton());
+            ItemStack item = event.getCurrentItem();
+            if (item == null) return;
+
+            if (this.isSilkChest(item)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            return;
         }
-        else item = event.getCurrentItem();
 
-        if (item == null || item.getType().isAir() || !this.isSilkChest(item)) return;
+        ItemStack item = event.getCurrentItem();
+        if (item == null) return;
 
-        Inventory clicked = event.getClickedInventory();
-        if (event.getClick() != ClickType.NUMBER_KEY) {
-            if (clicked != null && clicked.equals(event.getView().getTopInventory())) return;
+        boolean isRightClick = (event.isRightClick() && !event.isShiftClick()) || event.getClick() == ClickType.CREATIVE;
+        if (item.getType() == Material.BUNDLE && isRightClick) {
+            ItemStack cursor = event.getView().getCursor(); // Creative is shit, undetectable.
+            if (cursor != null && this.isSilkChest(cursor)) {
+                event.setCancelled(true);
+            }
         }
-
-        event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

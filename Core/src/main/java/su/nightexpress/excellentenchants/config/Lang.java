@@ -9,12 +9,13 @@ import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
 public class Lang extends CoreLang {
 
-    public static final LangString COMMAND_ARGUMENT_NAME_LEVEL = LangString.of("Command.Argument.Name.Level", "level");
-    public static final LangString COMMAND_ARGUMENT_NAME_SLOT = LangString.of("Command.Argument.Name.Slot", "slot");
+    public static final LangString COMMAND_ARGUMENT_NAME_LEVEL  = LangString.of("Command.Argument.Name.Level", "level");
+    public static final LangString COMMAND_ARGUMENT_NAME_SLOT   = LangString.of("Command.Argument.Name.Slot", "slot");
     public static final LangString COMMAND_ARGUMENT_NAME_RARITY = LangString.of("Command.Argument.Name.Rarity", "rarity");
 
     public static final LangString COMMAND_LIST_DESC        = LangString.of("Command.List.Desc", "List of custom enchantments.");
     public static final LangString COMMAND_ENCHANT_DESC     = LangString.of("Command.Enchant.Desc", "Enchant item in specific slot.");
+    public static final LangString COMMAND_DISENCHANT_DESC  = LangString.of("Command.Disenchant.Desc", "Disenchant item in specific slot.");
     public static final LangString COMMAND_BOOK_DESC        = LangString.of("Command.Book.Desc", "Give a book with specific enchantment.");
     public static final LangString COMMAND_RARITY_BOOK_DESC = LangString.of("Command.RarityBook.Desc", "Give a book with enchantment of specific rarity.");
     public static final LangString COMMAND_GET_FUEL_DESC    = LangString.of("Command.GetFuel.Desc", "Get enchantment fuel item.");
@@ -39,6 +40,14 @@ public class Lang extends CoreLang {
 
     public static final LangText COMMAND_ENCHANT_DONE_OTHERS = LangText.of("Command.Enchant.Done.Others",
         LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose(PLAYER_DISPLAY_NAME) + "'s " + LIGHT_YELLOW.enclose(GENERIC_ITEM) + " enchanted with " + LIGHT_YELLOW.enclose(GENERIC_ENCHANT + " " + GENERIC_LEVEL) + "!")
+    );
+
+    public static final LangText COMMAND_DISENCHANT_DONE_SELF = LangText.of("Command.Disenchant.Done.Self",
+        LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose(GENERIC_ITEM) + " disenchanted from " + LIGHT_YELLOW.enclose(GENERIC_ENCHANT) + "!")
+    );
+
+    public static final LangText COMMAND_DISENCHANT_DONE_OTHERS = LangText.of("Command.Disenchant.Done.Others",
+        LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose(PLAYER_DISPLAY_NAME) + "'s " + LIGHT_YELLOW.enclose(GENERIC_ITEM) + " disenchanted from " + LIGHT_YELLOW.enclose(GENERIC_ENCHANT) + "!")
     );
 
     public static final LangText COMMAND_ENCHANT_ERROR_NO_ITEM = LangText.of("Command.Enchant.Error.NoItem",
