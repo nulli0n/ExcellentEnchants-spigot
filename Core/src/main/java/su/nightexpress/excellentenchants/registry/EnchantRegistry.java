@@ -221,6 +221,7 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
 
     private void register(@NotNull String id, @NotNull Function<File, GameEnchantment> supplier) {
         if (Config.ENCHANTMENTS_DISABLED_LIST.get().contains(id)) return;
+        //if (true) return;
 
         File file = new File(plugin.getDataFolder() + Config.DIR_ENCHANTS, id + ".yml");
         FileUtil.create(file);
