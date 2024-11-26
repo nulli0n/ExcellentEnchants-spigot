@@ -18,17 +18,17 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.InteractEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
 import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.wrapper.UniSound;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 
 import java.io.File;
 import java.util.Set;
@@ -133,7 +133,7 @@ public class ReplanterEnchant extends GameEnchantment implements ChanceMeta, Int
             if (seed == Material.NETHER_WART && blockGround.getType() == Material.SOUL_SAND
                 || seed != Material.NETHER_WART && blockGround.getType() == Material.FARMLAND) {
                 if (this.takeSeeds(player, seed)) {
-                    UniSound.of(seed == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT).play(player);
+                    NightSound.of(seed == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT).play(player);
                     plugin.getEnchantNMS().sendAttackPacket(player, 0);
                     blockPlant.setType(this.fineSeedsToBlock(seed));
                     break;

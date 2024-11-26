@@ -98,7 +98,13 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
     private void loadAPI() {
         EnchantsAPI.load(this);
         Keys.loadKeys(this);
+
         ConfigBridge.setEnchantsTickInterval(Config.CORE_PASSIVE_ENCHANTS_TRIGGER_INTERVAL.get().intValue());
+        ConfigBridge.setGlobalDistEnchanting(Config.ENCHANTMENTS_GLOBAL_DIST_ENCHANTING.get());
+        ConfigBridge.setGlobalDistTrading(Config.ENCHANTMENTS_GLOBAL_DIST_TRADING.get());
+        ConfigBridge.setGlobalDistMobEquipment(Config.ENCHANTMENTS_GLOBAL_DIST_MOB_EQUIPMENT.get());
+        ConfigBridge.setGlobalDistTradeEquipment(Config.ENCHANTMENTS_GLOBAL_DIST_TRADE_EQUIPMENT.get());
+        ConfigBridge.setGlobalDistRandomLoot(Config.ENCHANTMENTS_GLOBAL_DIST_RANDOM_LOOT.get());
     }
 
     private void loadHooks() {

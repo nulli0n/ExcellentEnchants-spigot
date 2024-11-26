@@ -13,18 +13,18 @@ import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.PotionEffects;
 import su.nightexpress.excellentenchants.api.enchantment.meta.PotionMeta;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
-import su.nightexpress.excellentenchants.api.enchantment.meta.PotionEffects;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
 import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
-import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.excellentenchants.rarity.EnchantRarity;
+import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
-import su.nightexpress.nightcore.util.wrapper.UniSound;
 
 import java.io.File;
 
@@ -74,7 +74,7 @@ public class IceAspectEnchant extends GameEnchantment implements ChanceMeta, Pot
         if (this.hasVisualEffects()) {
             UniParticle.blockCrack(Material.ICE).play(victim.getEyeLocation(), 0.5, 0.1, 35);
             UniParticle.of(Particle.CLOUD).play(victim.getEyeLocation(), 0.25, 0.1, 25);
-            UniSound.of(Sound.BLOCK_GLASS_BREAK).play(victim.getLocation());
+            NightSound.of(Sound.BLOCK_GLASS_BREAK).play(victim.getLocation());
         }
         return true;
     }

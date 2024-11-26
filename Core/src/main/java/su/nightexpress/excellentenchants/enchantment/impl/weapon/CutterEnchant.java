@@ -15,19 +15,19 @@ import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
 import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.random.Rnd;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
-import su.nightexpress.nightcore.util.wrapper.UniSound;
 
 import java.io.File;
 
@@ -117,7 +117,7 @@ public class CutterEnchant extends GameEnchantment implements ChanceMeta, Combat
 
         if (this.hasVisualEffects()) {
             UniParticle.itemCrack(itemCut).play(victim.getEyeLocation(), 0.25, 0.15, 30);
-            UniSound.of(Sound.ENTITY_ITEM_BREAK).play(victim.getLocation());
+            NightSound.of(Sound.ENTITY_ITEM_BREAK).play(victim.getLocation());
         }
 
         return true;

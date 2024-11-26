@@ -13,16 +13,16 @@ import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
 import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.random.Rnd;
-import su.nightexpress.nightcore.util.wrapper.UniSound;
 
 import java.io.File;
 
@@ -78,7 +78,7 @@ public class RocketEnchant extends GameEnchantment implements ChanceMeta, Combat
         Firework firework = this.createRocket(victim.getWorld(), victim.getLocation(), level);
         firework.addPassenger(victim);
 
-        UniSound.of(Sound.ENTITY_FIREWORK_ROCKET_LAUNCH).play(victim.getLocation());
+        NightSound.of(Sound.ENTITY_FIREWORK_ROCKET_LAUNCH).play(victim.getLocation());
         return true;
     }
 

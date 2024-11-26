@@ -71,6 +71,41 @@ public class Config {
 
 
 
+    public static final ConfigValue<Boolean> ENCHANTMENTS_GLOBAL_DIST_ENCHANTING = ConfigValue.create("Enchantments.Global_Distribution.Enchanting_Table",
+        true,
+        "Controls whether excellent enchants can be obtained via enchanting table.",
+        "[*] Server reboot required.",
+        "[Default is true]"
+    );
+
+    public static final ConfigValue<Boolean> ENCHANTMENTS_GLOBAL_DIST_TRADING = ConfigValue.create("Enchantments.Global_Distribution.Trading",
+        true,
+        "Controls whether excellent enchants can be obtained via trading with villagers.",
+        "[*] Server reboot required.",
+        "[Default is true]"
+    );
+
+    public static final ConfigValue<Boolean> ENCHANTMENTS_GLOBAL_DIST_MOB_EQUIPMENT = ConfigValue.create("Enchantments.Global_Distribution.Mob_Equipment",
+        true,
+        "Controls whether excellent enchants can be populated on mob's equipment.",
+        "[*] Server reboot required.",
+        "[Default is true]"
+    );
+
+    public static final ConfigValue<Boolean> ENCHANTMENTS_GLOBAL_DIST_TRADE_EQUIPMENT = ConfigValue.create("Enchantments.Global_Distribution.Trade_Equipment",
+        true,
+        "Controls whether excellent enchants can be populated on traded equipment.",
+        "[*] Server reboot required.",
+        "[Default is true]"
+    );
+
+    public static final ConfigValue<Boolean> ENCHANTMENTS_GLOBAL_DIST_RANDOM_LOOT = ConfigValue.create("Enchantments.Global_Distribution.Random_Loot",
+        true,
+        "Controls whether excellent enchants can be populated on random loot.",
+        "[*] Server reboot required.",
+        "[Default is true]"
+    );
+
     public static final ConfigValue<Set<String>> ENCHANTMENTS_DISABLED_LIST = ConfigValue.forSet("Enchantments.Disabled.List",
         String::toLowerCase,
         FileConfig::set,

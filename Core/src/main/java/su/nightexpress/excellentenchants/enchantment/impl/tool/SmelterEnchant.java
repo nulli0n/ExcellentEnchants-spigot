@@ -18,11 +18,11 @@ import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
 import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.ConfigValue;
@@ -30,8 +30,8 @@ import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.LocationUtil;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
-import su.nightexpress.nightcore.util.wrapper.UniSound;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,8 +45,8 @@ public class SmelterEnchant extends GameEnchantment implements ChanceMeta, Block
 
     public static final String ID = "smelter";
 
-    private UniSound sound;
-    private boolean  disableOnCrouch;
+    private NightSound sound;
+    private boolean    disableOnCrouch;
 
     private final Set<Material>      exemptedItems;
     private final Set<FurnaceRecipe> recipes;
@@ -82,11 +82,7 @@ public class SmelterEnchant extends GameEnchantment implements ChanceMeta, Block
             "Sets whether or not enchantment will have no effect when crouching."
         ).read(config);
 
-        this.sound = ConfigValue.create("Settings.Sound",
-            UniSound.of(Sound.BLOCK_LAVA_EXTINGUISH),
-            "Sound to play on smelting.",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html"
-        ).read(config);
+        this.sound = ConfigValue.create("Settings.Sound", NightSound.of(Sound.BLOCK_LAVA_EXTINGUISH), "Sound to play on smelting.").read(config);
 
         this.exemptedItems.addAll(ConfigValue.forSet("Settings.Exempted_Blocks",
             BukkitThing::getMaterial,

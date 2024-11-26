@@ -11,16 +11,16 @@ import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
 import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
-import su.nightexpress.nightcore.util.wrapper.UniSound;
 
 import java.io.File;
 
@@ -63,7 +63,7 @@ public class DoubleStrikeEnchant extends GameEnchantment implements ChanceMeta, 
 
         if (this.hasVisualEffects()) {
             UniParticle.of(Particle.EXPLOSION).play(victim.getEyeLocation(), 0.25, 0.15, 15);
-            UniSound.of(Sound.ENTITY_GENERIC_EXPLODE).play(victim.getLocation());
+            NightSound.of(Sound.ENTITY_GENERIC_EXPLODE).play(victim.getLocation());
         }
         return true;
     }

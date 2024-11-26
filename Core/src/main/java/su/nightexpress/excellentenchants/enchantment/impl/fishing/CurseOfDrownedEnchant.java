@@ -11,16 +11,16 @@ import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.TradeType;
 import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
 import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.rarity.EnchantRarity;
 import su.nightexpress.excellentenchants.util.ItemCategories;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
-import su.nightexpress.nightcore.util.wrapper.UniSound;
 
 import java.io.File;
 
@@ -68,7 +68,7 @@ public class CurseOfDrownedEnchant extends GameEnchantment implements FishingEnc
 
         if (this.hasVisualEffects()) {
             UniParticle.of(Particle.UNDERWATER).play(hook.getLocation(), 0.75, 0.1, 50);
-            UniSound.of(Sound.ENTITY_DROWNED_AMBIENT).play(event.getPlayer());
+            NightSound.of(Sound.ENTITY_DROWNED_AMBIENT).play(event.getPlayer());
         }
         return true;
     }

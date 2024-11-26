@@ -48,6 +48,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.api.ConfigBridge;
 import su.nightexpress.excellentenchants.api.enchantment.*;
 import su.nightexpress.excellentenchants.api.enchantment.bridge.FlameWalker;
 import su.nightexpress.nightcore.NightPlugin;
@@ -270,31 +271,31 @@ public class Internal_1_21_3 implements EnchantNMS {
         else addInTag(EnchantmentTags.NON_TREASURE, reference);
 
         // Any enchantment can be on random loot.
-        if (distribution.isOnRandomLoot()) {
+        if (distribution.isOnRandomLoot() && ConfigBridge.isGlobalDistRandomLoot()) {
             addInTag(EnchantmentTags.ON_RANDOM_LOOT, reference);
         }
 
         // Only non-treasure enchantments should be on mob equipment, traded equipment and non-rebalanced trades.
         if (!distribution.isTreasure()) {
-            if (distribution.isOnMobSpawnEquipment()) {
+            if (distribution.isOnMobSpawnEquipment() && ConfigBridge.isGlobalDistMobEquipment()) {
                 addInTag(EnchantmentTags.ON_MOB_SPAWN_EQUIPMENT, reference);
             }
 
-            if (distribution.isOnTradedEquipment()) {
+            if (distribution.isOnTradedEquipment() && ConfigBridge.isGlobalDistTradeEquipment()) {
                 addInTag(EnchantmentTags.ON_TRADED_EQUIPMENT, reference);
             }
         }
 
         // Any enchantment can be tradable.
         if (experimentalTrades) {
-            if (distribution.isTradable()) {
+            if (distribution.isTradable() && ConfigBridge.isGlobalDistTrading()) {
                 distribution.getTrades().forEach(tradeType -> {
                     addInTag(getTradeKey(tradeType), reference);
                 });
             }
         }
         else {
-            if (distribution.isTradable()) {
+            if (distribution.isTradable() && ConfigBridge.isGlobalDistTrading()) {
                 addInTag(EnchantmentTags.TRADEABLE, reference);
             }
             else removeFromTag(EnchantmentTags.TRADEABLE, reference);
@@ -306,7 +307,7 @@ public class Internal_1_21_3 implements EnchantNMS {
         else {
             // Only non-curse and non-treasure enchantments should go in enchanting table.
             if (!distribution.isTreasure()) {
-                if (distribution.isDiscoverable()) {
+                if (distribution.isDiscoverable() && ConfigBridge.isGlobalDistEnchanting()) {
                     addInTag(EnchantmentTags.IN_ENCHANTING_TABLE, reference);
                 }
                 else removeFromTag(EnchantmentTags.IN_ENCHANTING_TABLE, reference);
