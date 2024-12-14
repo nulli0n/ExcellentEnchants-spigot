@@ -8,18 +8,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.api.enchantment.meta.MetaHolder;
 import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.placeholder.PlaceholderMap;
-import su.nightexpress.nightcore.util.random.Rnd;
 
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 public interface CustomEnchantment extends MetaHolder {
 
-    default void clear() {
+//    default void clear() {
+//
+//    }
 
-    }
-
-    @NotNull PlaceholderMap getPlaceholders(int level);
+    @NotNull UnaryOperator<String> replacePlaceholders(int level);
 
     @NotNull FileConfig getConfig();
 
@@ -84,7 +83,4 @@ public interface CustomEnchantment extends MetaHolder {
     void fuelCharges(@NotNull ItemStack item, int level);
 
     void consumeCharges(@NotNull ItemStack item, int level);
-
-    @Deprecated
-    void consumeChargesNoUpdate(@NotNull ItemStack item, int level);
 }

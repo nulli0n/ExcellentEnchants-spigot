@@ -80,6 +80,7 @@ public class TreasureHunterEnchant extends GameEnchantment implements ChanceMeta
             "Available loot table names: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/loot/LootTables.html"
         ).read(config);
 
+        this.lootTables.clear();
         if (isWhitelist) {
             this.lootTables.addAll(tables);
         }
@@ -89,10 +90,10 @@ public class TreasureHunterEnchant extends GameEnchantment implements ChanceMeta
         }
     }
 
-    @Override
-    public void clear() {
-        this.lootTables.clear();
-    }
+//    @Override
+//    public void clear() {
+//        this.lootTables.clear();
+//    }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onLootExplore(LootGenerateEvent event) {

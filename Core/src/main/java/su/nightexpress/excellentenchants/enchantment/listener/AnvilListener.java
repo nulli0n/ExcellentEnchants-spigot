@@ -41,26 +41,10 @@ public class AnvilListener extends AbstractListener<EnchantsPlugin> {
         if (second == null) second = new ItemStack(Material.AIR);
         if (result == null) result = new ItemStack(Material.AIR);
 
-        //if (first.getType().isAir() || first.getAmount() > 1 || !EnchantUtils.isEnchantable(first)) return;
-
-        //if (this.handleRename(event, first, second, result)) return;
-
         if (this.handleRecharge(event, first, second)) return;
 
         this.handleCombine(event, first, second, result);
     }
-
-    /*private boolean handleRename(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
-        if (!(second.getType().isAir() || second.getType() != first.getType() && !EnchantUtils.isEnchantedBook(second))) return false;
-        if (result.getType() != first.getType()) return false;
-
-        ItemStack renamed = new ItemStack(result);
-        EnchantUtils.getCustomEnchantments(first).forEach((hasEnch, hasLevel) -> EnchantUtils.add(renamed, hasEnch.getEnchantment(), hasLevel, true));
-        EnchantUtils.updateDisplay(renamed);
-
-        event.setResult(renamed);
-        return true;
-    }*/
 
     @SuppressWarnings("UnstableApiUsage")
     private boolean handleRecharge(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second) {
@@ -82,7 +66,6 @@ public class AnvilListener extends AbstractListener<EnchantsPlugin> {
         }
 
         PDCUtil.set(recharged, Keys.itemRecharged, count);
-        //EnchantUtils.updateDisplay(recharged);
         event.setResult(recharged);
 
         this.plugin.runTask(task -> event.getView().setRepairCost(chargable.size()));
@@ -92,66 +75,26 @@ public class AnvilListener extends AbstractListener<EnchantsPlugin> {
     private boolean handleCombine(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
         ItemStack merged = new ItemStack(result.getType().isAir() ? first : result);
 
-        /*AtomicInteger repairCost = new AtomicInteger(event.getInventory().getRepairCost());
-        EnchantUtils.getCustomEnchantments(first).forEach((data, level) -> {
-            if (EnchantUtils.add(merged, data.getEnchantment(), level, false)) {
-                repairCost.addAndGet(data.getAnvilCost());
-            }
-        });*/
-
         if (EnchantUtils.countCustomEnchantments(merged) > Config.CORE_ITEM_ENCHANT_LIMIT.get()) {
             event.setResult(null);
             return false;
         }
 
         Map<CustomEnchantment, Integer> chargesMap = new HashMap<>();
-        EnchantUtils.getCustomEnchantments(result).forEach((data, level) -> {
-            int chargesFirst = data.getCharges(first);
-            int chargesSecond = data.getCharges(second);
+        EnchantUtils.getCustomEnchantments(result).forEach((enchantment, level) -> {
+            int chargesFirst = enchantment.getCharges(first);
+            int chargesSecond = enchantment.getCharges(second);
 
-            chargesMap.put(data, chargesFirst + chargesSecond);
-            data.setCharges(merged, level, chargesFirst + chargesSecond);
+            chargesMap.put(enchantment, chargesFirst + chargesSecond);
+            enchantment.setCharges(merged, level, chargesFirst + chargesSecond);
         });
 
-        //this.plugin.runTask(task -> event.getInventory().setRepairCost(repairCost.get()));
-
-        if (!chargesMap.isEmpty()/* || repairCost.get() != event.getInventory().getRepairCost()*/) {
+        if (!chargesMap.isEmpty()) {
             event.setResult(merged);
             return true;
         }
 
         return false;
-
-        /*
-        if (second.getType().isAir() || second.getAmount() > 1 || !EnchantUtils.isEnchantable(second)) return false;
-        if (EnchantUtils.isEnchantedBook(first) && second.getType() != first.getType()) return false;
-        Map<EnchantmentData, Integer> firstEnchants = EnchantUtils.getCustomEnchantments(first);
-        //Map<EnchantmentData, Integer> secondEnchants = EnchantUtils.getCustomEnchantments(second);
-        Map<EnchantmentData, Integer> charges = new HashMap<>(firstEnchants.keySet().stream().collect(Collectors.toMap(k -> k, v -> v.getCharges(first))));
-        AtomicInteger repairCost = new AtomicInteger(event.getInventory().getRepairCost());
-
-        if (EnchantUtils.isEnchantedBook(second) || second.getType() == first.getType()) {
-            EnchantUtils.getCustomEnchantments(second).forEach((data, level) -> {
-                int maxMergeLevel = data.getMaxMergeLevel() < 0 ? data.getMaxLevel() : data.getMaxMergeLevel();
-
-                firstEnchants.merge(data, level, (oldLvl, newLvl) -> oldLvl.equals(newLvl) ? Math.min(maxMergeLevel, oldLvl + 1) : Math.max(oldLvl, newLvl));
-                charges.merge(data, data.getCharges(second), Integer::sum);
-            });
-        }
-
-        firstEnchants.forEach((enchantmentData, level) -> {
-            if (EnchantUtils.add(merged, enchantmentData.getEnchantment(), level, false)) {
-                repairCost.addAndGet(enchantmentData.getAnvilMergeCost(level));
-                enchantmentData.setCharges(merged, level, charges.getOrDefault(enchantmentData, 0));
-            }
-        });
-
-        if (first.equals(merged)) return false;
-
-        EnchantUtils.updateDisplay(merged);
-        event.setResult(merged);
-        this.plugin.runTask(task -> event.getInventory().setRepairCost(repairCost.get()));
-        return true;*/
     }
 
     @SuppressWarnings("UnstableApiUsage")

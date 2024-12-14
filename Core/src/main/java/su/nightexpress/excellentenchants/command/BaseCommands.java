@@ -31,7 +31,7 @@ public class BaseCommands {
     public static void load(@NotNull EnchantsPlugin plugin) {
         ChainedNode rootNode = plugin.getRootNode();
 
-        ReloadCommand.inject(plugin, rootNode, Perms.COMMAND_RELOAD);
+        rootNode.addChildren(ReloadCommand.builder(plugin, Perms.COMMAND_RELOAD));
 
         rootNode.addChildren(DirectNode.builder(plugin, "book")
             .description(Lang.COMMAND_BOOK_DESC)
@@ -111,10 +111,10 @@ public class BaseCommands {
         EnchantUtils.add(item, enchantment, level, true);
         Players.addItem(player, item);
 
-        Lang.COMMAND_BOOK_DONE.getMessage()
+        Lang.COMMAND_BOOK_DONE.getMessage().send(context.getSender(), replacer -> replacer
             .replace(Placeholders.GENERIC_ENCHANT, EnchantUtils.getLocalized(enchantment))
             .replace(Placeholders.forPlayer(player))
-            .send(context.getSender());
+        );
 
         return true;
     }
@@ -138,12 +138,12 @@ public class BaseCommands {
             EnchantUtils.add(item, enchantment, level, true);
         }
 
-        (context.getSender() == player ? Lang.COMMAND_ENCHANT_DONE_SELF : Lang.COMMAND_ENCHANT_DONE_OTHERS).getMessage()
+        (context.getSender() == player ? Lang.COMMAND_ENCHANT_DONE_SELF : Lang.COMMAND_ENCHANT_DONE_OTHERS).getMessage().send(context.getSender(), replacer -> replacer
             .replace(Placeholders.forPlayer(player))
             .replace(Placeholders.GENERIC_ITEM, ItemUtil.getItemName(item))
             .replace(Placeholders.GENERIC_ENCHANT, EnchantUtils.getLocalized(enchantment))
             .replace(Placeholders.GENERIC_LEVEL, NumberUtil.toRoman(level))
-            .send(context.getSender());
+        );
 
         return true;
     }
@@ -163,11 +163,11 @@ public class BaseCommands {
         Enchantment enchantment = arguments.getEnchantmentArgument(CommandArguments.ENCHANT);
         EnchantUtils.remove(item, enchantment);
 
-        (context.getSender() == player ? Lang.COMMAND_DISENCHANT_DONE_SELF : Lang.COMMAND_DISENCHANT_DONE_OTHERS).getMessage()
+        (context.getSender() == player ? Lang.COMMAND_DISENCHANT_DONE_SELF : Lang.COMMAND_DISENCHANT_DONE_OTHERS).getMessage().send(context.getSender(), replacer -> replacer
             .replace(Placeholders.forPlayer(player))
             .replace(Placeholders.GENERIC_ITEM, ItemUtil.getItemName(item))
             .replace(Placeholders.GENERIC_ENCHANT, EnchantUtils.getLocalized(enchantment))
-            .send(context.getSender());
+        );
 
         return true;
     }
@@ -178,9 +178,9 @@ public class BaseCommands {
         int amount = arguments.getIntArgument(CommandArguments.AMOUNT, 1);
 
         if (!enchantment.hasCharges()) {
-            Lang.COMMAND_GET_FUEL_ERROR_NO_CHARGES.getMessage()
+            Lang.COMMAND_GET_FUEL_ERROR_NO_CHARGES.getMessage().send(context.getSender(), replacer -> replacer
                 .replace(Placeholders.GENERIC_NAME, enchantment.getDisplayName())
-                .send(context.getSender());
+            );
             return false;
         }
 
@@ -189,10 +189,10 @@ public class BaseCommands {
 
         Players.addItem(player, fuel);
 
-        Lang.COMMAND_GET_FUEL_DONE.getMessage()
+        Lang.COMMAND_GET_FUEL_DONE.getMessage().send(context.getSender(), replacer -> replacer
             .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(amount))
             .replace(Placeholders.GENERIC_NAME, ItemUtil.getItemName(fuel))
-            .send(context.getSender());
+        );
 
         return true;
     }
@@ -204,7 +204,7 @@ public class BaseCommands {
         plugin.getEnchantManager().openEnchantsMenu(player);
 
         if (player != context.getSender()) {
-            Lang.COMMAND_LIST_DONE_OTHERS.getMessage().replace(Placeholders.forPlayer(player)).send(context.getSender());
+            Lang.COMMAND_LIST_DONE_OTHERS.getMessage().send(context.getSender(), replacer -> replacer.replace(Placeholders.forPlayer(player)));
         }
         return true;
     }
@@ -229,10 +229,10 @@ public class BaseCommands {
         EnchantUtils.add(item, enchantment, level, true);
         Players.addItem(player, item);
 
-        Lang.COMMAND_RARITY_BOOK_DONE.getMessage()
+        Lang.COMMAND_RARITY_BOOK_DONE.getMessage().send(context.getSender(), replacer -> replacer
             .replace(Placeholders.GENERIC_NAME, rarity.getName())
             .replace(Placeholders.forPlayer(player))
-            .send(context.getSender());
+        );
 
         return true;
     }

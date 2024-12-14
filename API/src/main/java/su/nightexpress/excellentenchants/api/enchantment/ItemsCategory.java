@@ -18,13 +18,11 @@ public class ItemsCategory {
 
     private final Supplier<Set<Material>> supplier;
     private final EquipmentSlot[]         slots;
-//    private final EnchantmentTarget       target;
     private final String                  localized;
 
-    public ItemsCategory(@NotNull Supplier<Set<Material>> supplier, EquipmentSlot[] slots/*, @Nullable EnchantmentTarget target*/, @Nullable String localized) {
+    public ItemsCategory(@NotNull Supplier<Set<Material>> supplier, EquipmentSlot[] slots, @Nullable String localized) {
         this.supplier = supplier;
         this.slots = slots;
-//        this.target = target;
         this.localized = localized;
     }
 
@@ -62,13 +60,6 @@ public class ItemsCategory {
         return slots;
     }
 
-//    /**
-//     * Only for compatibility reasons with versions < 1.21
-//     */
-//    public EnchantmentTarget getTarget() {
-//        return target;
-//    }
-
     public String getLocalized() {
         return localized;
     }
@@ -77,7 +68,6 @@ public class ItemsCategory {
 
         private Supplier<Set<Material>> supplier;
         private EquipmentSlot[] slots;
-//        private EnchantmentTarget target;
         private String localized;
 
         public Builder() {
@@ -87,7 +77,7 @@ public class ItemsCategory {
 
         @NotNull
         public ItemsCategory build() {
-            return new ItemsCategory(this.supplier, this.slots, /*this.target,*/ this.localized);
+            return new ItemsCategory(this.supplier, this.slots, this.localized);
         }
 
         @NotNull
@@ -101,13 +91,6 @@ public class ItemsCategory {
             this.supplier = supplier;
             return this;
         }
-
-//        @NotNull
-//        @Deprecated
-//        public Builder target(EnchantmentTarget target) {
-//            this.target = target;
-//            return this;
-//        }
 
         @NotNull
         public Builder localized(@NotNull LangString localized) {

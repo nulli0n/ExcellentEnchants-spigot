@@ -88,7 +88,7 @@ public class PlaceholderHook {
                 CustomEnchantment enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[0].toLowerCase()));
                 if (enchant == null) return null;
 
-                int level = NumberUtil.getInteger(chargesSplit[1], 1);
+                int level = NumberUtil.getIntegerAbs(chargesSplit[1], 1);
 
                 return String.valueOf(enchant.getCharges().getMaxAmount(level));
             }

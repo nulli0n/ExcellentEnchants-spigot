@@ -12,31 +12,30 @@ import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.meta.EnchantMeta;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.util.EnchantPlaceholders;
+import su.nightexpress.excellentenchants.util.EnchantBlacklist;
 import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.AbstractFileData;
 import su.nightexpress.nightcore.manager.SimpeListener;
 import su.nightexpress.nightcore.util.PDCUtil;
-import su.nightexpress.nightcore.util.placeholder.PlaceholderMap;
+import su.nightexpress.nightcore.util.placeholder.PlaceholderList;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> implements CustomEnchantment {
 
-    protected final EnchantMeta         meta;
-    protected final EnchantDefinition   definition;
-    protected final EnchantDistribution distribution;
-    protected final EnchantCharges      charges;
-    private final   NamespacedKey       chargesKey;
-    private final   EnchantPlaceholders placeholders;
-    private final   String              logPrefix;
+    protected final EnchantMeta              meta;
+    protected final EnchantDefinition        definition;
+    protected final EnchantDistribution      distribution;
+    protected final EnchantCharges           charges;
+    private final   NamespacedKey            chargesKey;
+    private final   PlaceholderList<Integer> placeholders;
+    private final   String                   logPrefix;
 
     private Enchantment enchantment;
     private boolean hiddenFromList;
@@ -125,9 +124,10 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
         this.plugin.error(this.logPrefix + text);
     }
 
+    @Override
     @NotNull
-    public PlaceholderMap getPlaceholders(int level) {
-        return this.placeholders.toMap(level);
+    public UnaryOperator<String> replacePlaceholders(int level) {
+        return this.placeholders.replacer(level);
     }
 
     public void addPlaceholder(@NotNull String key, @NotNull Function<Integer, String> replacer) {
@@ -166,8 +166,8 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
 
     @Override
     public boolean isAvailableToUse(@NotNull World world) {
-        Set<String> disabled = Config.ENCHANTMENTS_DISABLED_IN_WORLDS.get().getOrDefault(world.getName().toLowerCase(), Collections.emptySet());
-        return disabled.isEmpty() || (!disabled.contains(this.getId()) && !disabled.contains(Placeholders.WILDCARD));
+        EnchantBlacklist blacklist = Config.getDisabledEnchantments(world);
+        return blacklist == null || !blacklist.contains(this);
     }
 
     @Override
@@ -183,7 +183,7 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
     @Override
     @NotNull
     public String getFormattedName() {
-        return this.isCurse() ? this.getDisplayName() : this.getPlaceholders(1).replacer().apply(this.definition.getRarity().getNameFormat());
+        return this.isCurse() ? this.getDisplayName() : this.replacePlaceholders(1).apply(this.definition.getRarity().getNameFormat());
     }
 
     @Override
@@ -208,7 +208,7 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
         description.replaceAll(line -> {
             line = lineFormat.replace(Placeholders.GENERIC_DESCRIPTION, line);
             line = EnchantUtils.replaceComponents(this, line, level, charges);
-            line = this.getPlaceholders(level).replacer().apply(line);
+            line = this.replacePlaceholders(level).apply(line);
             return line;
         });
         return description;
@@ -297,19 +297,12 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
     }
 
     @Override
-    public void consumeChargesNoUpdate(@NotNull ItemStack item, int level) {
+    public void consumeCharges(@NotNull ItemStack item, int level) {
         if (!this.hasCharges()) return;
 
         int charges = this.getCharges(item);
         int consumeAmount = this.charges.getConsumeAmount(level);
 
         this.setCharges(item, level, charges < consumeAmount ? 0 : Math.max(0, charges - consumeAmount));
-    }
-
-    @Override
-    public void consumeCharges(@NotNull ItemStack item, int level) {
-        if (!this.hasCharges()) return;
-
-        this.consumeChargesNoUpdate(item, level);
     }
 }

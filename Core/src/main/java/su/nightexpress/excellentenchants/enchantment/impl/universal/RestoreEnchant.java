@@ -80,7 +80,7 @@ public class RestoreEnchant extends GameEnchantment implements GenericEnchant, C
         if (!this.checkTriggerChance(level)) return;
 
         event.setCancelled(true);
-        this.consumeChargesNoUpdate(item, level);
+        this.consumeCharges(item, level);
 
         double restorePercent = 100D - this.getDurabilityRestore(level);
         int restored = (int) (maxDurability * (restorePercent / 100D));

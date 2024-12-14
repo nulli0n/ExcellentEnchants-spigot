@@ -6,10 +6,11 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.ConfigBridge;
 import su.nightexpress.excellentenchants.api.EnchantmentID;
+import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.bridge.FlameWalker;
 import su.nightexpress.excellentenchants.api.enchantment.meta.PeriodMeta;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.enchantment.impl.armor.FlameWalkerEnchant;
 import su.nightexpress.excellentenchants.enchantment.listener.AnvilListener;
 import su.nightexpress.excellentenchants.enchantment.listener.GenericListener;
 import su.nightexpress.excellentenchants.enchantment.menu.EnchantsMenu;
@@ -25,7 +26,6 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
     private final Set<PassiveEnchant> passiveEnchants;
 
-
     private EnchantsMenu enchantsMenu;
 
     public EnchantManager(@NotNull EnchantsPlugin plugin) {
@@ -40,17 +40,25 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         this.addListener(new GenericListener(this.plugin, this));
         this.addListener(new AnvilListener(this.plugin));
 
-        this.addTask(this.plugin.createAsyncTask(this::displayProjectileTrails).setTicksInterval(Config.CORE_PROJECTILE_PARTICLE_INTERVAL.get()));
+        this.addAsyncTask(this::displayProjectileTrails, Config.CORE_PROJECTILE_PARTICLE_INTERVAL.get());
+
         if (!this.passiveEnchants.isEmpty()) {
-            this.addTask(this.plugin.createTask(this::updatePassiveEnchantEffects).setTicksInterval(ConfigBridge.getEnchantsTickInterval()));
+            this.addTask(this::updatePassiveEnchantEffects, ConfigBridge.getEnchantsTickInterval());
         }
-        if (EnchantRegistry.isRegistered(EnchantmentID.FLAME_WALKER)) {
-            this.addTask(this.plugin.createTask(FlameWalkerEnchant::tickBlocks).setSecondsInterval(1));
+
+        CustomEnchantment enchantment = EnchantRegistry.getById(EnchantmentID.FLAME_WALKER);
+        if (enchantment instanceof FlameWalker flameWalker) {
+            this.addTask(flameWalker::tickBlocks, 1);
         }
     }
 
     @Override
     protected void onShutdown() {
+        CustomEnchantment enchantment = EnchantRegistry.getById(EnchantmentID.FLAME_WALKER);
+        if (enchantment instanceof FlameWalker flameWalker) {
+            flameWalker.removeBlocks();
+        }
+
         if (this.enchantsMenu != null) this.enchantsMenu.clear();
     }
 

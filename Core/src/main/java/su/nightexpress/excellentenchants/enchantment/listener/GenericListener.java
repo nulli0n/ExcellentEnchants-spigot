@@ -26,7 +26,7 @@ public class GenericListener extends AbstractListener<EnchantsPlugin> {
 
     //private final EnchantManager enchantManager;
 
-    public GenericListener(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager enchantManager) {
+    public GenericListener(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager) {
         super(plugin);
         //this.enchantManager = enchantManager;
     }

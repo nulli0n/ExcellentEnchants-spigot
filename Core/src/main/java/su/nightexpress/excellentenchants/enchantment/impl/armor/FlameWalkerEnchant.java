@@ -19,9 +19,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.api.enchantment.DecayBlock;
 import su.nightexpress.excellentenchants.api.enchantment.TradeType;
-import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.bridge.FlameWalker;
+import su.nightexpress.excellentenchants.api.enchantment.type.GenericEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDefinition;
 import su.nightexpress.excellentenchants.enchantment.impl.EnchantDistribution;
 import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
@@ -32,16 +33,20 @@ import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.SimpeListener;
 import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.Lists;
+import su.nightexpress.nightcore.util.random.Rnd;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 public class FlameWalkerEnchant extends GameEnchantment implements GenericEnchant, FlameWalker, SimpeListener {
 
     private static final BlockFace[] FACES = {BlockFace.SOUTH, BlockFace.NORTH, BlockFace.EAST, BlockFace.WEST};
+
+    private final Map<Location, DecayBlock> magmaBlocks = new ConcurrentHashMap<>();
 
     private Modifier radius;
     private Modifier blockDecayTime;
@@ -86,43 +91,45 @@ public class FlameWalkerEnchant extends GameEnchantment implements GenericEnchan
         return this.blockDecayTime.getValue(level);
     }
 
+//    @Override
+//    public void clear() {
+//        this.removeBlocks();
+//    }
+
     @Override
-    public void clear() {
-        MAGMA_BLOCKS.keySet().forEach(location -> location.getBlock().setType(Material.LAVA));
-        MAGMA_BLOCKS.clear();
+    public void removeBlocks() {
+        magmaBlocks.keySet().forEach(location -> location.getBlock().setType(Material.LAVA));
+        magmaBlocks.clear();
     }
 
-    public static boolean isBlock(@NotNull Block block) {
-        return MAGMA_BLOCKS.containsKey(block.getLocation());
+    public boolean isBlock(@NotNull Block block) {
+        return magmaBlocks.containsKey(block.getLocation());
     }
 
-    public static void tickBlocks() {
-        long now = System.currentTimeMillis();
-
-        MAGMA_BLOCKS.keySet().removeIf(location -> location.getBlock().isLiquid() || location.getBlock().getType() != Material.MAGMA_BLOCK);
-        MAGMA_BLOCKS.forEach((location, pair) -> {
+    @Override
+    public void tickBlocks() {
+        magmaBlocks.keySet().removeIf(location -> location.getBlock().isLiquid() || location.getBlock().getType() != Material.MAGMA_BLOCK);
+        magmaBlocks.forEach((location, decayBlock) -> {
             Block block = location.getBlock();
-            long time = pair.getFirst();
-            if (now >= time) {
+            if (decayBlock.isExpired()) {
                 block.getWorld().getPlayers().forEach(player -> {
-                    player.sendBlockDamage(location, 0F, pair.getSecond());
+                    player.sendBlockDamage(location, 0F, decayBlock.getSourceId());
                 });
                 block.setType(Material.LAVA);
                 UniParticle.blockCrack(Material.MAGMA_BLOCK).play(location, 0.5, 0.7, 0.5, 0.03, 30);
                 return;
             }
 
-            long diff = TimeUnit.MILLISECONDS.toSeconds(time - now);
-
-            float progress = (float) (1D - Math.min(1D, diff / 5D));
-            if (progress > 1F) progress = 1F;
-            if (progress < 0F) progress = 0F;
-
-            float finalProgress = progress;
+            float progress = decayBlock.getProgress();
             block.getWorld().getPlayers().forEach(player -> {
-                player.sendBlockDamage(location, finalProgress, pair.getSecond());
+                player.sendBlockDamage(location, progress, decayBlock.getSourceId());
             });
         });
+    }
+
+    @Override
+    public void addBlock(@NotNull Block block, int level) {
+        this.magmaBlocks.put(block.getLocation(), new DecayBlock(block.getLocation(), Rnd.getDouble(this.getBlockDecayTime(level)) + 1));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

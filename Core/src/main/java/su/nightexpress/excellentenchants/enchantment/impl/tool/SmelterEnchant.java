@@ -84,6 +84,9 @@ public class SmelterEnchant extends GameEnchantment implements ChanceMeta, Block
 
         this.sound = ConfigValue.create("Settings.Sound", NightSound.of(Sound.BLOCK_LAVA_EXTINGUISH), "Sound to play on smelting.").read(config);
 
+        this.recipes.clear();
+        this.exemptedItems.clear();
+
         this.exemptedItems.addAll(ConfigValue.forSet("Settings.Exempted_Blocks",
             BukkitThing::getMaterial,
             (cfg, path, set) -> cfg.set(path, set.stream().map(BukkitThing::toString).toList()),
@@ -100,11 +103,11 @@ public class SmelterEnchant extends GameEnchantment implements ChanceMeta, Block
         });
     }
 
-    @Override
-    public void clear() {
-        this.recipes.clear();
-        this.exemptedItems.clear();
-    }
+//    @Override
+//    public void clear() {
+//        this.recipes.clear();
+//        this.exemptedItems.clear();
+//    }
 
     @Override
     public boolean onDrop(@NotNull BlockDropItemEvent event, @NotNull LivingEntity entity, @NotNull ItemStack item, int level) {

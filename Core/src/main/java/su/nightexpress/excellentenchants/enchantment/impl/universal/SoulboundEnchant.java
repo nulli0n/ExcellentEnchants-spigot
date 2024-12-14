@@ -79,7 +79,7 @@ public class SoulboundEnchant extends GameEnchantment implements GenericEnchant,
                     world.dropItemNaturally(location, save);
                 }
                 else {
-                    this.consumeChargesNoUpdate(save, EnchantUtils.getLevel(save, this.getBukkitEnchantment()));
+                    this.consumeCharges(save, EnchantUtils.getLevel(save, this.getBukkitEnchantment()));
                     player.getInventory().addItem(save);
                 }
             });

@@ -1,0 +1,72 @@
+Command:
+  List:
+    Desc: 'Lista de encantamentos personalizados.'
+    Usage: '[jogador]'
+    DoneOthers: <light_gray>Abriu o GUI para o jogador <light_yellow>%player_name%</light_yellow>.</light_gray>
+  GetFuel:
+    Desc: 'Obtém um item de recarga.'
+    Usage: <enchant> [quantidade]
+    Done: <light_gray>Você recebeu <light_yellow>x%amount% %name%</light_yellow>.</light_gray>
+  Enchant:
+    Usage: <enchant> <nivel> [jogador] [slot]
+    Desc: 'Encanta o item na mão.'
+    Done:
+      Self: <light_gray>O encantamento de <light_yellow>%item%</light_yellow> é <light_yellow>%enchant% %level%</light_yellow>!</light_gray>
+      Others: <light_gray>O encantamento de <light_yellow>%item%</light_yellow> do jogador <light_yellow>%player_display_name%</light_yellow> é <light_yellow>%enchant% %level%</light_yellow>!</light_gray>
+    Error:
+      NoItem: <red>Não há item para encantar!</red>
+  Book:
+    Usage: <jogador> <enchant> <nivel>
+    Desc: 'Concede um livro de encantamento personalizado.'
+    Done: <light_gray>Concedeu o livro de encantamento <light_yellow>%enchant%</light_yellow> para <light_yellow>%player_display_name%</light_yellow>.</light_gray>
+  RarityBook:
+    Usage: <jogador> <nivel> <raridade>
+    Desc: 'Concede um livro de encantamento com uma raridade específica.'
+    Done: <light_gray>Concedeu o livro de encantamento <light_yellow>%name%</light_yellow> para <light_yellow>%player_display_name%</light_yellow>.</light_gray>
+Error:
+  InvalidEnchantment: <red>Parâmetro inválido.</red>
+  InvalidRarity: <red>Tipo de raridade inválido!</red>
+ItemCategory:
+  HELMET: 'Capacete'
+  CHESTPLATE: 'Peitoral'
+  LEGGINGS: 'Calças'
+  BOOTS: 'Botas'
+  ELYTRA: 'Elytra'
+  SWORD: 'Espada'
+  TRIDENT: 'Tridente'
+  AXE: 'Machado'
+  BOW: 'Arco'
+  CROSSBOW: 'Besta'
+  HOE: 'Enxada'
+  PICKAXE: 'Picareta'
+  SHOVEL: 'Pá'
+  FISHING_ROD: 'Vara de pesca'
+  SHIELD: 'Escudo'
+  TOOL: 'Ferramenta'
+EnchantmentTarget:
+  ALL: 'Todos'
+  ARMOR: 'Armadura'
+  ARMOR_FEET: 'Botas'
+  ARMOR_LEGS: 'Calças'
+  ARMOR_TORSO: 'Peitoral'
+  ARMOR_HEAD: 'Capacete'
+  WEAPON: 'Arma'
+  TOOL: 'Ferramenta'
+  BOW: 'Arco'
+  FISHING_ROD: 'Vara de pesca'
+  BREAKABLE: 'Durabilidade'
+  WEARABLE: 'Vestível'
+  TRIDENT: 'Tridente'
+  CROSSBOW: 'Besta'
+  VANISHABLE: 'Desaparecível'
+DistributionWay:
+  ENCHANTING: 'Encantamento'
+  VILLAGER: 'Aldeão'
+  LOOT_GENERATION: 'Geração de saque'
+  FISHING: 'Pesca'
+  MOB_EQUIPMENT: 'Equipamento de mob'
+Rarity:
+  COMMON: '<white>Comum</white>'
+  UNCOMMON: '<light_green>Incomum</light_green>'
+  RARE: '<purple>Raro</purple>'
+  VERY_RARE: '<red>Mítico</red>'

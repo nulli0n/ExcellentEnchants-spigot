@@ -72,10 +72,7 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
 
         // Prevent to register enchantments during the runtime.
         if (this.freezed) {
-            getRegistered().forEach(enchantment -> {
-                enchantment.clear();
-                this.load(enchantment);
-            });
+            getRegistered().forEach(this::load);
             return;
         }
 
@@ -184,10 +181,10 @@ public class EnchantRegistry extends SimpleManager<EnchantsPlugin> {
 
     @Override
     protected void onShutdown() {
-        if (!freezed) {
-            getRegistered().forEach(CustomEnchantment::clear);
-            ENCHANTS_MAP.clear();
-        }
+//        if (!freezed) {
+//            getRegistered().forEach(CustomEnchantment::clear);
+//            ENCHANTS_MAP.clear();
+//        }
     }
 
     private <T extends CustomEnchantment> void registerType(@NotNull Class<T> enchantClass) {

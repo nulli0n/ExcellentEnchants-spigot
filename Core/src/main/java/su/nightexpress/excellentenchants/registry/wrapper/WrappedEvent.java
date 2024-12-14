@@ -1,7 +1,6 @@
 package su.nightexpress.excellentenchants.registry.wrapper;
 
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -38,7 +37,7 @@ public class WrappedEvent<E extends Event, T extends CustomEnchantment> implemen
         LivingEntity entity = this.dataGather.getEntity(event);
         if (entity == null) return;
 
-        Player player = entity instanceof Player user ? user : null;
+        //Player player = entity instanceof Player user ? user : null;
 
         this.dataGather.getEnchants(event, this.enchantClass, entity).forEach((item, enchants) -> {
             enchants.forEach((enchant, level) -> {
@@ -46,7 +45,7 @@ public class WrappedEvent<E extends Event, T extends CustomEnchantment> implemen
                 if (!enchant.isAvailableToUse(entity)) return;
                 if (enchant.isOutOfCharges(item)) return;
                 if (this.dataGather.useEnchant(event, entity, item, enchant, level)) {
-                    enchant.consumeChargesNoUpdate(item, level);
+                    enchant.consumeCharges(item, level);
                 }
             });
         });

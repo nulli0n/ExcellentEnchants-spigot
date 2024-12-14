@@ -15,5 +15,4 @@ public enum TradeType {
     SWAMP_SPECIAL,
     TAIGA_COMMON,
     TAIGA_SPECIAL
-    ;
 }

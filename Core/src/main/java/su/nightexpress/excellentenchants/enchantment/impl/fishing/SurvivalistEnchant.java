@@ -48,6 +48,7 @@ public class SurvivalistEnchant extends GameEnchantment implements FishingEnchan
     protected void loadAdditional(@NotNull FileConfig config) {
         this.meta.setProbability(Probability.create(config));
 
+        this.cookingRecipes.clear();
         this.plugin.getServer().recipeIterator().forEachRemaining(recipe -> {
             if (recipe instanceof CookingRecipe<?> cookingRecipe && cookingRecipe.getInput().getType().isItem() && !cookingRecipe.getResult().getType().isAir()) {
                 this.cookingRecipes.add(cookingRecipe);
@@ -55,10 +56,10 @@ public class SurvivalistEnchant extends GameEnchantment implements FishingEnchan
         });
     }
 
-    @Override
-    public void clear() {
-        this.cookingRecipes.clear();
-    }
+//    @Override
+//    public void clear() {
+//        this.cookingRecipes.clear();
+//    }
 
     @NotNull
     @Override

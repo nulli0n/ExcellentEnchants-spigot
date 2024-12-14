@@ -17,6 +17,7 @@ import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
 import su.nightexpress.excellentenchants.hook.impl.ProtocolLibHook;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 import su.nightexpress.excellentenchants.nms.Internal_1_21_3;
+import su.nightexpress.excellentenchants.nms.Internal_1_21_4;
 import su.nightexpress.excellentenchants.rarity.RarityManager;
 import su.nightexpress.excellentenchants.registry.EnchantRegistry;
 import su.nightexpress.nightcore.NightPlugin;
@@ -79,12 +80,14 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
         if (this.rarityManager != null) this.rarityManager.shutdown();
 
         this.registry.shutdown();
+        Keys.clear();
     }
 
     private boolean loadInternals() {
         this.enchantNMS = switch (Version.getCurrent()) {
             case MC_1_21 -> new Internal_1_21(this);
             case MC_1_21_3 -> new Internal_1_21_3(this);
+            case MC_1_21_4 -> new Internal_1_21_4(this);
             default -> null;
         };
 

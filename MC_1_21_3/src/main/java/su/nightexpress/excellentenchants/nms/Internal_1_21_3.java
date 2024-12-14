@@ -53,7 +53,6 @@ import su.nightexpress.excellentenchants.api.enchantment.*;
 import su.nightexpress.excellentenchants.api.enchantment.bridge.FlameWalker;
 import su.nightexpress.nightcore.NightPlugin;
 import su.nightexpress.nightcore.util.Reflex;
-import su.nightexpress.nightcore.util.random.Rnd;
 import su.nightexpress.nightcore.util.text.NightMessage;
 
 import java.lang.reflect.Method;
@@ -482,7 +481,8 @@ public class Internal_1_21_3 implements EnchantNMS {
             blocks.add(CraftBlock.at(world, posNear));
         }
 
-        blocks.forEach(block -> FlameWalker.addBlock(block, Rnd.getDouble(flameWalker.getBlockDecayTime(level)) + 1));
+        //blocks.forEach(block -> FlameWalker.addBlock(block, Rnd.getDouble(flameWalker.getBlockDecayTime(level)) + 1));
+        blocks.forEach(block -> flameWalker.addBlock(block, level));
 
         return !blocks.isEmpty();
     }

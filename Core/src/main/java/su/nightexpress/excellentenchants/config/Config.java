@@ -1,14 +1,18 @@
 package su.nightexpress.excellentenchants.config;
 
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import su.nightexpress.excellentenchants.util.ChargesFormat;
+import su.nightexpress.excellentenchants.util.EnchantBlacklist;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.bukkit.NightItem;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Set;
 
 import static su.nightexpress.excellentenchants.Placeholders.*;
 import static su.nightexpress.nightcore.util.text.tag.Tags.*;
@@ -116,14 +120,12 @@ public class Config {
         "[**] Disabled enchantments will be removed from all items forever!"
     );
 
-    public static final ConfigValue<Map<String, Set<String>>> ENCHANTMENTS_DISABLED_IN_WORLDS = ConfigValue.forMap("Enchantments.Disabled.ByWorld",
-        String::toLowerCase,
-        (cfg, path, worldName) -> cfg.getStringSet(path + "." + worldName).stream().map(String::toLowerCase).collect(Collectors.toSet()),
-        (cfg, path, map) -> map.forEach((world, enchants) -> cfg.set(path + "." + world, enchants)),
-        () -> Map.of(
-            "your_world_name", Lists.newSet("enchantment_name", "ice_aspect"),
-            "another_world", Lists.newSet("another_enchantment", "ice_aspect")
-        ),
+    public static final ConfigValue<Map<String, EnchantBlacklist>> ENCHANTMENTS_DISABLED_IN_WORLDS = ConfigValue.forMapById("Enchantments.Disabled.ByWorld",
+        EnchantBlacklist::read,
+        map -> {
+            map.put("your_world_name", new EnchantBlacklist(Lists.newSet("enchantment_name", "ice_aspect")));
+            map.put("another_world", new EnchantBlacklist(Lists.newSet("another_enchantment", "ice_aspect")));
+        },
         "Put here CUSTOM enchantment names that you want to disable in specific worlds.",
         "To disable all enchantments for a world, use '" + WILDCARD + "' instead of enchantment names.",
         "Enchantment names are equal to their config file names in the '" + DIR_ENCHANTS + "' directory.",
@@ -170,17 +172,13 @@ public class Config {
         WIKI_CHRAGES
     );
 
-    public static final ConfigValue<TreeMap<Integer, String>> ENCHANTMENTS_CHARGES_FORMAT = ConfigValue.forTreeMap("Enchantments.Charges.Format",
-        raw -> NumberUtil.getInteger(raw, 0),
-        (cfg, path, value) -> cfg.getString(path + "." + value, GENERIC_AMOUNT),
-        (cfg, path, map) -> map.forEach((perc, str) -> cfg.set(path + "." + perc, str)),
-        () -> {
-            TreeMap<Integer, String> map = new TreeMap<>();
-            map.put(0, LIGHT_RED.enclose("(" + GENERIC_AMOUNT + "⚡)"));
-            map.put(25, LIGHT_ORANGE.enclose("(" + GENERIC_AMOUNT + "⚡)"));
-            map.put(50, LIGHT_YELLOW.enclose("(" + GENERIC_AMOUNT + "⚡)"));
-            map.put(75, LIGHT_GREEN.enclose("(" + GENERIC_AMOUNT + "⚡)"));
-            return map;
+    public static final ConfigValue<Map<String, ChargesFormat>> ENCHANTMENTS_CHARGES_FORMAT = ConfigValue.forMapById("Enchantments.Charges.Formation",
+        ChargesFormat::read,
+        map -> {
+            map.put("zero", new ChargesFormat(0, LIGHT_RED.enclose("(" + GENERIC_AMOUNT + "⚡)")));
+            map.put("low", new ChargesFormat(25, LIGHT_ORANGE.enclose("(" + GENERIC_AMOUNT + "⚡)")));
+            map.put("medium", new ChargesFormat(50, LIGHT_YELLOW.enclose("(" + GENERIC_AMOUNT + "⚡)")));
+            map.put("high", new ChargesFormat(75, LIGHT_GREEN.enclose("(" + GENERIC_AMOUNT + "⚡)")));
         },
         "Enchantment charges format depends on amount of charges left (in percent).",
         "If you don't want to display charges, leave only keys with negative values.",
@@ -194,8 +192,8 @@ public class Config {
         "[Default is false]"
     );
 
-    public static final ConfigValue<ItemStack> ENCHANTMENTS_CHARGES_FUEL_ITEM = ConfigValue.create("Enchantments.Charges.Fuel_Item",
-        new ItemStack(Material.LAPIS_LAZULI),
+    public static final ConfigValue<NightItem> ENCHANTMENTS_CHARGES_FUEL_ITEM = ConfigValue.create("Enchantments.Charges.Fuel_Item",
+        new NightItem(Material.LAPIS_LAZULI),
         "Default item used to recharge item's enchantments on anvils.",
         "If you want different item for certain enchantments, you can do it in that enchantment configs.",
         "Item Options: " + WIKI_ITEMS_URL
@@ -208,5 +206,10 @@ public class Config {
 
     public static boolean isChargesEnabled() {
         return ENCHANTMENTS_CHARGES_ENABLED.get();
+    }
+
+    @Nullable
+    public static EnchantBlacklist getDisabledEnchantments(@NotNull World world) {
+        return ENCHANTMENTS_DISABLED_IN_WORLDS.get().get(world.getName().toLowerCase());
     }
 }

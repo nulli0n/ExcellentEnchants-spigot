@@ -40,43 +40,39 @@ public class PacketEventsHook {
             if (player == null) return;
             if (!EnchantUtils.canUpdateDisplay(player)) return;
 
-            if (type == PacketType.Play.Server.SET_SLOT) {
-                WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
+            switch (type) {
+                case PacketType.Play.Server.SET_SLOT -> {
+                    WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
 
-                ItemStack item = EnchantUtils.addDescription(toBukkit(setSlot.getItem()));
-                setSlot.setItem(fromBukkit(item));
-            }
-            else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
-                WrapperPlayServerWindowItems windowItems = new WrapperPlayServerWindowItems(event);
+                    ItemStack item = EnchantUtils.addDescription(toBukkit(setSlot.getItem()));
+                    setSlot.setItem(fromBukkit(item));
+                }
+                case PacketType.Play.Server.WINDOW_ITEMS -> {
+                    WrapperPlayServerWindowItems windowItems = new WrapperPlayServerWindowItems(event);
 
-                windowItems.getItems().replaceAll(packetItem -> {
-                    return fromBukkit(EnchantUtils.addDescription(toBukkit(packetItem)));
-                });
-            }
-            else if (type == PacketType.Play.Server.MERCHANT_OFFERS) {
-                WrapperPlayServerMerchantOffers merchantOffers = new WrapperPlayServerMerchantOffers(event);
+                    windowItems.getItems().replaceAll(packetItem -> {
+                        return fromBukkit(EnchantUtils.addDescription(toBukkit(packetItem)));
+                    });
+                }
+                case PacketType.Play.Server.MERCHANT_OFFERS -> {
+                    WrapperPlayServerMerchantOffers merchantOffers = new WrapperPlayServerMerchantOffers(event);
 
-                List<MerchantOffer> offers = merchantOffers.getMerchantOffers();
-                offers.forEach(offer -> {
-                    ItemStack result = toBukkit(offer.getOutputItem());
-                    offer.setOutputItem(fromBukkit(EnchantUtils.addDescription(result)));
-                });
+                    List<MerchantOffer> offers = merchantOffers.getMerchantOffers();
+                    offers.forEach(offer -> {
+                        ItemStack result = toBukkit(offer.getOutputItem());
+                        offer.setOutputItem(fromBukkit(EnchantUtils.addDescription(result)));
+                    });
+                }
+                default -> {
+                    return;
+                }
             }
-            else return;
 
             event.markForReEncode(true);
         }
 
         @NotNull
-        private static ItemStack toBukkit(@NotNull com.github.retrooper.packetevents.protocol.item.ItemStack pooperStack/*, @NotNull ClientVersion version*/) {
-//            pooperStack.getEnchantments(version).forEach(enchantment -> {
-//                String name = enchantment.getType().getName().getKey();
-//                CustomEnchantment custom = EnchantRegistry.getById(name);
-//                if (custom == null) return;
-//
-//                EnchantUtils.add(item, custom.getBukkitEnchantment(), enchantment.getLevel(), true);
-//            });
-
+        private static ItemStack toBukkit(@NotNull com.github.retrooper.packetevents.protocol.item.ItemStack pooperStack) {
             return SpigotConversionUtil.toBukkitItemStack(pooperStack);
         }
 

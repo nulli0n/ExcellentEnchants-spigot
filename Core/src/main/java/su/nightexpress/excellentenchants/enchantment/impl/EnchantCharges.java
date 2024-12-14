@@ -8,6 +8,7 @@ import su.nightexpress.excellentenchants.api.enchantment.Charges;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.bukkit.NightItem;
 
 import static su.nightexpress.nightcore.util.Placeholders.WIKI_ITEMS_URL;
 
@@ -18,7 +19,7 @@ public class EnchantCharges implements Charges {
     private Modifier  maxAmount;
     private Modifier  consumeAmount;
     private Modifier  rechargeAmount;
-    private ItemStack fuel;
+    private NightItem fuel;
 
     public EnchantCharges() {
 
@@ -54,7 +55,7 @@ public class EnchantCharges implements Charges {
         );
 
         this.fuel = ConfigValue.create("Charges.Fuel_Item",
-            new ItemStack(Material.LAPIS_LAZULI),
+            new NightItem(Material.LAPIS_LAZULI),
             "An item, that will be used to restore enchantment charges on anvils.",
             WIKI_ITEMS_URL
         ).read(config);
@@ -93,11 +94,10 @@ public class EnchantCharges implements Charges {
 
     @NotNull
     public ItemStack getFuel() {
-        ItemStack fuelHas = this.fuel;
-        if (!this.isCustomFuel() || fuelHas == null || fuelHas.getType().isAir()) {
-            return new ItemStack(Config.ENCHANTMENTS_CHARGES_FUEL_ITEM.get());
+        if (!this.isCustomFuel() || this.fuel == null || this.fuel.getMaterial().isAir()) {
+            return Config.ENCHANTMENTS_CHARGES_FUEL_ITEM.get().getItemStack();
         }
-        return new ItemStack(fuelHas);
+        return this.fuel.getItemStack();
     }
 
     @Override

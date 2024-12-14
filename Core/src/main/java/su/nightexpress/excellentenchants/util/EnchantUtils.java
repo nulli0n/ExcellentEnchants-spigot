@@ -31,8 +31,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static su.nightexpress.excellentenchants.Placeholders.*;
-import static su.nightexpress.excellentenchants.Placeholders.GENERIC_CHARGES;
-import static su.nightexpress.nightcore.util.Placeholders.GENERIC_VALUE;
 
 public class EnchantUtils {
 
@@ -110,9 +108,13 @@ public class EnchantUtils {
         if (showCharges) {
             int chargesMax = enchantment.getCharges().getMaxAmount(level);
             int percent = (int) Math.ceil((double) charges / (double) chargesMax * 100D);
-            Map.Entry<Integer, String> entry = Config.ENCHANTMENTS_CHARGES_FORMAT.get().floorEntry(percent);
-            if (entry != null) {
-                chargesFormat = entry.getValue().replace(GENERIC_AMOUNT, String.valueOf(charges));
+
+            ChargesFormat format = Config.ENCHANTMENTS_CHARGES_FORMAT.get().values().stream()
+                .filter(f -> f.isAboveThreshold(percent))
+                .max(Comparator.comparingInt(ChargesFormat::getThreshold)).orElse(null);
+
+            if (format != null) {
+                chargesFormat = format.getFormatted(charges);
             }
         }
 
@@ -298,29 +300,8 @@ public class EnchantUtils {
         Map<EquipmentSlot, ItemStack> equipment = EntityUtil.getEquippedItems(entity, slots);
         equipment.values().removeIf(item -> item == null || isEnchantedBook(item) || !item.hasItemMeta());
 
-//        equipment.entrySet().removeIf(entry -> {
-//            ItemStack item = entry.getValue();
-//            EquipmentSlot slot = entry.getKey();
-//            if (item == null || item.getType().isAir() || item.getType() == Material.ENCHANTED_BOOK) return true;
-//            if ((slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND) && ItemUtil.isArmor(item)) return true;
-//            return !item.hasItemMeta();
-//        });
         return equipment;
     }
-
-    /*@NotNull
-    private static Map<ItemStack, Map<EnchantmentData, Integer>> getEquipped(@NotNull LivingEntity entity) {
-        Map<ItemStack, Map<EnchantmentData, Integer>> map = new HashMap<>();
-        getEnchantedEquipment(entity).values().forEach(item -> {
-            map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(getCustomEnchantments(item));
-        });
-        return map;
-    }
-
-    @NotNull
-    public static <T extends EnchantmentData> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity, @NotNull Class<T> clazz) {
-        return getEquipped(entity, clazz, EQUIPMENT_SLOTS);
-    }*/
 
     @Nullable
     public static ItemStack getEquipped(@NotNull LivingEntity entity, @NotNull EquipmentSlot slot) {

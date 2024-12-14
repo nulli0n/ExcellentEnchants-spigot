@@ -107,6 +107,7 @@ public class ScavengerEnchant extends GameEnchantment implements ChanceMeta, Dea
             "Available loot table names: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/loot/LootTables.html"
         ).read(config);
 
+        this.lootTables.clear();
         if (isWhitelist) {
             this.lootTables.addAll(tables);
         }
@@ -116,10 +117,10 @@ public class ScavengerEnchant extends GameEnchantment implements ChanceMeta, Dea
         }
     }
 
-    @Override
-    public void clear() {
-        this.lootTables.clear();
-    }
+//    @Override
+//    public void clear() {
+//        this.lootTables.clear();
+//    }
 
     @Override
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, @NotNull ItemStack weapon, int level) {

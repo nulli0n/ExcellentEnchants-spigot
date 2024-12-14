@@ -5,10 +5,10 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.ChanceMeta;
 import su.nightexpress.excellentenchants.api.enchantment.meta.PeriodMeta;
 import su.nightexpress.excellentenchants.api.enchantment.meta.PotionMeta;
 import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
-import su.nightexpress.excellentenchants.util.EnchantPlaceholders;
 import su.nightexpress.nightcore.language.LangAssets;
 import su.nightexpress.nightcore.util.ItemUtil;
 import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.placeholder.PlaceholderList;
 
 public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
 
@@ -53,24 +53,24 @@ public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
     public static final String ENCHANTMENT_CHARGES_RECHARGE_AMOUNT       = "%enchantment_charges_recharge_amount%";
     public static final String ENCHANTMENT_CHARGES_FUEL_ITEM             = "%enchantment_charges_fuel_item%";
 
-    public static EnchantPlaceholders forEnchant(@NotNull GameEnchantment enchantment) {
-        EnchantPlaceholders placeholders = new EnchantPlaceholders();
-
-        placeholders
-            .add(ENCHANTMENT_ID, enchantment::getId)
-            .add(ENCHANTMENT_NAME, enchantment::getDisplayName)
-            .add(ENCHANTMENT_DESCRIPTION, () -> String.join("\n", enchantment.getDescription()))
+    @NotNull
+    public static PlaceholderList<Integer> forEnchant(@NotNull GameEnchantment enchantment) {
+        PlaceholderList<Integer> placeholders = PlaceholderList.create(list -> list
+            .add(ENCHANTMENT_ID, level -> enchantment.getId())
+            .add(ENCHANTMENT_NAME, level -> enchantment.getDisplayName())
+            .add(ENCHANTMENT_DESCRIPTION, level -> String.join("\n", enchantment.getDescription()))
             //.add(ENCHANTMENT_DESCRIPTION_FORMATTED, () -> String.join("\n", enchantment.getDescriptionFormatted()))
             .add(ENCHANTMENT_DESCRIPTION_REPLACED, level -> String.join("\n", enchantment.getDescription(level)))
             .add(ENCHANTMENT_LEVEL, NumberUtil::toRoman)
-            .add(ENCHANTMENT_LEVEL_MIN, () -> String.valueOf(1))
-            .add(ENCHANTMENT_LEVEL_MAX, () -> String.valueOf(enchantment.getDefinition().getMaxLevel()))
-            .add(ENCHANTMENT_RARITY, () -> enchantment.getDefinition().getRarity().getName())
-            .add(ENCHANTMENT_FIT_ITEM_TYPES, () -> enchantment.getDefinition().getSupportedItems().getLocalized())
+            .add(ENCHANTMENT_LEVEL_MIN, level -> String.valueOf(1))
+            .add(ENCHANTMENT_LEVEL_MAX, level -> String.valueOf(enchantment.getDefinition().getMaxLevel()))
+            .add(ENCHANTMENT_RARITY, level -> enchantment.getDefinition().getRarity().getName())
+            .add(ENCHANTMENT_FIT_ITEM_TYPES, level -> enchantment.getDefinition().getSupportedItems().getLocalized())
             .add(ENCHANTMENT_CHARGES_MAX_AMOUNT, level -> NumberUtil.format(enchantment.getCharges().getMaxAmount(level)))
             .add(ENCHANTMENT_CHARGES_CONSUME_AMOUNT, level -> NumberUtil.format(enchantment.getCharges().getConsumeAmount(level)))
             .add(ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, level -> NumberUtil.format(enchantment.getCharges().getRechargeAmount(level)))
-            .add(ENCHANTMENT_CHARGES_FUEL_ITEM, () -> ItemUtil.getItemName(enchantment.getCharges().getFuel()));
+            .add(ENCHANTMENT_CHARGES_FUEL_ITEM, level -> ItemUtil.getItemName(enchantment.getCharges().getFuel()))
+        );
 
         if (enchantment instanceof ChanceMeta chanceMeta) {
             placeholders.add(ENCHANTMENT_CHANCE, level -> NumberUtil.format(chanceMeta.getTriggerChance(level)));
