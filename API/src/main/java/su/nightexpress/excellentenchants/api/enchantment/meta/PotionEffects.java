@@ -65,7 +65,7 @@ public class PotionEffects {
 
     public int getEffectDuration(int level) {
         if (this.isPermanent()) {
-            int duration = ConfigBridge.getEnchantsTickInterval() * 2;
+            int duration = (int) (ConfigBridge.getEnchantsTickInterval() * 2);
             if (this.getEffectType().getKey().equals(PotionEffectType.NIGHT_VISION.getKey()) && duration < 600) {
                 duration += 30 * 20;
             }

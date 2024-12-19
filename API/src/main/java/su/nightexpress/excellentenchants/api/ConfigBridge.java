@@ -10,7 +10,7 @@ public class ConfigBridge {
     private static boolean globalDistTradeEquipment;
     private static boolean globalDistRandomLoot;
 
-    public static int getEnchantsTickInterval() {
+    public static long getEnchantsTickInterval() {
         return enchantsTickInterval;
     }
 
