@@ -17,13 +17,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <distributionManagement>
-        <repository>
-            <id>nightexpress</id>
-            <url>https://repo.nightexpressdev.com/releases</url>
-        </repository>
-    </distributionManagement>
-
     <repositories>
         <repository>
             <id>papermc</id>
