@@ -84,6 +84,6 @@ public class EnchantId {
     public static final String VAMPIRE             = "vampire";
     public static final String VENOM               = "venom";
     public static final String VILLAGE_DEFENDER    = "village_defender";
-    public static final String WISDOM              = "exp_hunter";
+    public static final String WISDOM              = "wisdom";
     public static final String WITHER              = "wither";
 }
