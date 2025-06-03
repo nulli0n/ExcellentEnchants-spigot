@@ -1,43 +1,40 @@
 package su.nightexpress.excellentenchants;
 
-import org.bukkit.entity.Item;
-import org.bukkit.event.block.BlockDropItemEvent;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.api.ConfigBridge;
+import su.nightexpress.excellentenchants.api.EnchantDefaults;
+import su.nightexpress.excellentenchants.api.EnchantRegistry;
+import su.nightexpress.excellentenchants.api.config.ConfigBridge;
+import su.nightexpress.excellentenchants.api.item.ItemSetRegistry;
 import su.nightexpress.excellentenchants.command.BaseCommands;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.config.Perms;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
+import su.nightexpress.excellentenchants.manager.EnchantProviders;
 import su.nightexpress.excellentenchants.hook.HookPlugin;
 import su.nightexpress.excellentenchants.hook.impl.PacketEventsHook;
 import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
 import su.nightexpress.excellentenchants.hook.impl.ProtocolLibHook;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
-import su.nightexpress.excellentenchants.nms.Internal_1_21_3;
-import su.nightexpress.excellentenchants.nms.Internal_1_21_4;
-import su.nightexpress.excellentenchants.rarity.RarityManager;
-import su.nightexpress.excellentenchants.registry.EnchantRegistry;
+import su.nightexpress.excellentenchants.nms.RegistryHack;
+import su.nightexpress.excellentenchants.nms.v1_21_4.Internal_1_21_4;
+import su.nightexpress.excellentenchants.nms.v1_21_4.RegistryHack_1_21_4;
+import su.nightexpress.excellentenchants.nms.v1_21_5.Internal_1_21_5;
+import su.nightexpress.excellentenchants.nms.v1_21_5.RegistryHack_1_21_5;
 import su.nightexpress.nightcore.NightPlugin;
 import su.nightexpress.nightcore.command.experimental.ImprovedCommands;
 import su.nightexpress.nightcore.config.PluginDetails;
 import su.nightexpress.nightcore.util.Plugins;
 import su.nightexpress.nightcore.util.Version;
 
+import java.io.File;
+
 public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
 
-    private EnchantRegistry registry;
-    private RarityManager   rarityManager;
-    private EnchantManager  enchantManager;
-    private EnchantNMS      enchantNMS;
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        this.registry = new EnchantRegistry(this);
-    }
+    private EnchantManager enchantManager;
+    private EnchantNMS     enchantNMS;
+    private RegistryHack   registryHack;
 
     @Override
     @NotNull
@@ -50,19 +47,28 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
 
     @Override
     public void enable() {
-        if (!this.loadInternals()) {
-            this.error("Unsupported server version!");
-            this.getPluginManager().disablePlugin(this);
-            return;
+        this.loadAPI();
+        this.loadInternals();
+
+        if (Version.isSpigot()) {
+            if (this.registryHack == null) {
+                this.error("Unsupported server version!");
+                this.getPluginManager().disablePlugin(this);
+                return;
+            }
+
+            File dataDir = this.getDataFolder();
+
+            ConfigBridge.load(dataDir, false); // Load distribution config, assign isPaper field.
+            ItemSetRegistry.load(dataDir); // Load default item types, uses ConfigBridge.isPaper() to determine which items source to use.
+            EnchantDefaults.load(dataDir); // Load defaults and read from the config files Definition and Distribution settings for enchants.
         }
 
-        this.loadAPI();
+        if (!EnchantRegistry.isLocked()) {
+            EnchantProviders.load(this);
+        }
+
         this.loadCommands();
-
-        this.rarityManager = new RarityManager(this);
-        this.rarityManager.setup();
-
-        this.registry.setup();
 
         this.enchantManager = new EnchantManager(this);
         this.enchantManager.setup();
@@ -77,37 +83,32 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
         }
 
         if (this.enchantManager != null) this.enchantManager.shutdown();
-        if (this.rarityManager != null) this.rarityManager.shutdown();
 
-        this.registry.shutdown();
         Keys.clear();
     }
 
-    private boolean loadInternals() {
-        this.enchantNMS = switch (Version.getCurrent()) {
-            case MC_1_21 -> new Internal_1_21(this);
-            case MC_1_21_3 -> new Internal_1_21_3(this);
-            case MC_1_21_4 -> new Internal_1_21_4(this);
-            default -> null;
-        };
+    private void loadInternals() {
+        boolean isSpigot = Version.isSpigot();
 
-        return this.enchantNMS != null;
-    }
-
-    private void loadCommands() {
-        BaseCommands.load(this);
+        switch (Version.getCurrent()) {
+            case MC_1_21_4 -> {
+                this.enchantNMS = new Internal_1_21_4();
+                if (isSpigot) this.registryHack = new RegistryHack_1_21_4(this);
+            }
+            case MC_1_21_5 -> {
+                this.enchantNMS = new Internal_1_21_5();
+                if (isSpigot) this.registryHack = new RegistryHack_1_21_5(this);
+            }
+        }
     }
 
     private void loadAPI() {
         EnchantsAPI.load(this);
         Keys.loadKeys(this);
+    }
 
-        ConfigBridge.setEnchantsTickInterval(Config.CORE_PASSIVE_ENCHANTS_TRIGGER_INTERVAL.get().intValue());
-        ConfigBridge.setGlobalDistEnchanting(Config.ENCHANTMENTS_GLOBAL_DIST_ENCHANTING.get());
-        ConfigBridge.setGlobalDistTrading(Config.ENCHANTMENTS_GLOBAL_DIST_TRADING.get());
-        ConfigBridge.setGlobalDistMobEquipment(Config.ENCHANTMENTS_GLOBAL_DIST_MOB_EQUIPMENT.get());
-        ConfigBridge.setGlobalDistTradeEquipment(Config.ENCHANTMENTS_GLOBAL_DIST_TRADE_EQUIPMENT.get());
-        ConfigBridge.setGlobalDistRandomLoot(Config.ENCHANTMENTS_GLOBAL_DIST_RANDOM_LOOT.get());
+    private void loadCommands() {
+        BaseCommands.load(this);
     }
 
     private void loadHooks() {
@@ -128,21 +129,6 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
         }
     }
 
-    public void populateResource(@NotNull BlockDropItemEvent event, @NotNull ItemStack itemStack) {
-        Item item = this.getEnchantNMS().popResource(event.getBlock(), itemStack);
-        event.getItems().add(item);
-    }
-
-    @NotNull
-    public EnchantRegistry getRegistry() {
-        return registry;
-    }
-
-    @NotNull
-    public RarityManager getRarityManager() {
-        return rarityManager;
-    }
-
     @NotNull
     public EnchantManager getEnchantManager() {
         return this.enchantManager;
@@ -150,6 +136,14 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
 
     @NotNull
     public EnchantNMS getEnchantNMS() {
-        return enchantNMS;
+        return this.enchantNMS;
+    }
+
+    public RegistryHack getRegistryHack() {
+        return this.registryHack;
+    }
+
+    public boolean hasInternals() {
+        return this.enchantNMS != null;
     }
 }

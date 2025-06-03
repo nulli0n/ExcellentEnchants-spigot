@@ -36,7 +36,7 @@ public class PacketEventsHook {
         @Override
         public void onPacketSend(PacketSendEvent event) {
             PacketTypeCommon type = event.getPacketType();
-            Player player = (Player) event.getPlayer();
+            Player player = event.getPlayer();
             if (player == null) return;
             if (!EnchantUtils.canUpdateDisplay(player)) return;
 

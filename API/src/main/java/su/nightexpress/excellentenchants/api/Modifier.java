@@ -3,102 +3,71 @@ package su.nightexpress.excellentenchants.api;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.StringUtil;
+import su.nightexpress.nightcore.config.Writeable;
 
-public class Modifier {
+public class Modifier implements Writeable {
 
-    private double base;
-    private double perLevel;
-    private double step;
-    private double cap;
-    private ModifierAction action;
+    private final double         base;
+    private final double         perLevel;
+    private final double         capacity;
+    private final ModifierAction action;
 
-    public Modifier(double base, double perLevel, double step, double cap, @NotNull ModifierAction action) {
-        this.setBase(base);
-        this.setPerLevel(perLevel);
-        this.setStep(step);
-        this.setCap(cap);
-        this.setAction(action);
+    public Modifier(double base, double perLevel, double capacity, @NotNull ModifierAction action) {
+        this.base = base;
+        this.perLevel = perLevel;
+        this.capacity = capacity;
+        this.action = action;
     }
 
     @NotNull
-    public static Modifier add(double base, double perLevel, double step) {
-        return add(base, perLevel, step, -1);
+    public static Builder addictive(double base) {
+        return new Builder(base, ModifierAction.ADD);
     }
 
     @NotNull
-    public static Modifier multiply(double base, double perLevel, double step) {
-        return multiply(base, perLevel, step, -1);
+    public static Builder multiplier(double base) {
+        return new Builder(base, ModifierAction.MULTIPLY);
     }
 
     @NotNull
-    public static Modifier add(double base, double perLevel, double step, double cap) {
-        return new Modifier(base, perLevel, step, cap, ModifierAction.ADD);
+    public static Modifier load(@NotNull FileConfig config, @NotNull String path, @NotNull Modifier.Builder builder, String ... comments) {
+        return load(config, path, builder.build(), comments);
     }
 
     @NotNull
-    public static Modifier multiply(double base, double perLevel, double step, double cap) {
-        return new Modifier(base, perLevel, step, cap, ModifierAction.MULTIPLY);
+    public static Modifier load(@NotNull FileConfig config, @NotNull String path, @NotNull Modifier def, String ... comments) {
+        return ConfigValue.create(path, Modifier::read, def, comments).read(config);
     }
 
     @NotNull
-    public static Modifier read(@NotNull FileConfig cfg, @NotNull String path, @NotNull Modifier def, String ... comments) {
-        return new ConfigValue<>(path,
-            (cfg2, path2, def2) -> Modifier.read(cfg2, path2),
-            (cfg2, path2, mod) -> mod.write(cfg2, path2),
-            def,
-            comments
-        ).read(cfg);
+    public static Modifier read(@NotNull FileConfig config, @NotNull String path) {
+        double base = ConfigValue.create(path + ".Base", 0D).read(config);
+        double perLevel = ConfigValue.create(path + ".Per_Level", 0D).read(config);
+        double cap = ConfigValue.create(path + ".Capacity", -1).read(config);
+        ModifierAction action = ConfigValue.create(path + ".Action", ModifierAction.class, ModifierAction.ADD).read(config);
+
+        return new Modifier(base, perLevel, cap, action);
     }
 
-    @NotNull
-    public static Modifier read(@NotNull FileConfig cfg, @NotNull String path) {
-        double base = ConfigValue.create(path + ".Base", 0D,
-            "Start modifier value."
-        ).read(cfg);
-
-        double perLevel = ConfigValue.create(path + ".Per_Level", 0D,
-            "Additional value calculated by enchantment level step (see below). Formula: <per_level> * <step>"
-        ).read(cfg);
-
-        double step = ConfigValue.create(path + ".Step" , 1D,
-            "Defines level step for 'Per_Level' value calculation. Formula: <enchant_level> / <step>"
-        ).read(cfg);
-
-        double cap = ConfigValue.create(path + ".Cap", -1,
-            "Sets a limit for the final (base & per level calculations) value.",
-            "Set '-1' for no limit."
-        ).read(cfg);
-
-        ModifierAction action = ConfigValue.create(path + ".Action", ModifierAction.class, ModifierAction.ADD,
-            "Sets action performed between 'Base' and final 'Per_Level' values.",
-            "Available types: " + StringUtil.inlineEnum(ModifierAction.class, ", ")
-        ).read(cfg);
-
-        return new Modifier(base, perLevel, step, cap, action);
-    }
-
-    public void write(@NotNull FileConfig cfg, @NotNull String path) {
-        cfg.set(path + ".Base", this.getBase());
-        cfg.set(path + ".Per_Level", this.getPerLevel());
-        cfg.set(path + ".Step", this.getStep());
-        cfg.set(path + ".Cap", this.getCap());
-        cfg.set(path + ".Action", this.getAction().name());
+    @Override
+    public void write(@NotNull FileConfig config, @NotNull String path) {
+        config.set(path + ".Base", this.base);
+        config.set(path + ".Per_Level", this.perLevel);
+        config.set(path + ".Capacity", this.capacity);
+        config.set(path + ".Action", this.action.name());
     }
 
     public double getValue(int level) {
-        if (/*level == 1 || */this.perLevel == 0D) return this.capValue(this.getBase());
+        if (this.perLevel == 0D) return this.base;
 
-        //level -= 1;
-
-        double step = this.getStep() == 0D ? 1D : Math.floor((double) level / this.getStep());
-        double result =  this.action.math(this.getBase(), this.getPerLevel() * step);
+        //double step = this.step == 0D ? 1D : Math.floor((double) level / this.step);
+        double result =  this.action.math(this.base, this.perLevel * level);
 
         return this.capValue(result);
     }
 
     public double capValue(double result) {
-        return this.cap > 0 ? Math.min(result, this.cap) : result;
+        return this.capacity > 0 ? Math.min(result, this.capacity) : result;
     }
 
     public int getIntValue(int level) {
@@ -109,32 +78,12 @@ public class Modifier {
         return this.base;
     }
 
-    public void setBase(double base) {
-        this.base = base;
-    }
-
     public double getPerLevel() {
         return this.perLevel;
     }
 
-    public void setPerLevel(double perLevel) {
-        this.perLevel = perLevel;
-    }
-
-    public double getStep() {
-        return step;
-    }
-
-    public void setStep(double step) {
-        this.step = step;
-    }
-
-    public double getCap() {
-        return cap;
-    }
-
-    public void setCap(double cap) {
-        this.cap = cap;
+    public double getCapacity() {
+        return this.capacity;
     }
 
     @NotNull
@@ -142,7 +91,36 @@ public class Modifier {
         return this.action;
     }
 
-    public void setAction(@NotNull ModifierAction action) {
-        this.action = action;
+    public static class Builder {
+
+        private final double base;
+        private final ModifierAction action;
+
+        private double perLevel;
+        private double capacity;
+
+        public Builder(double base, @NotNull ModifierAction action) {
+            this.base = base;
+            this.action = action;
+            this.perLevel = 0D;
+            this.capacity = -1D;
+        }
+
+        @NotNull
+        public Modifier build() {
+            return new Modifier(this.base, this.perLevel, this.capacity, this.action);
+        }
+
+        @NotNull
+        public Builder perLevel(double perLevel) {
+            this.perLevel = perLevel;
+            return this;
+        }
+
+        @NotNull
+        public Builder capacity(double capacity) {
+            this.capacity = capacity;
+            return this;
+        }
     }
 }

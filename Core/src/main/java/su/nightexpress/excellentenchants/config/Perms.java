@@ -1,6 +1,6 @@
 package su.nightexpress.excellentenchants.config;
 
-import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.nightcore.util.wrapper.UniPermission;
 
 public class Perms {
@@ -8,8 +8,8 @@ public class Perms {
     private static final String PREFIX         = "excellentenchants.";
     private static final String PREFIX_COMMAND = PREFIX + "command.";
 
-    public static final UniPermission PLUGIN  = new UniPermission(PREFIX + Placeholders.WILDCARD);
-    public static final UniPermission COMMAND = new UniPermission(PREFIX_COMMAND + Placeholders.WILDCARD);
+    public static final UniPermission PLUGIN  = new UniPermission(PREFIX + EnchantsPlaceholders.WILDCARD);
+    public static final UniPermission COMMAND = new UniPermission(PREFIX_COMMAND + EnchantsPlaceholders.WILDCARD);
 
     public static final UniPermission COMMAND_BOOK        = new UniPermission(PREFIX_COMMAND + "book");
     public static final UniPermission COMMAND_ENCHANT     = new UniPermission(PREFIX_COMMAND + "enchant");

@@ -1,7 +1,7 @@
 package su.nightexpress.excellentenchants.util;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.config.Writeable;
 
@@ -17,7 +17,7 @@ public class ChargesFormat implements Writeable {
 
     @NotNull
     public String getFormatted(int charges) {
-        return this.format.replace(Placeholders.GENERIC_AMOUNT, String.valueOf(charges));
+        return this.format.replace(EnchantsPlaceholders.GENERIC_AMOUNT, String.valueOf(charges));
     }
 
     public boolean isAboveThreshold(int percent) {
@@ -31,7 +31,7 @@ public class ChargesFormat implements Writeable {
     @NotNull
     public static ChargesFormat read(@NotNull FileConfig config, @NotNull String path) {
         int threshold = config.getInt(path + ".Threshold");
-        String format = config.getString(path + ".Format", Placeholders.GENERIC_AMOUNT);
+        String format = config.getString(path + ".Format", EnchantsPlaceholders.GENERIC_AMOUNT);
 
         return new ChargesFormat(threshold, format);
     }

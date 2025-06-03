@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
-import su.nightexpress.excellentenchants.registry.EnchantRegistry;
+import su.nightexpress.excellentenchants.api.EnchantRegistry;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.StringUtil;
 

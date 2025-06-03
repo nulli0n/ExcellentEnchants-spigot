@@ -1,13 +1,13 @@
 package su.nightexpress.excellentenchants.util;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
@@ -17,41 +17,26 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import su.nightexpress.excellentenchants.api.EnchantHolder;
+import su.nightexpress.excellentenchants.api.EnchantRegistry;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.type.BlockEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Keys;
-import su.nightexpress.excellentenchants.enchantment.impl.GameEnchantment;
-import su.nightexpress.excellentenchants.registry.EnchantRegistry;
-import su.nightexpress.nightcore.language.LangAssets;
 import su.nightexpress.nightcore.util.*;
 import su.nightexpress.nightcore.util.random.Rnd;
-import su.nightexpress.nightcore.util.text.NightMessage;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static su.nightexpress.excellentenchants.Placeholders.*;
 
 public class EnchantUtils {
 
-    private static final Set<UUID>                      IGNORE_DISPLAY_UPDATE    = new HashSet<>();
-    private static final Map<UUID, EnchantedProjectile> ENCHANTED_PROJECTILE_MAP = new ConcurrentHashMap<>();
-
-    public static final int LEVEL_CAP = 255;
-    public static final int WEIGHT_CAP = 1024;
+    private static final EquipmentSlot[] HANDS = {EquipmentSlot.HAND, EquipmentSlot.OFF_HAND};
+    private static final Set<UUID> IGNORE_DISPLAY_UPDATE = new HashSet<>();
 
     private static boolean busyBreak;
 
-    public static boolean isBusyByOthers() {
-        return false;
-    }
-
-    public static boolean isBusyByEnchant() {
-        return busyBreak;
-    }
-
     public static boolean isBusy() {
-        return isBusyByEnchant() || isBusyByOthers();
+        return busyBreak;
     }
 
     public static void busyBreak(@NotNull Player player, @NotNull Block block) {
@@ -85,50 +70,6 @@ public class EnchantUtils {
     }
 
     @Nullable
-    public static String getLocalized(@NotNull String keyRaw) {
-        Enchantment enchantment = BukkitThing.getEnchantment(keyRaw);
-        return enchantment == null ? null : getLocalized(enchantment);
-    }
-
-    @NotNull
-    public static String getLocalized(@NotNull Enchantment enchantment) {
-        CustomEnchantment enchant = EnchantRegistry.getByKey(enchantment.getKey());
-        if (enchant != null) {
-            return enchant.getDisplayName();
-        }
-        return LangAssets.get(enchantment);
-    }
-
-    @NotNull
-    public static String replaceComponents(@NotNull GameEnchantment enchantment, @NotNull String string, int level, int charges) {
-        String chargesFormat = "";
-        boolean showLevel = enchantment.getDefinition().getMaxLevel() > 1;
-        boolean showCharges = enchantment.hasCharges() && charges >= 0;
-
-        if (showCharges) {
-            int chargesMax = enchantment.getCharges().getMaxAmount(level);
-            int percent = (int) Math.ceil((double) charges / (double) chargesMax * 100D);
-
-            ChargesFormat format = Config.ENCHANTMENTS_CHARGES_FORMAT.get().values().stream()
-                .filter(f -> f.isAboveThreshold(percent))
-                .max(Comparator.comparingInt(ChargesFormat::getThreshold)).orElse(null);
-
-            if (format != null) {
-                chargesFormat = format.getFormatted(charges);
-            }
-        }
-
-        String compName = Config.ENCHANTMENTS_DISPLAY_NAME_COMPONENT.get().replace(GENERIC_VALUE, enchantment.getDisplayName());
-        String compLevel = showLevel ? Config.ENCHANTMENTS_DISPLAY_LEVEL_COMPONENT.get().replace(GENERIC_VALUE, NumberUtil.toRoman(level)) : "";
-        String compChrages = showCharges ? Config.ENCHANTMENTS_DISPLAY_CHARGES_COMPONENT.get().replace(GENERIC_VALUE, chargesFormat) : "";
-
-        return string
-            .replace(GENERIC_NAME, compName)
-            .replace(GENERIC_LEVEL, compLevel)
-            .replace(GENERIC_CHARGES, compChrages);
-    }
-
-    @Nullable
     public static ItemStack addDescription(@Nullable ItemStack item) {
         if (item == null || item.getType().isAir() || !canHaveDescription(item)) return item;
 
@@ -139,21 +80,36 @@ public class EnchantUtils {
         Map<CustomEnchantment, Integer> enchants = getCustomEnchantments(meta);
         if (enchants.isEmpty()) return item;
 
-        List<String> metaLore = meta.getLore();
-        List<String> lore = metaLore == null ? new ArrayList<>() : metaLore;
+        List<String> lore = ItemUtil.getLoreSerialized(meta);
 
         enchants.forEach((enchant, level) -> {
             int chargesAmount = enchant.getCharges(meta);
-            lore.addAll(NightMessage.asLegacy(enchant.getDescription(level, chargesAmount)));
+            lore.addAll(enchant.getDescription(level, chargesAmount));
         });
 
-        meta.setLore(lore);
+        ItemUtil.setLore(meta, lore);
         copy.setItemMeta(meta);
         return copy;
     }
 
+    public static void setBlockEnchant(@NotNull ItemStack itemStack, @NotNull BlockEnchant enchant) {
+        PDCUtil.set(itemStack, Keys.blockEnchant, enchant.getId());
+    }
+
+    @Nullable
+    public static BlockEnchant getBlockEnchant(@NotNull ItemStack itemStack) {
+        String enchantId = PDCUtil.getString(itemStack, Keys.blockEnchant).orElse(null);
+        if (enchantId == null) return null;
+
+        return EnchantRegistry.BLOCK.getEnchant(enchantId);
+    }
+
     public static boolean isEnchantedBook(@NotNull ItemStack item) {
         return item.getType() == Material.ENCHANTED_BOOK;
+    }
+
+    public static boolean isEquipment(@NotNull ItemStack itemStack) {
+        return itemStack.hasItemMeta() && !isEnchantedBook(itemStack);
     }
 
     public static int randomLevel(@NotNull Enchantment enchantment) {
@@ -199,16 +155,16 @@ public class EnchantUtils {
     }
 
     public static boolean canHaveDescription(@NotNull ItemStack item) {
-        if (Config.ENCHANTMENTS_DISPLAY_DESCRIPTION_BOOKS_ONLY.get()) {
+        if (Config.DESCRIPTION_BOOKS_ONLY.get()) {
             return isEnchantedBook(item);
         }
         return true;
     }
 
     @Nullable
-    public static EquipmentSlot getItemHand(@NotNull Player player, @NotNull Material material) {
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HAND, EquipmentSlot.OFF_HAND}) {
-            ItemStack itemStack = player.getInventory().getItem(slot);
+    public static EquipmentSlot getItemHand(@NotNull LivingEntity entity, @NotNull Material material) {
+        for (EquipmentSlot slot : HANDS) {
+            ItemStack itemStack = EntityUtil.getItemInSlot(entity, slot);
             if (itemStack != null && itemStack.getType() == material) {
                 return slot;
             }
@@ -284,23 +240,15 @@ public class EnchantUtils {
     }
 
     @NotNull
-    public static <T extends CustomEnchantment> Map<T, Integer> getCustomEnchantments(@NotNull ItemStack item, @NotNull Class<T> clazz) {
+    public static <T extends CustomEnchantment> Map<T, Integer> getCustomEnchantments(@NotNull ItemStack item, @NotNull EnchantHolder<T> holder) {
         Map<T, Integer> map = new HashMap<>();
         getEnchantments(item).forEach((enchantment, level) -> {
-            CustomEnchantment enchantmentData = EnchantRegistry.getByKey(enchantment.getKey());
-            if (enchantmentData == null || !clazz.isAssignableFrom(enchantmentData.getClass())) return;
+            T specific = holder.getEnchant(BukkitThing.getValue(enchantment));
+            if (specific == null) return;
 
-            map.put(clazz.cast(enchantmentData), level);
+            map.put(specific, level);
         });
         return map;
-    }
-
-    @NotNull
-    private static Map<EquipmentSlot, ItemStack> getEnchantedEquipment(@NotNull LivingEntity entity, @NotNull EquipmentSlot... slots) {
-        Map<EquipmentSlot, ItemStack> equipment = EntityUtil.getEquippedItems(entity, slots);
-        equipment.values().removeIf(item -> item == null || isEnchantedBook(item) || !item.hasItemMeta());
-
-        return equipment;
     }
 
     @Nullable
@@ -311,51 +259,55 @@ public class EnchantUtils {
         return equipment.getItem(slot);
     }
 
-    public static int getEquippedLevel(@NotNull LivingEntity entity, @NotNull Enchantment enchantment, @NotNull EquipmentSlot slot) {
-        ItemStack itemStack = getEquipped(entity, slot);
-        return itemStack == null ? 0 : getLevel(itemStack, enchantment);
-    }
-
     @NotNull
-    public static <T extends CustomEnchantment> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity,
-                                                                                            @NotNull Class<T> clazz,
-                                                                                            @NotNull EquipmentSlot... slots) {
+    public static <T extends CustomEnchantment> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity, @NotNull EnchantHolder<T> holder) {
         Map<ItemStack, Map<T, Integer>> map = new HashMap<>();
-        getEnchantedEquipment(entity, slots).values().forEach(item -> {
-            map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(getCustomEnchantments(item, clazz));
+
+        EntityUtil.getEquippedItems(entity).forEach((slot, itemStack) -> {
+            if (itemStack == null || !isEquipment(itemStack)) return;
+
+            getCustomEnchantments(itemStack, holder).forEach((enchant, level) -> {
+                EquipmentSlot[] enchantSlots = enchant.getSupportedItems().getSlots();
+                if (!Lists.contains(enchantSlots, slot)) return;
+
+                map.computeIfAbsent(itemStack, k -> new LinkedHashMap<>()).put(enchant, level);
+            });
         });
         return map;
     }
 
+//    @NotNull
+//    public static Map<ItemStack, Integer> getEquipped(@NotNull LivingEntity entity, @NotNull CustomEnchantment enchantment) {
+//        Map<ItemStack, Integer> map = new HashMap<>();
+//        ItemSet supportedItems = enchantment.getSupportedItems();
+//
+//        EntityUtil.getEquippedItems(entity, supportedItems.getSlots()).values().forEach(itemStack -> {
+//            if (itemStack == null || !isEquipment(itemStack)) return;
+//
+//            int level = getLevel(itemStack, enchantment.getBukkitEnchantment());
+//            if (level > 0) {
+//                map.put(itemStack, level);
+//            }
+//        });
+//        return map;
+//    }
+
+    public static void addArrowEnchant(@NotNull AbstractArrow arrow, @NotNull CustomEnchantment enchant, int level) {
+        PDCUtil.set(arrow, enchant.getBukkitEnchantment().getKey(), level);
+    }
+
     @NotNull
-    public static Map<ItemStack, Integer> getEquipped(@NotNull LivingEntity entity, @NotNull CustomEnchantment enchantment) {
-        Map<ItemStack, Integer> map = new HashMap<>();
-        getEnchantedEquipment(entity, enchantment.getDefinition().getSupportedItems().getSlots()).values().forEach(item -> {
-            int level = getLevel(item, enchantment.getBukkitEnchantment());
-            if (level > 0) {
-                map.put(item, level);
-            }
+    public static <T extends CustomEnchantment> Map<T, Integer> getArrowEnchants(@NotNull AbstractArrow arrow, @NotNull EnchantHolder<T> holder) {
+        Map<T, Integer> map = new HashMap<>();
+
+        holder.getEnchants().forEach(enchant -> {
+            int level = PDCUtil.getInt(arrow, enchant.getBukkitEnchantment().getKey()).orElse(-1);
+            if (level <= 0) return;
+
+            map.put(enchant, level);
         });
+
         return map;
-    }
-
-    public static void addEnchantedProjectile(@NotNull Projectile projectile, @Nullable ItemStack item) {
-        EnchantedProjectile enchantedProjectile = new EnchantedProjectile(projectile, item);
-        ENCHANTED_PROJECTILE_MAP.put(projectile.getUniqueId(), enchantedProjectile);
-    }
-
-    @Nullable
-    public static EnchantedProjectile getEnchantedProjectile(@NotNull Projectile projectile) {
-        return ENCHANTED_PROJECTILE_MAP.get(projectile.getUniqueId());
-    }
-
-    public static void removeEnchantedProjectile(@NotNull Projectile projectile) {
-        ENCHANTED_PROJECTILE_MAP.remove(projectile.getUniqueId());
-    }
-
-    @NotNull
-    public static Collection<EnchantedProjectile> getEnchantedProjectiles() {
-        return ENCHANTED_PROJECTILE_MAP.values();
     }
 
     public static void setSpawnReason(@NotNull Entity entity, @NotNull CreatureSpawnEvent.SpawnReason reason) {
@@ -365,6 +317,23 @@ public class EnchantUtils {
     @Nullable
     public static CreatureSpawnEvent.SpawnReason getSpawnReason(@NotNull Entity entity) {
         String name = PDCUtil.getString(entity, Keys.entitySpawnReason).orElse(null);
-        return name == null ? null : StringUtil.getEnum(name, CreatureSpawnEvent.SpawnReason.class).orElse(null);
+        return name == null ? null : Enums.get(name, CreatureSpawnEvent.SpawnReason.class);
+    }
+
+    public static void populateResource(@NotNull BlockDropItemEvent event, @NotNull ItemStack itemStack) {
+        Block block = event.getBlock();
+        World world = block.getWorld();
+        Location location = block.getLocation();
+
+        float yMod = 0.25F / 2.0F;
+        double x = (location.getX() + 0.5F) + Rnd.getDouble(-0.25D, 0.25D);
+        double y = (location.getY() + 0.5F) + Rnd.getDouble(-0.25D, 0.25D) - yMod;
+        double z = (location.getZ() + 0.5F) + Rnd.getDouble(-0.25D, 0.25D);
+
+        Location spawn = new Location(world, x, y, z);
+        Item item = world.createEntity(spawn, Item.class);
+        item.setItemStack(itemStack);
+
+        event.getItems().add(item);
     }
 }

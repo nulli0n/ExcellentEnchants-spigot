@@ -2,30 +2,36 @@ package su.nightexpress.excellentenchants.api.enchantment.meta;
 
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.api.Modifier;
-import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.random.Rnd;
 
 public class Probability {
 
+    public static final double CAP = 100D;
+
     private final Modifier triggerChance;
 
-    private Probability(@NotNull Modifier triggerChance) {
+    public Probability(@NotNull Modifier triggerChance) {
         this.triggerChance = triggerChance;
     }
 
     @NotNull
-    public static Probability create(@NotNull FileConfig config) {
-        return create(config, Modifier.add(100, 0, 1, 100));
+    public static Probability oneHundred() {
+        return addictive(100, 0);
     }
 
     @NotNull
-    public static Probability create(@NotNull FileConfig config, @NotNull Modifier def) {
-        Modifier chanceMod = Modifier.read(config, "Settings.Trigger_Chance",
-            def,
-            "A chance that this enchantment will be triggered."
-        );
+    public static Probability addictive(double base, double perLevel) {
+        return new Probability(Modifier.addictive(base).perLevel(perLevel).capacity(CAP).build());
+    }
 
-        return new Probability(chanceMod);
+    @NotNull
+    public static Probability multiplier(double base, double perLevel) {
+        return new Probability(Modifier.multiplier(base).perLevel(perLevel).capacity(CAP).build());
+    }
+
+    @NotNull
+    public Modifier getTriggerChance() {
+        return this.triggerChance;
     }
 
     public double getTriggerChance(int level) {

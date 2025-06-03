@@ -1,8 +1,8 @@
 package su.nightexpress.excellentenchants;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
-import su.nightexpress.excellentenchants.rarity.RarityManager;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
+import su.nightexpress.excellentenchants.nms.EnchantNMS;
 
 public class EnchantsAPI {
 
@@ -13,7 +13,7 @@ public class EnchantsAPI {
     }
 
     @NotNull
-    private static EnchantsPlugin plugin() {
+    public static EnchantsPlugin getPlugin() {
         if (plugin == null) throw new IllegalStateException("API is not initialized!");
 
         return plugin;
@@ -21,11 +21,11 @@ public class EnchantsAPI {
 
     @NotNull
     public static EnchantManager getEnchantManager() {
-        return plugin().getEnchantManager();
+        return getPlugin().getEnchantManager();
     }
 
     @NotNull
-    public static RarityManager getRarityManager() {
-        return plugin().getRarityManager();
+    public static EnchantNMS getInternals() {
+        return getPlugin().getEnchantNMS();
     }
 }

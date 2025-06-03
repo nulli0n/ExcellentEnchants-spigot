@@ -4,7 +4,7 @@ import su.nightexpress.nightcore.core.CoreLang;
 import su.nightexpress.nightcore.language.entry.LangString;
 import su.nightexpress.nightcore.language.entry.LangText;
 
-import static su.nightexpress.excellentenchants.Placeholders.*;
+import static su.nightexpress.excellentenchants.api.EnchantsPlaceholders.*;
 import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
 public class Lang extends CoreLang {
