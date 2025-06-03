@@ -51,7 +51,6 @@
 - [nightcore](https://nightexpressdev.com/nightcore/) 2.7.6 or newer.
 
 **OPTIONAL:**
-- [EconomyBridge](https://nightexpressdev.com/economy-bridge/) - For custom item and open cost support.
 - [ProtocolLib](https://ci.dmulloy2.net/job/ProtocolLib/) or [PacketEvents](https://spigotmc.org/resources/80279/) - For dynamic enchant description.
 
 # Downloads & Documentation
