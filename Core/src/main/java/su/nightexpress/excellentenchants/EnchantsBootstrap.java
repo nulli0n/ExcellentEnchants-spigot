@@ -14,6 +14,7 @@ import io.papermc.paper.registry.tag.TagKey;
 import io.papermc.paper.tag.PostFlattenTagRegistrar;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.EquipmentSlotGroup;
@@ -21,15 +22,15 @@ import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.api.EnchantDefaults;
 import su.nightexpress.excellentenchants.api.EnchantKeys;
-import su.nightexpress.excellentenchants.api.wrapper.EnchantDefinition;
-import su.nightexpress.excellentenchants.api.wrapper.EnchantDistribution;
 import su.nightexpress.excellentenchants.api.EnchantRegistry;
 import su.nightexpress.excellentenchants.api.bridge.PostFlatten;
 import su.nightexpress.excellentenchants.api.config.ConfigBridge;
 import su.nightexpress.excellentenchants.api.config.DistributionConfig;
-import su.nightexpress.excellentenchants.api.wrapper.TradeType;
 import su.nightexpress.excellentenchants.api.item.ItemSet;
 import su.nightexpress.excellentenchants.api.item.ItemSetRegistry;
+import su.nightexpress.excellentenchants.api.wrapper.EnchantDefinition;
+import su.nightexpress.excellentenchants.api.wrapper.EnchantDistribution;
+import su.nightexpress.excellentenchants.api.wrapper.TradeType;
 import su.nightexpress.nightcore.util.Lists;
 
 import java.io.File;
@@ -109,17 +110,20 @@ public class EnchantsBootstrap implements PluginBootstrap {
 
                 List<TypedKey<Enchantment>> exclusiveEntries = definition.getExclusiveSet().stream()
                     .map(Key::key)
+                    .filter(disabled -> !DistributionConfig.isDisabled(disabled.value()))
                     .map(EnchantmentKeys::create)
                     .toList();
                 var exclusiveSet = RegistrySet.keySet(RegistryKey.ENCHANTMENT, exclusiveEntries);
 
                 EquipmentSlotGroup[] activeSlots = Stream.of(supportedSet.getSlots()).map(EquipmentSlot::getGroup).toArray(EquipmentSlotGroup[]::new);
                 Key key = customKey(enchantId);
+                Component component = MiniMessage.miniMessage().deserialize(definition.getDisplayName());
+                String nameOnly = MiniMessage.miniMessage().stripTags(definition.getDisplayName());
 
                 event.registry().register(
                     EnchantmentKeys.create(key),
                     builder -> builder
-                        .description(Component.translatable(key.asString(), definition.getDisplayName()))
+                        .description(Component.translatable(key.asString(), nameOnly, component.style()))
                         .primaryItems(primaryItems)
                         .supportedItems(supportedItems)
                         .exclusiveWith(exclusiveSet)

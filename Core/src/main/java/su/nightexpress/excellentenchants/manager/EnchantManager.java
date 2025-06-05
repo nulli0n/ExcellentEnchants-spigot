@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.*;
 import su.nightexpress.excellentenchants.api.config.ConfigBridge;
+import su.nightexpress.excellentenchants.api.config.DistributionConfig;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.type.ProjectileEnchant;
@@ -95,6 +96,8 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         }
 
         EnchantRegistry.getDataMap().forEach((enchantId, data) -> {
+            if (DistributionConfig.isDisabled(enchantId)) return;
+
             EnchantProvider<?> provider = EnchantRegistry.getProviderById(enchantId);
             if (provider == null) {
                 this.plugin.error("No provider present for the '" + enchantId + "' enchantment!");

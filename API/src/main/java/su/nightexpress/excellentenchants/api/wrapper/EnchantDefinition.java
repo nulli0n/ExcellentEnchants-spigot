@@ -62,6 +62,7 @@ public class EnchantDefinition implements Writeable {
         String displayName = ConfigValue.create(path + ".DisplayName",
             "null",
             "Enchantment display name.",
+            "https://docs.advntr.dev/minimessage/format.html#standard-tags",
             "[*] Reboot required when changed."
         ).read(config);
 
