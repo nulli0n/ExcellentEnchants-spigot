@@ -5,6 +5,7 @@ import su.nightexpress.excellentenchants.api.enchantment.component.EnchantCompon
 import su.nightexpress.excellentenchants.api.enchantment.meta.Period;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.TimeUtil;
 
 public class PeriodComponent implements EnchantComponent<Period> {
 
@@ -17,7 +18,13 @@ public class PeriodComponent implements EnchantComponent<Period> {
     @Override
     @NotNull
     public Period read(@NotNull FileConfig config, @NotNull Period defaultValue) {
-        long interval = ConfigValue.create("Period.Tick_Interval",
+        if (config.contains("Period.Tick_Interval")) {
+            long oldValue = config.getLong("Period.Tick_Interval");
+            config.set("Period.Interval", (int) Math.max(1, TimeUtil.ticksToSeconds(oldValue)));
+            config.remove("Period.Tick_Interval");
+        }
+
+        long interval = ConfigValue.create("Period.Interval",
             defaultValue.getInterval(),
             "Only triggers if the age (ticks lived) of the entity is divisible by the given number.",
             "Should be greater than and divisible by the global 'Tick_Interval' in the main plugin config.",

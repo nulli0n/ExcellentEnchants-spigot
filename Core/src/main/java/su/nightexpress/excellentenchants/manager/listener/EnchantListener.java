@@ -281,16 +281,23 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlockStore(InventoryClickEvent event) {
+    public void onBlockStoreClick(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
         Player player = (Player) event.getWhoClicked();
 
         if (inventory.getType() != InventoryType.CRAFTING) {
-            ItemStack itemStack = event.getCurrentItem();
-
+            int size = inventory.getSize();
             int hotkey = event.getHotbarButton();
-            if (hotkey >= 0) {
+            ItemStack itemStack = null;
+
+            if (event.getRawSlot() >= size) {
+                itemStack = event.getCurrentItem();
+            }
+            else if (hotkey >= 0) {
                 itemStack = player.getInventory().getItem(hotkey);
+            }
+            else if (event.getClick() == ClickType.SWAP_OFFHAND) {
+                itemStack = player.getInventory().getItemInOffHand();
             }
             if (itemStack == null) return;
 
@@ -329,7 +336,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlockStore(InventoryDragEvent event) {
+    public void onBlockStoreDrag(InventoryDragEvent event) {
         Inventory inventory = event.getInventory();
 
         ItemStack itemStack = event.getCursor();

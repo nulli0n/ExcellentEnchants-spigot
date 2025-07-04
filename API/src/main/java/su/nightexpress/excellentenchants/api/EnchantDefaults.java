@@ -321,6 +321,13 @@ public class EnchantDefaults {
             .exclusives(EnchantKeys.custom(EnchantId.VEINMINER), EnchantKeys.custom(EnchantId.TUNNEL))
             .build(), EnchantDistribution.regular(TradeType.PLAINS_COMMON));
 
+        EnchantRegistry.addData(EnchantId.GLASSBREAKER, EnchantDefinition.builder("Glass Breaker", 1)
+            .description("Breaks glass instantly")
+            .weight(COMMON)
+            .supportedItems(ItemSetId.TOOL)
+            .primaryItems(ItemSetId.MINING_TOOLS)
+            .build(), EnchantDistribution.regular(TradeType.DESERT_COMMON));
+
         EnchantRegistry.addData(EnchantId.HASTE, EnchantDefinition.builder("Haste", 3)
             .description("Grants permanent " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " effect.")
             .weight(RARE)
@@ -370,6 +377,12 @@ public class EnchantDefaults {
             .supportedItems(ItemSetId.TOOL)
             .primaryItems(ItemSetId.MINING_TOOLS)
             .build(), EnchantDistribution.treasure(TradeType.DESERT_SPECIAL));
+
+        EnchantRegistry.addData(EnchantId.TREEFELLER, EnchantDefinition.builder("Treefeller", 1)
+            .description("Cuts down an entire tree.")
+            .weight(RARE)
+            .items(ItemSetId.AXE)
+            .build(), EnchantDistribution.regular(TradeType.TAIGA_SPECIAL));
 
         EnchantRegistry.addData(EnchantId.TUNNEL, EnchantDefinition.builder("Tunnel", 3)
             .description("Mines multiple blocks at once in a certain shape.")

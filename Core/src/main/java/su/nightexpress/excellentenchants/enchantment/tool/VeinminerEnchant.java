@@ -95,7 +95,7 @@ public class VeinminerEnchant extends GameEnchantment implements MiningEnchant {
         Set<Block> ores = new HashSet<>();
         Set<Block> prepare = new HashSet<>(this.getNearby(source));
 
-        int limit = Math.min(this.getBlocksLimit(level), 30);
+        int limit = Math.min(this.getBlocksLimit(level), 30); // TODO Limit
         if (limit < 0) return;
 
         while (ores.addAll(prepare) && ores.size() < limit) {

@@ -14,12 +14,7 @@ public class Period {
 
     @NotNull
     public static Period ofSeconds(int seconds) {
-        return new Period(TimeUtil.secondsToTicks(seconds));
-    }
-
-    @NotNull
-    public static Period ofTicks(long interval) {
-        return new Period(interval);
+        return new Period(seconds);
     }
 
     public long getInterval() {
@@ -27,6 +22,8 @@ public class Period {
     }
 
     public boolean isTriggerTime(@NotNull LivingEntity entity) {
-        return entity.getTicksLived() % this.interval == 0L;
+        int secondsLived = (int) TimeUtil.ticksToSeconds(entity.getTicksLived());
+
+        return secondsLived % this.interval == 0;
     }
 }

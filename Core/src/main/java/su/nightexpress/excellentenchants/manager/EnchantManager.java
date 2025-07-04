@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.manager;
 
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -186,26 +185,15 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
     @NotNull
     private Set<LivingEntity> getPassiveEnchantEntities() {
-        Set<LivingEntity> entities = new HashSet<>();
-
-        Players.getOnline().forEach(player -> {
-            if (player.isDead()) return;
-
-            entities.add(player);
-        });
+        Set<LivingEntity> entities = new HashSet<>(Players.getOnline());
 
         if (Config.PASSIVE_ENCHANTS_ALLOW_FOR_MOBS.get()) {
             this.plugin.getServer().getWorlds().forEach(world -> {
-                for (Chunk chunk : world.getLoadedChunks()) {
-                    for (Entity entity : chunk.getEntities()) {
-                        if (!(entity instanceof LivingEntity livingEntity)) continue;
-                        if (!livingEntity.isValid() || livingEntity.isDead()) continue;
-
-                        entities.add(livingEntity);
-                    }
-                }
+                entities.addAll(world.getLivingEntities());
             });
         }
+
+        entities.removeIf(Entity::isDead);
 
         return entities;
     }

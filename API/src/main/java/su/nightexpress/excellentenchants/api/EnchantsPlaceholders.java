@@ -68,7 +68,7 @@ public class EnchantsPlaceholders extends Placeholders {
             .add(ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, level -> NumberUtil.format(enchantment.getCharges().getRechargeAmount()))
             .add(ENCHANTMENT_CHARGES_FUEL_ITEM, level -> ItemUtil.getItemNameSerialized(enchantment.getFuel()))
             .add(TRIGGER_CHANCE, level -> NumberUtil.format(enchantment.getComponent(EnchantComponent.PROBABILITY).getTriggerChance(level)))
-            .add(TIRGGER_INTERVAL, () -> NumberUtil.format(enchantment.getComponent(EnchantComponent.PERIODIC).getInterval() / 20D))
+            .add(TIRGGER_INTERVAL, () -> NumberUtil.format(enchantment.getComponent(EnchantComponent.PERIODIC).getInterval()))
             .add(EFFECT_AMPLIFIER, level -> NumberUtil.toRoman(enchantment.getComponent(EnchantComponent.POTION_EFFECT).getAmplifier(level)))
             .add(EFFECT_DURATION, level -> NumberUtil.format(enchantment.getComponent(EnchantComponent.POTION_EFFECT).getDuration(level) / 20D))
             .add(EFFECT_TYPE, () -> LangUtil.getSerializedName(enchantment.getComponent(EnchantComponent.POTION_EFFECT).getType()))

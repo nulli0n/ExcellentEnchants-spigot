@@ -17,11 +17,10 @@ import su.nightexpress.nightcore.util.Version;
 public class EnchantProviders {
 
     public static void load(@NotNull EnchantsPlugin plugin) {
-        if (plugin.hasInternals()) {
-            EnchantRegistry.addProvider(EnchantId.FLAME_WALKER, (file, data) -> new FlameWalkerEnchant(plugin, file, data));
-        }
         if (Version.isPaper()) {
-            EnchantRegistry.addProvider(EnchantId.AUTO_REEL, (file, data) -> new AutoReelEnchant(plugin, file, data));
+            if (Version.isAtLeast(Version.MC_1_21_5)) {
+                EnchantRegistry.addProvider(EnchantId.AUTO_REEL, (file, data) -> new AutoReelEnchant(plugin, file, data));
+            }
             EnchantRegistry.addProvider(EnchantId.SILK_CHEST, (file, data) -> new SilkChestEnchant(plugin, file, data));
         }
 
@@ -29,7 +28,7 @@ public class EnchantProviders {
         EnchantRegistry.addProvider(EnchantId.DARKNESS_CLOAK, (file, data) -> new DarknessCloakEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.ELEMENTAL_PROTECTION, (file, data) -> new ElementalProtectionEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.FIRE_SHIELD, (file, data) -> new FireShieldEnchant(plugin, file, data));
-
+        EnchantRegistry.addProvider(EnchantId.FLAME_WALKER, (file, data) -> new FlameWalkerEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.HARDENED, (file, data) -> new HardenedEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.ICE_SHIELD, (file, data) -> new IceShieldEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.JUMPING, (file, data) -> new JumpingEnchant(plugin, file, data));
@@ -68,6 +67,7 @@ public class EnchantProviders {
         EnchantRegistry.addProvider(EnchantId.CURSE_OF_BREAKING, (file, data) -> new CurseOfBreakingEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.CURSE_OF_MEDIOCRITY, (file, data) -> new CurseOfMediocrityEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.CURSE_OF_MISFORTUNE, (file, data) -> new CurseOfMisfortuneEnchant(plugin, file, data));
+        EnchantRegistry.addProvider(EnchantId.GLASSBREAKER, (file, data) -> new GlassbreakerEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.HASTE, (file, data) -> new HasteEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.LUCKY_MINER, (file, data) -> new LuckyMinerEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.REPLANTER, (file, data) -> new ReplanterEnchant(plugin, file, data));
@@ -75,6 +75,7 @@ public class EnchantProviders {
         EnchantRegistry.addProvider(EnchantId.SMELTER, (file, data) -> new SmelterEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.TELEKINESIS, (file, data) -> new TelekinesisEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.TUNNEL, (file, data) -> new TunnelEnchant(plugin, file, data));
+        EnchantRegistry.addProvider(EnchantId.TREEFELLER, (file, data) -> new TreefellerEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.VEINMINER, (file, data) -> new VeinminerEnchant(plugin, file, data));
 
         EnchantRegistry.addProvider(EnchantId.CURSE_OF_FRAGILITY, (file, data) -> new CurseOfFragilityEnchant(plugin, file, data));

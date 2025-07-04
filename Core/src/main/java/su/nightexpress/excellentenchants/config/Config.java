@@ -20,16 +20,11 @@ public class Config {
         "[Default is 1]"
     );
 
-    public static final ConfigValue<Long> PASSIVE_ENCHANTS_TICK_INTERVAL = ConfigValue.create("Passive_Enchants.Tick_Interval",
-        1L,
-        "Sets tick interval for passive enchantments.",
-        "Keep this value lower, but at the same rate as enchantment's 'Tick_Interval'.",
-        "=".repeat(15) + " EXAMPLES " + "=".repeat(15),
-        "==> Global (this): 1 ticks; Regrowth: 200 ticks; Saturation: 300 ticks;",
-        "==> Global (this): 1 ticks, Regrowth: 100 ticks; Saturation: 150 ticks;",
-        "[Increase for performance; Decrease for better experience]",
-        "[20 ticks = 1 second]",
-        "[Default is 100]"
+    public static final ConfigValue<Integer> PASSIVE_ENCHANTS_TICK_INTERVAL = ConfigValue.create("Passive_Enchants.Interval",
+        1,
+        "Tick interval for passive enchantments (in seconds).",
+        "Passive enchants depends on entity's 'ticksLived' value, changing this value may result in passive enchants not triggered correctly.",
+        "[Default is 1]"
     );
 
     public static final ConfigValue<Boolean> PASSIVE_ENCHANTS_ALLOW_FOR_MOBS = ConfigValue.create("Passive_Enchants.AllowForMobs",

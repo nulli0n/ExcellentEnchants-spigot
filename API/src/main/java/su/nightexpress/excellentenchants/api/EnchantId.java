@@ -46,6 +46,7 @@ public class EnchantId {
     public static final String CURSE_OF_BREAKING   = "curse_of_breaking";
     public static final String CURSE_OF_MEDIOCRITY = "curse_of_mediocrity";
     public static final String CURSE_OF_MISFORTUNE = "curse_of_misfortune";
+    public static final String GLASSBREAKER        = "glassbreaker";
     public static final String HASTE               = "haste";
     public static final String LUCKY_MINER         = "lucky_miner";
     public static final String REPLANTER           = "replanter";
@@ -53,6 +54,7 @@ public class EnchantId {
     public static final String SILK_SPAWNER        = "silk_spawner";
     public static final String SMELTER             = "smelter";
     public static final String TELEKINESIS         = "telekinesis";
+    public static final String TREEFELLER          = "treefeller";
     public static final String TUNNEL              = "tunnel";
     public static final String VEINMINER           = "veinminer";
 

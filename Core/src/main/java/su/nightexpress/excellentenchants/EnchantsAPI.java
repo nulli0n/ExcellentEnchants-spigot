@@ -2,7 +2,6 @@ package su.nightexpress.excellentenchants;
 
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
-import su.nightexpress.excellentenchants.nms.EnchantNMS;
 
 public class EnchantsAPI {
 
@@ -24,8 +23,8 @@ public class EnchantsAPI {
         return getPlugin().getEnchantManager();
     }
 
-    @NotNull
-    public static EnchantNMS getInternals() {
-        return getPlugin().getEnchantNMS();
-    }
+//    @NotNull
+//    public static EnchantNMS getInternals() {
+//        return getPlugin().getEnchantNMS();
+//    }
 }

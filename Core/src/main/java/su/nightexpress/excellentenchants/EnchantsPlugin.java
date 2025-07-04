@@ -10,17 +10,15 @@ import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.config.Perms;
-import su.nightexpress.excellentenchants.manager.EnchantManager;
-import su.nightexpress.excellentenchants.manager.EnchantProviders;
 import su.nightexpress.excellentenchants.hook.HookPlugin;
 import su.nightexpress.excellentenchants.hook.impl.PacketEventsHook;
 import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
 import su.nightexpress.excellentenchants.hook.impl.ProtocolLibHook;
-import su.nightexpress.excellentenchants.nms.EnchantNMS;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
+import su.nightexpress.excellentenchants.manager.EnchantProviders;
 import su.nightexpress.excellentenchants.nms.RegistryHack;
-import su.nightexpress.excellentenchants.nms.v1_21_4.Internal_1_21_4;
+import su.nightexpress.excellentenchants.nms.mc_1_21_7.RegistryHack_1_21_7;
 import su.nightexpress.excellentenchants.nms.v1_21_4.RegistryHack_1_21_4;
-import su.nightexpress.excellentenchants.nms.v1_21_5.Internal_1_21_5;
 import su.nightexpress.excellentenchants.nms.v1_21_5.RegistryHack_1_21_5;
 import su.nightexpress.nightcore.NightPlugin;
 import su.nightexpress.nightcore.command.experimental.ImprovedCommands;
@@ -33,7 +31,6 @@ import java.io.File;
 public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
 
     private EnchantManager enchantManager;
-    private EnchantNMS     enchantNMS;
     private RegistryHack   registryHack;
 
     @Override
@@ -48,9 +45,9 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
     @Override
     public void enable() {
         this.loadAPI();
-        this.loadInternals();
 
         if (Version.isSpigot()) {
+            this.loadInternals();
             if (this.registryHack == null) {
                 this.error("Unsupported server version!");
                 this.getPluginManager().disablePlugin(this);
@@ -88,17 +85,12 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
     }
 
     private void loadInternals() {
-        boolean isSpigot = Version.isSpigot();
+        //boolean isSpigot = Version.isSpigot();
 
         switch (Version.getCurrent()) {
-            case MC_1_21_4 -> {
-                this.enchantNMS = new Internal_1_21_4();
-                if (isSpigot) this.registryHack = new RegistryHack_1_21_4(this);
-            }
-            case MC_1_21_5 -> {
-                this.enchantNMS = new Internal_1_21_5();
-                if (isSpigot) this.registryHack = new RegistryHack_1_21_5(this);
-            }
+            case MC_1_21_4 -> this.registryHack = new RegistryHack_1_21_4(this);
+            case MC_1_21_5 -> this.registryHack = new RegistryHack_1_21_5(this);
+            case MC_1_21_7 -> this.registryHack = new RegistryHack_1_21_7(this);
         }
     }
 
@@ -134,16 +126,16 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
         return this.enchantManager;
     }
 
-    @NotNull
-    public EnchantNMS getEnchantNMS() {
-        return this.enchantNMS;
-    }
+//    @NotNull
+//    public EnchantNMS getEnchantNMS() {
+//        return this.enchantNMS;
+//    }
 
     public RegistryHack getRegistryHack() {
         return this.registryHack;
     }
 
-    public boolean hasInternals() {
-        return this.enchantNMS != null;
-    }
+//    public boolean hasInternals() {
+//        return this.enchantNMS != null;
+//    }
 }
