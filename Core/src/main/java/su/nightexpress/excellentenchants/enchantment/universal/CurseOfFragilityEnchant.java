@@ -9,13 +9,13 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
-import su.nightexpress.excellentenchants.api.enchantment.type.InventoryEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.type.ContainerEnchant;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
 import su.nightexpress.nightcore.config.FileConfig;
 
 import java.io.File;
 
-public class CurseOfFragilityEnchant extends GameEnchantment implements InventoryEnchant {
+public class CurseOfFragilityEnchant extends GameEnchantment implements ContainerEnchant {
 
     public CurseOfFragilityEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
         super(plugin, file, data);

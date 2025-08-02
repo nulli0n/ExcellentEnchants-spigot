@@ -1,15 +1,14 @@
 package su.nightexpress.excellentenchants.hook.impl;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.EnchantRegistry;
+import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.StringUtil;
 
@@ -75,7 +74,7 @@ public class PlaceholderHook {
                 ItemStack item = player.getInventory().getItem(slot);
                 if (item == null || item.getType().isAir()) return "-";
 
-                CustomEnchantment enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[1].toLowerCase()));
+                CustomEnchantment enchant = EnchantRegistry.getById(chargesSplit[1].toLowerCase());
                 if (enchant == null) return null;
 
                 return String.valueOf(enchant.getCharges(item));
@@ -85,7 +84,7 @@ public class PlaceholderHook {
                 String[] chargesSplit = params.substring("charges_maximum_".length()).split(":");
                 if (chargesSplit.length < 2) return null;
 
-                CustomEnchantment enchant = EnchantRegistry.getByKey(NamespacedKey.minecraft(chargesSplit[0].toLowerCase()));
+                CustomEnchantment enchant = EnchantRegistry.getById(chargesSplit[0].toLowerCase());
                 if (enchant == null) return null;
 
                 int level = NumberUtil.getIntegerAbs(chargesSplit[1], 1);

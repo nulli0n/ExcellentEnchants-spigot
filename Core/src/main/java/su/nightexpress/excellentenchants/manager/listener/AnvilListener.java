@@ -20,7 +20,7 @@ import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.manager.AbstractListener;
 import su.nightexpress.nightcore.util.PDCUtil;
-import su.nightexpress.nightcore.util.bukkit.NightSound;
+import su.nightexpress.nightcore.util.sound.VanillaSound;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -118,7 +118,7 @@ public class AnvilListener extends AbstractListener<EnchantsPlugin> {
         event.getView().setCursor(item);
         event.setCancelled(false);
 
-        NightSound.of(Sound.BLOCK_ENCHANTMENT_TABLE_USE).play(player);
+        VanillaSound.of(Sound.BLOCK_ENCHANTMENT_TABLE_USE).play(player);
 
         ItemStack second = anvilInventory.getItem(1);
         if (second != null && !second.getType().isAir()) {

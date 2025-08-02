@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.api.EnchantHolder;
 import su.nightexpress.excellentenchants.api.EnchantRegistry;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
+import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Keys;
@@ -154,6 +155,13 @@ public class EnchantUtils {
         });
     }
 
+    public static void restoreCharges(@NotNull ItemStack itemStack, @NotNull Enchantment enchantment, int level) {
+        CustomEnchantment customEnchantment = EnchantRegistry.getByBukkit(enchantment);
+        if (customEnchantment != null && customEnchantment.hasComponent(EnchantComponent.CHARGES)) {
+            customEnchantment.restoreCharges(itemStack, level);
+        }
+    }
+
     public static boolean canHaveDescription(@NotNull ItemStack item) {
         if (Config.DESCRIPTION_BOOKS_ONLY.get()) {
             return isEnchantedBook(item);
@@ -231,7 +239,7 @@ public class EnchantUtils {
     private static Map<CustomEnchantment, Integer> toCustomEnchantments(@NotNull Map<Enchantment, Integer> enchants) {
         Map<CustomEnchantment, Integer> map = new LinkedHashMap<>();
         enchants.forEach((enchantment, level) -> {
-            CustomEnchantment excellent = EnchantRegistry.getByKey(enchantment.getKey());
+            CustomEnchantment excellent = EnchantRegistry.getByBukkit(enchantment);
             if (excellent != null) {
                 map.put(excellent, level);
             }
@@ -260,6 +268,21 @@ public class EnchantUtils {
     }
 
     @NotNull
+    public static <T extends CustomEnchantment> Map<ItemStack, Map<T, Integer>> getAll(@NotNull Player player, @NotNull EnchantHolder<T> holder) {
+        Map<ItemStack, Map<T, Integer>> map = new HashMap<>();
+
+        for (ItemStack itemStack : player.getInventory().getContents()) {
+            if (itemStack == null || itemStack.getType().isAir()) continue;
+
+            getCustomEnchantments(itemStack, holder).forEach((enchant, level) -> {
+                map.computeIfAbsent(itemStack, k -> new LinkedHashMap<>()).put(enchant, level);
+            });
+        }
+
+        return map;
+    }
+
+    @NotNull
     public static <T extends CustomEnchantment> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity, @NotNull EnchantHolder<T> holder) {
         Map<ItemStack, Map<T, Integer>> map = new HashMap<>();
 
@@ -275,22 +298,6 @@ public class EnchantUtils {
         });
         return map;
     }
-
-//    @NotNull
-//    public static Map<ItemStack, Integer> getEquipped(@NotNull LivingEntity entity, @NotNull CustomEnchantment enchantment) {
-//        Map<ItemStack, Integer> map = new HashMap<>();
-//        ItemSet supportedItems = enchantment.getSupportedItems();
-//
-//        EntityUtil.getEquippedItems(entity, supportedItems.getSlots()).values().forEach(itemStack -> {
-//            if (itemStack == null || !isEquipment(itemStack)) return;
-//
-//            int level = getLevel(itemStack, enchantment.getBukkitEnchantment());
-//            if (level > 0) {
-//                map.put(itemStack, level);
-//            }
-//        });
-//        return map;
-//    }
 
     public static void addArrowEnchant(@NotNull AbstractArrow arrow, @NotNull CustomEnchantment enchant, int level) {
         PDCUtil.set(arrow, enchant.getBukkitEnchantment().getKey(), level);

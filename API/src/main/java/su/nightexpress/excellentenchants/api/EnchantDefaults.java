@@ -47,6 +47,8 @@ public class EnchantDefaults {
             distribution = EnchantDistribution.read(config, "Distribution");
 
             EnchantRegistry.addData(id, definition, distribution, data.isCurse());
+
+            config.saveChanges();
         });
     }
 

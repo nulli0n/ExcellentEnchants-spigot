@@ -5,7 +5,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.api.config.ConfigBridge;
 import su.nightexpress.excellentenchants.api.config.DistributionConfig;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
@@ -14,6 +13,7 @@ import su.nightexpress.excellentenchants.api.wrapper.EnchantDistribution;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class EnchantRegistry {
 
@@ -32,7 +32,7 @@ public class EnchantRegistry {
     public static final EnchantHolder<AttackEnchant>     ATTACK     = registerHolder("attack", AttackEnchant.class, AttackEnchant::getAttackPriority);
     public static final EnchantHolder<DefendEnchant>     DEFEND     = registerHolder("defend", DefendEnchant.class, DefendEnchant::getProtectPriority);
     public static final EnchantHolder<ProtectionEnchant> PROTECTION = registerHolder("protection", ProtectionEnchant.class, ProtectionEnchant::getProtectionPriority);
-    public static final EnchantHolder<InventoryEnchant>  INVENTORY  = registerHolder("inventory", InventoryEnchant.class, InventoryEnchant::getClickPriority);
+    public static final EnchantHolder<ContainerEnchant>  CONTAINER  = registerHolder("inventory", ContainerEnchant.class, ContainerEnchant::getClickPriority);
     public static final EnchantHolder<MoveEnchant>       MOVE       = registerHolder("move", MoveEnchant.class, MoveEnchant::getMovePriority);
     public static final EnchantHolder<KillEnchant>       KILL       = registerHolder("kill", KillEnchant.class, KillEnchant::getKillPriority);
     public static final EnchantHolder<DeathEnchant>      DEATH      = registerHolder("death", DeathEnchant.class, DeathEnchant::getDeathPriority);
@@ -41,8 +41,9 @@ public class EnchantRegistry {
     public static final EnchantHolder<InteractEnchant>   INTERACT   = registerHolder("interact", InteractEnchant.class, InteractEnchant::getInteractPriority);
     public static final EnchantHolder<DurabilityEnchant> DURABILITY = registerHolder("durability", DurabilityEnchant.class, DurabilityEnchant::getItemDamagePriority);
 
-    public static final EnchantHolder<BlockEnchant>   BLOCK   = registerHolder("block", BlockEnchant.class, e -> EnchantPriority.NORMAL);
-    public static final EnchantHolder<PassiveEnchant> PASSIVE = registerHolder("passive", PassiveEnchant.class, e -> EnchantPriority.NORMAL);
+    public static final EnchantHolder<InventoryEnchant> INVENTORY = registerHolder("inventory", InventoryEnchant.class, e -> EnchantPriority.NORMAL);
+    public static final EnchantHolder<BlockEnchant>     BLOCK     = registerHolder("block", BlockEnchant.class, e -> EnchantPriority.NORMAL);
+    public static final EnchantHolder<PassiveEnchant>   PASSIVE   = registerHolder("passive", PassiveEnchant.class, e -> EnchantPriority.NORMAL);
 
     private static boolean locked;
 
@@ -76,7 +77,7 @@ public class EnchantRegistry {
     }
 
     public static boolean isRegistered(@NotNull Enchantment enchantment) {
-        return getByKey(enchantment.getKey()) != null;
+        return getByBukkit(enchantment) != null;
     }
 
     @Nullable
@@ -89,9 +90,19 @@ public class EnchantRegistry {
         return BY_KEY.get(key);
     }
 
+    @Nullable
+    public static CustomEnchantment getByBukkit(@NotNull Enchantment enchantment) {
+        return getByKey(enchantment.getKey());
+    }
+
     @NotNull
     public static Set<CustomEnchantment> getRegistered() {
         return new HashSet<>(BY_ID.values());
+    }
+
+    @NotNull
+    public static Set<Enchantment> getRegisteredBukkit() {
+        return getRegistered().stream().map(CustomEnchantment::getBukkitEnchantment).collect(Collectors.toSet());
     }
 
     @NotNull

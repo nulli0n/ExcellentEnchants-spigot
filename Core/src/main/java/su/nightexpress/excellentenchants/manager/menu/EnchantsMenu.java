@@ -23,7 +23,7 @@ import su.nightexpress.nightcore.ui.menu.type.NormalMenu;
 import su.nightexpress.nightcore.util.*;
 import su.nightexpress.nightcore.util.bukkit.NightItem;
 import su.nightexpress.nightcore.util.placeholder.Replacer;
-import su.nightexpress.nightcore.util.text.NightMessage;
+import su.nightexpress.nightcore.util.text.night.NightMessage;
 
 import java.util.*;
 import java.util.function.Predicate;

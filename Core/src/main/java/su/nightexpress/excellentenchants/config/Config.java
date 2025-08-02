@@ -8,7 +8,7 @@ import su.nightexpress.nightcore.util.bukkit.NightItem;
 import java.util.Map;
 
 import static su.nightexpress.excellentenchants.api.EnchantsPlaceholders.*;
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
+import static su.nightexpress.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 public class Config {
 
@@ -47,12 +47,12 @@ public class Config {
     );
 
     public static final ConfigValue<String> DESCRIPTION_FORMAT_DEFAULT = ConfigValue.create("Description.Format.Default",
-        LIGHT_GRAY.wrap("• " + GENERIC_DESCRIPTION),
+        SOFT_GRAY.wrap("• " + GENERIC_DESCRIPTION),
         "Sets description format for enchantments without charges."
     );
 
     public static final ConfigValue<String> DESCRIPTION_FORMAT_CHARGES = ConfigValue.create("Description.Format.WithCharges",
-        LIGHT_GRAY.wrap("• " + GENERIC_DESCRIPTION + " (" + GENERIC_CHARGES + ")"),
+        SOFT_GRAY.wrap("• " + GENERIC_DESCRIPTION + " " + GENERIC_CHARGES),
         "Sets description format for enchantments with charges enabled."
     );
 
@@ -66,10 +66,10 @@ public class Config {
     public static final ConfigValue<Map<String, ChargesFormat>> CHARGES_FORMAT = ConfigValue.forMapById("Charges.Format",
         ChargesFormat::read,
         map -> {
-            map.put("zero", new ChargesFormat(0, LIGHT_RED.wrap("(" + GENERIC_AMOUNT + "⚡)")));
-            map.put("low", new ChargesFormat(25, LIGHT_ORANGE.wrap("(" + GENERIC_AMOUNT + "⚡)")));
-            map.put("medium", new ChargesFormat(50, LIGHT_YELLOW.wrap("(" + GENERIC_AMOUNT + "⚡)")));
-            map.put("high", new ChargesFormat(75, LIGHT_GREEN.wrap("(" + GENERIC_AMOUNT + "⚡)")));
+            map.put("zero", new ChargesFormat(0, SOFT_RED.wrap("(" + GENERIC_AMOUNT + "⚡)")));
+            map.put("low", new ChargesFormat(25, SOFT_ORANGE.wrap("(" + GENERIC_AMOUNT + "⚡)")));
+            map.put("medium", new ChargesFormat(50, SOFT_YELLOW.wrap("(" + GENERIC_AMOUNT + "⚡)")));
+            map.put("high", new ChargesFormat(75, SOFT_GREEN.wrap("(" + GENERIC_AMOUNT + "⚡)")));
         },
         "Sets charges format based on percent of max. charges amount."
     );

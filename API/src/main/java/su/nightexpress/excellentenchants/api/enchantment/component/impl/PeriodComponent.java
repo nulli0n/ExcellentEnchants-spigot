@@ -26,9 +26,8 @@ public class PeriodComponent implements EnchantComponent<Period> {
 
         long interval = ConfigValue.create("Period.Interval",
             defaultValue.getInterval(),
-            "Only triggers if the age (ticks lived) of the entity is divisible by the given number.",
-            "Should be greater than and divisible by the global 'Tick_Interval' in the main plugin config.",
-            "[20 ticks = 1 second]"
+            "Only triggers if the age (seconds lived) of the entity is divisible by the given number.",
+            "Should be greater than and divisible by the global 'Tick_Interval' in the main plugin config."
         ).read(config);
 
         return new Period(interval);

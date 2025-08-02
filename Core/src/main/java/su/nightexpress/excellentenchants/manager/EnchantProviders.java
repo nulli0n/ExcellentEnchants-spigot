@@ -97,7 +97,6 @@ public class EnchantProviders {
         EnchantRegistry.addProvider(EnchantId.PARALYZE, (file, data) -> new ParalyzeEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.RAGE, (file, data) -> new RageEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.ROCKET, (file, data) -> new RocketEnchant(plugin, file, data));
-        //EnchantRegistry.addProvider(EnchantId.SURPRISE, (file, data) -> new SurpriseEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.SWIPER, (file, data) -> new SwiperEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.TEMPER, (file, data) -> new TemperEnchant(plugin, file, data));
         EnchantRegistry.addProvider(EnchantId.THRIFTY, (file, data) -> new ThriftyEnchant(plugin, file, data));

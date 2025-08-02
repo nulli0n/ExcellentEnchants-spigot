@@ -111,11 +111,6 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
         });
     }
 
-//    @NotNull
-//    protected Charges getDefaultCharges() {
-//        return Charges.normal();
-//    }
-
     protected abstract void loadAdditional(@NotNull FileConfig config);
 
     @Override

@@ -19,8 +19,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantRegistry;
-import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.excellentenchants.util.EnchantUtils;
@@ -71,10 +69,7 @@ public class GenericListener extends AbstractListener<EnchantsPlugin> {
             if (result == null) return;
 
             event.getEnchantsToAdd().forEach((enchantment, level) -> {
-                CustomEnchantment customEnchantment = EnchantRegistry.getByKey(enchantment.getKey());
-                if (customEnchantment != null) {
-                    customEnchantment.restoreCharges(result, level);
-                }
+                EnchantUtils.restoreCharges(result, enchantment, level);
             });
 
             inventory.setItem(0, result);

@@ -49,7 +49,7 @@ public class ItemSetRegistry {
         register(ItemSetId.ELYTRA, ItemSet.buildByType(Material.ELYTRA).slots(EquipmentSlot.CHEST).name("Elytra"));
         register(ItemSetId.SWORD, ItemSet.buildByName(getSwords()).slots(EquipmentSlot.HAND).name("Sword"));
         register(ItemSetId.AXE, ItemSet.buildByName(getAxes()).slots(EquipmentSlot.HAND).name("Axe"));
-        register(ItemSetId.HOE, ItemSet.buildByName(getHoes()).slots(EquipmentSlot.HAND) .name("Hoe"));
+        register(ItemSetId.HOE, ItemSet.buildByName(getHoes()).slots(EquipmentSlot.HAND).name("Hoe"));
         register(ItemSetId.PICKAXE, ItemSet.buildByName(getPickaxes()).slots(EquipmentSlot.HAND).name("Pickaxe"));
         register(ItemSetId.SHOVEL, ItemSet.buildByName(getShovels()).slots(EquipmentSlot.HAND).name("Shovel"));
         register(ItemSetId.TRIDENT, ItemSet.buildByType(Material.TRIDENT).slots(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).name("Trident"));
@@ -59,12 +59,12 @@ public class ItemSetRegistry {
         register(ItemSetId.SHIELD, ItemSet.buildByType(Material.SHIELD).slots(EquipmentSlot.OFF_HAND).name("Shield"));
         register(ItemSetId.BREAKABLE, ItemSet.buildByName(getBreakable()).slots(EquipmentSlot.values()).name("Brekable"));
         register(ItemSetId.ARMOR, ItemSet.buildByName(getArmors()).slots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET).name("Armor"));
-        register(ItemSetId.TOOL, ItemSet.buildByName(getTools()).slots(EquipmentSlot.HAND).name("Tool").build());
-        register(ItemSetId.SWORDS_AXES, ItemSet.buildByName(getSwordsAxes()).slots(EquipmentSlot.HAND).name("Weapon").build());
-        register(ItemSetId.BOW_CROSSBOW, ItemSet.buildByType(Lists.newSet(Material.BOW, Material.CROSSBOW)).slots(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).name("Bow / Crossbow").build());
-        register(ItemSetId.CHESTPLATE_ELYTRA, ItemSet.buildByName(getTorso()).slots(EquipmentSlot.CHEST).name("Chestplate / Elytra").build());
-        register(ItemSetId.ALL_WEAPON, ItemSet.buildByName(getAllRangeWeapon()).slots(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).name("Weapon").build());
-        register(ItemSetId.MINING_TOOLS, ItemSet.buildByName(getMiningTools()).slots(EquipmentSlot.HAND).name("Mining Tool").build());
+        register(ItemSetId.TOOL, ItemSet.buildByName(getTools()).slots(EquipmentSlot.HAND).name("Tool"));
+        register(ItemSetId.SWORDS_AXES, ItemSet.buildByName(getSwordsAxes()).slots(EquipmentSlot.HAND).name("Weapon"));
+        register(ItemSetId.BOW_CROSSBOW, ItemSet.buildByType(Lists.newSet(Material.BOW, Material.CROSSBOW)).slots(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).name("Bow / Crossbow"));
+        register(ItemSetId.CHESTPLATE_ELYTRA, ItemSet.buildByName(getTorso()).slots(EquipmentSlot.CHEST).name("Chestplate / Elytra"));
+        register(ItemSetId.ALL_WEAPON, ItemSet.buildByName(getAllRangeWeapon()).slots(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).name("Weapon"));
+        register(ItemSetId.MINING_TOOLS, ItemSet.buildByName(getMiningTools()).slots(EquipmentSlot.HAND).name("Mining Tool"));
         register(ItemSetId.TOOLS_WEAPONS, ItemSet.buildByName(getToolsAndWeapon()).slots(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).name("Tools & Weapons"));
     }
 
@@ -94,11 +94,6 @@ public class ItemSetRegistry {
     public static boolean isPresent(@NotNull String id) {
         return BY_ID.containsKey(id.toLowerCase());
     }
-
-//    @NotNull
-//    private static Set<Material> getBySlot(@NotNull EquipmentSlot slot) {
-//        return get(material -> material.getEquipmentSlot() == slot);
-//    }
 
     @NotNull
     private static Set<String> getBreakable() {

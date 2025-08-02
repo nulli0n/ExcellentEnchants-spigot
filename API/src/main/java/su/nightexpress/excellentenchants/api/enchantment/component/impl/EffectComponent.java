@@ -20,12 +20,7 @@ public class EffectComponent implements EnchantComponent<PotionEffects> {
     public PotionEffects read(@NotNull FileConfig config, @NotNull PotionEffects defaultValue) {
         PotionEffectType effectType = defaultValue.getType();
         boolean isPassive = defaultValue.isPermanent();
-        Modifier durationMod = defaultValue.getDuration();
-
-        if (!isPassive) {
-            durationMod = Modifier.load(config, "PotionEffect.Duration", defaultValue.getDuration(), "Effect duration (in seconds).");
-        }
-
+        Modifier durationMod = Modifier.load(config, "PotionEffect.Duration", defaultValue.getDuration(), "Effect duration (in seconds).");
         Modifier amplifierMod = Modifier.load(config, "PotionEffect.Amplifier", defaultValue.getAmplifier(), "Effect amplifier.");
 
         return new PotionEffects(effectType, durationMod, amplifierMod, isPassive);

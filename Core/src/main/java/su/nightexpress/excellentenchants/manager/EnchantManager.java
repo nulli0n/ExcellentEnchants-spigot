@@ -44,7 +44,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
     private final Map<AbstractArrow, Set<UniParticle>> arrowEffects;
     private final Map<Location, TickedBlock>           tickedBlocks;
-    private final Map<UUID, Explosion> explosions;
+    private final Map<UUID, Explosion>                 explosions;
 
     private EnchantsMenu enchantsMenu;
 
@@ -245,6 +245,10 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
     public <T extends CustomEnchantment> void handleArmorEnchants(@NotNull LivingEntity entity, @NotNull EnchantHolder<T> holder, @NotNull EnchantUsage<T> usage) {
         this.handleFully(entity, EnchantUtils.getEquipped(entity, holder), holder::getPriority, usage);
+    }
+
+    public <T extends CustomEnchantment> void handleInventoryEnchants(@NotNull Player player, @NotNull EnchantHolder<T> holder, @NotNull EnchantUsage<T> usage) {
+        this.handleFully(player, EnchantUtils.getAll(player, holder), holder::getPriority, usage);
     }
 
     public <T extends CustomEnchantment> void handleItemEnchants(@NotNull LivingEntity entity,

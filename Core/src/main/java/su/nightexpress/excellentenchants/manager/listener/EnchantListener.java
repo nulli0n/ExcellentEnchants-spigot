@@ -208,6 +208,11 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
         }
 
         this.manager.handleArmorEnchants(entity, EnchantRegistry.DEATH, (item, enchant, level) -> enchant.onDeath(event, entity, item, level));
+
+        if (event instanceof PlayerDeathEvent deathEvent) {
+            Player player = deathEvent.getPlayer();
+            this.manager.handleInventoryEnchants(player, EnchantRegistry.INVENTORY, (item, enchant, level) -> enchant.onDeath(deathEvent, player, item, level));
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -265,7 +270,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
         ItemStack itemStack = event.getCurrentItem();
         if (itemStack == null || itemStack.getType().isAir()) return;
 
-        this.manager.handleItemEnchants(player, itemStack, EnchantRegistry.INVENTORY, (item, enchant, level) -> enchant.onClick(event, player, item, level));
+        this.manager.handleItemEnchants(player, itemStack, EnchantRegistry.CONTAINER, (item, enchant, level) -> enchant.onClick(event, player, item, level));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

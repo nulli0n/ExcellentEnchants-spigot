@@ -12,6 +12,7 @@ import io.papermc.paper.registry.keys.tags.EnchantmentTagKeys;
 import io.papermc.paper.registry.set.RegistrySet;
 import io.papermc.paper.registry.tag.TagKey;
 import io.papermc.paper.tag.PostFlattenTagRegistrar;
+import io.papermc.paper.tag.TagEntry;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -31,6 +32,7 @@ import su.nightexpress.excellentenchants.api.item.ItemSetRegistry;
 import su.nightexpress.excellentenchants.api.wrapper.EnchantDefinition;
 import su.nightexpress.excellentenchants.api.wrapper.EnchantDistribution;
 import su.nightexpress.excellentenchants.api.wrapper.TradeType;
+import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.Lists;
 
 import java.io.File;
@@ -47,7 +49,6 @@ public class EnchantsBootstrap implements PluginBootstrap {
     @NotNull
     private static Key customKey(@NotNull String id) {
         return EnchantKeys.custom(id);
-        //return Key.key(ConfigBridge.getNamespace(), id);
     }
 
     @Override
@@ -109,8 +110,9 @@ public class EnchantsBootstrap implements PluginBootstrap {
                 var supportedItems = event.getOrCreateTag(supportedItemsTag);
 
                 List<TypedKey<Enchantment>> exclusiveEntries = definition.getExclusiveSet().stream()
-                    .map(Key::key)
-                    .filter(disabled -> !DistributionConfig.isDisabled(disabled.value()))
+                    .map(BukkitThing::parseKey)
+                    .map(EnchantKeys::adaptCustom) // Remap with the 'correct' namespace according to the config setting.
+                    .filter(key -> !DistributionConfig.isDisabled(key.value()))
                     .map(EnchantmentKeys::create)
                     .toList();
                 var exclusiveSet = RegistrySet.keySet(RegistryKey.ENCHANTMENT, exclusiveEntries);
@@ -137,8 +139,7 @@ public class EnchantsBootstrap implements PluginBootstrap {
             });
         }));
 
-        // Register a new handler for the freeze lifecycle event on the enchantment registry
-        lifeCycle.registerEventHandler(LifecycleEvents.TAGS.postFlatten(RegistryKey.ENCHANTMENT).newHandler(event -> {
+        lifeCycle.registerEventHandler(LifecycleEvents.TAGS.preFlatten(RegistryKey.ENCHANTMENT).newHandler(event -> {
             var registrar = event.registrar();
 
             EnchantRegistry.getDataMap().forEach((enchantId, data) -> {
@@ -148,22 +149,25 @@ public class EnchantsBootstrap implements PluginBootstrap {
                 EnchantDistribution distribution = data.getDistribution();
                 TypedKey<Enchantment> key = EnchantmentKeys.create(customKey(enchantId));
 
+                TagEntry<Enchantment> entry = TagEntry.valueEntry(key);
+                var list = Lists.newSet(entry);
+
                 // Any enchantment can be treasure.
                 if (distribution.isTreasure()) {
-                    registrar.addToTag(EnchantmentTagKeys.TREASURE, Lists.newSet(key));
-                    registrar.addToTag(EnchantmentTagKeys.DOUBLE_TRADE_PRICE, Lists.newSet(key));
+                    registrar.addToTag(EnchantmentTagKeys.TREASURE, list);
+                    registrar.addToTag(EnchantmentTagKeys.DOUBLE_TRADE_PRICE, list);
                 }
-                else registrar.addToTag(EnchantmentTagKeys.NON_TREASURE, Lists.newSet(key));
+                else registrar.addToTag(EnchantmentTagKeys.NON_TREASURE, list);
 
                 // Any enchantment can be on random loot.
                 if (distribution.isOnRandomLoot() && DistributionConfig.DISTRIBUTION_RANDOM_LOOT.get()) {
-                    registrar.addToTag(EnchantmentTagKeys.ON_RANDOM_LOOT, Lists.newSet(key));
+                    registrar.addToTag(EnchantmentTagKeys.ON_RANDOM_LOOT, list);
                 }
 
                 // Only non-treasure enchantments should be on mob equipment, traded equipment and non-rebalanced trades.
                 if (!distribution.isTreasure()) {
                     if (distribution.isOnMobSpawnEquipment() && DistributionConfig.DISTRIBUTION_MOB_EQUIPMENT.get()) {
-                        registrar.addToTag(EnchantmentTagKeys.ON_MOB_SPAWN_EQUIPMENT, Lists.newSet(key));
+                        registrar.addToTag(EnchantmentTagKeys.ON_MOB_SPAWN_EQUIPMENT, list);
                     }
 
                     // This only works if Villager Trade Rebalance is disabled.
@@ -174,26 +178,26 @@ public class EnchantsBootstrap implements PluginBootstrap {
                     // - TradeRebalanceEnchantmentProviders
                     // - VanillaEnchantmentProviders
                     if (distribution.isOnTradedEquipment() && DistributionConfig.DISTRIBUTION_TRADE_EQUIPMENT.get()) {
-                        registrar.addToTag(EnchantmentTagKeys.ON_TRADED_EQUIPMENT, Lists.newSet(key));
+                        registrar.addToTag(EnchantmentTagKeys.ON_TRADED_EQUIPMENT, list);
                     }
                 }
 
                 // Any enchantment can be tradable (on enchanted books).
                 if (distribution.isTradable() && DistributionConfig.DISTRIBUTION_TRADING.get()) {
                     distribution.getTrades().forEach(tradeType -> {
-                        registrar.addToTag(getTradeKey(tradeType), Lists.newSet(key));
+                        registrar.addToTag(getTradeKey(tradeType), list);
                     });
-                    registrar.addToTag(EnchantmentTagKeys.TRADEABLE, Lists.newSet(key));
+                    registrar.addToTag(EnchantmentTagKeys.TRADEABLE, list);
                 }
 
                 if (data.isCurse()) {
-                    registrar.addToTag(EnchantmentTagKeys.CURSE, Lists.newSet(key));
+                    registrar.addToTag(EnchantmentTagKeys.CURSE, list);
                 }
                 else {
                     // Only non-curse and non-treasure enchantments should go in enchanting table.
                     if (!distribution.isTreasure()) {
                         if (distribution.isDiscoverable() && DistributionConfig.DISTRIBUTION_ENCHANTING.get()) {
-                            registrar.addToTag(EnchantmentTagKeys.IN_ENCHANTING_TABLE, Lists.newSet(key));
+                            registrar.addToTag(EnchantmentTagKeys.IN_ENCHANTING_TABLE, list);
                         }
                     }
                 }
