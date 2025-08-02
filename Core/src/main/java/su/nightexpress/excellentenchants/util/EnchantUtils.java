@@ -28,6 +28,7 @@ import su.nightexpress.nightcore.util.*;
 import su.nightexpress.nightcore.util.random.Rnd;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class EnchantUtils {
 
@@ -328,6 +329,10 @@ public class EnchantUtils {
     }
 
     public static void populateResource(@NotNull BlockDropItemEvent event, @NotNull ItemStack itemStack) {
+        populateResource(event, itemStack, null);
+    }
+
+    public static void populateResource(@NotNull BlockDropItemEvent event, @NotNull ItemStack itemStack, @Nullable Consumer<Item> consumer) {
         Block block = event.getBlock();
         World world = block.getWorld();
         Location location = block.getLocation();
@@ -340,6 +345,7 @@ public class EnchantUtils {
         Location spawn = new Location(world, x, y, z);
         Item item = world.createEntity(spawn, Item.class);
         item.setItemStack(itemStack);
+        if (consumer != null) consumer.accept(item);
 
         event.getItems().add(item);
     }

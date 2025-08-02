@@ -10,6 +10,7 @@ import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.EnchantData;
@@ -21,7 +22,8 @@ import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
 import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.ItemReplacer;
+import su.nightexpress.nightcore.util.ItemUtil;
+import su.nightexpress.nightcore.util.placeholder.Replacer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,8 +33,10 @@ import java.util.stream.Stream;
 
 public class SilkChestEnchant extends GameEnchantment implements BlockDropEnchant, BlockEnchant {
 
-    private       String        chestName;
-    private       List<String>  chestLore;
+    private static final String NO_PICKUP = "NO_PICKUP";
+
+    private String       chestName;
+    private List<String> chestLore;
 
     public SilkChestEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
         super(plugin, file, data);
@@ -63,13 +67,13 @@ public class SilkChestEnchant extends GameEnchantment implements BlockDropEnchan
         chestItem.update(true);
 
         int amount = (int) Stream.of(chestItem.getBlockInventory().getContents()).filter(i -> i != null && !i.getType().isAir()).count();
+        Replacer replacer = Replacer.create().replace(EnchantsPlaceholders.GENERIC_AMOUNT, () -> String.valueOf(amount));
 
         stateMeta.setBlockState(chestItem);
-        stateMeta.setDisplayName(this.chestName);
-        stateMeta.setLore(this.chestLore);
+        ItemUtil.setCustomName(stateMeta, replacer.apply(this.chestName));
+        ItemUtil.setLore(stateMeta, replacer.apply(this.chestLore));
         chestStack.setItemMeta(stateMeta);
 
-        ItemReplacer.replace(chestStack, str -> str.replace(EnchantsPlaceholders.GENERIC_AMOUNT, String.valueOf(amount)));
         EnchantUtils.setBlockEnchant(chestStack, this);
         return chestStack;
     }
@@ -104,7 +108,7 @@ public class SilkChestEnchant extends GameEnchantment implements BlockDropEnchan
             return false;
         }
 
-        EnchantUtils.populateResource(event, this.getSilkChest(chest));
+        EnchantUtils.populateResource(event, this.getSilkChest(chest), drop -> drop.setMetadata(NO_PICKUP, new FixedMetadataValue(this.plugin, true)));
 
         chest.getBlockInventory().clear();
 
