@@ -157,7 +157,8 @@ public class EnchantsBootstrap implements PluginBootstrap {
                     registrar.addToTag(EnchantmentTagKeys.TREASURE, list);
                     registrar.addToTag(EnchantmentTagKeys.DOUBLE_TRADE_PRICE, list);
                 }
-                else registrar.addToTag(EnchantmentTagKeys.NON_TREASURE, list);
+                // This tag is included in other tags, which makes it impossible to exclude enchants of this tag from other tags.
+                //else registrar.addToTag(EnchantmentTagKeys.NON_TREASURE, list);
 
                 // Any enchantment can be on random loot.
                 if (distribution.isOnRandomLoot() && DistributionConfig.DISTRIBUTION_RANDOM_LOOT.get()) {

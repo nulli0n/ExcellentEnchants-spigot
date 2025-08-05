@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ExcellentEnchants</artifactId>
         <groupId>su.nightexpress.excellentenchants</groupId>
-        <version>5.2.0</version>
+        <version>5.2.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -88,37 +88,37 @@
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>API</artifactId>
-            <version>5.2.0</version>
+            <version>5.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>NMS</artifactId>
-            <version>5.2.0</version>
+            <version>5.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>MC_1_21_8</artifactId>
-            <version>5.2.0</version>
+            <version>5.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>MC_1_21_7</artifactId>
-            <version>5.2.0</version>
+            <version>5.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>MC_1_21_5</artifactId>
-            <version>5.2.0</version>
+            <version>5.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>MC_1_21_4</artifactId>
-            <version>5.2.0</version>
+            <version>5.2.1</version>
         </dependency>
 
     </dependencies>
