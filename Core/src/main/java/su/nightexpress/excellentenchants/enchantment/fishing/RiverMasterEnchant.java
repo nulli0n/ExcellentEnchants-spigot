@@ -46,7 +46,7 @@ public class RiverMasterEnchant extends GameEnchantment implements FishingEnchan
         if (event.getState() != PlayerFishEvent.State.FISHING) return false;
 
         FishHook hook = event.getHook();
-        hook.setVelocity(hook.getVelocity().multiply(this.getDistanceMod(level)));
+        this.plugin.runTask(hook, () -> hook.setVelocity(hook.getVelocity().multiply(this.getDistanceMod(level))));
         return true;
     }
 }
