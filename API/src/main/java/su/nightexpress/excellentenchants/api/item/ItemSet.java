@@ -9,6 +9,7 @@ import su.nightexpress.nightcore.config.Writeable;
 import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.Enums;
 import su.nightexpress.nightcore.util.Lists;
+import su.nightexpress.nightcore.util.LowerCase;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +25,7 @@ public class ItemSet implements Writeable {
     private final String          displayName;
 
     public ItemSet(@NotNull Set<String> materials, EquipmentSlot[] slots, @NotNull String displayName) {
-        this.materials = Lists.modify(materials, String::toLowerCase);
+        this.materials = Lists.modify(materials, LowerCase.INTERNAL::apply);
         this.slots = slots;
         this.displayName = displayName;
     }

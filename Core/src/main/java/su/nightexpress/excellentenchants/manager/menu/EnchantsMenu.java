@@ -7,10 +7,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MenuType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantRegistry;
-import su.nightexpress.excellentenchants.api.config.ConfigBridge;
+import su.nightexpress.excellentenchants.api.EnchantFiles;
+import su.nightexpress.excellentenchants.api.EnchantKeys;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.config.Keys;
+import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.ui.menu.MenuViewer;
@@ -21,6 +22,7 @@ import su.nightexpress.nightcore.ui.menu.data.MenuLoader;
 import su.nightexpress.nightcore.ui.menu.item.MenuItem;
 import su.nightexpress.nightcore.ui.menu.type.NormalMenu;
 import su.nightexpress.nightcore.util.*;
+import su.nightexpress.nightcore.util.bridge.RegistryType;
 import su.nightexpress.nightcore.util.bukkit.NightItem;
 import su.nightexpress.nightcore.util.placeholder.Replacer;
 import su.nightexpress.nightcore.util.text.night.NightMessage;
@@ -49,7 +51,7 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
     public EnchantsMenu(@NotNull EnchantsPlugin plugin) {
         super(plugin, MenuType.GENERIC_9X4, BLACK.wrap("Custom Enchantments"));
 
-        this.load(FileConfig.loadOrExtract(plugin, ConfigBridge.DIR_MENU, FILE_NAME));
+        this.load(FileConfig.loadOrExtract(plugin, EnchantFiles.DIR_MENU, FILE_NAME));
     }
 
     @Override
@@ -100,7 +102,9 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
             for (String line : this.enchantLoreConflicts) {
                 if (line.contains(GENERIC_NAME)) {
                     enchant.getDefinition().getExclusiveSet().stream()
-                        .map(BukkitThing::getEnchantment).filter(Objects::nonNull).map(LangUtil::getSerializedName)
+                        .map(BukkitThing::parseKey)
+                        .map(EnchantKeys::createOrVanilla)
+                        .map(key -> BukkitThing.getByKey(RegistryType.ENCHANTMENT, key)).filter(Objects::nonNull).map(LangUtil::getSerializedName)
                         .forEach(conf -> conflicts.add(line.replace(GENERIC_NAME, conf)));
                     continue;
                 }

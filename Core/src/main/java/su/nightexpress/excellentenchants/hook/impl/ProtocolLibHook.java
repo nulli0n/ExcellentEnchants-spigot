@@ -48,6 +48,28 @@ public class ProtocolLibHook {
             }
         });
 
+        manager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.SET_PLAYER_INVENTORY) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
+                PacketContainer packet = event.getPacket();
+                if (!EnchantUtils.canUpdateDisplay(event.getPlayer())) return;
+
+                ItemStack item = packet.getItemModifier().read(0);
+                packet.getItemModifier().write(0, EnchantUtils.addDescription(item));
+            }
+        });
+
+        manager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.SET_CURSOR_ITEM) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
+                PacketContainer packet = event.getPacket();
+                if (!EnchantUtils.canUpdateDisplay(event.getPlayer())) return;
+
+                ItemStack item = packet.getItemModifier().read(0);
+                packet.getItemModifier().write(0, EnchantUtils.addDescription(item));
+            }
+        });
+
         manager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.OPEN_WINDOW_MERCHANT) {
             @Override
             public void onPacketSending(PacketEvent event) {

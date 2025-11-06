@@ -10,9 +10,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.EnchantBlacklist;
-import su.nightexpress.excellentenchants.api.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
-import su.nightexpress.excellentenchants.api.config.DistributionConfig;
+import su.nightexpress.excellentenchants.bridge.DistributionConfig;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.component.ComponentLoader;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
@@ -61,10 +60,10 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
         this.definition = data.getDefinition();
         this.distribution = data.getDistribution();
 
-        ItemSet primary = ItemSetRegistry.getById(this.definition.getPrimaryItemsId());
-        ItemSet supported = ItemSetRegistry.getById(this.definition.getSupportedItemsId());
+        ItemSet primary = ItemSetRegistry.getByKey(this.definition.getPrimaryItemsId());
+        ItemSet supported = ItemSetRegistry.getByKey(this.definition.getSupportedItemsId());
         if (primary == null || supported == null) {
-            throw new IllegalStateException("Invalid primary/supported item type in the " + this.getId() + " enchantment.");
+            throw new IllegalStateException("Invalid primary/supported item sets in the " + this.getId() + " enchantment.");
         }
         this.primaryItems = primary;
         this.supportedItems = supported;

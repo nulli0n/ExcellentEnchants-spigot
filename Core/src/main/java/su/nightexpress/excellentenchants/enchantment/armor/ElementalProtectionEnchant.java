@@ -11,6 +11,7 @@ import su.nightexpress.excellentenchants.api.*;
 import su.nightexpress.excellentenchants.api.damage.DamageBonusType;
 import su.nightexpress.excellentenchants.api.damage.DamageBonus;
 import su.nightexpress.excellentenchants.api.enchantment.type.ProtectionEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;

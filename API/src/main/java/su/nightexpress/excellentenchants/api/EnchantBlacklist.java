@@ -5,6 +5,7 @@ import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.config.Writeable;
 import su.nightexpress.nightcore.util.Lists;
+import su.nightexpress.nightcore.util.LowerCase;
 
 import java.util.Set;
 
@@ -13,7 +14,7 @@ public class EnchantBlacklist implements Writeable {
     private final Set<String> names;
 
     public EnchantBlacklist(@NotNull Set<String> names) {
-        this.names = Lists.modify(names, String::toLowerCase);
+        this.names = Lists.modify(names, LowerCase.INTERNAL::apply);
     }
 
     @NotNull
@@ -32,6 +33,6 @@ public class EnchantBlacklist implements Writeable {
     }
 
     public boolean contains(@NotNull String name) {
-        return this.names.contains(EnchantsPlaceholders.WILDCARD) || this.names.contains(name.toLowerCase());
+        return this.names.contains(EnchantsPlaceholders.WILDCARD) || this.names.contains(LowerCase.INTERNAL.apply(name));
     }
 }

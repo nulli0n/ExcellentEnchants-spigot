@@ -4,31 +4,34 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.api.*;
-import su.nightexpress.excellentenchants.api.config.ConfigBridge;
-import su.nightexpress.excellentenchants.api.config.DistributionConfig;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.type.ProjectileEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantData;
+import su.nightexpress.excellentenchants.enchantment.EnchantDataRegistry;
 import su.nightexpress.excellentenchants.config.Config;
+import su.nightexpress.excellentenchants.enchantment.EnchantHolder;
+import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.excellentenchants.manager.block.TickedBlock;
 import su.nightexpress.excellentenchants.manager.damage.Explosion;
 import su.nightexpress.excellentenchants.manager.listener.AnvilListener;
 import su.nightexpress.excellentenchants.manager.listener.EnchantListener;
 import su.nightexpress.excellentenchants.manager.listener.GenericListener;
+import su.nightexpress.excellentenchants.manager.listener.SlotListener;
 import su.nightexpress.excellentenchants.manager.menu.EnchantsMenu;
 import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.manager.AbstractManager;
+import su.nightexpress.nightcore.util.BukkitThing;
+import su.nightexpress.nightcore.util.EntityUtil;
 import su.nightexpress.nightcore.util.Players;
 import su.nightexpress.nightcore.util.Version;
 import su.nightexpress.nightcore.util.bridge.RegistryType;
@@ -64,6 +67,10 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         this.addListener(new AnvilListener(this.plugin));
         this.addListener(new EnchantListener(this.plugin, this));
 
+        if (Version.isPaper()) {
+            this.addListener(new SlotListener(this.plugin, this));
+        }
+
         this.addAsyncTask(this::tickArrowEffects, Config.ARROW_EFFECTS_TICK_INTERVAL.get());
 
         if (!EnchantRegistry.PASSIVE.isEmpty()) {
@@ -85,56 +92,31 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
     }
 
     private void loadEnchants() {
-        if (EnchantRegistry.isLocked()) {
-            EnchantRegistry.getRegistered().forEach(CustomEnchantment::load);
-            return;
-        }
-
-        if (Version.isSpigot()) {
-            this.plugin.getRegistryHack().unfreezeRegistry();
-        }
-
-        EnchantRegistry.getDataMap().forEach((enchantId, data) -> {
-            if (DistributionConfig.isDisabled(enchantId)) return;
-
-            EnchantProvider<?> provider = EnchantRegistry.getProviderById(enchantId);
-            if (provider == null) {
-                this.plugin.error("No provider present for the '" + enchantId + "' enchantment!");
-                return;
-            }
-
-            this.loadEnchant(enchantId, data, provider);
-        });
-
-        if (Version.isSpigot()) {
-            EnchantRegistry.getRegistered().forEach(enchantment -> {
-                this.plugin.getRegistryHack().addExclusives(enchantment);
-            });
-
-            this.plugin.getRegistryHack().freezeRegistry();
-        }
-
-        EnchantRegistry.lock();
-
+        EnchantDataRegistry.getMap().forEach(this::loadEnchant);
         this.plugin.info("Loaded " + EnchantRegistry.getRegistered().size() + " enchantments.");
     }
 
-    private boolean loadEnchant(@NotNull String id, @NotNull EnchantData data, @NotNull EnchantProvider<?> provider) {
-        File file = new File(plugin.getDataFolder() + ConfigBridge.DIR_ENCHANTS, id + ".yml");
+    private boolean loadEnchant(@NotNull String id, @NotNull EnchantData data) {
+        CustomEnchantment registered = EnchantRegistry.getById(id);
+        if (registered != null) {
+            return registered.load();
+        }
+
+        File file = new File(plugin.getDataFolder() + EnchantFiles.DIR_ENCHANTS, id + ".yml");
         if (!file.exists()) {
             this.plugin.error("No config present for the '" + id + "' enchantment.");
             return false;
         }
 
-        CustomEnchantment enchantment = provider.create(file, data);
+        CustomEnchantment enchantment = data.getProvider().create(this.plugin, file, data);
 
-        Enchantment bukkitEnchant;
-        if (Version.isSpigot()) {
-            bukkitEnchant = this.plugin.getRegistryHack().registerEnchantment(enchantment);
+        Enchantment bukkitEnchant = BukkitThing.getByKey(RegistryType.ENCHANTMENT, EnchantKeys.create(id));
+        /*if (Version.isSpigot()) {
+            bukkitEnchant = BukkitThing.getByKey(RegistryType.ENCHANTMENT, EnchantKeys.custom(id));
         }
         else {
             bukkitEnchant = RegistryType.ENCHANTMENT.getRegistry().get(EnchantKeys.custom(id));
-        }
+        }*/
 
         if (bukkitEnchant == null) {
             this.plugin.error("No registered bukkit enchant found for '" + id + "'.");
@@ -145,6 +127,28 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         enchantment.onRegister(bukkitEnchant);
         EnchantRegistry.registerEnchant(enchantment);
         return true;
+    }
+
+    public void updateCache(@NotNull LivingEntity entity, @NotNull EquipmentSlot slot, @Nullable ItemStack itemStack) {
+        EnchantRegistry.getHolders().forEach(holder -> {
+            if (!holder.isCacheable()) return;
+
+            if (itemStack == null || itemStack.getType().isAir() || !EnchantUtils.isEquipment(itemStack)) {
+                holder.removeCache(entity, slot);
+                return;
+            }
+
+            Map<CustomEnchantment, Integer> allEnchants = EnchantUtils.getCustomEnchantments(itemStack);
+            holder.updateCache(entity, slot, itemStack, allEnchants);
+        });
+    }
+
+    public void clearCache(@NotNull LivingEntity entity) {
+        EnchantRegistry.getHolders().forEach(holder -> {
+            if (!holder.isCacheable()) return;
+
+            holder.clearCache(entity);
+        });
     }
 
     public void openEnchantsMenu(@NotNull Player player) {
@@ -179,7 +183,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
     private void tickPassiveEnchants() {
         this.getPassiveEnchantEntities().forEach(entity -> {
-            this.handleArmorEnchants(entity, EnchantRegistry.PASSIVE, (item, enchant, level) -> enchant.onTrigger(entity, item, level));
+            this.handleCached(entity, EntityUtil.EQUIPMENT_SLOTS, EnchantRegistry.PASSIVE, (item, enchant, level) -> enchant.onTrigger(entity, item, level));
         });
     }
 
@@ -243,8 +247,10 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         explosion.handleDamage(event);
     }
 
+    private static final EquipmentSlot[] ARMOR_SLOTS = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFF_HAND};
+
     public <T extends CustomEnchantment> void handleArmorEnchants(@NotNull LivingEntity entity, @NotNull EnchantHolder<T> holder, @NotNull EnchantUsage<T> usage) {
-        this.handleFully(entity, EnchantUtils.getEquipped(entity, holder), holder::getPriority, usage);
+        this.handleCached(entity, ARMOR_SLOTS, holder, usage);
     }
 
     public <T extends CustomEnchantment> void handleInventoryEnchants(@NotNull Player player, @NotNull EnchantHolder<T> holder, @NotNull EnchantUsage<T> usage) {
@@ -255,10 +261,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
                                                                  @NotNull EquipmentSlot slot,
                                                                  @NotNull EnchantHolder<T> holder,
                                                                  @NotNull EnchantUsage<T> usage) {
-        ItemStack itemStack = EnchantUtils.getEquipped(entity, slot);
-        if (itemStack == null || !EnchantUtils.isEquipment(itemStack)) return;
-
-        this.handleItemEnchants(entity, itemStack, holder, usage);
+        this.handleCached(entity, new EquipmentSlot[]{slot}, holder, usage);
     }
 
     public <T extends CustomEnchantment> void handleItemEnchants(@NotNull LivingEntity entity,
@@ -283,32 +286,58 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         this.handleDirect(enchants, holder::getPriority, usage);
     }
 
+    public <T extends CustomEnchantment> void handleCached(@NotNull LivingEntity entity,
+                                                           @NotNull EquipmentSlot[] slots,
+                                                           @NotNull EnchantHolder<T> holder,
+                                                           @NotNull EnchantUsage<T> usage) {
+
+        Map<ItemStack, Map<T, Integer>> enchantMap = new HashMap<>();
+        boolean noCache = entity.getType() != EntityType.PLAYER || !holder.isCacheable() || Version.isSpigot();
+
+        for (EquipmentSlot slot : slots) {
+            if (noCache || slot == EquipmentSlot.HAND) {
+                ItemStack itemStack = EntityUtil.getItemInSlot(entity, slot);
+                if (itemStack == null || itemStack.getType().isAir() || !EnchantUtils.isEquipment(itemStack)) continue;
+
+                enchantMap.put(itemStack, EnchantUtils.getCustomEnchantments(itemStack, holder));
+            }
+            else {
+                EnchantedItem<T> enchantedItem = holder.getCached(entity, slot);
+                if (enchantedItem == null) continue;
+
+                enchantMap.put(enchantedItem.getItemStack(), enchantedItem.getEnchants());
+            }
+        }
+
+        this.handleFully(entity, enchantMap, holder::getPriority, usage);
+    }
+
     public <T extends CustomEnchantment> void handleFully(@NotNull LivingEntity entity,
                                                           @NotNull Map<ItemStack, Map<T, Integer>> enchantMap,
                                                           @NotNull Function<T, EnchantPriority> priority,
                                                           @NotNull EnchantUsage<T> usage) {
 
-        this.handleDirect(enchantMap, priority, (item, enchant, level) -> {
+        this.handleDirect(enchantMap, priority, (itemStack, enchant, level) -> {
             if (!enchant.isAvailableToUse(entity)) return false;
-            if (enchant.isOutOfCharges(item)) return false;
+            if (enchant.isOutOfCharges(itemStack)) return false;
             if (enchant.hasComponent(EnchantComponent.PERIODIC) && !enchant.isTriggerTime(entity)) return false;
             if (enchant.hasComponent(EnchantComponent.PROBABILITY) && !enchant.testTriggerChance(level)) return false;
-            if (!usage.useEnchant(item, enchant, level)) return false;
+            if (!usage.useEnchant(itemStack, enchant, level)) return false;
 
-            enchant.consumeCharges(item, level);
+            enchant.consumeCharges(itemStack, level); // TODO Re-add equipment for mobs to apply changes
             return true;
         });
     }
 
     public <T extends CustomEnchantment> void handleDirect(@NotNull Map<ItemStack, Map<T, Integer>> enchantMap,
                                                            @NotNull Function<T, EnchantPriority> priority,
-                                                           @NotNull EnchantUsage<T> handler) {
-        enchantMap.forEach((item, enchants) -> {
+                                                           @NotNull EnchantUsage<T> usage) {
+        enchantMap.forEach((itemStack, enchants) -> {
             enchants.entrySet().stream().sorted(Comparator.comparingInt(entry -> priority.apply(entry.getKey()).ordinal())).forEach(entry -> {
                 T enchant = entry.getKey();
                 int level = entry.getValue();
 
-                handler.useEnchant(item, enchant, level);
+                usage.useEnchant(itemStack, enchant, level);
             });
         });
     }
