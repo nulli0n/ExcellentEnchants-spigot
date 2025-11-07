@@ -111,12 +111,6 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         CustomEnchantment enchantment = data.getProvider().create(this.plugin, file, data);
 
         Enchantment bukkitEnchant = BukkitThing.getByKey(RegistryType.ENCHANTMENT, EnchantKeys.create(id));
-        /*if (Version.isSpigot()) {
-            bukkitEnchant = BukkitThing.getByKey(RegistryType.ENCHANTMENT, EnchantKeys.custom(id));
-        }
-        else {
-            bukkitEnchant = RegistryType.ENCHANTMENT.getRegistry().get(EnchantKeys.custom(id));
-        }*/
 
         if (bukkitEnchant == null) {
             this.plugin.error("No registered bukkit enchant found for '" + id + "'.");
@@ -165,14 +159,12 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
     private void tickArrowEffects() {
         this.arrowEffects.keySet().removeIf(arrow -> !arrow.isValid() || arrow.isDead());
-        this.arrowEffects.forEach((arrow, effects) -> {
-            effects.forEach(particle -> particle.play(arrow.getLocation(), 0f, 0f, 10));
-        });
+        this.arrowEffects.forEach((arrow, effects) -> effects.forEach(particle -> particle.play(arrow.getLocation(), 0f, 0f, 10)));
     }
 
     private void tickBlocks() {
         this.tickedBlocks.values().removeIf(tickedBlock -> {
-            tickedBlock.tick();
+            this.plugin.runTask(tickedBlock.getLocation(), tickedBlock::tick);
             return tickedBlock.isDead();
         });
     }
@@ -182,9 +174,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
     }
 
     private void tickPassiveEnchants() {
-        this.getPassiveEnchantEntities().forEach(entity -> {
-            this.handleCached(entity, EntityUtil.EQUIPMENT_SLOTS, EnchantRegistry.PASSIVE, (item, enchant, level) -> enchant.onTrigger(entity, item, level));
-        });
+        this.getPassiveEnchantEntities().forEach(entity -> this.handleCached(entity, EntityUtil.EQUIPMENT_SLOTS, EnchantRegistry.PASSIVE, (item, enchant, level) -> enchant.onTrigger(entity, item, level)));
     }
 
     @NotNull
@@ -192,9 +182,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         Set<LivingEntity> entities = new HashSet<>(Players.getOnline());
 
         if (Config.PASSIVE_ENCHANTS_ALLOW_FOR_MOBS.get()) {
-            this.plugin.getServer().getWorlds().forEach(world -> {
-                entities.addAll(world.getLivingEntities());
-            });
+            this.plugin.getServer().getWorlds().forEach(world -> entities.addAll(world.getLivingEntities()));
         }
 
         entities.removeIf(Entity::isDead);
@@ -207,7 +195,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         TickedBlock tickedBlock = new TickedBlock(location, origin, lifeTime);
         this.tickedBlocks.put(location, tickedBlock);
 
-        block.setType(transform);
+        this.plugin.runTask(location, () -> block.setType(transform));
     }
 
     public boolean removeTickedBlock(@NotNull Block block) {
@@ -218,7 +206,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
         TickedBlock tickedBlock = this.tickedBlocks.remove(location);
         if (tickedBlock == null) return false;
 
-        tickedBlock.restore();
+        this.plugin.runTask(location, tickedBlock::restore);
         return true;
     }
 
@@ -228,7 +216,9 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
         this.explosions.put(entity.getUniqueId(), explosion);
 
-        return entity.getWorld().createExplosion(location, power, fire, destroy, entity);
+        final boolean[] result = {false};
+        this.plugin.runTask(location, () -> result[0] = entity.getWorld().createExplosion(location, power, fire, destroy, entity));
+        return result[0];
     }
 
     public void handleEnchantExplosion(@NotNull EntityExplodeEvent event, @NotNull LivingEntity entity) {
@@ -237,7 +227,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
         explosion.handleExplosion(event);
 
-        this.plugin.runTask(task -> this.explosions.remove(entity.getUniqueId()));
+        this.plugin.runTask(entity, () -> this.explosions.remove(entity.getUniqueId()));
     }
 
     public void handleEnchantExplosionDamage(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity entity) {
@@ -332,14 +322,13 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
     public <T extends CustomEnchantment> void handleDirect(@NotNull Map<ItemStack, Map<T, Integer>> enchantMap,
                                                            @NotNull Function<T, EnchantPriority> priority,
                                                            @NotNull EnchantUsage<T> usage) {
-        enchantMap.forEach((itemStack, enchants) -> {
-            enchants.entrySet().stream().sorted(Comparator.comparingInt(entry -> priority.apply(entry.getKey()).ordinal())).forEach(entry -> {
-                T enchant = entry.getKey();
-                int level = entry.getValue();
+        enchantMap.forEach((itemStack, enchants) ->
+              enchants.entrySet().stream().sorted(Comparator.comparingInt(entry ->
+                    priority.apply(entry.getKey()).ordinal())).forEach(entry -> {
+            T enchant = entry.getKey();
+            int level = entry.getValue();
 
-                usage.useEnchant(itemStack, enchant, level);
-            });
-        });
+            usage.useEnchant(itemStack, enchant, level);
+        }));
     }
 }
-

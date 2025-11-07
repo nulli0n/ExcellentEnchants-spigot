@@ -69,13 +69,7 @@ public class RegistryHack_1_21_5 implements RegistryHack {
     @NotNull
     private static ResourceLocation customResourceLocation(@NotNull String value) {
         return CraftNamespacedKey.toMinecraft(EnchantKeys.create(value));
-        //return ResourceLocation.fromNamespaceAndPath(ConfigBridge.getNamespace(), value);
     }
-
-//    @NotNull
-//    private static <T> ResourceKey<T> customResourceKey(@NotNull Registry<T> registry, @NotNull String name) {
-//        return ResourceKey.create(registry.key(), resourceLocation(name));
-//    }
 
     private static <T> TagKey<T> customTagKey(@NotNull Registry<T> registry, @NotNull String name) {
         return TagKey.create(registry.key(), customResourceLocation(name));
@@ -236,26 +230,6 @@ public class RegistryHack_1_21_5 implements RegistryHack {
         return CraftEnchantment.minecraftToBukkit(enchantment);
     }
 
-//    public void displayTags() {
-//        displayTag(EnchantmentTags.CURSE);
-//        displayTag(EnchantmentTags.TREASURE);
-//        displayTag(EnchantmentTags.NON_TREASURE);
-//        displayTag(EnchantmentTags.IN_ENCHANTING_TABLE);
-//        displayTag(EnchantmentTags.DOUBLE_TRADE_PRICE);
-//        displayTag(EnchantmentTags.ON_TRADED_EQUIPMENT);
-//        displayTag(EnchantmentTags.ON_MOB_SPAWN_EQUIPMENT);
-//        displayTag(EnchantmentTags.ON_RANDOM_LOOT);
-//        displayTag(EnchantmentTags.ARMOR_EXCLUSIVE);
-//        displayTag(EnchantmentTags.TRADEABLE);
-//    }
-//
-//    public void displayTag(TagKey<Enchantment> tagKey) {
-//        ENCHANTS.get(tagKey).ifPresent(holders -> {
-//            System.out.println(tagKey + ": " + holders.stream().map(Holder::value).toList());
-//        });
-//        System.out.println(" ");
-//    }
-
     private void setupDistribution(@NotNull EnchantDistribution distribution, boolean curse, @NotNull Holder.Reference<Enchantment> reference) {
         boolean experimentalTrades = SERVER.getWorldData().enabledFeatures().contains(FeatureFlags.TRADE_REBALANCE);
 
@@ -365,9 +339,6 @@ public class RegistryHack_1_21_5 implements RegistryHack {
 
         return getFrozenTags(ENCHANTS).get(customKey);
     }
-
-
-
 
     @NotNull
     private static TagKey<Enchantment> getTradeKey(@NotNull TradeType tradeType) {

@@ -69,13 +69,7 @@ public class RegistryHack_1_21_4 implements RegistryHack {
     @NotNull
     private static ResourceLocation customResourceLocation(@NotNull String value) {
         return CraftNamespacedKey.toMinecraft(EnchantKeys.create(value));
-        //return ResourceLocation.fromNamespaceAndPath(ConfigBridge.getNamespace(), value);
     }
-
-//    @NotNull
-//    private static <T> ResourceKey<T> customResourceKey(@NotNull Registry<T> registry, @NotNull String name) {
-//        return ResourceKey.create(registry.key(), resourceLocation(name));
-//    }
 
     private static <T> TagKey<T> customTagKey(@NotNull Registry<T> registry, @NotNull String name) {
         return TagKey.create(registry.key(), customResourceLocation(name));
@@ -113,7 +107,6 @@ public class RegistryHack_1_21_4 implements RegistryHack {
     @SuppressWarnings("unchecked")
     @NotNull
     private static <T> Map<TagKey<T>, HolderSet.Named<T>> getTagsMap(@NotNull Object tagSet) {
-        // new HashMap, because original is ImmutableMap.
         return new HashMap<>((Map<TagKey<T>, HolderSet.Named<T>>) Reflex.getFieldValue(tagSet, TAG_SET_MAP_FIELD));
     }
 
@@ -127,7 +120,6 @@ public class RegistryHack_1_21_4 implements RegistryHack {
     public void freezeRegistry() {
         freeze(ITEMS);
         freeze(ENCHANTS);
-        //this.displayTags();
     }
 
     private static <T> void unfreeze(@NotNull MappedRegistry<T> registry) {
@@ -210,8 +202,6 @@ public class RegistryHack_1_21_4 implements RegistryHack {
         HolderSet.Named<Item> primaryItems = getFrozenTags(ITEMS).get(customItemsTag(primaryId));
 
         Component display = CraftChatMessage.fromJSON(NightMessage.asJson(definition.getDisplayName()));
-        //HolderSet.Named<Item> supportedItems = createItemsSet("enchant_supported", customEnchantment, supCat);
-        //HolderSet.Named<Item> primaryItems = createItemsSet("enchant_primary", customEnchantment, primCat);
         int weight = definition.getWeight();
         int maxLevel = definition.getMaxLevel();
         Enchantment.Cost minCost = nmsCost(definition.getMinCost());
@@ -237,26 +227,6 @@ public class RegistryHack_1_21_4 implements RegistryHack {
         // Return the bukkit mirror.
         return CraftEnchantment.minecraftToBukkit(enchantment);
     }
-
-//    public void displayTags() {
-//        displayTag(EnchantmentTags.CURSE);
-//        displayTag(EnchantmentTags.TREASURE);
-//        displayTag(EnchantmentTags.NON_TREASURE);
-//        displayTag(EnchantmentTags.IN_ENCHANTING_TABLE);
-//        displayTag(EnchantmentTags.DOUBLE_TRADE_PRICE);
-//        displayTag(EnchantmentTags.ON_TRADED_EQUIPMENT);
-//        displayTag(EnchantmentTags.ON_MOB_SPAWN_EQUIPMENT);
-//        displayTag(EnchantmentTags.ON_RANDOM_LOOT);
-//        displayTag(EnchantmentTags.ARMOR_EXCLUSIVE);
-//        displayTag(EnchantmentTags.TRADEABLE);
-//    }
-//
-//    public void displayTag(TagKey<Enchantment> tagKey) {
-//        ENCHANTS.get(tagKey).ifPresent(holders -> {
-//            System.out.println(tagKey + ": " + holders.stream().map(Holder::value).toList());
-//        });
-//        System.out.println(" ");
-//    }
 
     private void setupDistribution(@NotNull EnchantDistribution distribution, boolean curse, @NotNull Holder.Reference<Enchantment> reference) {
         boolean experimentalTrades = SERVER.getWorldData().enabledFeatures().contains(FeatureFlags.TRADE_REBALANCE);
@@ -353,28 +323,7 @@ public class RegistryHack_1_21_4 implements RegistryHack {
 
         // Creates new tag, puts it in the 'frozenTags' map and binds holders to it.
         ITEMS.bindTag(tag, holders);
-
-        //return getFrozenTags(ITEMS).get(customKey);
     }
-
-//    @NotNull
-//    private static HolderSet.Named<Item> createItemsSet(@NotNull String prefix, @NotNull CustomEnchantment customEnchantment, @NotNull ItemsCategory category) {
-//        TagKey<Item> customKey = getTagKey(ITEMS, prefix + "/" + customEnchantment.getId());
-//        List<Holder<Item>> holders = new ArrayList<>();
-//
-//        category.getMaterialNames().forEach(material -> {
-//            ResourceLocation location = ResourceLocation.withDefaultNamespace(material);// CraftNamespacedKey.toMinecraft(material.getKey());
-//            Holder.Reference<Item> holder = ITEMS.get(location).orElse(null);
-//            if (holder == null) return;
-//
-//            holders.add(holder);
-//        });
-//
-//        // Creates new tag, puts it in the 'frozenTags' map and binds holders to it.
-//        ITEMS.bindTag(customKey, holders);
-//
-//        return getFrozenTags(ITEMS).get(customKey);
-//    }
 
     @NotNull
     private static HolderSet.Named<Enchantment> createExclusiveSet(@NotNull String id) {
@@ -386,14 +335,6 @@ public class RegistryHack_1_21_4 implements RegistryHack {
 
         return getFrozenTags(ENCHANTS).get(customKey);
     }
-
-//    private static HolderSet.Named<Enchantment> getExclusiveSet(@NotNull CustomEnchantment data) {
-//        TagKey<Enchantment> customKey = TagKey.create(Registries.ENCHANTMENT, ResourceLocation.withDefaultNamespace("exclusives/" + data.getId()));
-//        return ENCHANTS.get(customKey).orElse(null);
-//    }
-
-
-
 
     @NotNull
     private static TagKey<Enchantment> getTradeKey(@NotNull TradeType tradeType) {
