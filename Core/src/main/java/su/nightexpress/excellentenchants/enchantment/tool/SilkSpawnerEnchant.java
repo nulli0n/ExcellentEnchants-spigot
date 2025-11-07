@@ -94,7 +94,7 @@ public class SilkSpawnerEnchant extends GameEnchantment implements MiningEnchant
         World world = block.getWorld();
 
         // Drop it directly in the world, bcuz BlockDropItemEvent won't fire for spawners unless setDropItems is set on true in BlockBreakEvent.
-        world.dropItemNaturally(location, this.getSpawner(spawner));
+        this.plugin.runTask(location, () -> world.dropItemNaturally(location, this.getSpawner(spawner)));
         return true;
     }
 

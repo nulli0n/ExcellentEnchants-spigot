@@ -58,11 +58,13 @@ public class BomberEnchant extends GameEnchantment implements BowEnchant {
 
         int fuseTicks = Math.max(1, this.getFuseTicks(level));
 
-        TNTPrimed primed = projectile.getWorld().spawn(projectile.getLocation(), TNTPrimed.class);
-        primed.setVelocity(projectile.getVelocity().multiply(event.getForce() * 1.25));
-        primed.setFuseTicks(fuseTicks);
-        primed.setSource(shooter);
-        event.setProjectile(primed);
+        this.plugin.runTask(projectile.getLocation(), () -> {
+            TNTPrimed primed = projectile.getWorld().spawn(projectile.getLocation(), TNTPrimed.class);
+            primed.setVelocity(projectile.getVelocity().multiply(event.getForce() * 1.25));
+            primed.setFuseTicks(fuseTicks);
+            primed.setSource(shooter);
+            event.setProjectile(primed);
+        });
         return true;
     }
 }

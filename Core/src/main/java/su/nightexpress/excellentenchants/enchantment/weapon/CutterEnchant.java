@@ -91,9 +91,13 @@ public class CutterEnchant extends GameEnchantment implements AttackEnchant {
         armor[get] = null;
         equipment.setArmorContents(armor);
 
-        Item drop = victim.getWorld().dropItemNaturally(victim.getLocation(), itemCut);
-        drop.setPickupDelay(50);
-        drop.getVelocity().multiply(3D);
+        this.plugin.runTask(victim.getLocation(), () -> {
+            Item drop = victim.getWorld().dropItemNaturally(victim.getLocation(), itemCut);
+            this.plugin.runTask(drop, () -> {
+                drop.setPickupDelay(50);
+                drop.getVelocity().multiply(3D);
+            });
+        });
 
         if (this.hasVisualEffects()) {
             UniParticle.itemCrack(itemCut).play(victim.getEyeLocation(), 0.25, 0.15, 30);

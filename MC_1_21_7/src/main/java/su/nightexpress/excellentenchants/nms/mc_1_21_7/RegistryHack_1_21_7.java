@@ -324,8 +324,6 @@ public class RegistryHack_1_21_7 implements RegistryHack {
 
         // Creates new tag, puts it in the 'frozenTags' map and binds holders to it.
         ITEMS.bindTag(tag, holders);
-
-        //return getFrozenTags(ITEMS).get(customKey);
     }
 
     @NotNull
@@ -338,9 +336,6 @@ public class RegistryHack_1_21_7 implements RegistryHack {
 
         return getFrozenTags(ENCHANTS).get(customKey);
     }
-
-
-
 
     @NotNull
     private static TagKey<Enchantment> getTradeKey(@NotNull TradeType tradeType) {

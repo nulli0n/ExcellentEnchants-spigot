@@ -29,7 +29,7 @@ public class SoulboundEnchant extends GameEnchantment implements InventoryEnchan
         if (event.getKeepInventory()) return false;
 
         event.getDrops().remove(itemStack);
-        this.plugin.runTask(task -> Players.addItem(event.getEntity(), itemStack));
+        this.plugin.runTask(event.getEntity(), () -> Players.addItem(event.getEntity(), itemStack));
         return true;
     }
 }

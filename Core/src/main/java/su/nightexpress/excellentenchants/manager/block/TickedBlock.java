@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.manager.block;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.nightcore.util.EntityUtil;
 import su.nightexpress.nightcore.util.LocationUtil;
@@ -35,9 +36,10 @@ public class TickedBlock {
     public void sendDamageInfo(float progress) {
         if (!this.location.isWorldLoaded()) return;
 
-        this.location.getWorld().getPlayers().forEach(player -> {
-            player.sendBlockDamage(this.location, progress, this.sourceId);
-        });
+        World world = this.location.getWorld();
+        if (world != null) {
+            world.getPlayers().forEach(player -> player.sendBlockDamage(this.location, progress, this.sourceId));
+        }
     }
 
     public void tick() {
@@ -56,6 +58,11 @@ public class TickedBlock {
 
     public float getProgress() {
         return (float) this.livedTicks / (float) this.lifeTime;
+    }
+
+    @NotNull
+    public Location getLocation() {
+        return this.location;
     }
 
     public boolean isDead() {

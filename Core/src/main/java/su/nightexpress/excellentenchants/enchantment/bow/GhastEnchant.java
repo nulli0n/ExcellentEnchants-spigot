@@ -67,11 +67,11 @@ public class GhastEnchant extends GameEnchantment implements BowEnchant {
         // as large ones has a slow speed and punches each other on shoot.
         if (EnchantUtils.contains(bow, Enchantment.MULTISHOT)) {
             fireball = shooter.launchProjectile(SmallFireball.class);
-            fireball.setVelocity(projectile.getVelocity().normalize().multiply(0.5f));
+            this.plugin.runTask(fireball, () -> fireball.setVelocity(projectile.getVelocity().normalize().multiply(0.5f)));
         }
         else {
             fireball = shooter.launchProjectile(Fireball.class);
-            fireball.setDirection(projectile.getVelocity());
+            this.plugin.runTask(fireball, () -> fireball.setDirection(projectile.getVelocity()));
         }
         fireball.setIsIncendiary(this.fireSpread);
         fireball.setYield(this.getYield(level));

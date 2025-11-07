@@ -50,9 +50,7 @@ public class StoppingForceEnchant extends GameEnchantment implements DefendEncha
     public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         double reduction = 1D - Math.max(0, this.getKnockbackReduction(level));
 
-        this.plugin.runTask(task -> {
-            victim.setVelocity(victim.getVelocity().multiply(reduction));
-        });
+        this.plugin.runTask(victim, () -> victim.setVelocity(victim.getVelocity().multiply(reduction)));
         return true;
     }
 }

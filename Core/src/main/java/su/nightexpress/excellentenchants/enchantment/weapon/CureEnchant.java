@@ -52,12 +52,14 @@ public class CureEnchant extends GameEnchantment implements AttackEnchant {
         }
 
         if (victim instanceof PigZombie) {
-            victim.getWorld().spawn(victim.getLocation(), Piglin.class);
-            victim.remove();
+            this.plugin.runTask(victim.getLocation(), () -> victim.getWorld().spawn(victim.getLocation(), Piglin.class));
+            this.plugin.runTask(victim, victim::remove);
         }
         else if (victim instanceof ZombieVillager zombieVillager) {
-            zombieVillager.setConversionTime(1);
-            zombieVillager.setConversionPlayer(player);
+            this.plugin.runTask(zombieVillager, () -> {
+                zombieVillager.setConversionTime(1);
+                zombieVillager.setConversionPlayer(player);
+            });
         }
         return true;
     }

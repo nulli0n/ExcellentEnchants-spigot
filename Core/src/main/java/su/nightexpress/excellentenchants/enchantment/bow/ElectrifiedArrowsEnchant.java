@@ -55,13 +55,15 @@ public class ElectrifiedArrowsEnchant extends GameEnchantment implements ArrowEn
 
     private void summonLightning(@NotNull Block block) {
         Location location = block.getLocation();
-        block.getWorld().strikeLightningEffect(location);
+        this.plugin.runTask(location, () -> {
+            block.getWorld().strikeLightningEffect(location);
 
-        if (this.hasVisualEffects()) {
-            Location center = LocationUtil.setCenter2D(location.add(0, 1, 0));
-            UniParticle.blockCrack(block.getType()).play(center, 0.5, 0.1, 100);
-            UniParticle.of(Particle.ELECTRIC_SPARK).play(center, 0.75, 0.05, 120);
-        }
+            if (this.hasVisualEffects()) {
+                Location center = LocationUtil.setCenter2D(location.add(0, 1, 0));
+                UniParticle.blockCrack(block.getType()).play(center, 0.5, 0.1, 100);
+                UniParticle.of(Particle.ELECTRIC_SPARK).play(center, 0.75, 0.05, 120);
+            }
+        });
     }
 
     @Override

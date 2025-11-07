@@ -45,7 +45,7 @@ public class EnderBowEnchant extends GameEnchantment implements BowEnchant {
         if (!(event.getProjectile() instanceof Projectile projectile)) return false;
 
         EnderPearl pearl = shooter.launchProjectile(EnderPearl.class);
-        pearl.setVelocity(projectile.getVelocity());
+        this.plugin.runTask(pearl, () -> pearl.setVelocity(projectile.getVelocity()));
         event.setProjectile(pearl);
         return true;
     }

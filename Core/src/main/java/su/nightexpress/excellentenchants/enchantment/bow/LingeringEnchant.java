@@ -90,24 +90,26 @@ public class LingeringEnchant extends GameEnchantment implements ArrowEnchant {
 
         ThrownPotion potion = shooter.launchProjectile(ThrownPotion.class);
         potion.setItem(item);
-        potion.teleport(location);
+        potion.teleportAsync(location);
 
-        AreaEffectCloud cloud = potion.getWorld().spawn(location, AreaEffectCloud.class);
-        cloud.clearCustomEffects();
-        cloud.setSource(shooter);
-        cloud.setWaitTime(10);
-        cloud.setRadius(3F); // 3.0
-        cloud.setRadiusOnUse(-0.5F);
-        cloud.setDuration(600); // 600
-        cloud.setRadiusPerTick(-cloud.getRadius() / (float)cloud.getDuration());
-        cloud.setBasePotionType(arrow.getBasePotionType());
-        effects.forEach(potionEffect -> cloud.addCustomEffect(potionEffect, false));
+        this.plugin.runTask(location, () -> {
+            AreaEffectCloud cloud = potion.getWorld().spawn(location, AreaEffectCloud.class);
+            cloud.clearCustomEffects();
+            cloud.setSource(shooter);
+            cloud.setWaitTime(10);
+            cloud.setRadius(3F); // 3.0
+            cloud.setRadiusOnUse(-0.5F);
+            cloud.setDuration(600); // 600
+            cloud.setRadiusPerTick(-cloud.getRadius() / (float)cloud.getDuration());
+            cloud.setBasePotionType(arrow.getBasePotionType());
+            effects.forEach(potionEffect -> cloud.addCustomEffect(potionEffect, false));
 
-        LingeringPotionSplashEvent splashEvent = new LingeringPotionSplashEvent(potion, hitEntity, hitBlock, hitFace, cloud);
-        plugin.getPluginManager().callEvent(splashEvent);
-        if (splashEvent.isCancelled()) {
-            cloud.remove();
-        }
-        potion.remove();
+            LingeringPotionSplashEvent splashEvent = new LingeringPotionSplashEvent(potion, hitEntity, hitBlock, hitFace, cloud);
+            plugin.getPluginManager().callEvent(splashEvent);
+            if (splashEvent.isCancelled()) {
+                cloud.remove();
+            }
+            potion.remove();
+        });
     }
 }

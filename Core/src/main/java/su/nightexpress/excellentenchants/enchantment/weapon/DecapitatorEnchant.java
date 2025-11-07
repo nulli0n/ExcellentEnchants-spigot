@@ -105,7 +105,7 @@ public class DecapitatorEnchant extends GameEnchantment implements KillEnchant {
             }
         }
 
-        entity.getWorld().dropItemNaturally(entity.getLocation(), item.getItemStack());
+        this.plugin.runTask(entity, () -> entity.getWorld().dropItemNaturally(entity.getLocation(), item.getItemStack()));
 
         if (this.hasVisualEffects()) {
             UniParticle.blockCrack(Material.REDSTONE_BLOCK).play(entity.getEyeLocation(), 0.25, 0.15, 30);
