@@ -22,7 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantRegistry;
+import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.excellentenchants.api.damage.DamageBonus;
 import su.nightexpress.excellentenchants.api.damage.DamageBonusType;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
@@ -193,6 +193,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
 
         if (source.getCausingEntity() instanceof LivingEntity damager) {
             if (source.getDamageType() == DamageType.THORNS) return;
+            if (damager == victim) return;
 
             this.manager.handleArmorEnchants(victim, EnchantRegistry.DEFEND, (item, enchant, level) -> enchant.onProtect(event, damager, victim, item, level));
         }
@@ -203,16 +204,16 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
         LivingEntity entity = event.getEntity();
         Player killer = entity.getKiller();
 
+        if (event instanceof PlayerDeathEvent deathEvent) {
+            Player player = deathEvent.getPlayer();
+            this.manager.handleInventoryEnchants(player, EnchantRegistry.INVENTORY, (item, enchant, level) -> enchant.onDeath(deathEvent, player, item, level));
+        }
+
         if (killer != null) {
             this.manager.handleItemEnchants(killer, EquipmentSlot.HAND, EnchantRegistry.KILL, (item, enchant, level) -> enchant.onKill(event, entity, killer, item, level));
         }
 
         this.manager.handleArmorEnchants(entity, EnchantRegistry.DEATH, (item, enchant, level) -> enchant.onDeath(event, entity, item, level));
-
-        if (event instanceof PlayerDeathEvent deathEvent) {
-            Player player = deathEvent.getPlayer();
-            this.manager.handleInventoryEnchants(player, EnchantRegistry.INVENTORY, (item, enchant, level) -> enchant.onDeath(deathEvent, player, item, level));
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

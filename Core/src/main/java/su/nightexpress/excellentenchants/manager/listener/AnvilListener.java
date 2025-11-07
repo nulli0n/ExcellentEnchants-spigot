@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.view.AnvilView;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.config.DistributionConfig;
+import su.nightexpress.excellentenchants.bridge.DistributionConfig;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Keys;
@@ -75,7 +75,7 @@ public class AnvilListener extends AbstractListener<EnchantsPlugin> {
     private boolean handleCombine(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
         ItemStack merged = new ItemStack(result.getType().isAir() ? first : result);
 
-        if (EnchantUtils.countCustomEnchantments(merged) > DistributionConfig.ANVIL_ENCHANT_LIMIT.get()) {
+        if (EnchantUtils.countCustomEnchantments(first) >= DistributionConfig.ANVIL_ENCHANT_LIMIT.get()) {
             event.setResult(null);
             return false;
         }

@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantData;
+import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.Modifier;

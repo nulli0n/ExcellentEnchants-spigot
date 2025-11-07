@@ -11,6 +11,10 @@ public class EnchantsAPI {
         EnchantsAPI.plugin = plugin;
     }
 
+    static void clear() {
+        plugin = null;
+    }
+
     @NotNull
     public static EnchantsPlugin getPlugin() {
         if (plugin == null) throw new IllegalStateException("API is not initialized!");

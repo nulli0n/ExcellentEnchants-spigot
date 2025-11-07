@@ -7,9 +7,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.recipe.data.MerchantOffer;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMerchantOffers;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -53,6 +51,18 @@ public class PacketEventsHook {
                     windowItems.getItems().replaceAll(packetItem -> {
                         return fromBukkit(EnchantUtils.addDescription(toBukkit(packetItem)));
                     });
+                }
+                case PacketType.Play.Server.SET_PLAYER_INVENTORY -> {
+                    WrapperPlayServerSetPlayerInventory setPlayerInventory = new WrapperPlayServerSetPlayerInventory(event);
+
+                    ItemStack stack = EnchantUtils.addDescription(toBukkit(setPlayerInventory.getStack()));
+                    setPlayerInventory.setStack(fromBukkit(stack));
+                }
+                case PacketType.Play.Server.SET_CURSOR_ITEM -> {
+                    WrapperPlayServerSetCursorItem setCursorItem = new WrapperPlayServerSetCursorItem(event);
+
+                    ItemStack stack = EnchantUtils.addDescription(toBukkit(setCursorItem.getStack()));
+                    setCursorItem.setStack(fromBukkit(stack));
                 }
                 case PacketType.Play.Server.MERCHANT_OFFERS -> {
                     WrapperPlayServerMerchantOffers merchantOffers = new WrapperPlayServerMerchantOffers(event);

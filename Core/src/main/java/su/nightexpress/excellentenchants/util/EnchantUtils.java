@@ -9,7 +9,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,8 +16,8 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.api.EnchantHolder;
-import su.nightexpress.excellentenchants.api.EnchantRegistry;
+import su.nightexpress.excellentenchants.enchantment.EnchantHolder;
+import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockEnchant;
@@ -260,14 +259,6 @@ public class EnchantUtils {
         return map;
     }
 
-    @Nullable
-    public static ItemStack getEquipped(@NotNull LivingEntity entity, @NotNull EquipmentSlot slot) {
-        EntityEquipment equipment = entity.getEquipment();
-        if (equipment == null) return null;
-
-        return equipment.getItem(slot);
-    }
-
     @NotNull
     public static <T extends CustomEnchantment> Map<ItemStack, Map<T, Integer>> getAll(@NotNull Player player, @NotNull EnchantHolder<T> holder) {
         Map<ItemStack, Map<T, Integer>> map = new HashMap<>();
@@ -284,6 +275,7 @@ public class EnchantUtils {
     }
 
     @NotNull
+    @Deprecated
     public static <T extends CustomEnchantment> Map<ItemStack, Map<T, Integer>> getEquipped(@NotNull LivingEntity entity, @NotNull EnchantHolder<T> holder) {
         Map<ItemStack, Map<T, Integer>> map = new HashMap<>();
 

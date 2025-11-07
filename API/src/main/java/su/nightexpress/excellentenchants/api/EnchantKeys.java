@@ -2,12 +2,14 @@ package su.nightexpress.excellentenchants.api;
 
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.api.config.ConfigBridge;
+import su.nightexpress.excellentenchants.bridge.DistributionConfig;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class EnchantKeys {
+
+    public static final String NAMESPACE = "excellentenchants";
 
     private static final Set<NamespacedKey> VANILLA_KEYS = new HashSet<>();
 
@@ -59,8 +61,8 @@ public class EnchantKeys {
     }
 
     @NotNull
-    public static NamespacedKey adaptCustom(@NotNull NamespacedKey from) {
-        return isVanilla(from) ? from : custom(from.getKey());
+    public static NamespacedKey createOrVanilla(@NotNull NamespacedKey from) {
+        return isVanilla(from) ? from : create(from.getKey());
     }
 
     @NotNull
@@ -71,7 +73,12 @@ public class EnchantKeys {
     }
 
     @NotNull
-    public static NamespacedKey custom(@NotNull String string) {
-        return new NamespacedKey(ConfigBridge.getNamespace(), string);
+    public static NamespacedKey create(@NotNull String string) {
+        return new NamespacedKey(getNamespace(), string);
+    }
+
+    @NotNull
+    public static String getNamespace() {
+        return DistributionConfig.CUSTOM_NAMESPACE_ENABLED.get() ? NAMESPACE : NamespacedKey.MINECRAFT;
     }
 }

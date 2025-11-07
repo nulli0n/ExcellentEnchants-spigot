@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MenuType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantData;
+import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.type.ContainerEnchant;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;

@@ -26,14 +26,15 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.api.EnchantKeys;
-import su.nightexpress.excellentenchants.api.config.DistributionConfig;
+import su.nightexpress.excellentenchants.api.IEnchantData;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.item.ItemSet;
-import su.nightexpress.excellentenchants.api.item.ItemSetRegistry;
 import su.nightexpress.excellentenchants.api.wrapper.EnchantCost;
 import su.nightexpress.excellentenchants.api.wrapper.EnchantDefinition;
 import su.nightexpress.excellentenchants.api.wrapper.EnchantDistribution;
 import su.nightexpress.excellentenchants.api.wrapper.TradeType;
+import su.nightexpress.excellentenchants.bridge.DistributionConfig;
+import su.nightexpress.excellentenchants.bridge.RegistryHack;
 import su.nightexpress.nightcore.NightPlugin;
 import su.nightexpress.nightcore.util.Reflex;
 import su.nightexpress.nightcore.util.text.night.NightMessage;
@@ -42,7 +43,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public class RegistryHack_1_21_8 implements su.nightexpress.excellentenchants.nms.RegistryHack {
+public class RegistryHack_1_21_8 implements RegistryHack {
 
     private static final MinecraftServer             SERVER;
     private static final MappedRegistry<Enchantment> ENCHANTS;
@@ -67,7 +68,7 @@ public class RegistryHack_1_21_8 implements su.nightexpress.excellentenchants.nm
 
     @NotNull
     private static ResourceLocation customResourceLocation(@NotNull String value) {
-        return CraftNamespacedKey.toMinecraft(EnchantKeys.custom(value));
+        return CraftNamespacedKey.toMinecraft(EnchantKeys.create(value));
     }
 
     private static <T> TagKey<T> customTagKey(@NotNull Registry<T> registry, @NotNull String name) {
@@ -114,8 +115,6 @@ public class RegistryHack_1_21_8 implements su.nightexpress.excellentenchants.nm
     public void unfreezeRegistry() {
         unfreeze(ENCHANTS);
         unfreeze(ITEMS);
-
-        ItemSetRegistry.getByIdMap().forEach(RegistryHack_1_21_8::createItemsSet);
     }
 
     @Override
@@ -164,10 +163,8 @@ public class RegistryHack_1_21_8 implements su.nightexpress.excellentenchants.nm
     }
 
     private static <T> void unbound(@NotNull MappedRegistry<T> registry) {
-        Class<?> tagSetClass = Reflex.getInnerClass(MappedRegistry.class.getName(), "a");  // TagSet for PaperMC
-        if (tagSetClass == null) throw new IllegalStateException("TagSet class not found!");
-
-        Method unboundMethod = Reflex.getMethod(tagSetClass, TAG_SET_UNBOUND_METHOD);
+        Class<?> tagSetClass = Reflex.safeInnerClass(MappedRegistry.class.getName(), "a");
+        Method unboundMethod = Reflex.safeMethod(tagSetClass, TAG_SET_UNBOUND_METHOD);
         Object unboundTagSet = Reflex.invokeMethod(unboundMethod, registry); // new TagSet object.
 
         Reflex.setFieldValue(registry, REGISTRY_ALL_TAGS_FIELD, unboundTagSet);
@@ -195,33 +192,26 @@ public class RegistryHack_1_21_8 implements su.nightexpress.excellentenchants.nm
 
     @Override
     @Nullable
-    public org.bukkit.enchantments.Enchantment registerEnchantment(@NotNull CustomEnchantment customEnchantment) {
-        EnchantDefinition definition = customEnchantment.getDefinition();
+    public org.bukkit.enchantments.Enchantment registerEnchantment(@NotNull String id, @NotNull IEnchantData data, @NotNull EquipmentSlot[] enchantSlots) {
+        EnchantDefinition definition = data.getDefinition();
+        EnchantDistribution distribution = data.getDistribution();
 
         String primaryId = definition.getPrimaryItemsId();
         String supportedId = definition.getSupportedItemsId();
 
-        ItemSet primarySet = ItemSetRegistry.getById(primaryId);
-        ItemSet supportedSet = ItemSetRegistry.getById(supportedId);
-
-        if (primarySet == null || supportedSet == null) {
-            this.plugin.error("Could not register enchantment '" + customEnchantment.getId() + "' due to invalid primary/supported items sets: " + primaryId + "/" + supportedId);
-            return null;
-        }
-
         HolderSet.Named<Item> supportedItems = getFrozenTags(ITEMS).get(customItemsTag(supportedId));
         HolderSet.Named<Item> primaryItems = getFrozenTags(ITEMS).get(customItemsTag(primaryId));
 
-        Component display = CraftChatMessage.fromJSON(NightMessage.asJson(customEnchantment.getDisplayName()));
+        Component display = CraftChatMessage.fromJSON(NightMessage.asJson(definition.getDisplayName()));
         int weight = definition.getWeight();
         int maxLevel = definition.getMaxLevel();
         Enchantment.Cost minCost = nmsCost(definition.getMinCost());
         Enchantment.Cost maxCost = nmsCost(definition.getMaxCost());
         int anvilCost = definition.getAnvilCost();
-        EquipmentSlotGroup[] slots = nmsSlots(supportedSet);
+        EquipmentSlotGroup[] slots = nmsSlots(enchantSlots);
 
         Enchantment.EnchantmentDefinition nmsDefinition = Enchantment.definition(supportedItems, primaryItems, weight, maxLevel, minCost, maxCost, anvilCost, slots);
-        HolderSet<Enchantment> exclusiveSet = createExclusiveSet(customEnchantment);
+        HolderSet<Enchantment> exclusiveSet = createExclusiveSet(id);
         DataComponentMap.Builder builder = DataComponentMap.builder();
 
         Enchantment enchantment = new Enchantment(display, nmsDefinition, exclusiveSet, builder.build());
@@ -230,18 +220,17 @@ public class RegistryHack_1_21_8 implements su.nightexpress.excellentenchants.nm
         Holder.Reference<Enchantment> reference = ENCHANTS.createIntrusiveHolder(enchantment);
 
         // Add it into Registry.
-        Registry.register(ENCHANTS, customEnchantKey(customEnchantment.getId()), enchantment);
+        Registry.register(ENCHANTS, customEnchantKey(id), enchantment);
 
         // Now it's possible to add/remove it from vanilla tags since we have a valid, registered Reference.
-        this.setupDistribution(customEnchantment, reference);
+        this.setupDistribution(distribution, data.isCurse(), reference);
 
         // Return the bukkit mirror.
         return CraftEnchantment.minecraftToBukkit(enchantment);
     }
 
-    private void setupDistribution(@NotNull CustomEnchantment customEnchantment, @NotNull Holder.Reference<Enchantment> reference) {
+    private void setupDistribution(@NotNull EnchantDistribution distribution, boolean curse, @NotNull Holder.Reference<Enchantment> reference) {
         boolean experimentalTrades = SERVER.getWorldData().enabledFeatures().contains(FeatureFlags.TRADE_REBALANCE);
-        EnchantDistribution distribution = customEnchantment.getDistribution();
 
         // Any enchantment can be treasure.
         if (distribution.isTreasure()) {
@@ -281,7 +270,7 @@ public class RegistryHack_1_21_8 implements su.nightexpress.excellentenchants.nm
             else removeFromTag(EnchantmentTags.TRADEABLE, reference);
         }
 
-        if (customEnchantment.isCurse()) {
+        if (curse) {
             addInTag(EnchantmentTags.CURSE, reference);
         }
         else {
@@ -320,11 +309,12 @@ public class RegistryHack_1_21_8 implements su.nightexpress.excellentenchants.nm
         registry.bindTag(tagKey, contents);
     }
 
-    private static void createItemsSet(@NotNull String id, @NotNull ItemSet category) {
+    @Override
+    public void createItemsSet(@NotNull String id, @NotNull ItemSet itemSet) {
         TagKey<Item> tag = customItemsTag(id);
         List<Holder<Item>> holders = new ArrayList<>();
 
-        category.getMaterials().forEach(material -> {
+        itemSet.getMaterials().forEach(material -> {
             ResourceLocation location = ResourceLocation.withDefaultNamespace(material);// CraftNamespacedKey.toMinecraft(material.getKey());
             Holder.Reference<Item> holder = ITEMS.get(location).orElse(null);
             if (holder == null) return;
@@ -337,8 +327,8 @@ public class RegistryHack_1_21_8 implements su.nightexpress.excellentenchants.nm
     }
 
     @NotNull
-    private static HolderSet.Named<Enchantment> createExclusiveSet(@NotNull CustomEnchantment customEnchantment) {
-        TagKey<Enchantment> customKey = customTagKey(ENCHANTS, "exclusive_set/" + customEnchantment.getId());
+    private static HolderSet.Named<Enchantment> createExclusiveSet(@NotNull String id) {
+        TagKey<Enchantment> customKey = customTagKey(ENCHANTS, "exclusive_set/" + id);
         List<Holder<Enchantment>> holders = new ArrayList<>();
 
         // Creates new tag, puts it in the 'frozenTags' map and binds holders to it.
@@ -372,8 +362,7 @@ public class RegistryHack_1_21_8 implements su.nightexpress.excellentenchants.nm
         return new Enchantment.Cost(cost.base(), cost.perLevel());
     }
 
-    private static EquipmentSlotGroup[] nmsSlots(@NotNull ItemSet category) {
-        EquipmentSlot[] slots = category.getSlots();
+    private static EquipmentSlotGroup[] nmsSlots(@NotNull EquipmentSlot[] slots) {
         EquipmentSlotGroup[] nmsSlots = new EquipmentSlotGroup[slots.length];
 
         for (int index = 0; index < nmsSlots.length; index++) {

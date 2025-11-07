@@ -10,7 +10,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantData;
+import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.EnchantPriority;

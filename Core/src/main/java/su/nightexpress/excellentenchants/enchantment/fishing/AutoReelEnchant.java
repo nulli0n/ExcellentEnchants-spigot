@@ -7,7 +7,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantData;
+import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
@@ -47,6 +47,7 @@ public class AutoReelEnchant extends GameEnchantment implements FishingEnchant {
 
             player.swingHand(slot);
             event.getHook().retrieve(slot);
+            player.damageItemStack(itemStack, 1);
         });
         return true;
     }

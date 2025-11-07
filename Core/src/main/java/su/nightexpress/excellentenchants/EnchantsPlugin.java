@@ -1,77 +1,67 @@
 package su.nightexpress.excellentenchants;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.api.EnchantDefaults;
-import su.nightexpress.excellentenchants.api.EnchantRegistry;
-import su.nightexpress.excellentenchants.api.config.ConfigBridge;
 import su.nightexpress.excellentenchants.api.item.ItemSetRegistry;
+import su.nightexpress.excellentenchants.bridge.spigot.SpigotEnchantsBootstrap;
 import su.nightexpress.excellentenchants.command.BaseCommands;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.config.Perms;
+import su.nightexpress.excellentenchants.enchantment.EnchantDataRegistry;
 import su.nightexpress.excellentenchants.hook.HookPlugin;
 import su.nightexpress.excellentenchants.hook.impl.PacketEventsHook;
 import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
 import su.nightexpress.excellentenchants.hook.impl.ProtocolLibHook;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
-import su.nightexpress.excellentenchants.manager.EnchantProviders;
-import su.nightexpress.excellentenchants.nms.RegistryHack;
-import su.nightexpress.excellentenchants.nms.mc_1_21_7.RegistryHack_1_21_7;
-import su.nightexpress.excellentenchants.nms.mc_1_21_8.RegistryHack_1_21_8;
-import su.nightexpress.excellentenchants.nms.v1_21_4.RegistryHack_1_21_4;
-import su.nightexpress.excellentenchants.nms.v1_21_5.RegistryHack_1_21_5;
 import su.nightexpress.nightcore.NightPlugin;
-import su.nightexpress.nightcore.command.experimental.ImprovedCommands;
+import su.nightexpress.nightcore.commands.command.NightCommand;
 import su.nightexpress.nightcore.config.PluginDetails;
 import su.nightexpress.nightcore.util.Plugins;
 import su.nightexpress.nightcore.util.Version;
 
-import java.io.File;
-
-public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
+public class EnchantsPlugin extends NightPlugin {
 
     private EnchantManager enchantManager;
-    private RegistryHack   registryHack;
 
     @Override
     @NotNull
     protected PluginDetails getDefaultDetails() {
         return PluginDetails.create("Enchants", new String[]{"eenchants", "excellentenchants"})
             .setConfigClass(Config.class)
-            .setLangClass(Lang.class)
             .setPermissionsClass(Perms.class);
     }
 
     @Override
-    public void enable() {
-        this.loadAPI();
+    protected boolean disableCommandManager() {
+        return true;
+    }
+
+    @Override
+    protected void addRegistries() {
+        super.addRegistries();
+        this.registerLang(Lang.class);
+    }
+
+    @Override
+    protected void onStartup() {
+        super.onStartup();
+
+        EnchantsAPI.load(this);
+        Keys.loadKeys(this);
 
         if (Version.isSpigot()) {
-            this.loadInternals();
-            if (this.registryHack == null) {
-                this.error("Unsupported server version!");
-                this.getPluginManager().disablePlugin(this);
-                return;
-            }
-
-            File dataDir = this.getDataFolder();
-
-            ConfigBridge.load(dataDir, false); // Load distribution config, assign isPaper field.
-            ItemSetRegistry.load(dataDir); // Load default item types, uses ConfigBridge.isPaper() to determine which items source to use.
-            EnchantDefaults.load(dataDir); // Load defaults and read from the config files Definition and Distribution settings for enchants.
+            new SpigotEnchantsBootstrap().bootstrap(this);
         }
+    }
 
-        if (!EnchantRegistry.isLocked()) {
-            EnchantProviders.load(this);
-        }
-
-        this.loadCommands();
-
+    @Override
+    public void enable() {
         this.enchantManager = new EnchantManager(this);
         this.enchantManager.setup();
 
         this.loadHooks();
+        this.loadCommands();
     }
 
     @Override
@@ -81,28 +71,20 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
         }
 
         if (this.enchantManager != null) this.enchantManager.shutdown();
+    }
 
+    @Override
+    protected void onShutdown() {
+        super.onShutdown();
+
+        ItemSetRegistry.clear();
+        EnchantDataRegistry.clear();
         Keys.clear();
-    }
-
-    private void loadInternals() {
-        //boolean isSpigot = Version.isSpigot();
-
-        switch (Version.getCurrent()) {
-            case MC_1_21_4 -> this.registryHack = new RegistryHack_1_21_4(this);
-            case MC_1_21_5 -> this.registryHack = new RegistryHack_1_21_5(this);
-            case MC_1_21_7 -> this.registryHack = new RegistryHack_1_21_7(this);
-            case MC_1_21_8 -> this.registryHack = new RegistryHack_1_21_8(this);
-        }
-    }
-
-    private void loadAPI() {
-        EnchantsAPI.load(this);
-        Keys.loadKeys(this);
+        EnchantsAPI.clear();
     }
 
     private void loadCommands() {
-        BaseCommands.load(this);
+        this.rootCommand = NightCommand.forPlugin(this, builder -> new BaseCommands(this).load(builder));
     }
 
     private void loadHooks() {
@@ -127,17 +109,4 @@ public class EnchantsPlugin extends NightPlugin implements ImprovedCommands {
     public EnchantManager getEnchantManager() {
         return this.enchantManager;
     }
-
-//    @NotNull
-//    public EnchantNMS getEnchantNMS() {
-//        return this.enchantNMS;
-//    }
-
-    public RegistryHack getRegistryHack() {
-        return this.registryHack;
-    }
-
-//    public boolean hasInternals() {
-//        return this.enchantNMS != null;
-//    }
 }

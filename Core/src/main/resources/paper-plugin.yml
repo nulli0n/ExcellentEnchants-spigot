@@ -1,35 +1,26 @@
 main: su.nightexpress.excellentenchants.EnchantsPlugin
-bootstrapper: su.nightexpress.excellentenchants.EnchantsBootstrap
+bootstrapper: su.nightexpress.excellentenchants.bridge.paper.PaperEnchantsBootstrap
 name: ExcellentEnchants
 version: '${project.version}'
 description: A lot of new enchantments properly integrated into the server!
 api-version: '1.21'
-folia-supported: true
 #loader: io.papermc.testplugin.TestPluginLoader
 dependencies:
   bootstrap:
     nightcore:
       load: BEFORE
       required: true
-      join-classpath: true
   server:
     nightcore:
       load: BEFORE
       required: true
-      join-classpath: true
     ProtocolLib:
       load: BEFORE
       required: false
-      join-classpath: true
     packetevents:
       load: BEFORE
       required: false
-      join-classpath: true
     PlaceholderAPI:
-      load: OMIT
       required: false
-      join-classpath: true
     MythicMobs:
-      load: OMIT
       required: false
-      join-classpath: true

@@ -3,8 +3,8 @@ package su.nightexpress.excellentenchants.api.wrapper;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.api.EnchantId;
+import su.nightexpress.excellentenchants.api.EnchantKeys;
 import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
-import su.nightexpress.excellentenchants.api.config.ConfigBridge;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.config.Writeable;
@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Set;
 
 public class EnchantDefinition implements Writeable {
+
+    public static final int LEVEL_CAP  = 255;
+    public static final int WEIGHT_CAP = 1024;
 
     private final String       displayName;
     private final List<String> description;
@@ -42,8 +45,8 @@ public class EnchantDefinition implements Writeable {
                              @NotNull Set<String> exclusiveSet) {
         this.displayName = displayName;
         this.description = description;
-        this.weight = weight;
-        this.maxLevel = Math.clamp(maxLevel, 1, ConfigBridge.LEVEL_CAP);
+        this.weight = Math.clamp(weight, 1, WEIGHT_CAP);
+        this.maxLevel = Math.clamp(maxLevel, 1, LEVEL_CAP);
         this.minCost = minCost;
         this.maxCost = maxCost;
         this.anvilCost = anvilCost;
@@ -75,13 +78,14 @@ public class EnchantDefinition implements Writeable {
         int weight = ConfigValue.create(path + ".Weight",
             5,
             "Weight affects the chance of getting an enchantment from enchanting or loots.",
+            "Value between 1 and " + WEIGHT_CAP + " (inclusive).",
             "[*] Reboot required when changed."
         ).read(config);
 
         int maxLevel = ConfigValue.create(path + ".MaxLevel",
             3,
             "The maximum level of this enchantment.",
-            "Value between 1 and " + ConfigBridge.LEVEL_CAP + " (inclusive).",
+            "Value between 1 and " + LEVEL_CAP + " (inclusive).",
             "[*] Reboot required when changed."
         ).read(config);
 
@@ -127,7 +131,7 @@ public class EnchantDefinition implements Writeable {
             Lists.newSet(),
             "Enchantments that are incompatible with this enchantment.",
             "[*] Vanilla enchantments must be specified with the 'minecraft:' namespace: 'minecraft:sharpness'.",
-            "[*] Excellent enchantments must be specified with the '" + ConfigBridge.NAMESPACE + ":' namespace: '" + ConfigBridge.NAMESPACE + ":" + EnchantId.ICE_ASPECT + "'.",
+            "[*] Excellent enchantments must be specified with the '" + EnchantKeys.NAMESPACE + ":' namespace: '" + EnchantKeys.NAMESPACE + ":" + EnchantId.ICE_ASPECT + "'.",
             "    If custom namespace is disabled, use the vanilla (minecraft) one.",
             "[*] Reboot required when changed."
         ).read(config);

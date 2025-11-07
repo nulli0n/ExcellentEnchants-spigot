@@ -5,7 +5,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantData;
+import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.enchantment.type.InventoryEnchant;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
 import su.nightexpress.nightcore.config.FileConfig;

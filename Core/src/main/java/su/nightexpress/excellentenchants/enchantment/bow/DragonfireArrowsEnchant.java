@@ -18,7 +18,7 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantData;
+import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.Modifier;
