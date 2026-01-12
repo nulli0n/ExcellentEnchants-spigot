@@ -1,0 +1,25 @@
+[--help]
+Loading BuildTools version: git-BuildTools-c4a8e0b-196 (#196)
+Java Version: Java 21
+Current Path: D:\no_del\ExcellentEnchants-spigot
+Option                                 Description                            
+------                                 -----------                            
+--compile <[NONE,CRAFTBUKKIT,SPIGOT]>  Software to compile                    
+--compile-if-changed                   Run BuildTools only when changes are   
+                                         detected in the repository           
+--dev                                  Development mode                       
+--disable-certificate-check            Disable HTTPS certificate check        
+--disable-java-check                   Disable Java version check             
+--dont-update                          Don't pull updates from Git            
+--experimental                         Build experimental version             
+--final-name <String>                  Name of the final jar                  
+--generate-docs                        Generate Javadoc jar                   
+--generate-source                      Generate source jar                    
+--gui                                  Explicitly show the GUI                
+--help                                 Show the help                          
+--nogui                                Explicitly don't show the GUI          
+-o, --output-dir <File>                Final jar output directory (default: .)
+--pr, --pull-request [<repo>:<id>]     Build specific pull requests           
+--remapped                             Produce and install extra remapped jars
+--rev <String>                         Version to build (default: latest)     
+--skip-compile                         Skip compilation                       

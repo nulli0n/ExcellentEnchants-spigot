@@ -55,8 +55,9 @@
         <dependency>
             <groupId>io.lumine</groupId>
             <artifactId>Mythic-Dist</artifactId>
-            <version>5.6.0</version>
-            <scope>provided</scope>
+            <version>5.11.2</version>
+            <systemPath>${project.basedir}/lib/MythicMobsPremium-5.11.2-SNAPSHOT.jar</systemPath>
+            <scope>system</scope>
         </dependency>
 
         <dependency>
