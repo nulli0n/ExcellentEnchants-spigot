@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.enchantment.bow;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Arrow;
@@ -30,9 +31,14 @@ import java.io.File;
 
 public class ElectrifiedArrowsEnchant extends GameEnchantment implements ArrowEnchant {
 
+    /** 固定额外伤害（❤，对应 Electrified.DamageAmount） */
     private Modifier damageAmount;
+    /** 额外伤害百分比（单位：%，对应 Electrified.Damage_Multiplier，例如 30 = 30%） */
+    private Modifier damagePercent;
 
-    public ElectrifiedArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
+    public ElectrifiedArrowsEnchant(@NotNull EnchantsPlugin plugin,
+                                    @NotNull File file,
+                                    @NotNull EnchantData data) {
         super(plugin, file, data);
 
         this.addComponent(EnchantComponent.PROBABILITY, Probability.addictive(0, 5));
@@ -41,24 +47,49 @@ public class ElectrifiedArrowsEnchant extends GameEnchantment implements ArrowEn
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
+        // 固定额外伤害（❤）
         this.damageAmount = Modifier.load(config, "Electrified.DamageAmount",
-            Modifier.addictive(1.25).perLevel(0.25).capacity(1000D),
-            "Sets additional damage caused by enchantment's effect."
+                // 默认给 0，所有数值交给 YAML 控制
+                Modifier.addictive(0D).perLevel(0D).capacity(1000D),
+                "Sets flat additional damage caused by enchantment's effect."
         );
 
-        this.addPlaceholder(EnchantsPlaceholders.GENERIC_DAMAGE, level -> NumberUtil.format(this.getDamage(level)));
+        // 百分比额外伤害（单位：%）
+        this.damagePercent = Modifier.load(config, "Electrified.Damage_Multiplier",
+                // 默认 30% 额外伤害，具体由 YAML 覆盖
+                Modifier.addictive(30D).perLevel(0D).capacity(1000.0),
+                "Extra damage (in % of arrow damage)."
+        );
+
+        // %damage%：显示当前等级的「百分比」数值，例如 30、35……
+        this.addPlaceholder(EnchantsPlaceholders.GENERIC_DAMAGE,
+                level -> NumberUtil.format(this.getDamagePercent(level)));
     }
 
-    public double getDamage(int level) {
+    /** 固定额外伤害（❤） */
+    public double getFlatDamage(int level) {
+        if (this.damageAmount == null) return 0D;
         return this.damageAmount.getValue(level);
     }
 
+    /** 百分比额外伤害，例如 30 = 30% */
+    public double getDamagePercent(int level) {
+        if (this.damagePercent == null) return 0D;
+        double value = this.damagePercent.getValue(level);
+        if (value < 0.0) value = 0.0; // 防止写成负数
+        return value;
+    }
+
+    /** 召唤闪电效果（原版 strikeLightningEffect） */
     private void summonLightning(@NotNull Block block) {
-        Location location = block.getLocation();
-        block.getWorld().strikeLightningEffect(location);
+        World world = block.getWorld();
+        if (world == null) return;
+
+        Location location = block.getLocation().add(0.5, 0, 0.5);
+        world.strikeLightningEffect(location);
 
         if (this.hasVisualEffects()) {
-            Location center = LocationUtil.setCenter2D(location.add(0, 1, 0));
+            Location center = LocationUtil.setCenter2D(location.clone().add(0, 1, 0));
             UniParticle.blockCrack(block.getType()).play(center, 0.5, 0.1, 100);
             UniParticle.of(Particle.ELECTRIC_SPARK).play(center, 0.75, 0.05, 120);
         }
@@ -71,21 +102,49 @@ public class ElectrifiedArrowsEnchant extends GameEnchantment implements ArrowEn
     }
 
     @Override
-    public boolean onShoot(@NotNull EntityShootBowEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
+    public boolean onShoot(@NotNull EntityShootBowEvent event,
+                           @NotNull LivingEntity shooter,
+                           @NotNull ItemStack bow,
+                           int level) {
         return true;
     }
 
     @Override
-    public void onHit(@NotNull ProjectileHitEvent event, @NotNull LivingEntity shooter, @NotNull Arrow arrow, int level) {
-        if (event.getHitEntity() != null || event.getHitBlock() == null) return;
+    public void onHit(@NotNull ProjectileHitEvent event,
+                      @NotNull LivingEntity shooter,
+                      @NotNull Arrow arrow,
+                      int level) {
+
+        if (event.getHitEntity() != null) {
+            // 打到实体时，雷在 onDamage 里处理
+            return;
+        }
+
+        if (event.getHitBlock() == null) return;
 
         Block block = event.getHitBlock();
         this.summonLightning(block);
     }
 
     @Override
-    public void onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull Arrow arrow, int level) {
-        this.summonLightning(victim.getLocation().getBlock().getRelative(BlockFace.DOWN));
-        event.setDamage(event.getDamage() + this.getDamage(level));
+    public void onDamage(@NotNull EntityDamageByEntityEvent event,
+                         @NotNull LivingEntity shooter,
+                         @NotNull LivingEntity victim,
+                         @NotNull Arrow arrow,
+                         int level) {
+
+        // 在受击实体脚下那一格召唤闪电效果
+        Block block = victim.getLocation().getBlock().getRelative(BlockFace.DOWN);
+        this.summonLightning(block);
+
+        // 当前这次箭的基础伤害（包含其它附魔 & 暴击等）
+        double base = event.getDamage();
+
+        double extraFlat     = this.getFlatDamage(level);         // 固定额外❤
+        double percent       = this.getDamagePercent(level);      // 百分比数值，例如 30
+        double extraFromPercent = base * (percent / 100D);        // 百分比额外伤害
+
+        double finalDamage = base + extraFlat + extraFromPercent;
+        event.setDamage(finalDamage);
     }
 }

@@ -29,16 +29,18 @@ public class InfernusEnchant extends GameEnchantment implements TridentEnchant {
 
     public InfernusEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
         super(plugin, file, data);
+        // 粒子效果保持不变
         this.addComponent(EnchantComponent.ARROW, ArrowEffects.basic(Particle.FLAME));
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
         this.fireTicks = Modifier.load(config, "Infernus.Fire_Ticks",
-            Modifier.addictive(60).perLevel(20).capacity(120),
-            "Sets for how long (in ticks) entity will be ignited on hit. 20 ticks = 1 second.");
+                Modifier.addictive(60).perLevel(20).capacity(120),
+                "Sets for how long (in ticks) entity will be ignited on hit. 20 ticks = 1 second.");
 
-        this.addPlaceholder(EnchantsPlaceholders.GENERIC_TIME, level -> NumberUtil.format((double) this.getFireTicks(level) / 20D));
+        this.addPlaceholder(EnchantsPlaceholders.GENERIC_TIME,
+                level -> NumberUtil.format((double) this.getFireTicks(level) / 20D));
     }
 
     public int getFireTicks(int level) {
@@ -52,22 +54,42 @@ public class InfernusEnchant extends GameEnchantment implements TridentEnchant {
     }
 
     @Override
-    public boolean onLaunch(@NotNull ProjectileLaunchEvent event, @NotNull LivingEntity shooter, @NotNull ItemStack trident, int level) {
+    public boolean onLaunch(@NotNull ProjectileLaunchEvent event,
+                            @NotNull LivingEntity shooter,
+                            @NotNull ItemStack trident,
+                            int level) {
+        // 让三叉戟本身带火焰效果（视觉）
         event.getEntity().setFireTicks(Integer.MAX_VALUE);
         return true;
     }
 
     @Override
-    public void onHit(@NotNull ProjectileHitEvent event, @NotNull LivingEntity shooter, @NotNull Trident projectile, int level) {
+    public void onHit(@NotNull ProjectileHitEvent event,
+                      @NotNull LivingEntity shooter,
+                      @NotNull Trident projectile,
+                      int level) {
+        // 这里不再给命中的实体点燃，避免绕过安全区只拦伤害的情况
+        // 需要的话可以只做一些粒子/音效之类的视觉效果
         Entity entity = event.getHitEntity();
         if (entity == null) return;
 
-        int ticks = this.getFireTicks(level);
-        entity.setFireTicks(ticks);
+        // 现在不在这里 setFireTicks 了
+        // 真实点燃逻辑在 onDamage 中执行，并受安全区伤害判定影响
     }
 
     @Override
-    public void onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull Trident projectile, int level) {
+    public void onDamage(@NotNull EntityDamageByEntityEvent event,
+                         @NotNull LivingEntity shooter,
+                         @NotNull LivingEntity victim,
+                         @NotNull Trident projectile,
+                         int level) {
 
+        // 如果其他插件（安全区、领地、空岛保护等）把这次伤害取消了，就不要点燃
+        if (event.isCancelled()) return;
+
+        int ticks = this.getFireTicks(level);
+
+        // 用最大值保证不会缩短已有的燃烧时间
+        victim.setFireTicks(Math.max(victim.getFireTicks(), ticks));
     }
 }

@@ -30,24 +30,29 @@ public class TemperEnchant extends GameEnchantment implements AttackEnchant {
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
         this.damageAmount = Modifier.load(config, "Temper.Damage_Amount",
-            Modifier.addictive(0).perLevel(5).capacity(100),
-            "Extra damage (in %)"
+                Modifier.addictive(0).perLevel(5).capacity(100),
+                "Extra damage (in %)"
         );
 
+        // 改成按“损失生命百分比”计算的步长（X% missing health）
         this.damageStep = Modifier.load(config, "Settings.Damage.Step",
-            Modifier.addictive(0.5),
-            "Damage will be increased for every X entity's health points missing. Where X is this value.",
-            "By default increases damage by 5% for every 0.5 HP missing."
+                // 默认每损失 5% 生命算一档，你可以在 YAML 里改这个值
+                Modifier.addictive(5),
+                "Damage will be increased for every X% of missing health. Where X is this value.",
+                "By default increases damage by 5% for every 5% health missing."
         );
 
-        this.addPlaceholder(EnchantsPlaceholders.GENERIC_AMOUNT, level -> NumberUtil.format(this.getDamageAmount(level)));
-        this.addPlaceholder(EnchantsPlaceholders.GENERIC_RADIUS, level -> NumberUtil.format(this.getDamageStep(level)));
+        this.addPlaceholder(EnchantsPlaceholders.GENERIC_AMOUNT,
+                level -> NumberUtil.format(this.getDamageAmount(level)));
+        this.addPlaceholder(EnchantsPlaceholders.GENERIC_RADIUS,
+                level -> NumberUtil.format(this.getDamageStep(level)));
     }
 
     public double getDamageAmount(int level) {
         return this.damageAmount.getValue(level);
     }
 
+    // 现在表示“每档所需的损失生命百分比”
     public double getDamageStep(int level) {
         return this.damageStep.getValue(level);
     }
@@ -59,18 +64,28 @@ public class TemperEnchant extends GameEnchantment implements AttackEnchant {
     }
 
     @Override
-    public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onAttack(@NotNull EntityDamageByEntityEvent event,
+                            @NotNull LivingEntity damager,
+                            @NotNull LivingEntity victim,
+                            @NotNull ItemStack weapon,
+                            int level) {
+
         double health = damager.getHealth();
         double maxHealth = EntityUtil.getAttribute(damager, Attribute.MAX_HEALTH);
+
+        if (maxHealth <= 0) return false;
         if (health >= maxHealth) return false;
 
-        double missingHealth = maxHealth - health;
-        double step = this.getDamageStep(level);
-        if (step == 0 || missingHealth < step) return false;
+        // 损失生命百分比（0~100）
+        double missingPercent = (maxHealth - health) / maxHealth * 100.0;
 
-        double steps = Math.floor(missingHealth / step);
-        if (steps == 0) return false;
+        double step = this.getDamageStep(level); // 每档需要损失的百分比
+        if (step <= 0 || missingPercent < step) return false;
 
+        double steps = Math.floor(missingPercent / step);
+        if (steps <= 0) return false;
+
+        // 每档增加 getDamageAmount(level)% 伤害
         double percent = 1D + (this.getDamageAmount(level) * steps / 100D);
 
         event.setDamage(event.getDamage() * percent);

@@ -42,8 +42,11 @@ public class DoubleStrikeEnchant extends GameEnchantment implements AttackEnchan
         event.setDamage(event.getDamage() * 2D);
 
         if (this.hasVisualEffects()) {
-            UniParticle.of(Particle.EXPLOSION).play(victim.getEyeLocation(), 0.25, 0.15, 15);
-            NightSound.of(Sound.ENTITY_GENERIC_EXPLODE).play(victim.getLocation());
+            // UniParticle.of(Particle.EXPLOSION).play(victim.getEyeLocation(), 0.25, 0.15, 15);
+            UniParticle.of(Particle.EXPLOSION).play(victim.getEyeLocation(), 0.25, 0.15, 5);
+            // NightSound.of(Sound.ENTITY_GENERIC_EXPLODE).play(victim.getLocation());
+            NightSound sound = NightSound.of(Sound.ENTITY_GENERIC_EXPLODE, 0.5F, 1.0F);
+            sound.play(victim.getLocation());
         }
         return true;
     }

@@ -42,16 +42,16 @@ public class CutterEnchant extends GameEnchantment implements AttackEnchant {
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
         this.durabilityReduction = Modifier.load(config, "Cutter.Durability_Reduction",
-            Modifier.addictive(0).perLevel(0.01).capacity(1D),
-            "Amount (in percent) of how much item durability will be reduced.");
+                Modifier.addictive(0).perLevel(0.01).capacity(1D),
+                "Amount (in percent) of how much item durability will be reduced.");
 
         this.allowPlayers = ConfigValue.create("Cutter.Allow_Players",
-            true,
-            "Sets whether or not this enchantment will have effect on players.").read(config);
+                true,
+                "Sets whether or not this enchantment will have effect on players.").read(config);
 
         this.allowMobs = ConfigValue.create("Cutter.Allow_Mobs",
-            true,
-            "Sets whether or not this enchantment will have effect on mobs.").read(config);
+                true,
+                "Sets whether or not this enchantment will have effect on mobs.").read(config);
 
         this.addPlaceholder(EnchantsPlaceholders.GENERIC_DAMAGE, level -> NumberUtil.format(this.getDurabilityReduction(level) * 100D));
     }
@@ -67,7 +67,12 @@ public class CutterEnchant extends GameEnchantment implements AttackEnchant {
     }
 
     @Override
-    public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean onAttack(@NotNull EntityDamageByEntityEvent event,
+                            @NotNull LivingEntity damager,
+                            @NotNull LivingEntity victim,
+                            @NotNull ItemStack weapon,
+                            int level) {
+
         EntityEquipment equipment = victim.getEquipment();
         if (equipment == null) return false;
 
@@ -85,15 +90,30 @@ public class CutterEnchant extends GameEnchantment implements AttackEnchant {
         ItemMeta meta = itemCut.getItemMeta();
         if (!(meta instanceof Damageable damageable)) return false;
 
-        damageable.setDamage((int) (itemCut.getType().getMaxDurability() * this.getDurabilityReduction(level)));
+        // ---------------- 原逻辑（覆盖耐久 + 剥落护甲 + 掉落） ----------------
+        // damageable.setDamage((int) (itemCut.getType().getMaxDurability() * this.getDurabilityReduction(level)));
+        // itemCut.setItemMeta(damageable);
+        //
+        // armor[get] = null;
+        // equipment.setArmorContents(armor);
+        //
+        // Item drop = victim.getWorld().dropItemNaturally(victim.getLocation(), itemCut);
+        // drop.setPickupDelay(50);
+        // drop.getVelocity().multiply(3D);
+        // ------------------------------------------------------------------
+
+        // ---------------- 新逻辑：只增加耐久损伤，不剥落护甲、不掉落 ----------------
+        int maxDurability = itemCut.getType().getMaxDurability();
+        // 计算按百分比应该有的“损伤值”
+        int targetDamage = (int) (maxDurability * this.getDurabilityReduction(level));
+
+        int currentDamage = damageable.getDamage();
+        // 不让附魔“修复”已经更破的装备，只会变得更破
+        int newDamage = Math.max(currentDamage, targetDamage);
+
+        damageable.setDamage(newDamage);
         itemCut.setItemMeta(damageable);
-
-        armor[get] = null;
-        equipment.setArmorContents(armor);
-
-        Item drop = victim.getWorld().dropItemNaturally(victim.getLocation(), itemCut);
-        drop.setPickupDelay(50);
-        drop.getVelocity().multiply(3D);
+        // ------------------------------------------------------------------
 
         if (this.hasVisualEffects()) {
             UniParticle.itemCrack(itemCut).play(victim.getEyeLocation(), 0.25, 0.15, 30);

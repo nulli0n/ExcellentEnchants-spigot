@@ -30,7 +30,10 @@ import java.io.File;
 
 public class VampiricArrowsEnchant extends GameEnchantment implements ArrowEnchant {
 
-    private Modifier healAmount;
+    // 伤害比例（或固定值），跟“嗜血”的 Amount 一样
+    private Modifier amount;
+    // 是否按造成伤害的百分比来吸血
+    private boolean multiplier;
 
     public VampiricArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
         super(plugin, file, data);
@@ -40,16 +43,30 @@ public class VampiricArrowsEnchant extends GameEnchantment implements ArrowEncha
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.healAmount = Modifier.load(config, "Vampire.Heal_Amount",
-            Modifier.addictive(1).perLevel(0.5).capacity(5),
-            "Amount of hearts to be restore."
+        // 跟“嗜血”一样：Vampire.Amount + Vampire.Multiplier
+        this.amount = Modifier.load(config, "Vampire.Amount",
+                Modifier.addictive(0.02D).perLevel(0.01D).capacity(10D),
+                "Amount of health to be restored for attacker.",
+                "If 'Multiplier' is true, works as a fraction of inflicted damage."
         );
 
-        this.addPlaceholder(EnchantsPlaceholders.GENERIC_AMOUNT, level -> NumberUtil.format(this.getHealAmount(level)));
+        this.multiplier = config.getBoolean("Vampire.Multiplier", true);
+
+        // 如果是百分比，就显示为「xx%」，否则显示为具体数值
+        this.addPlaceholder(EnchantsPlaceholders.GENERIC_AMOUNT, level -> {
+            double value = this.amount.getValue(level);
+            if (this.multiplier) {
+                // 0.02 -> "2"
+                return NumberUtil.format(value * 100D);
+            }
+            else {
+                return NumberUtil.format(value);
+            }
+        });
     }
 
-    public double getHealAmount(int level) {
-        return this.healAmount.getValue(level);
+    public double getAmount(int level) {
+        return this.amount.getValue(level);
     }
 
     @Override
@@ -65,14 +82,26 @@ public class VampiricArrowsEnchant extends GameEnchantment implements ArrowEncha
 
     @Override
     public void onHit(@NotNull ProjectileHitEvent event, @NotNull LivingEntity shooter, @NotNull Arrow arrow, int level) {
-
+        // 不用在这里做事，回血在 onDamage 里处理
     }
 
     @Override
-    public void onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull Arrow arrow, int level) {
+    public void onDamage(@NotNull EntityDamageByEntityEvent event,
+                         @NotNull LivingEntity shooter,
+                         @NotNull LivingEntity victim,
+                         @NotNull Arrow arrow,
+                         int level) {
+
         if (shooter.isDead() || shooter.getHealth() <= 0D) return;
 
-        double healAmount = this.getHealAmount(level);
+        double amount = this.getAmount(level);
+        if (amount <= 0D) return;
+
+        // 这次箭真正造成的伤害（带上护甲等计算后的）
+        double inflicted = event.getFinalDamage();
+
+        // 如果 Multiplier = true：按伤害比例回血；否则就是固定回血
+        double healAmount = this.multiplier ? inflicted * amount : amount;
         if (healAmount <= 0D) return;
 
         double health = shooter.getHealth();
