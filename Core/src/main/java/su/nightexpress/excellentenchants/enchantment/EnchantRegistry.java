@@ -4,7 +4,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.api.EnchantKeys;
+import su.nightexpress.excellentenchants.EnchantsKeys;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
@@ -30,34 +30,24 @@ public class EnchantRegistry {
     public static final EnchantHolder<AttackEnchant>     ATTACK     = registerHolder("attack", AttackEnchant.class, AttackEnchant::getAttackPriority);
     public static final EnchantHolder<DefendEnchant>     DEFEND     = registerCachedHolder("defend", DefendEnchant.class, DefendEnchant::getProtectPriority);
     public static final EnchantHolder<ProtectionEnchant> PROTECTION = registerCachedHolder("protection", ProtectionEnchant.class, ProtectionEnchant::getProtectionPriority);
-    public static final EnchantHolder<ContainerEnchant>  CONTAINER  = registerHolder("inventory", ContainerEnchant.class, ContainerEnchant::getClickPriority);
+    public static final EnchantHolder<ContainerEnchant>  CONTAINER  = registerHolder("container", ContainerEnchant.class, ContainerEnchant::getClickPriority);
     public static final EnchantHolder<MoveEnchant>       MOVE       = registerCachedHolder("move", MoveEnchant.class, MoveEnchant::getMovePriority);
     public static final EnchantHolder<KillEnchant>       KILL       = registerHolder("kill", KillEnchant.class, KillEnchant::getKillPriority);
-    public static final EnchantHolder<DeathEnchant>      DEATH      = registerCachedHolder("death", DeathEnchant.class, DeathEnchant::getDeathPriority);
-    public static final EnchantHolder<ResurrectEnchant>  RESURRECT  = registerCachedHolder("resurrect", ResurrectEnchant.class, ResurrectEnchant::getResurrectPriority);
+    public static final EnchantHolder<DeathEnchant>      DEATH      = registerHolder("death", DeathEnchant.class, DeathEnchant::getDeathPriority);
+    public static final EnchantHolder<ResurrectEnchant>  RESURRECT  = registerHolder("resurrect", ResurrectEnchant.class, ResurrectEnchant::getResurrectPriority);
     public static final EnchantHolder<FishingEnchant>    FISHING    = registerHolder("fishing", FishingEnchant.class, FishingEnchant::getFishingPriority);
     public static final EnchantHolder<InteractEnchant>   INTERACT   = registerHolder("interact", InteractEnchant.class, InteractEnchant::getInteractPriority);
     public static final EnchantHolder<DurabilityEnchant> DURABILITY = registerCachedHolder("durability", DurabilityEnchant.class, DurabilityEnchant::getItemDamagePriority);
+    public static final EnchantHolder<BlockChangeEnchant> BLOCK_CHANGE = registerCachedHolder("block_change", BlockChangeEnchant.class, e -> EnchantPriority.NORMAL);
 
     public static final EnchantHolder<InventoryEnchant> INVENTORY = registerHolder("inventory", InventoryEnchant.class, e -> EnchantPriority.NORMAL);
     public static final EnchantHolder<BlockEnchant>     BLOCK     = registerHolder("block", BlockEnchant.class, e -> EnchantPriority.NORMAL);
     public static final EnchantHolder<PassiveEnchant>   PASSIVE   = registerCachedHolder("passive", PassiveEnchant.class, e -> EnchantPriority.NORMAL);
 
-    private static boolean locked;
-
-    @Deprecated
-    public static void lock() {
-        locked = true;
-    }
-
-    public static boolean isLocked() {
-        return locked;
-    }
-
     public static void registerEnchant(@NotNull CustomEnchantment enchantment) {
         getHolders().forEach(holder -> holder.accept(enchantment));
 
-        BY_KEY.put(EnchantKeys.create(enchantment.getId()), enchantment);
+        BY_KEY.put(EnchantsKeys.create(enchantment.getId()), enchantment);
         BY_ID.put(enchantment.getId(), enchantment);
     }
 

@@ -13,40 +13,39 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.spawner.Spawner;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.MiningEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
-import su.nightexpress.excellentenchants.util.EnchantUtils;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.ItemUtil;
 import su.nightexpress.nightcore.util.LangUtil;
 import su.nightexpress.nightcore.util.LocationUtil;
+import su.nightexpress.nightcore.util.text.night.wrapper.TagWrappers;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashSet;
-
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
 public class SilkSpawnerEnchant extends GameEnchantment implements MiningEnchant, BlockEnchant {
 
     private String spawnerName;
 
-    public SilkSpawnerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public SilkSpawnerEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.PROBABILITY, Probability.addictive(0, 25));
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
         this.spawnerName = ConfigValue.create("SilkSpawner.Name",
-            GREEN.wrap(LangUtil.getSerializedName(Material.SPAWNER) + " " + GRAY.wrap("(" + WHITE.wrap(EnchantsPlaceholders.GENERIC_TYPE) + ")")),
+            TagWrappers.GREEN.wrap(LangUtil.getSerializedName(Material.SPAWNER) + " " + TagWrappers.GRAY.wrap("(" + TagWrappers.WHITE.wrap(EnchantsPlaceholders.GENERIC_TYPE) + ")")),
             "Spawner item display name.",
             "Use '" + EnchantsPlaceholders.GENERIC_TYPE + "' for the mob name."
         ).read(config);
@@ -67,7 +66,7 @@ public class SilkSpawnerEnchant extends GameEnchantment implements MiningEnchant
         ItemUtil.setCustomName(stateMeta, this.spawnerName.replace(EnchantsPlaceholders.GENERIC_TYPE, LangUtil.getSerializedName(spawnerBlock.getSpawnedType())));
         itemSpawner.setItemMeta(stateMeta);
 
-        EnchantUtils.setBlockEnchant(itemSpawner, this);
+        this.manager.setBlockEnchant(itemSpawner, this);
         return itemSpawner;
     }
 

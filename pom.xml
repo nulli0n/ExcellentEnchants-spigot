@@ -7,15 +7,16 @@
     <groupId>su.nightexpress.excellentenchants</groupId>
     <artifactId>ExcellentEnchants</artifactId>
     <packaging>pom</packaging>
-    <version>5.3.0</version>
+    <version>5.4.0</version>
     <modules>
         <module>API</module>
         <module>Core</module>
-        <module>MC_1_21_4</module>
-        <module>MC_1_21_5</module>
-        <module>MC_1_21_7</module>
         <module>MC_1_21_8</module>
         <module>MC_1_21_10</module>
+        <module>spigot-1.21.11</module>
+        <module>tooltip-packetevents</module>
+        <module>tooltip-protocollib</module>
+        <module>compat-mythicmobs</module>
     </modules>
 
     <properties>
@@ -37,6 +38,10 @@
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
 
+        <repository>
+            <id>nightexpress-releases</id>
+            <url>https://repo.nightexpressdev.com/releases</url>
+        </repository>
     </repositories>
 
     <pluginRepositories>
@@ -50,7 +55,7 @@
         <dependency>
             <groupId>su.nightexpress.nightcore</groupId>
             <artifactId>main</artifactId>
-            <version>2.10.0</version>
+            <version>2.13.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

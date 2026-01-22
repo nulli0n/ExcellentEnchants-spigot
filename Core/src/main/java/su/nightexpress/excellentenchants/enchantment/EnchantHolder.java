@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
-import su.nightexpress.excellentenchants.api.EnchantedItem;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.nightcore.util.LowerCase;
 

@@ -1,19 +1,15 @@
 package su.nightexpress.excellentenchants;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.api.item.ItemSetRegistry;
+import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.bridge.spigot.SpigotEnchantsBootstrap;
 import su.nightexpress.excellentenchants.command.BaseCommands;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.config.Perms;
-import su.nightexpress.excellentenchants.enchantment.EnchantDataRegistry;
-import su.nightexpress.excellentenchants.hook.HookPlugin;
-import su.nightexpress.excellentenchants.hook.impl.PacketEventsHook;
-import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
-import su.nightexpress.excellentenchants.hook.impl.ProtocolLibHook;
+import su.nightexpress.excellentenchants.placeholder.PlaceholderHook;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
+import su.nightexpress.excellentenchants.tooltip.TooltipManager;
 import su.nightexpress.nightcore.NightPlugin;
 import su.nightexpress.nightcore.commands.command.NightCommand;
 import su.nightexpress.nightcore.config.PluginDetails;
@@ -22,6 +18,7 @@ import su.nightexpress.nightcore.util.Version;
 
 public class EnchantsPlugin extends NightPlugin {
 
+    private TooltipManager tooltipManager;
     private EnchantManager enchantManager;
 
     @Override
@@ -48,7 +45,6 @@ public class EnchantsPlugin extends NightPlugin {
         super.onStartup();
 
         EnchantsAPI.load(this);
-        Keys.loadKeys(this);
 
         if (Version.isSpigot()) {
             new SpigotEnchantsBootstrap().bootstrap(this);
@@ -57,6 +53,14 @@ public class EnchantsPlugin extends NightPlugin {
 
     @Override
     public void enable() {
+        Config settings = new Config();
+        settings.load(this.config);
+
+        if (settings.isEnchantTooltipEnabled()) {
+            this.tooltipManager = new TooltipManager(this);
+            this.tooltipManager.setup();
+        }
+
         this.enchantManager = new EnchantManager(this);
         this.enchantManager.setup();
 
@@ -70,6 +74,10 @@ public class EnchantsPlugin extends NightPlugin {
             PlaceholderHook.shutdown();
         }
 
+        if (this.tooltipManager != null) {
+            this.tooltipManager.shutdown();
+            this.tooltipManager = null;
+        }
         if (this.enchantManager != null) this.enchantManager.shutdown();
     }
 
@@ -77,9 +85,6 @@ public class EnchantsPlugin extends NightPlugin {
     protected void onShutdown() {
         super.onShutdown();
 
-        ItemSetRegistry.clear();
-        EnchantDataRegistry.clear();
-        Keys.clear();
         EnchantsAPI.clear();
     }
 
@@ -88,18 +93,6 @@ public class EnchantsPlugin extends NightPlugin {
     }
 
     private void loadHooks() {
-        if (Config.isDescriptionEnabled()) {
-            if (Plugins.isInstalled(HookPlugin.PACKET_EVENTS)) {
-                PacketEventsHook.setup(this);
-            }
-            else if (Plugins.isInstalled(HookPlugin.PROTOCOL_LIB)) {
-                ProtocolLibHook.setup(this);
-            }
-            else {
-                this.warn("You need to install " + HookPlugin.PACKET_EVENTS + " or " + HookPlugin.PROTOCOL_LIB + " for enchantment description to work.");
-            }
-        }
-
         if (Plugins.hasPlaceholderAPI()) {
             PlaceholderHook.setup(this);
         }
@@ -108,5 +101,10 @@ public class EnchantsPlugin extends NightPlugin {
     @NotNull
     public EnchantManager getEnchantManager() {
         return this.enchantManager;
+    }
+
+    @Nullable
+    public TooltipManager getTooltipManager() {
+        return this.tooltipManager;
     }
 }

@@ -25,15 +25,15 @@ import org.bukkit.craftbukkit.v1_21_R6.util.CraftNamespacedKey;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.api.EnchantKeys;
-import su.nightexpress.excellentenchants.api.IEnchantData;
+import su.nightexpress.excellentenchants.EnchantsKeys;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.item.ItemSet;
 import su.nightexpress.excellentenchants.api.wrapper.EnchantCost;
-import su.nightexpress.excellentenchants.api.wrapper.EnchantDefinition;
-import su.nightexpress.excellentenchants.api.wrapper.EnchantDistribution;
+import su.nightexpress.excellentenchants.api.EnchantDefinition;
+import su.nightexpress.excellentenchants.api.EnchantDistribution;
 import su.nightexpress.excellentenchants.api.wrapper.TradeType;
-import su.nightexpress.excellentenchants.bridge.DistributionConfig;
+import su.nightexpress.excellentenchants.bridge.DistributionSettings;
+import su.nightexpress.excellentenchants.bridge.EnchantCatalogEntry;
 import su.nightexpress.excellentenchants.bridge.RegistryHack;
 import su.nightexpress.nightcore.NightPlugin;
 import su.nightexpress.nightcore.util.Reflex;
@@ -68,7 +68,7 @@ public class RegistryHack_1_21_10 implements RegistryHack {
 
     @NotNull
     private static ResourceLocation customResourceLocation(@NotNull String value) {
-        return CraftNamespacedKey.toMinecraft(EnchantKeys.create(value));
+        return CraftNamespacedKey.toMinecraft(EnchantsKeys.create(value));
     }
 
     private static <T> TagKey<T> customTagKey(@NotNull Registry<T> registry, @NotNull String name) {
@@ -194,12 +194,12 @@ public class RegistryHack_1_21_10 implements RegistryHack {
 
     @Override
     @Nullable
-    public org.bukkit.enchantments.Enchantment registerEnchantment(@NotNull String id, @NotNull IEnchantData data, @NotNull EquipmentSlot[] enchantSlots) {
-        EnchantDefinition definition = data.getDefinition();
-        EnchantDistribution distribution = data.getDistribution();
+    public org.bukkit.enchantments.Enchantment registerEnchantment(@NotNull EnchantCatalogEntry entry, @NotNull DistributionSettings settings) {
+        String id = entry.getId();
+        EnchantDefinition definition = entry.getDefinition();
 
-        String primaryId = definition.getPrimaryItemsId();
-        String supportedId = definition.getSupportedItemsId();
+        String primaryId = definition.getPrimaryItemSet().getId();
+        String supportedId = definition.getSupportedItemSet().getId();
 
         HolderSet.Named<Item> supportedItems = getFrozenTags(ITEMS).get(customItemsTag(supportedId));
         HolderSet.Named<Item> primaryItems = getFrozenTags(ITEMS).get(customItemsTag(primaryId));
@@ -210,14 +210,13 @@ public class RegistryHack_1_21_10 implements RegistryHack {
         Enchantment.Cost minCost = nmsCost(definition.getMinCost());
         Enchantment.Cost maxCost = nmsCost(definition.getMaxCost());
         int anvilCost = definition.getAnvilCost();
-        EquipmentSlotGroup[] slots = nmsSlots(enchantSlots);
+        EquipmentSlotGroup[] slots = nmsSlots(definition.getSupportedItemSet().getSlots());
 
         Enchantment.EnchantmentDefinition nmsDefinition = Enchantment.definition(supportedItems, primaryItems, weight, maxLevel, minCost, maxCost, anvilCost, slots);
         HolderSet<Enchantment> exclusiveSet = this.createExclusiveSet(id);
         DataComponentMap.Builder builder = DataComponentMap.builder();
 
         Enchantment enchantment = new Enchantment(display, nmsDefinition, exclusiveSet, builder.build());
-
         // Create a new Holder for the custom enchantment.
         Holder.Reference<Enchantment> reference = ENCHANTS.createIntrusiveHolder(enchantment);
 
@@ -225,13 +224,14 @@ public class RegistryHack_1_21_10 implements RegistryHack {
         Registry.register(ENCHANTS, customEnchantKey(id), enchantment);
 
         // Now it's possible to add/remove it from vanilla tags since we have a valid, registered Reference.
-        this.setupDistribution(distribution, data.isCurse(), reference);
+        this.setupDistribution(entry, settings, reference);
 
         // Return the bukkit mirror.
         return CraftEnchantment.minecraftToBukkit(enchantment);
     }
 
-    private void setupDistribution(@NotNull EnchantDistribution distribution, boolean curse, @NotNull Holder.Reference<Enchantment> reference) {
+    private void setupDistribution(@NotNull EnchantCatalogEntry entry, @NotNull DistributionSettings settings, @NotNull Holder.Reference<Enchantment> reference) {
+        EnchantDistribution distribution = entry.getDistribution();
         boolean experimentalTrades = SERVER.getWorldData().enabledFeatures().contains(FeatureFlags.TRADE_REBALANCE);
 
         // Any enchantment can be treasure.
@@ -242,43 +242,43 @@ public class RegistryHack_1_21_10 implements RegistryHack {
         else addInTag(EnchantmentTags.NON_TREASURE, reference);
 
         // Any enchantment can be on random loot.
-        if (distribution.isOnRandomLoot() && DistributionConfig.DISTRIBUTION_RANDOM_LOOT.get()) {
+        if (distribution.isOnRandomLoot() && settings.isRandomLootEnabled()) {
             addInTag(EnchantmentTags.ON_RANDOM_LOOT, reference);
         }
 
         // Only non-treasure enchantments should be on mob equipment, traded equipment and non-rebalanced trades.
         if (!distribution.isTreasure()) {
-            if (distribution.isOnMobSpawnEquipment() && DistributionConfig.DISTRIBUTION_MOB_EQUIPMENT.get()) {
+            if (distribution.isOnMobSpawnEquipment() && settings.isMobEquipmentEnabled()) {
                 addInTag(EnchantmentTags.ON_MOB_SPAWN_EQUIPMENT, reference);
             }
 
-            if (distribution.isOnTradedEquipment() && DistributionConfig.DISTRIBUTION_TRADE_EQUIPMENT.get()) {
+            if (distribution.isOnTradedEquipment() && settings.isTradeEquipmentEnabled()) {
                 addInTag(EnchantmentTags.ON_TRADED_EQUIPMENT, reference);
             }
         }
 
         // Any enchantment can be tradable.
         if (experimentalTrades) {
-            if (distribution.isTradable() && DistributionConfig.DISTRIBUTION_TRADING.get()) {
+            if (distribution.isTradable() && settings.isTradingEnabled()) {
                 distribution.getTrades().forEach(tradeType -> {
                     addInTag(getTradeKey(tradeType), reference);
                 });
             }
         }
         else {
-            if (distribution.isTradable() && DistributionConfig.DISTRIBUTION_TRADING.get()) {
+            if (distribution.isTradable() && settings.isTradingEnabled()) {
                 addInTag(EnchantmentTags.TRADEABLE, reference);
             }
             else removeFromTag(EnchantmentTags.TRADEABLE, reference);
         }
 
-        if (curse) {
+        if (entry.isCurse()) {
             addInTag(EnchantmentTags.CURSE, reference);
         }
         else {
             // Only non-curse and non-treasure enchantments should go in enchanting table.
             if (!distribution.isTreasure()) {
-                if (distribution.isDiscoverable() && DistributionConfig.DISTRIBUTION_ENCHANTING.get()) {
+                if (distribution.isDiscoverable() && settings.isEnchantingEnabled()) {
                     addInTag(EnchantmentTags.IN_ENCHANTING_TABLE, reference);
                 }
                 else removeFromTag(EnchantmentTags.IN_ENCHANTING_TABLE, reference);
@@ -312,8 +312,8 @@ public class RegistryHack_1_21_10 implements RegistryHack {
     }
 
     @Override
-    public void createItemsSet(@NotNull String id, @NotNull ItemSet itemSet) {
-        TagKey<Item> tag = customItemsTag(id);
+    public void createItemsSet(@NotNull ItemSet itemSet) {
+        TagKey<Item> tag = customItemsTag(itemSet.getId());
         List<Holder<Item>> holders = new ArrayList<>();
 
         itemSet.getMaterials().forEach(material -> {

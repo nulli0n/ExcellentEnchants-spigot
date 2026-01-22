@@ -5,7 +5,7 @@ import su.nightexpress.nightcore.locale.LangEntry;
 import su.nightexpress.nightcore.locale.entry.MessageLocale;
 import su.nightexpress.nightcore.locale.entry.TextLocale;
 
-import static su.nightexpress.excellentenchants.api.EnchantsPlaceholders.*;
+import static su.nightexpress.excellentenchants.EnchantsPlaceholders.*;
 import static su.nightexpress.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 public class Lang implements LangContainer {

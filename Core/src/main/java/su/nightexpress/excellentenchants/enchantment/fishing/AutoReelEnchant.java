@@ -7,19 +7,20 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
+import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.type.FishingEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
-import su.nightexpress.excellentenchants.util.EnchantUtils;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.FileConfig;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class AutoReelEnchant extends GameEnchantment implements FishingEnchant {
 
-    public AutoReelEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public AutoReelEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
     }
 
     @Override
@@ -38,10 +39,10 @@ public class AutoReelEnchant extends GameEnchantment implements FishingEnchant {
         if (event.getState() != PlayerFishEvent.State.BITE) return false;
 
         Player player = event.getPlayer();
-        EquipmentSlot slot = EnchantUtils.getItemHand(player, Material.FISHING_ROD);
+        EquipmentSlot slot = EnchantsUtils.getItemHand(player, Material.FISHING_ROD);
         if (slot == null) return false;
 
-        this.plugin.runTask(task -> {
+        this.plugin.runTask(() -> {
             if (event.isCancelled()) return;
             if (!event.getHook().isValid()) return;
 

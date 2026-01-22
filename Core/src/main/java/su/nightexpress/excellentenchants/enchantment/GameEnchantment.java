@@ -1,46 +1,44 @@
 package su.nightexpress.excellentenchants.enchantment;
 
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantBlacklist;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
-import su.nightexpress.excellentenchants.bridge.DistributionConfig;
+import su.nightexpress.excellentenchants.EnchantsUtils;
+import su.nightexpress.excellentenchants.api.EnchantDefinition;
+import su.nightexpress.excellentenchants.api.EnchantDistribution;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.component.ComponentLoader;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Charges;
 import su.nightexpress.excellentenchants.api.item.ItemSet;
-import su.nightexpress.excellentenchants.api.item.ItemSetRegistry;
-import su.nightexpress.excellentenchants.api.wrapper.EnchantDefinition;
-import su.nightexpress.excellentenchants.api.wrapper.EnchantDistribution;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.util.ChargesFormat;
-import su.nightexpress.excellentenchants.util.EnchantUtils;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.manager.AbstractFileData;
 import su.nightexpress.nightcore.util.PDCUtil;
 import su.nightexpress.nightcore.util.placeholder.PlaceholderList;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> implements CustomEnchantment {
+public abstract class GameEnchantment implements CustomEnchantment {
 
+    protected final EnchantsPlugin plugin;
+    protected final EnchantManager manager;
+    protected final Path           file;
+    protected final String         id;
+
+    protected final Enchantment         enchantment;
     protected final EnchantDefinition   definition;
     protected final EnchantDistribution distribution;
-    protected final ItemSet             primaryItems;
-    protected final ItemSet             supportedItems;
     protected final boolean             curse;
 
     protected final Map<EnchantComponent<?>, ComponentLoader<?>> componentLoaders;
@@ -49,37 +47,32 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
     private final NamespacedKey            chargesKey;
     private final PlaceholderList<Integer> placeholders;
 
-    private Enchantment enchantment;
-    private boolean     hiddenFromList;
+    private boolean hiddenFromList;
     private boolean visualEffects;
     private boolean chargeable;
 
-    public GameEnchantment(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file);
-
-        this.definition = data.getDefinition();
-        this.distribution = data.getDistribution();
-
-        ItemSet primary = ItemSetRegistry.getByKey(this.definition.getPrimaryItemsId());
-        ItemSet supported = ItemSetRegistry.getByKey(this.definition.getSupportedItemsId());
-        if (primary == null || supported == null) {
-            throw new IllegalStateException("Invalid primary/supported item sets in the " + this.getId() + " enchantment.");
-        }
-        this.primaryItems = primary;
-        this.supportedItems = supported;
-        this.curse = data.isCurse();
+    public GameEnchantment(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        this.plugin = plugin;
+        this.manager = manager;
+        this.file = file;
+        this.id = context.id();
+        this.enchantment = context.enchantment();
+        this.definition = context.definition();
+        this.distribution = context.distribution();
+        this.curse = context.curse();
         this.componentLoaders = new HashMap<>();
         this.componentDatas = new HashMap<>();
 
-        this.chargesKey = new NamespacedKey(plugin, this.getId() + "_charges");
+        this.chargesKey = new NamespacedKey(this.plugin, this.getId() + "_charges");
         this.placeholders = EnchantsPlaceholders.forEnchant(this);
     }
 
     @Override
-    protected boolean onLoad(@NotNull FileConfig config) {
-        this.loadSettings(config);
-        this.loadAdditional(config);
-        return true;
+    public void load() {
+        FileConfig.load(this.file).edit(config -> {
+            this.loadSettings(config);
+            this.loadAdditional(config);
+        });
     }
 
     private void loadSettings(@NotNull FileConfig config) {
@@ -111,18 +104,6 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
     }
 
     protected abstract void loadAdditional(@NotNull FileConfig config);
-
-    @Override
-    protected void onSave(@NotNull FileConfig config) {
-
-    }
-
-    @Override
-    public void onRegister(@NotNull Enchantment enchantment) {
-        if (this.enchantment != null) return;
-
-        this.enchantment = enchantment;
-    }
 
     protected <T> void addComponent(@NotNull EnchantComponent<T> type, @NotNull T data) {
         this.componentLoaders.putIfAbsent(type, config -> type.read(config, data));
@@ -167,6 +148,12 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
         this.placeholders.add(key, replacer);
     }
 
+    @NotNull
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
     @Override
     @NotNull
     public Enchantment getBukkitEnchantment() {
@@ -193,17 +180,6 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
         return this.getComponent(EnchantComponent.CHARGES);
     }
 
-    @Override
-    public boolean isAvailableToUse(@NotNull World world) {
-        EnchantBlacklist blacklist = DistributionConfig.getDisabled(world);
-        return blacklist == null || !blacklist.contains(this);
-    }
-
-    @Override
-    public boolean isAvailableToUse(@NotNull LivingEntity entity) {
-        return this.isAvailableToUse(entity.getWorld());
-    }
-
     @NotNull
     public String getDisplayName() {
         return this.definition.getDisplayName();
@@ -218,48 +194,21 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
     @Override
     @NotNull
     public List<String> getDescription(int level) {
-        return this.getDescription(level, 0);
-    }
-
-    @Override
-    @NotNull
-    public List<String> getDescription(int level, int charges) {
         List<String> description = new ArrayList<>(this.getDescription());
-
-        String lineFormat = (this.isChargeable() ? Config.DESCRIPTION_FORMAT_CHARGES : Config.DESCRIPTION_FORMAT_DEFAULT).get();
-
-        description.replaceAll(text -> {
-            return Replacer.create()
-                .replace(EnchantsPlaceholders.GENERIC_DESCRIPTION, text)
-                .replace(EnchantsPlaceholders.GENERIC_NAME, this::getDisplayName)
-                .replace(EnchantsPlaceholders.GENERIC_CHARGES, () -> {
-                    if (!this.isChargeable() || charges < 0) return "";
-
-                    int maxCharges = this.getMaxCharges(level);
-                    int percent = (int) Math.ceil((double) charges / (double) maxCharges * 100D);
-
-                    ChargesFormat chargesFormat = Config.CHARGES_FORMAT.get().values().stream()
-                        .filter(other -> other.isAboveThreshold(percent))
-                        .max(Comparator.comparingInt(ChargesFormat::getThreshold)).orElse(null);
-
-                    return chargesFormat == null ? "" : chargesFormat.getFormatted(charges);
-                })
-                .replace(this.replacePlaceholders(level))
-                .apply(lineFormat);
-        });
+        description.replaceAll(this.replacePlaceholders(level));
         return description;
     }
 
     @NotNull
     @Override
     public ItemSet getPrimaryItems() {
-        return this.primaryItems;
+        return this.definition.getPrimaryItemSet();
     }
 
     @NotNull
     @Override
     public ItemSet getSupportedItems() {
-        return this.supportedItems;
+        return this.definition.getSupportedItemSet();
     }
 
     @Override
@@ -315,7 +264,7 @@ public abstract class GameEnchantment extends AbstractFileData<EnchantsPlugin> i
     public boolean isFullOfCharges(@NotNull ItemStack item) {
         if (!this.isChargeable()) return false;
 
-        int level = EnchantUtils.getLevel(item, this.getBukkitEnchantment());
+        int level = EnchantsUtils.getLevel(item, this.getBukkitEnchantment());
         int max = this.getMaxCharges(level);
 
         return this.getCharges(item) == max;

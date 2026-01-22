@@ -5,24 +5,25 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.type.KillEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.NumberUtil;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class WisdomEnchant extends GameEnchantment implements KillEnchant {
 
     private Modifier xpModifier;
 
-    public WisdomEnchant(@NotNull EnchantsPlugin plugin, File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public WisdomEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
     }
 
     @Override

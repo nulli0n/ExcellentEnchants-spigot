@@ -5,21 +5,22 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Period;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.EntityUtil;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class RegrowthEnchant extends GameEnchantment implements PassiveEnchant {
 
@@ -27,8 +28,8 @@ public class RegrowthEnchant extends GameEnchantment implements PassiveEnchant {
     private Modifier maxHealth;
     private Modifier healAmount;
 
-    public RegrowthEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public RegrowthEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.PROBABILITY, Probability.oneHundred());
         this.addComponent(EnchantComponent.PERIODIC, Period.ofSeconds(15));
     }
@@ -69,7 +70,7 @@ public class RegrowthEnchant extends GameEnchantment implements PassiveEnchant {
 
     @Override
     public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
-        double maxHealth = EntityUtil.getAttribute(entity, Attribute.MAX_HEALTH);
+        double maxHealth = EntityUtil.getAttributeValue(entity, Attribute.MAX_HEALTH);
         double health = entity.getHealth();
         if (health < this.getMinHealthToHeal(level) || health > this.getMaxHealthToHeal(level)) return false;
         if (health >= maxHealth) return false;

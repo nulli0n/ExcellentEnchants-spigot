@@ -7,22 +7,23 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.AttackEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.bukkit.NightSound;
+import su.nightexpress.nightcore.util.sound.VanillaSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class DoubleStrikeEnchant extends GameEnchantment implements AttackEnchant {
 
-    public DoubleStrikeEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public DoubleStrikeEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.PROBABILITY, Probability.addictive(1, 2));
     }
 
@@ -43,7 +44,7 @@ public class DoubleStrikeEnchant extends GameEnchantment implements AttackEnchan
 
         if (this.hasVisualEffects()) {
             UniParticle.of(Particle.EXPLOSION).play(victim.getEyeLocation(), 0.25, 0.15, 15);
-            NightSound.of(Sound.ENTITY_GENERIC_EXPLODE).play(victim.getLocation());
+            VanillaSound.of(Sound.ENTITY_GENERIC_EXPLODE).play(victim.getLocation());
         }
         return true;
     }

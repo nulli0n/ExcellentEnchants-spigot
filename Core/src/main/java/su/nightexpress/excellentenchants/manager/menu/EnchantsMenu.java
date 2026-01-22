@@ -1,17 +1,17 @@
 package su.nightexpress.excellentenchants.manager.menu;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MenuType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantFiles;
-import su.nightexpress.excellentenchants.api.EnchantKeys;
+import su.nightexpress.excellentenchants.EnchantsFiles;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
-import su.nightexpress.excellentenchants.config.Keys;
 import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
+import su.nightexpress.nightcore.bridge.common.NightKey;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.ui.menu.MenuViewer;
@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import static su.nightexpress.excellentenchants.api.EnchantsPlaceholders.*;
+import static su.nightexpress.excellentenchants.EnchantsPlaceholders.*;
 import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
 public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBased, Filled<CustomEnchantment> {
@@ -40,6 +40,8 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
 
     private static final String CONFLICTS = "%conflicts%";
     private static final String CHARGES   = "%charges%";
+
+    private final NamespacedKey levelKey;
 
     private NightItem    enchantIcon;
     private String       enchantName;
@@ -50,8 +52,9 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
 
     public EnchantsMenu(@NotNull EnchantsPlugin plugin) {
         super(plugin, MenuType.GENERIC_9X4, BLACK.wrap("Custom Enchantments"));
+        this.levelKey = new NamespacedKey(plugin, "list_display_level");
 
-        this.load(FileConfig.loadOrExtract(plugin, EnchantFiles.DIR_MENU, FILE_NAME));
+        this.load(FileConfig.loadOrExtract(plugin, EnchantsFiles.DIR_MENU, FILE_NAME));
     }
 
     @Override
@@ -82,13 +85,13 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
             ItemStack currentItem = event.getCurrentItem();
             if (currentItem == null) return;
 
-            int levelHas = PDCUtil.getInt(currentItem, Keys.keyLevel).orElse(1);
+            int levelHas = PDCUtil.getInt(currentItem, this.levelKey).orElse(1);
             if (++levelHas > enchantmentData.getDefinition().getMaxLevel()) {
                 levelHas = 1;
             }
 
             ItemStack item = this.buildEnchantIcon(enchantmentData, levelHas).getItemStack();
-            PDCUtil.set(item, Keys.keyLevel, levelHas);
+            PDCUtil.set(item, this.levelKey, levelHas);
             event.setCurrentItem(item);
         });
 
@@ -102,8 +105,8 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
             for (String line : this.enchantLoreConflicts) {
                 if (line.contains(GENERIC_NAME)) {
                     enchant.getDefinition().getExclusiveSet().stream()
-                        .map(BukkitThing::parseKey)
-                        .map(EnchantKeys::createOrVanilla)
+                        .map(NightKey::key)
+                        .map(NightKey::toBukkit)
                         .map(key -> BukkitThing.getByKey(RegistryType.ENCHANTMENT, key)).filter(Objects::nonNull).map(LangUtil::getSerializedName)
                         .forEach(conf -> conflicts.add(line.replace(GENERIC_NAME, conf)));
                     continue;

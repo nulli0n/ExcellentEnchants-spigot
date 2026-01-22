@@ -5,18 +5,18 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.enchantment.type.InventoryEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.Players;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class SoulboundEnchant extends GameEnchantment implements InventoryEnchant {
 
-    public SoulboundEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public SoulboundEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class SoulboundEnchant extends GameEnchantment implements InventoryEnchan
         if (event.getKeepInventory()) return false;
 
         event.getDrops().remove(itemStack);
-        this.plugin.runTask(task -> Players.addItem(event.getEntity(), itemStack));
+        event.getItemsToKeep().add(itemStack);
         return true;
     }
 }

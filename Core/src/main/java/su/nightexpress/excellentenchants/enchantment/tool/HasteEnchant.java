@@ -1,26 +1,28 @@
 package su.nightexpress.excellentenchants.enchantment.tool;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
+import su.nightexpress.excellentenchants.api.EnchantPriority;
+import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
-import su.nightexpress.excellentenchants.api.enchantment.meta.Period;
 import su.nightexpress.excellentenchants.api.enchantment.meta.PotionEffects;
-import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.type.MiningEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.FileConfig;
 
-import java.io.File;
+import java.nio.file.Path;
 
-public class HasteEnchant extends GameEnchantment implements PassiveEnchant {
+public class HasteEnchant extends GameEnchantment implements MiningEnchant {
 
-    public HasteEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
-        this.addComponent(EnchantComponent.POTION_EFFECT, PotionEffects.permanent(PotionEffectType.HASTE));
-        this.addComponent(EnchantComponent.PERIODIC, Period.ofSeconds(5));
+    public HasteEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
+        this.addComponent(EnchantComponent.POTION_EFFECT, PotionEffects.temporal(PotionEffectType.HASTE, Modifier.addictive(3).perLevel(1).capacity(10)));
     }
 
     @Override
@@ -29,7 +31,13 @@ public class HasteEnchant extends GameEnchantment implements PassiveEnchant {
     }
 
     @Override
-    public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
-        return this.addPotionEffect(entity, level);
+    public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity player, @NotNull ItemStack item, int level) {
+        return this.addPotionEffect(player, level);
+    }
+
+    @Override
+    @NotNull
+    public EnchantPriority getBreakPriority() {
+        return EnchantPriority.NORMAL;
     }
 }

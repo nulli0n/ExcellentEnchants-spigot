@@ -9,19 +9,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
-import su.nightexpress.excellentenchants.api.Modifier;
+import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
+import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.type.MiningEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
-import su.nightexpress.excellentenchants.util.EnchantUtils;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.BukkitThing;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,8 +39,8 @@ public class VeinminerEnchant extends GameEnchantment implements MiningEnchant {
     private Set<Material> affectedBlocks;
     private boolean       disableOnCrouch;
 
-    public VeinminerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public VeinminerEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
     }
 
     @Override
@@ -105,7 +106,7 @@ public class VeinminerEnchant extends GameEnchantment implements MiningEnchant {
             prepare.addAll(nearby);
         }
         ores.remove(source);
-        ores.forEach(ore -> EnchantUtils.safeBusyBreak(player, ore));
+        ores.forEach(ore -> EnchantsUtils.safeBusyBreak(player, ore));
     }
 
     @Override
@@ -117,7 +118,7 @@ public class VeinminerEnchant extends GameEnchantment implements MiningEnchant {
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity entity, @NotNull ItemStack tool, int level) {
         if (!(entity instanceof Player player)) return false;
-        if (EnchantUtils.isBusy()) return false;
+        if (EnchantsUtils.isBusy()) return false;
         if (this.disableOnCrouch && player.isSneaking()) return false;
 
         Block block = event.getBlock();

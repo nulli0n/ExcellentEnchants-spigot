@@ -5,20 +5,21 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Period;
 import su.nightexpress.excellentenchants.api.enchantment.meta.PotionEffects;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.FileConfig;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class WaterBreathingEnchant extends GameEnchantment implements PassiveEnchant {
 
-    public WaterBreathingEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public WaterBreathingEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.POTION_EFFECT, PotionEffects.permanent(PotionEffectType.WATER_BREATHING));
         this.addComponent(EnchantComponent.PERIODIC, Period.ofSeconds(5));
     }

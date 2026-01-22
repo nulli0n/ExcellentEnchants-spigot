@@ -8,13 +8,13 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
+import su.nightexpress.excellentenchants.EnchantsUtils;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.config.Perms;
 import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
-import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.commands.Arguments;
 import su.nightexpress.nightcore.commands.Commands;
 import su.nightexpress.nightcore.commands.builder.HubNodeBuilder;
@@ -23,7 +23,6 @@ import su.nightexpress.nightcore.commands.context.ParsedArguments;
 import su.nightexpress.nightcore.core.config.CoreLang;
 import su.nightexpress.nightcore.util.*;
 import su.nightexpress.nightcore.util.bridge.RegistryType;
-import su.nightexpress.nightcore.util.random.Rnd;
 
 public class BaseCommands {
 
@@ -114,7 +113,7 @@ public class BaseCommands {
     private int getLevel(@NotNull Enchantment enchantment, @NotNull ParsedArguments arguments) {
         int level = arguments.getInt(CommandArguments.LEVEL, -1);
         if (level <= 0) {
-            level = EnchantUtils.randomLevel(enchantment);
+            level = EnchantsUtils.randomLevel(enchantment);
         }
         return level;
     }
@@ -144,8 +143,8 @@ public class BaseCommands {
 
         boolean custom = context.hasFlag(CommandArguments.FLAG_CUSTOM);
         boolean charged = context.hasFlag(CommandArguments.FLAG_CHARGED);
-        Enchantment enchantment = Rnd.get(custom ? EnchantRegistry.getRegisteredBukkit() : BukkitThing.getAll(RegistryType.ENCHANTMENT));
-        int level = EnchantUtils.randomLevel(enchantment);
+        Enchantment enchantment = Randomizer.pick(custom ? EnchantRegistry.getRegisteredBukkit() : BukkitThing.getAll(RegistryType.ENCHANTMENT));
+        int level = EnchantsUtils.randomLevel(enchantment);
 
         return this.giveBook(context.getSender(), player, enchantment, level, charged);
     }
@@ -153,10 +152,10 @@ public class BaseCommands {
     private boolean giveBook(@NotNull CommandSender sender, @NotNull Player player, @NotNull Enchantment enchantment, int level, boolean charged) {
         ItemStack itemStack = new ItemStack(Material.ENCHANTED_BOOK);
         if (charged) {
-            EnchantUtils.restoreCharges(itemStack, enchantment, level);
+            EnchantsUtils.restoreCharges(itemStack, enchantment, level);
         }
 
-        EnchantUtils.add(itemStack, enchantment, level, true);
+        EnchantsUtils.add(itemStack, enchantment, level, true);
         Players.addItem(player, itemStack);
 
         Lang.ENCHANTED_BOOK_GAVE.message().send(sender, replacer -> replacer
@@ -187,10 +186,10 @@ public class BaseCommands {
         Enchantment enchantment = arguments.getEnchantment(CommandArguments.ENCHANT);
         int level = getLevel(enchantment, arguments);
 
-        EnchantUtils.add(itemStack, enchantment, level, true);
+        EnchantsUtils.add(itemStack, enchantment, level, true);
 
         if (charged) {
-            EnchantUtils.restoreCharges(itemStack, enchantment, level);
+            EnchantsUtils.restoreCharges(itemStack, enchantment, level);
         }
 
         context.send(context.getSender() == player ? Lang.COMMAND_ENCHANT_DONE_SELF : Lang.COMMAND_ENCHANT_DONE_OTHERS, replacer -> replacer
@@ -219,7 +218,7 @@ public class BaseCommands {
         }
 
         Enchantment enchantment = arguments.getEnchantment(CommandArguments.ENCHANT);
-        EnchantUtils.remove(itemStack, enchantment);
+        EnchantsUtils.remove(itemStack, enchantment);
 
         context.send(context.getSender() == player ? Lang.COMMAND_DISENCHANT_DONE_SELF : Lang.COMMAND_DISENCHANT_DONE_OTHERS, replacer -> replacer
             .replace(EnchantsPlaceholders.forPlayer(player))

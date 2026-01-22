@@ -15,18 +15,19 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.InteractEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.MiningEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.bukkit.NightSound;
+import su.nightexpress.nightcore.util.sound.VanillaSound;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,8 +48,8 @@ public class ReplanterEnchant extends GameEnchantment implements InteractEnchant
         CROP_MAP.put(Material.NETHER_WART, Material.NETHER_WART);
     }
 
-    public ReplanterEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public ReplanterEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.PROBABILITY, Probability.oneHundred());
     }
 
@@ -124,7 +125,7 @@ public class ReplanterEnchant extends GameEnchantment implements InteractEnchant
             if (seed == Material.NETHER_WART && blockGround.getType() == Material.SOUL_SAND
                 || seed != Material.NETHER_WART && blockGround.getType() == Material.FARMLAND) {
                 if (this.takeSeeds(player, seed)) {
-                    NightSound.of(seed == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT).play(player);
+                    VanillaSound.of(seed == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT).play(player);
                     player.swingMainHand();
                     blockPlant.setType(entry.getValue());
                     break;
@@ -150,7 +151,7 @@ public class ReplanterEnchant extends GameEnchantment implements InteractEnchant
 
         // Replant the gathered crops with a new one.
         if (this.takeSeeds(player, dataPlant.getPlacementMaterial())) {
-            plugin.runTask(task -> {
+            plugin.runTask(() -> {
                 blockPlant.setType(plant.getMaterial());
                 plant.setAge(0);
                 blockPlant.setBlockData(plant);

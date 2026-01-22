@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ExcellentEnchants</artifactId>
         <groupId>su.nightexpress.excellentenchants</groupId>
-        <version>5.3.0</version>
+        <version>5.4.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,28 +19,8 @@
 
     <repositories>
         <repository>
-            <id>papermc</id>
-            <url>https://repo.papermc.io/repository/maven-public/</url>
-        </repository>
-
-        <repository>
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-
-        <repository>
-            <id>lumine-repo</id>
-            <url>https://mvn.lumine.io/repository/maven-public/</url>
-        </repository>
-
-        <repository>
-            <id>lumine-snapshot</id>
-            <url>https://mvn.lumine.io/repository/maven-snapshots/</url>
-        </repository>
-
-        <repository>
-            <id>codemc-releases</id>
-            <url>https://repo.codemc.io/repository/maven-releases/</url>
         </repository>
     </repositories>
 
@@ -49,27 +29,6 @@
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.21.10-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.lumine</groupId>
-            <artifactId>Mythic-Dist</artifactId>
-            <version>5.6.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.dmulloy2</groupId>
-            <artifactId>ProtocolLib</artifactId>
-            <version>5.4.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.retrooper</groupId>
-            <artifactId>packetevents-spigot</artifactId>
-            <version>2.10.1</version>
             <scope>provided</scope>
         </dependency>
 
@@ -83,39 +42,44 @@
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>API</artifactId>
-            <version>5.3.0</version>
+            <version>5.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>su.nightexpress.excellentenchants</groupId>
+            <artifactId>spigot-1.21.11</artifactId>
+            <version>5.4.0</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>MC_1_21_10</artifactId>
-            <version>5.3.0</version>
+            <version>5.4.0</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
             <artifactId>MC_1_21_8</artifactId>
-            <version>5.3.0</version>
+            <version>5.4.0</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
-            <artifactId>MC_1_21_7</artifactId>
-            <version>5.3.0</version>
+            <artifactId>tooltip-packetevents</artifactId>
+            <version>5.4.0</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
-            <artifactId>MC_1_21_5</artifactId>
-            <version>5.3.0</version>
+            <artifactId>tooltip-protocollib</artifactId>
+            <version>5.4.0</version>
         </dependency>
 
         <dependency>
             <groupId>su.nightexpress.excellentenchants</groupId>
-            <artifactId>MC_1_21_4</artifactId>
-            <version>5.3.0</version>
+            <artifactId>compat-mythicmobs</artifactId>
+            <version>5.4.0</version>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -126,6 +90,19 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Force PaperMC to remap the plugin to paper mappings, but keep Spigot compatibility -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

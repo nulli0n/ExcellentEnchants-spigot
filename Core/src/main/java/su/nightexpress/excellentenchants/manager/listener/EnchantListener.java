@@ -8,6 +8,7 @@ import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -22,21 +23,24 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
+import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.excellentenchants.api.damage.DamageBonus;
 import su.nightexpress.excellentenchants.api.damage.DamageBonusType;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.ProtectionEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
-import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.nightcore.util.EntityUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class EnchantListener extends AbstractListener<EnchantsPlugin> {
+
+    private static final EquipmentSlot[] ARMOR_SLOTS = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFF_HAND};
 
     private final EnchantManager manager;
 
@@ -49,14 +53,21 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
 
-        this.manager.handleItemEnchants(player, EquipmentSlot.HAND, EnchantRegistry.MINING, (item, enchant, level) -> enchant.onBreak(event, player, item, level));
+        this.manager.handleInSlot(player, EquipmentSlot.HAND, EnchantRegistry.MINING, (item, enchant, level) -> enchant.onBreak(event, player, item, level));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onDrop(BlockDropItemEvent event) {
+    public void onBlockDrop(BlockDropItemEvent event) {
         Player player = event.getPlayer();
 
-        this.manager.handleItemEnchants(player, EquipmentSlot.HAND, EnchantRegistry.BLOCK_DROP, (item, enchant, level) -> enchant.onDrop(event, player, item, level));
+        this.manager.handleInSlot(player, EquipmentSlot.HAND, EnchantRegistry.BLOCK_DROP, (item, enchant, level) -> enchant.onDrop(event, player, item, level));
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockChange(EntityChangeBlockEvent event) {
+        if (!(event.getEntity() instanceof LivingEntity entity)) return;
+
+        this.manager.handleInSlots(entity, EntityUtil.EQUIPMENT_SLOTS, EnchantRegistry.BLOCK_CHANGE, (item, enchant, level) -> enchant.onBlockChange(event, entity, item, level));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -64,7 +75,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
         LivingEntity entity = event.getEntity();
         EquipmentSlot slot = event.getHand();
 
-        this.manager.handleItemEnchants(entity, slot, EnchantRegistry.BOW, (item, enchant, level) -> {
+        this.manager.handleInSlot(entity, slot, EnchantRegistry.BOW, (item, enchant, level) -> {
             if (!enchant.onShoot(event, entity, item, level)) return false;
 
             if (event.getProjectile() instanceof AbstractArrow arrow) {
@@ -93,7 +104,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
     }
 
     private void addArrowEffects(@NotNull AbstractArrow arrow, @NotNull CustomEnchantment enchant, int level) {
-        EnchantUtils.addArrowEnchant(arrow, enchant, level);
+        EnchantsUtils.addArrowEnchant(arrow, enchant, level);
 
         if (enchant.hasVisualEffects() && enchant.hasComponent(EnchantComponent.ARROW)) {
             this.manager.addArrowEffect(arrow, enchant.getComponent(EnchantComponent.ARROW).getTrailEffect());
@@ -119,7 +130,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
             });
         }
 
-        this.plugin.runTask(task -> this.manager.removeArrowEffects(abstractArrow));
+        this.plugin.runTask(() -> this.manager.removeArrowEffects(abstractArrow));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -131,7 +142,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
 
         Map<ProtectionEnchant, DamageBonus> damageMap = new HashMap<>();
 
-        this.manager.handleArmorEnchants(victim, EnchantRegistry.PROTECTION, (item, enchant, level) -> {
+        this.manager.handleInSlots(victim, ARMOR_SLOTS, EnchantRegistry.PROTECTION, (item, enchant, level) -> {
             if (event.isCancelled()) return false;
 
             DamageBonus damageBonus = damageMap.computeIfAbsent(enchant, k -> enchant.getDamageBonus());
@@ -188,14 +199,14 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
         else if (directDamager instanceof LivingEntity damager) {
             if (source.getDamageType() == DamageType.THORNS) return;
 
-            this.manager.handleItemEnchants(damager, EquipmentSlot.HAND, EnchantRegistry.ATTACK, (item, enchant, level) -> enchant.onAttack(event, damager, victim, item, level));
+            this.manager.handleInSlot(damager, EquipmentSlot.HAND, EnchantRegistry.ATTACK, (item, enchant, level) -> enchant.onAttack(event, damager, victim, item, level));
         }
 
         if (source.getCausingEntity() instanceof LivingEntity damager) {
             if (source.getDamageType() == DamageType.THORNS) return;
             if (damager == victim) return;
 
-            this.manager.handleArmorEnchants(victim, EnchantRegistry.DEFEND, (item, enchant, level) -> enchant.onProtect(event, damager, victim, item, level));
+            this.manager.handleInSlots(victim, ARMOR_SLOTS, EnchantRegistry.DEFEND, (item, enchant, level) -> enchant.onProtect(event, damager, victim, item, level));
         }
     }
 
@@ -210,17 +221,17 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
         }
 
         if (killer != null) {
-            this.manager.handleItemEnchants(killer, EquipmentSlot.HAND, EnchantRegistry.KILL, (item, enchant, level) -> enchant.onKill(event, entity, killer, item, level));
+            this.manager.handleInSlot(killer, EquipmentSlot.HAND, EnchantRegistry.KILL, (item, enchant, level) -> enchant.onKill(event, entity, killer, item, level));
         }
 
-        this.manager.handleArmorEnchants(entity, EnchantRegistry.DEATH, (item, enchant, level) -> enchant.onDeath(event, entity, item, level));
+        this.manager.handleInSlots(entity, ARMOR_SLOTS, EnchantRegistry.DEATH, (item, enchant, level) -> enchant.onDeath(event, entity, item, level));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onResurrect(EntityResurrectEvent event) {
         LivingEntity entity = event.getEntity();
 
-        this.manager.handleArmorEnchants(entity, EnchantRegistry.RESURRECT, (item, enchant, level) -> enchant.onResurrect(event, entity, item, level));
+        this.manager.handleInSlots(entity, ARMOR_SLOTS, EnchantRegistry.RESURRECT, (item, enchant, level) -> enchant.onResurrect(event, entity, item, level));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -228,11 +239,11 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
         Player player = event.getPlayer();
         EquipmentSlot slot = event.getHand();
         if (slot == null) {
-            slot = EnchantUtils.getItemHand(player, Material.FISHING_ROD);
+            slot = EnchantsUtils.getItemHand(player, Material.FISHING_ROD);
         }
         if (slot == null) return;
 
-        this.manager.handleItemEnchants(player, slot, EnchantRegistry.FISHING, (item, enchant, level) -> enchant.onFishing(event, item, level));
+        this.manager.handleInSlot(player, slot, EnchantRegistry.FISHING, (item, enchant, level) -> enchant.onFishing(event, item, level));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -242,19 +253,22 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
 
         Location from = event.getFrom();
         Location to = event.getTo();
-        if (to == null) return;
         if (from.getX() == to.getX() && from.getY() == to.getY() && from.getZ() == to.getZ()) return;
 
-        this.manager.handleArmorEnchants(player, EnchantRegistry.MOVE, (item, enchant, level) -> enchant.onMove(event, player, item, level));
+        this.manager.handleInSlots(player, ARMOR_SLOTS, EnchantRegistry.MOVE, (item, enchant, level) -> enchant.onMove(event, player, item, level));
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         EquipmentSlot slot = event.getHand();
+
+        if (slot == null && event.getAction() == Action.PHYSICAL) {
+            slot = EquipmentSlot.FEET;
+        }
         if (slot == null) return;
 
-        this.manager.handleItemEnchants(player, slot, EnchantRegistry.INTERACT, (item, enchant, level) -> enchant.onInteract(event, player, item, level));
+        this.manager.handleInSlot(player, slot, EnchantRegistry.INTERACT, (item, enchant, level) -> enchant.onInteract(event, player, item, level));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -278,7 +292,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
     public void onBlockPlace(BlockPlaceEvent event) {
         ItemStack itemStack = event.getItemInHand();
 
-        BlockEnchant enchant = EnchantUtils.getBlockEnchant(itemStack);
+        BlockEnchant enchant = this.manager.getBlockEnchant(itemStack);
         if (enchant == null) return;
 
         Player player = event.getPlayer();
@@ -307,7 +321,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
             }
             if (itemStack == null) return;
 
-            BlockEnchant enchant = EnchantUtils.getBlockEnchant(itemStack);
+            BlockEnchant enchant = this.manager.getBlockEnchant(itemStack);
             if (enchant == null) return;
 
             if (!enchant.canPlaceInContainers()) {
@@ -321,18 +335,17 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
         ItemStack clickedItem = event.getCurrentItem();
         if (clickedItem == null) return;
 
-        ItemStack cursor = event.getView().getCursor(); // Creative is shit, undetectable.
-        if (cursor == null) return;
+        ItemStack cursor = event.getView().getCursor();
 
         boolean isLeftClick = (event.isLeftClick() && !event.isShiftClick()) || event.getClick() == ClickType.CREATIVE;
         if (!isLeftClick) return;
 
         BlockEnchant enchant;
         if (cursor.getType() == Material.BUNDLE) {
-            enchant = EnchantUtils.getBlockEnchant(clickedItem);
+            enchant = this.manager.getBlockEnchant(clickedItem);
         }
         else if (clickedItem.getType() == Material.BUNDLE) {
-            enchant = EnchantUtils.getBlockEnchant(cursor);
+            enchant = this.manager.getBlockEnchant(cursor);
         }
         else return;
 
@@ -348,7 +361,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
         ItemStack itemStack = event.getCursor();
         if (itemStack == null) return;
 
-        BlockEnchant enchant = EnchantUtils.getBlockEnchant(itemStack);
+        BlockEnchant enchant = this.manager.getBlockEnchant(itemStack);
         if (enchant == null || enchant.canPlaceInContainers()) return;
 
         if (event.getRawSlots().stream().anyMatch(slot -> {
@@ -363,7 +376,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
     public void onBlockHopper(InventoryPickupItemEvent event) {
         ItemStack itemStack = event.getItem().getItemStack();
 
-        BlockEnchant enchant = EnchantUtils.getBlockEnchant(itemStack);
+        BlockEnchant enchant = this.manager.getBlockEnchant(itemStack);
         if (enchant == null || enchant.canPlaceInContainers()) return;
 
         event.setCancelled(true);

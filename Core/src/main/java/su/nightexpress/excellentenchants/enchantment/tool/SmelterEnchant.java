@@ -14,22 +14,24 @@ import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
+import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
-import su.nightexpress.excellentenchants.util.EnchantUtils;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
+import su.nightexpress.nightcore.bridge.wrap.NightSound;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.LocationUtil;
-import su.nightexpress.nightcore.util.bukkit.NightSound;
+import su.nightexpress.nightcore.util.sound.VanillaSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -43,8 +45,8 @@ public class SmelterEnchant extends GameEnchantment implements BlockDropEnchant 
     private final Set<Material>      exemptedItems;
     private final Set<FurnaceRecipe> recipes;
 
-    public SmelterEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public SmelterEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.PROBABILITY, Probability.addictive(15, 5));
 
         this.exemptedItems = new HashSet<>();
@@ -58,14 +60,14 @@ public class SmelterEnchant extends GameEnchantment implements BlockDropEnchant 
             "Sets whether or not enchantment will have no effect when crouching."
         ).read(config);
 
-        this.sound = ConfigValue.create("Smelter.Sound", NightSound.of(Sound.BLOCK_LAVA_EXTINGUISH), "Sound to play on smelting.").read(config);
+        this.sound = ConfigValue.create("Smelter.Sound", VanillaSound.of(Sound.BLOCK_LAVA_EXTINGUISH), "Sound to play on smelting.").read(config);
 
         this.recipes.clear();
         this.exemptedItems.clear();
 
         this.exemptedItems.addAll(ConfigValue.forSet("Smelter.Exempted_Blocks",
             BukkitThing::getMaterial,
-            (cfg, path, set) -> cfg.set(path, set.stream().map(BukkitThing::toString).toList()),
+            (cfg, path, set) -> cfg.set(path, set.stream().map(BukkitThing::getAsString).toList()),
             Lists.newSet(Material.COBBLESTONE),
             "List of blocks / items that are immune to the Smelter effect."
         ).read(config));
@@ -114,7 +116,7 @@ public class SmelterEnchant extends GameEnchantment implements BlockDropEnchant 
         });
         if (smelts.isEmpty()) return false;
 
-        smelts.forEach(itemStack -> EnchantUtils.populateResource(event, itemStack));
+        smelts.forEach(itemStack -> EnchantsUtils.populateResource(event, itemStack));
 
         Block block = state.getBlock();
         if (this.hasVisualEffects()) {

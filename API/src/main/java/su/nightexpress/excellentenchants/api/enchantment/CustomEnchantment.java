@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.api.enchantment;
 
-import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
@@ -9,26 +8,21 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Charges;
 import su.nightexpress.excellentenchants.api.item.ItemSet;
-import su.nightexpress.excellentenchants.api.wrapper.EnchantDefinition;
-import su.nightexpress.excellentenchants.api.wrapper.EnchantDistribution;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.excellentenchants.api.EnchantDefinition;
+import su.nightexpress.excellentenchants.api.EnchantDistribution;
 
 import java.util.List;
 import java.util.function.UnaryOperator;
 
 public interface CustomEnchantment {
 
-    boolean load();
-
-    void onRegister(@NotNull Enchantment enchantment);
+    void load();
 
     <T> boolean hasComponent(@NotNull EnchantComponent<T> type);
 
     @NotNull <T> T getComponent(@NotNull EnchantComponent<T> type);
 
     @NotNull UnaryOperator<String> replacePlaceholders(int level);
-
-    @NotNull FileConfig getConfig();
 
     @NotNull Enchantment getBukkitEnchantment();
 
@@ -42,10 +36,6 @@ public interface CustomEnchantment {
 
     boolean isTriggerTime(@NotNull LivingEntity entity);
 
-    boolean isAvailableToUse(@NotNull LivingEntity entity);
-
-    boolean isAvailableToUse(@NotNull World world);
-
     @NotNull String getId();
 
     @NotNull String getDisplayName();
@@ -53,8 +43,6 @@ public interface CustomEnchantment {
     @NotNull List<String> getDescription();
 
     @NotNull List<String> getDescription(int level);
-
-    @NotNull List<String> getDescription(int level, int charges);
 
     @NotNull ItemSet getPrimaryItems();
 

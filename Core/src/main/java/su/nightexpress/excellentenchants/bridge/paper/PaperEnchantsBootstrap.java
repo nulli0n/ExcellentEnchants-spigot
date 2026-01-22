@@ -2,13 +2,11 @@ package su.nightexpress.excellentenchants.bridge.paper;
 
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
-import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEventType;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
-import io.papermc.paper.registry.event.RegistryComposeEvent;
-import io.papermc.paper.registry.event.RegistryEventProvider;
 import io.papermc.paper.registry.event.RegistryEvents;
 import io.papermc.paper.registry.keys.EnchantmentKeys;
 import io.papermc.paper.registry.keys.tags.EnchantmentTagKeys;
@@ -27,20 +25,19 @@ import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
-import su.nightexpress.excellentenchants.api.EnchantKeys;
+import su.nightexpress.excellentenchants.EnchantsKeys;
 import su.nightexpress.excellentenchants.api.item.ItemSet;
 import su.nightexpress.excellentenchants.api.item.ItemSetRegistry;
-import su.nightexpress.excellentenchants.api.wrapper.EnchantDefinition;
-import su.nightexpress.excellentenchants.api.wrapper.EnchantDistribution;
+import su.nightexpress.excellentenchants.api.EnchantDefinition;
+import su.nightexpress.excellentenchants.api.EnchantDistribution;
 import su.nightexpress.excellentenchants.api.wrapper.TradeType;
-import su.nightexpress.excellentenchants.bridge.DistributionConfig;
-import su.nightexpress.excellentenchants.enchantment.EnchantDataRegistry;
+import su.nightexpress.excellentenchants.enchantment.DistributionConfig;
+import su.nightexpress.excellentenchants.enchantment.EnchantCatalog;
 import su.nightexpress.nightcore.bridge.common.NightKey;
 import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.Reflex;
 
-import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -48,20 +45,22 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
 
     @NotNull
     private TagKey<ItemType> customItemTag(@NotNull String name) {
-        return TagKey.create(RegistryKey.ITEM, Key.key(EnchantKeys.NAMESPACE, name));
+        return TagKey.create(RegistryKey.ITEM, Key.key(EnchantsKeys.NAMESPACE, name));
     }
 
     @NotNull
     private Key customKey(@NotNull String id) {
-        return EnchantKeys.create(id);
+        return EnchantsKeys.create(id);
     }
 
     @Override
     public void bootstrap(@NotNull BootstrapContext context) {
         Path dataDirectory = context.getDataDirectory();
 
-        DistributionConfig.load(dataDirectory); // Load distribution config,
-        EnchantDataRegistry.initialize(dataDirectory, true); // Load defaults and read from the config files Definition and Distribution settings for enchants.
+        DistributionConfig distributionConfig = DistributionConfig.load(dataDirectory);
+        if (distributionConfig.isUseMinecraftNamespace()) {
+            EnchantsKeys.setVanillaNamespace();
+        }
 
         var lifeCycle = context.getLifecycleManager();
 
@@ -69,58 +68,56 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
         // Use 'postFlatten' instead of 'preFlatten' to access vanilla item tags to create default item sets more effectively.
         lifeCycle.registerEventHandler(LifecycleEvents.TAGS.postFlatten(RegistryKey.ITEM).newHandler(event -> {
             PostFlattenTagRegistrar<ItemType> registrar = event.registrar();
+            PaperItemTagLookup tagLookup = new PaperItemTagLookup(registrar);
+            ItemSetRegistry itemSetRegistry = new ItemSetRegistry(dataDirectory, tagLookup);
 
             // Load default item types.
-            ItemSetRegistry.initialize(dataDirectory, new PaperItemTagLookup(registrar));
+            itemSetRegistry.load();
 
             // Register custom tags for our ItemSet objects.
-            ItemSetRegistry.getMap().forEach((keyName, category) -> {
-                TagKey<ItemType> tagKey = this.customItemTag(keyName);
+            itemSetRegistry.values().forEach(itemSet -> {
+                TagKey<ItemType> tagKey = this.customItemTag(itemSet.getId());
                 // Transform item names into TagEntry values by creating TypedKey for each item.
-                var tagEntries = category.getMaterials().stream().map(itemName -> TypedKey.create(RegistryKey.ITEM, Key.key(itemName))).toList();
+                var tagEntries = itemSet.getMaterials().stream().map(itemName -> TypedKey.create(RegistryKey.ITEM, Key.key(itemName))).toList();
 
                 registrar.addToTag(tagKey, tagEntries);
             });
+
+            // Load defaults and read from the config files Definition and Distribution settings for enchants.
+            EnchantCatalog.loadAll(dataDirectory, itemSetRegistry, (entry, exception) -> context.getLogger().error("Could not load '{}' enchantment: '{}'", entry.getId(), exception.getMessage()));
         }));
 
-
-        Method method = Reflex.findMethod(RegistryEventProvider.class, "compose", "freeze").orElseThrow();
-        @SuppressWarnings("unchecked")
-        var eventType = (LifecycleEventType.Prioritizable<BootstrapContext, RegistryComposeEvent<Enchantment, EnchantmentRegistryEntry.Builder>>) Reflex.invokeMethod(method, RegistryEvents.ENCHANTMENT);
-        if (eventType == null) throw new IllegalStateException("LifecycleEventType not found.");
-
         // Register a new handler for the freeze lifecycle event on the enchantment registry
-        lifeCycle.registerEventHandler(eventType.newHandler(event -> {
-            EnchantDataRegistry.getMap().forEach((enchantId, data) -> {
+        lifeCycle.registerEventHandler(RegistryEvents.ENCHANTMENT.compose().newHandler(event -> {
+            var registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+
+            EnchantCatalog.enabled().forEach((data) -> {
                 EnchantDefinition definition = data.getDefinition();
-                String primaryId = definition.getPrimaryItemsId();
-                String supportedId = definition.getSupportedItemsId();
+                ItemSet primarySet = definition.getPrimaryItemSet();
+                ItemSet supportedSet = definition.getSupportedItemSet();
 
-                ItemSet primarySet = ItemSetRegistry.getByKey(primaryId);
-                ItemSet supportedSet = ItemSetRegistry.getByKey(supportedId);
-                if (primarySet == null || supportedSet == null) {
-                    context.getLogger().error("Could not register enchantment '{}' due to invalid primary/supported items sets: {}/{}", enchantId, primaryId, supportedId);
-                    return;
-                }
-
-                TagKey<ItemType> primaryItemsTag = this.customItemTag(primaryId);
-                TagKey<ItemType> supportedItemsTag = this.customItemTag(supportedId);
+                TagKey<ItemType> primaryItemsTag = this.customItemTag(primarySet.getId());
+                TagKey<ItemType> supportedItemsTag = this.customItemTag(supportedSet.getId());
 
                 Tag<@NonNull ItemType> primaryItems = event.getOrCreateTag(primaryItemsTag);
                 Tag<@NonNull ItemType> supportedItems = event.getOrCreateTag(supportedItemsTag);
 
                 RegistryKeySet<@NonNull Enchantment> exclusiveSet = RegistrySet.keySet(RegistryKey.ENCHANTMENT, definition.getExclusiveSet()
                     .stream()
-                    .map(NightKey::key)
-                    .map(NightKey::toBukkit)
-                    .map(EnchantKeys::createOrVanilla) // Remap with the 'correct' namespace according to the config setting.
-                    .filter(key -> EnchantKeys.isVanilla(key) || EnchantDataRegistry.isPresent(key.value()))
-                    .map(EnchantmentKeys::create)
+                    .map(rawKey -> {
+                        Key key = NightKey.key(rawKey).toBukkit();
+                        if (registry.get(key) == null) {
+                            context.getLogger().warn("Unknown enchantment '{}' in exclusive list of '{}'. Ensure excluded enchantments are loaded before they are listed as exclusions for others.", key, data.getId());
+                            return null;
+                        }
+                        return EnchantmentKeys.create(key);
+                    })
+                    .filter(Objects::nonNull)
                     .toList()
                 );
 
                 EquipmentSlotGroup[] activeSlots = Stream.of(supportedSet.getSlots()).map(EquipmentSlot::getGroup).toArray(EquipmentSlotGroup[]::new);
-                Key key = this.customKey(enchantId);
+                Key key = this.customKey(data.getId());
                 Component component = MiniMessage.miniMessage().deserialize(definition.getDisplayName());
                 String nameOnly = MiniMessage.miniMessage().stripTags(definition.getDisplayName());
 
@@ -144,9 +141,9 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
         lifeCycle.registerEventHandler(LifecycleEvents.TAGS.preFlatten(RegistryKey.ENCHANTMENT).newHandler(event -> {
             var registrar = event.registrar();
 
-            EnchantDataRegistry.getMap().forEach((enchantId, data) -> {
+            EnchantCatalog.enabled().forEach((data) -> {
                 EnchantDistribution distribution = data.getDistribution();
-                TypedKey<Enchantment> key = EnchantmentKeys.create(this.customKey(enchantId));
+                TypedKey<Enchantment> key = EnchantmentKeys.create(this.customKey(data.getId()));
 
                 TagEntry<Enchantment> entry = TagEntry.valueEntry(key);
                 Set<TagEntry<Enchantment>> list = Lists.newSet(entry);
@@ -160,13 +157,13 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
                 //else registrar.addToTag(EnchantmentTagKeys.NON_TREASURE, list);
 
                 // Any enchantment can be on random loot.
-                if (distribution.isOnRandomLoot() && DistributionConfig.DISTRIBUTION_RANDOM_LOOT.get()) {
+                if (distribution.isOnRandomLoot() && distributionConfig.isRandomLootEnabled()) {
                     registrar.addToTag(EnchantmentTagKeys.ON_RANDOM_LOOT, list);
                 }
 
                 // Only non-treasure enchantments should be on mob equipment, traded equipment and non-rebalanced trades.
                 if (!distribution.isTreasure()) {
-                    if (distribution.isOnMobSpawnEquipment() && DistributionConfig.DISTRIBUTION_MOB_EQUIPMENT.get()) {
+                    if (distribution.isOnMobSpawnEquipment() && distributionConfig.isMobEquipmentEnabled()) {
                         registrar.addToTag(EnchantmentTagKeys.ON_MOB_SPAWN_EQUIPMENT, list);
                     }
 
@@ -177,13 +174,13 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
                     // - VillagerTrades
                     // - TradeRebalanceEnchantmentProviders
                     // - VanillaEnchantmentProviders
-                    if (distribution.isOnTradedEquipment() && DistributionConfig.DISTRIBUTION_TRADE_EQUIPMENT.get()) {
+                    if (distribution.isOnTradedEquipment() && distributionConfig.isTradeEquipmentEnabled()) {
                         registrar.addToTag(EnchantmentTagKeys.ON_TRADED_EQUIPMENT, list);
                     }
                 }
 
                 // Any enchantment can be tradable (on enchanted books).
-                if (distribution.isTradable() && DistributionConfig.DISTRIBUTION_TRADING.get()) {
+                if (distribution.isTradable() && distributionConfig.isTradingEnabled()) {
                     distribution.getTrades().forEach(tradeType -> {
                         registrar.addToTag(getTradeKey(tradeType), list);
                     });
@@ -196,7 +193,7 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
                 else {
                     // Only non-curse and non-treasure enchantments should go in enchanting table.
                     if (!distribution.isTreasure()) {
-                        if (distribution.isDiscoverable() && DistributionConfig.DISTRIBUTION_ENCHANTING.get()) {
+                        if (distribution.isDiscoverable() && distributionConfig.isEnchantingEnabled()) {
                             registrar.addToTag(EnchantmentTagKeys.IN_ENCHANTING_TABLE, list);
                         }
                     }

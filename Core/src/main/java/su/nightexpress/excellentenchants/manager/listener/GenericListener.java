@@ -1,10 +1,8 @@
 package su.nightexpress.excellentenchants.manager.listener;
 
-import org.bukkit.GameMode;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -13,15 +11,13 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
+import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
-import su.nightexpress.excellentenchants.util.EnchantUtils;
 import su.nightexpress.nightcore.manager.AbstractListener;
 
 public class GenericListener extends AbstractListener<EnchantsPlugin> {
@@ -34,42 +30,22 @@ public class GenericListener extends AbstractListener<EnchantsPlugin> {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDisplayGameMode(PlayerGameModeChangeEvent event) {
-        Player player = event.getPlayer();
-        GameMode current = player.getGameMode();
-        GameMode changed = event.getNewGameMode();
-
-        // When enter Creative gamemode, force update all inventory to flush item's lore so they don't have enchant descriptions.
-        if (changed == GameMode.CREATIVE) {
-            EnchantUtils.runInDisabledDisplayUpdate(player, player::updateInventory);
-        }
-        else if (current == GameMode.CREATIVE) {
-            this.plugin.runTask(task -> player.updateInventory());
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onDisplayQuit(PlayerQuitEvent event) {
-        EnchantUtils.allowDisplayUpdate(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        EnchantUtils.setSpawnReason(event.getEntity(), event.getSpawnReason());
+        this.manager.setSpawnReason(event.getEntity(), event.getSpawnReason());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChargesFillOnEnchant(EnchantItemEvent event) {
         if (!Config.isChargesEnabled()) return;
 
-        this.plugin.runTask(task -> {
+        this.plugin.runTask(() -> {
             Inventory inventory = event.getInventory();
 
             ItemStack result = inventory.getItem(0);
             if (result == null) return;
 
             event.getEnchantsToAdd().forEach((enchantment, level) -> {
-                EnchantUtils.restoreCharges(result, enchantment, level);
+                EnchantsUtils.restoreCharges(result, enchantment, level);
             });
 
             inventory.setItem(0, result);

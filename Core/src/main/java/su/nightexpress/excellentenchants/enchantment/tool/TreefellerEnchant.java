@@ -10,16 +10,18 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
+import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
+import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.type.MiningEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
-import su.nightexpress.excellentenchants.util.EnchantUtils;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.Lists;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,24 +39,23 @@ public class TreefellerEnchant extends GameEnchantment implements MiningEnchant 
         BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST
     };
 
-    private int     blockLimit;
-    private boolean disableOnCrouch;
+    private Modifier blocksLimit;
+    private boolean  disableOnCrouch;
 
-    public TreefellerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public TreefellerEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
     }
 
     @Override
     protected void loadAdditional(@NotNull FileConfig config) {
-        this.disableOnCrouch = ConfigValue.create("Treefaller.Disable_On_Crouch",
+        this.disableOnCrouch = ConfigValue.create("Treefeller.Disable_On_Crouch",
             true,
             "Controls whether enchantment effect can be bypassed by crouching."
         ).read(config);
 
-        this.blockLimit = ConfigValue.create("Treefaller.Block_Limit",
-            180,
-            "Max. blocks to lookup for tree logs (including leaves)."
-        ).read(config);
+        this.blocksLimit = Modifier.load(config, "Treefeller.Block_Limit",
+            Modifier.addictive(16).perLevel(8).capacity(180),
+            "Max. blocks to lookup for tree logs (including leaves).");
     }
 
     @NotNull
@@ -103,8 +104,8 @@ public class TreefellerEnchant extends GameEnchantment implements MiningEnchant 
         return Tag.LEAVES.isTagged(material);
     }
 
-    private void chopTree(@NotNull Player player, @NotNull Block source, @NotNull ItemStack tool) {
-        Set<Block> logsToBreak = this.getLogsAndLeaves(source, this.blockLimit);
+    private void chopTree(@NotNull Player player, @NotNull Block source, @NotNull ItemStack tool, int level) {
+        Set<Block> logsToBreak = this.getLogsAndLeaves(source, this.blocksLimit.getIntValue(level));
 
         logsToBreak.remove(source);
 
@@ -112,7 +113,7 @@ public class TreefellerEnchant extends GameEnchantment implements MiningEnchant 
             if (tool.getAmount() <= 0) break; // Item broke.
             if (!isLog(log.getType())) continue;
 
-            EnchantUtils.safeBusyBreak(player, log);
+            EnchantsUtils.safeBusyBreak(player, log);
         }
     }
 
@@ -125,13 +126,13 @@ public class TreefellerEnchant extends GameEnchantment implements MiningEnchant 
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent event, @NotNull LivingEntity entity, @NotNull ItemStack tool, int level) {
         if (!(entity instanceof Player player)) return false;
-        if (EnchantUtils.isBusy()) return false;
+        if (EnchantsUtils.isBusy()) return false;
         if (this.disableOnCrouch && player.isSneaking()) return false;
 
         Block block = event.getBlock();
         if (!isLog(block.getType())) return false;
 
-        this.chopTree(player, block, tool);
+        this.chopTree(player, block, tool, level);
         return true;
     }
 }

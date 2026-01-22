@@ -8,30 +8,31 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.AttackEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.LocationUtil;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class ThunderEnchant extends GameEnchantment implements AttackEnchant {
 
     private boolean  thunderstormOnly;
     private Modifier damageModifier;
 
-    public ThunderEnchant(@NotNull EnchantsPlugin plugin, File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public ThunderEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.PROBABILITY, Probability.addictive(5, 2));
     }
 
@@ -74,7 +75,7 @@ public class ThunderEnchant extends GameEnchantment implements AttackEnchant {
 
         if (this.hasVisualEffects()) {
             Block block = location.getBlock().getRelative(BlockFace.DOWN);
-            Location center = LocationUtil.getCenter(location);
+            Location center = LocationUtil.setCenter3D(location.clone());
             UniParticle.blockCrack(block.getType()).play(center, 0.5, 0.1, 100);
             UniParticle.of(Particle.ELECTRIC_SPARK).play(center, 0.75, 0.05, 120);
         }

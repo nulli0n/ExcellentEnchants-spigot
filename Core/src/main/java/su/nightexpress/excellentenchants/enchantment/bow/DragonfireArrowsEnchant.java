@@ -17,29 +17,30 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.ArrowEffects;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.ArrowEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.ItemUtil;
 import su.nightexpress.nightcore.util.NumberUtil;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class DragonfireArrowsEnchant extends GameEnchantment implements ArrowEnchant {
 
     private Modifier duration;
     private Modifier radius;
 
-    public DragonfireArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public DragonfireArrowsEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.ARROW, ArrowEffects.basic(Particle.DRAGON_BREATH));
         this.addComponent(EnchantComponent.PROBABILITY, Probability.addictive(4, 3));
     }
@@ -111,7 +112,7 @@ public class DragonfireArrowsEnchant extends GameEnchantment implements ArrowEnc
         AreaEffectCloud cloud = potion.getWorld().spawn(location, AreaEffectCloud.class);
         cloud.clearCustomEffects();
         cloud.setSource(shooter);
-        cloud.setParticle(Particle.DRAGON_BREATH);
+        cloud.setParticle(Particle.DRAGON_BREATH, 1F);
         cloud.setRadius((float) this.getFireRadius(level));
         cloud.setDuration(this.getFireDuration(level));
         cloud.setRadiusPerTick((7.0F - cloud.getRadius()) / (float) cloud.getDuration());

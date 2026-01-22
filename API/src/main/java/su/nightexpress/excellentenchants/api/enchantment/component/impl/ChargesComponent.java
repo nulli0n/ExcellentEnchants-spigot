@@ -1,7 +1,7 @@
 package su.nightexpress.excellentenchants.api.enchantment.component.impl;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Charges;

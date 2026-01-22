@@ -1,6 +1,7 @@
 package su.nightexpress.excellentenchants.manager.listener;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,11 +14,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.view.AnvilView;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.bridge.DistributionConfig;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.config.Keys;
-import su.nightexpress.excellentenchants.util.EnchantUtils;
+import su.nightexpress.excellentenchants.enchantment.EnchantSettings;
+import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.nightcore.manager.AbstractListener;
 import su.nightexpress.nightcore.util.PDCUtil;
 import su.nightexpress.nightcore.util.sound.VanillaSound;
@@ -27,8 +27,13 @@ import java.util.Map;
 
 public class AnvilListener extends AbstractListener<EnchantsPlugin> {
 
-    public AnvilListener(@NotNull EnchantsPlugin plugin) {
+    private final EnchantSettings settings;
+    private final NamespacedKey rechargedKey;
+
+    public AnvilListener(@NotNull EnchantsPlugin plugin, @NotNull EnchantSettings settings) {
         super(plugin);
+        this.settings = settings;
+        this.rechargedKey = new NamespacedKey(plugin, "item.recharged");
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -44,44 +49,33 @@ public class AnvilListener extends AbstractListener<EnchantsPlugin> {
 
         if (this.handleRecharge(event, first, second)) return;
 
-        this.handleCombine(event, first, second, result);
+        this.anvilCombine(event, first, second, result);
     }
 
-    private boolean handleRecharge(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second) {
-        if (!Config.isChargesEnabled()) return false;
-        if (second.getType().isAir()) return false;
-
-        Map<CustomEnchantment, Integer> chargable = new HashMap<>();
-        EnchantUtils.getCustomEnchantments(first).forEach((data, level) -> {
-            if (data.isChargesFuel(second) && !data.isFullOfCharges(first)) {
-                chargable.put(data, level);
-            }
-        });
-        if (chargable.isEmpty()) return false;
-
-        int count;
-        ItemStack recharged = new ItemStack(first);
-        for (count = 0; count < second.getAmount() && !chargable.keySet().stream().allMatch(data -> data.isFullOfCharges(recharged)); ++count) {
-            chargable.forEach((enchant, level) -> enchant.fuelCharges(recharged, level));
-        }
-
-        PDCUtil.set(recharged, Keys.itemRecharged, count);
-        event.setResult(recharged);
-
-        this.plugin.runTask(task -> event.getView().setRepairCost(chargable.size()));
-        return true;
-    }
-
-    private boolean handleCombine(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
+    private boolean anvilCombine(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
         ItemStack merged = new ItemStack(result.getType().isAir() ? first : result);
 
-        if (EnchantUtils.countCustomEnchantments(first) >= DistributionConfig.ANVIL_ENCHANT_LIMIT.get()) {
+        int countResult = EnchantsUtils.countCustomEnchantments(result);
+        int countItem;
+        if (EnchantsUtils.isEnchantedBook(second)) {
+            countItem = EnchantsUtils.countCustomEnchantments(first);
+        }
+        else if (first.getType() == second.getType()) {
+            int countFirst = EnchantsUtils.countCustomEnchantments(first);
+            int countSecond = EnchantsUtils.countCustomEnchantments(second);
+            countItem = Math.max(countFirst, countSecond);
+        }
+        else return false;
+
+        int limit = this.settings.getAnvilEnchantsLimit();
+
+        if (countResult > countItem && (countItem >= limit || countResult > limit)) {
             event.setResult(null);
             return false;
         }
 
         Map<CustomEnchantment, Integer> chargesMap = new HashMap<>();
-        EnchantUtils.getCustomEnchantments(result).forEach((enchantment, level) -> {
+        EnchantsUtils.getCustomEnchantments(result).forEach((enchantment, level) -> {
             int chargesFirst = enchantment.getCharges(first);
             int chargesSecond = enchantment.getCharges(second);
 
@@ -97,6 +91,33 @@ public class AnvilListener extends AbstractListener<EnchantsPlugin> {
         return false;
     }
 
+    private boolean handleRecharge(@NotNull PrepareAnvilEvent event, @NotNull ItemStack first, @NotNull ItemStack second) {
+        if (!Config.isChargesEnabled()) return false;
+        if (second.getType().isAir()) return false;
+
+        Map<CustomEnchantment, Integer> chargable = new HashMap<>();
+        EnchantsUtils.getCustomEnchantments(first).forEach((data, level) -> {
+            if (data.isChargesFuel(second) && !data.isFullOfCharges(first)) {
+                chargable.put(data, level);
+            }
+        });
+        if (chargable.isEmpty()) return false;
+
+        int count;
+        ItemStack recharged = new ItemStack(first);
+        for (count = 0; count < second.getAmount() && !chargable.keySet().stream().allMatch(data -> data.isFullOfCharges(recharged)); ++count) {
+            chargable.forEach((enchant, level) -> enchant.fuelCharges(recharged, level));
+        }
+
+        PDCUtil.set(recharged, this.rechargedKey, count);
+        event.setResult(recharged);
+
+        this.plugin.runTask(() -> event.getView().setRepairCost(chargable.size()));
+        return true;
+    }
+
+
+
     @EventHandler(priority = EventPriority.NORMAL)
     public void onClickAnvil(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
@@ -107,14 +128,14 @@ public class AnvilListener extends AbstractListener<EnchantsPlugin> {
         ItemStack item = event.getCurrentItem();
         if (item == null) return;
 
-        int count = PDCUtil.getInt(item, Keys.itemRecharged).orElse(0);
+        int count = PDCUtil.getInt(item, this.rechargedKey).orElse(0);
         if (count == 0) return;
 
         Player player = (Player) event.getWhoClicked();
         if (player.getLevel() < anvilView.getRepairCost()) return;
 
         player.setLevel(player.getLevel() - anvilView.getRepairCost());
-        PDCUtil.remove(item, Keys.itemRecharged);
+        PDCUtil.remove(item, this.rechargedKey);
         event.getView().setCursor(item);
         event.setCancelled(false);
 

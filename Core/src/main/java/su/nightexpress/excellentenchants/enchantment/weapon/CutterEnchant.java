@@ -10,32 +10,39 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
+import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.Modifier;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.AttackEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.configuration.ConfigProperty;
+import su.nightexpress.nightcore.configuration.ConfigTypes;
 import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.bukkit.NightSound;
-import su.nightexpress.nightcore.util.random.Rnd;
+import su.nightexpress.nightcore.util.Randomizer;
+import su.nightexpress.nightcore.util.sound.VanillaSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class CutterEnchant extends GameEnchantment implements AttackEnchant {
+
+    private final ConfigProperty<Boolean> ignoreMythicMobs = ConfigProperty.of(ConfigTypes.BOOLEAN, "Cutter.Ignore-MythicMobs", false,
+        "Whether enchantment has effect on mobs from the MythicMobs plugin.");
 
     private Modifier durabilityReduction;
     private boolean  allowPlayers;
     private boolean  allowMobs;
 
-    public CutterEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public CutterEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.PROBABILITY, Probability.addictive(2, 1));
     }
 
@@ -52,6 +59,8 @@ public class CutterEnchant extends GameEnchantment implements AttackEnchant {
         this.allowMobs = ConfigValue.create("Cutter.Allow_Mobs",
             true,
             "Sets whether or not this enchantment will have effect on mobs.").read(config);
+
+        this.ignoreMythicMobs.loadWithDefaults(config);
 
         this.addPlaceholder(EnchantsPlaceholders.GENERIC_DAMAGE, level -> NumberUtil.format(this.getDurabilityReduction(level) * 100D));
     }
@@ -76,9 +85,10 @@ public class CutterEnchant extends GameEnchantment implements AttackEnchant {
 
         boolean isPlayer = victim instanceof Player;
         if (isPlayer && !this.allowPlayers || (!isPlayer && !this.allowMobs)) return false;
+        if (!this.ignoreMythicMobs.get() && EnchantsUtils.isMythicMob(victim)) return false;
 
-        int get = Rnd.get(armor.length);
-        ItemStack itemCut = armor[get];
+        int index = Randomizer.nextInt(armor.length);
+        ItemStack itemCut = armor[index];
 
         if (itemCut == null || itemCut.getType().isAir() || itemCut.getType().getMaxDurability() == 0) return false;
 
@@ -88,7 +98,7 @@ public class CutterEnchant extends GameEnchantment implements AttackEnchant {
         damageable.setDamage((int) (itemCut.getType().getMaxDurability() * this.getDurabilityReduction(level)));
         itemCut.setItemMeta(damageable);
 
-        armor[get] = null;
+        armor[index] = null;
         equipment.setArmorContents(armor);
 
         Item drop = victim.getWorld().dropItemNaturally(victim.getLocation(), itemCut);
@@ -97,7 +107,7 @@ public class CutterEnchant extends GameEnchantment implements AttackEnchant {
 
         if (this.hasVisualEffects()) {
             UniParticle.itemCrack(itemCut).play(victim.getEyeLocation(), 0.25, 0.15, 30);
-            NightSound.of(Sound.ENTITY_ITEM_BREAK).play(victim.getLocation());
+            VanillaSound.of(Sound.ENTITY_ITEM_BREAK).play(victim.getLocation());
         }
 
         return true;

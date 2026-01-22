@@ -8,38 +8,43 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.excellentenchants.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
+import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
-import su.nightexpress.excellentenchants.api.EnchantsPlaceholders;
 import su.nightexpress.excellentenchants.api.enchantment.component.EnchantComponent;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Probability;
 import su.nightexpress.excellentenchants.api.enchantment.type.KillEnchant;
+import su.nightexpress.excellentenchants.config.Perms;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
-import su.nightexpress.excellentenchants.hook.HookPlugin;
-import su.nightexpress.excellentenchants.hook.impl.MythicMobsHook;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.*;
+import su.nightexpress.nightcore.util.BukkitThing;
+import su.nightexpress.nightcore.util.LangUtil;
+import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.bukkit.NightItem;
+import su.nightexpress.nightcore.util.placeholder.PlaceholderContext;
+import su.nightexpress.nightcore.util.text.night.wrapper.TagWrappers;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static su.nightexpress.nightcore.util.text.tag.Tags.LIGHT_YELLOW;
-
 public class DecapitatorEnchant extends GameEnchantment implements KillEnchant {
+
+    private static final String PERMISSION_NO_DROP = Perms.PREFIX + "enchant.decapitator.bypass";
 
     private boolean                 ignoreMythicMobs;
     private Set<EntityType>         ignoredEntityTypes;
     private String                  headName;
     private Map<EntityType, String> headTextures;
 
-    public DecapitatorEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public DecapitatorEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.PROBABILITY, Probability.addictive(1, 2));
     }
 
@@ -60,7 +65,7 @@ public class DecapitatorEnchant extends GameEnchantment implements KillEnchant {
         ).read(config);
 
         this.headName = ConfigValue.create("Decapitator.Head_Item.Name",
-                LIGHT_YELLOW.wrap(EnchantsPlaceholders.GENERIC_TYPE + "'s Head"),
+                TagWrappers.YELLOW.wrap(EnchantsPlaceholders.GENERIC_TYPE + "'s Head"),
                 "Head item display name. Use '" + EnchantsPlaceholders.GENERIC_TYPE + "' for entity name.")
             .read(config);
 
@@ -86,21 +91,27 @@ public class DecapitatorEnchant extends GameEnchantment implements KillEnchant {
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, @NotNull ItemStack weapon, int level) {
         EntityType entityType = entity.getType();
         if (this.ignoredEntityTypes.contains(entityType)) return false;
-        if (this.ignoreMythicMobs && Plugins.isLoaded(HookPlugin.MYTHIC_MOBS) && MythicMobsHook.isMythicMob(entity)) return false;
+        if (this.ignoreMythicMobs && EnchantsUtils.isMythicMob(entity)) return false;
+        if (entity.hasPermission(PERMISSION_NO_DROP)) return false;
 
         Material material = getHeadMaterial(entityType);
         NightItem item = NightItem.fromType(material);
 
+        PlaceholderContext placeholderContext = PlaceholderContext.builder()
+            .with(EnchantsPlaceholders.GENERIC_TYPE, () -> entity instanceof Player player ? player.getName() : LangUtil.getSerializedName(entity.getType()))
+            .with(EnchantsPlaceholders.GENERIC_KILLER, killer::getName)
+            .build();
+
         if (material == Material.PLAYER_HEAD) {
+            item.setDisplayName(placeholderContext.apply(this.headName));
+
             if (entity instanceof Player player) {
-                item.setDisplayName(this.headName.replace(EnchantsPlaceholders.GENERIC_TYPE, entity.getName()));
                 item.setPlayerProfile(player);
             }
             else {
                 String texture = this.headTextures.get(entity.getType());
                 if (texture == null) return false;
 
-                item.setDisplayName(this.headName.replace(EnchantsPlaceholders.GENERIC_TYPE, LangUtil.getSerializedName(entity.getType())));
                 item.setProfileBySkinURL(texture);
             }
         }

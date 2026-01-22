@@ -12,17 +12,18 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
-import su.nightexpress.excellentenchants.enchantment.EnchantData;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.type.InteractEnchant;
+import su.nightexpress.excellentenchants.enchantment.EnchantContext;
 import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
+import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.LocationUtil;
-import su.nightexpress.nightcore.util.bukkit.NightSound;
+import su.nightexpress.nightcore.util.sound.VanillaSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,8 +43,8 @@ public class GlassbreakerEnchant extends GameEnchantment implements InteractEnch
         return name.endsWith("glass") || name.endsWith("glass_pane") || name.endsWith("stained_glass");
     }
 
-    public GlassbreakerEnchant(@NotNull EnchantsPlugin plugin, @NotNull File file, @NotNull EnchantData data) {
-        super(plugin, file, data);
+    public GlassbreakerEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
+        super(plugin, manager, file, context);
     }
 
     @Override
@@ -75,7 +76,7 @@ public class GlassbreakerEnchant extends GameEnchantment implements InteractEnch
         if (!player.breakBlock(block)) return false;
 
         UniParticle.blockCrack(material).play(LocationUtil.setCenter3D(block.getLocation()), 0.5, 0.1, 10);
-        NightSound.of(soundGroup.getBreakSound()).play(player);
+        VanillaSound.of(soundGroup.getBreakSound()).play(player);
         return true;
     }
 }
