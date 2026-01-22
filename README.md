@@ -25,9 +25,9 @@ Provides **75+ vanilla-like** enchantments for your server, where each enchantme
 - [**Seemless Integration**](https://nightexpressdev.com/excellentenchants/features/compatibility/). Data-driven enchantments that are fully compatible with commands, game mechanics and other plugins.
 - **Anvils** support. Combine new enchantments with vanilla ones with no issues!
 - **Grindstone** support. Grindstone new enchantments just like vanilla ones!
-- [**Enchanting Table**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Obtain new enchantments through villager trades!
+- [**Enchanting Table**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Use new enchantments in the enchanting table!
 - [**Villager Trades**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Obtain new enchantments through villager trades!
-- [**Random Loot**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Found new enchantments in dungeon chests!
+- [**Random Loot**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Find new enchantments in dungeon chests!
 - [**Fishing**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Fish enchanted books containing new enchantments!
 - [**Mob Equipment**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Mobs can spawn with items enchanted with new enchantments!
 - **Enchanted Books** support. Get enchanted books with new enchantments right from the Creative menu!
@@ -36,14 +36,14 @@ Provides **75+ vanilla-like** enchantments for your server, where each enchantme
 - **Colored Tooltip**. Customize the item tooltip color for new enchantments!
 - [**Description Tooltip**](https://nightexpressdev.com/excellentenchants/features/description/). Display enchantment summary in item's tooltips!
 - [**Disable Enchantments**](https://nightexpressdev.com/excellentenchants/features/disabling/). Disable custom enchantments globally or per world!
-- [**New Curses**](https://nightexpressdev.com/excellentenchants/features/enchants/). Did you ever wanted more curses? We have ones!
+- [**New Curses**](https://nightexpressdev.com/excellentenchants/features/enchants/). Did you ever wanted more curses? We have them!
 - [**Item Sets**](https://nightexpressdev.com/excellentenchants/features/item-sets/). Create your own item sets for new enchantments!
 - **Axes Support**. Sword enchantments are applicable for axes!
 - **Crossbows Support**. Allows bow enchantments for crossbows by default!
 - **Elytra Support**. Allows chestplate enchantments for elytras by default!
 - **Exclusives**. Customize list of incompatible enchantments for each enchantment!
 - **Enchantments GUI**. Customizable GUI for players to browse all the custom enchantments!
-- **Visual Effects**. Enchantments comes with particle effects and sounds!
+- **Visual Effects**. Enchantments come with particle effects and sounds!
 - [**Enchant Charges**](https://nightexpressdev.com/excellentenchants/features/charges/). Unique feature that brings new mechanics to the custom enchantments!
 - [**PlaceholderAPI**](https://nightexpressdev.com/excellentenchants/hooks/placeholder-api/) support.
 
