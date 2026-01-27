@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment;
 
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.EnchantsFiles;
 import su.nightexpress.excellentenchants.EnchantsKeys;
@@ -175,77 +176,77 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
         .description("Shoots ender pearls instead of arrows.")
         .weight(VERY_RARE)
         .items(ItemSetDefaults.BOW)
-        .exclusives(EnchantsKeys.create(BOMBER.getId()), EnchantsKeys.FLAME, EnchantsKeys.PUNCH, EnchantsKeys.POWER)
+        .exclusives(BOMBER.getKey(), EnchantsKeys.FLAME, EnchantsKeys.PUNCH, EnchantsKeys.POWER)
         .build(), () -> EnchantDistribution.treasure(TradeType.PLAINS_SPECIAL), EnderBowEnchant::new
     ),
     GHAST(() -> EnchantDefinition.builder("Ghast", 1)
         .description("Shoots fireballs instead of arrows.")
         .weight(VERY_RARE)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(BOMBER.getId()), EnchantsKeys.FLAME, EnchantsKeys.PUNCH, EnchantsKeys.POWER)
+        .exclusives(ENDER_BOW.getKey(), BOMBER.getKey(), EnchantsKeys.FLAME, EnchantsKeys.PUNCH, EnchantsKeys.POWER)
         .build(), () -> EnchantDistribution.treasure(TradeType.DESERT_COMMON), GhastEnchant::new
     ),
     CONFUSING_ARROWS(() -> EnchantDefinition.builder("Confusing Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.)")
         .weight(COMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.SWAMP_COMMON), ConfusingArrowsEnchant::new
     ),
     DARKNESS_ARROWS(() -> EnchantDefinition.builder("Darkness Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.)")
         .weight(COMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.SNOW_COMMON), DarknessArrowsEnchant::new
     ),
     DRAGONFIRE_ARROWS(() -> EnchantDefinition.builder("Dragonfire Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have Dragonfire Effect (R=" + GENERIC_RADIUS + ", " + GENERIC_DURATION + "s).")
         .weight(RARE)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.SWAMP_SPECIAL), DragonfireArrowsEnchant::new
     ),
     ELECTRIFIED_ARROWS(() -> EnchantDefinition.builder("Electrified Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for an arrow to strike lightning with " + GENERIC_DAMAGE + "❤ extra damage.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_COMMON), ElectrifiedArrowsEnchant::new
     ),
     EXPLOSIVE_ARROWS(() -> EnchantDefinition.builder("Explosive Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance to shoot an explosive arrow.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.TAIGA_COMMON), ExplosiveArrowsEnchant::new
     ),
     FLARE(() -> EnchantDefinition.builder("Flare", 1)
         .description(TRIGGER_CHANCE + "% chance to create a torch where arrow lands.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.BOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.treasure(TradeType.SNOW_COMMON), FlareEnchant::new
     ),
     HOVER(() -> EnchantDefinition.builder("Hover", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.)")
         .weight(COMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_SPECIAL), HoverEnchant::new
     ),
     LINGERING(() -> EnchantDefinition.builder("Lingering", 3)
         .description(TRIGGER_CHANCE + "% chance for tipped arrows to generate a lingering effect.")
         .weight(RARE)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.SAVANNA_COMMON), LingeringEnchant::new
     ),
     POISONED_ARROWS(() -> EnchantDefinition.builder("Poisoned Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.)")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.SWAMP_COMMON), PoisonedArrowsEnchant::new
     ),
     SNIPER(() -> EnchantDefinition.builder("Sniper", 2)
@@ -258,14 +259,14 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
         .description(TRIGGER_CHANCE + "% chance to restore " + GENERIC_AMOUNT + "❤ on arrow hit.")
         .weight(RARE)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.SWAMP_SPECIAL), VampiricArrowsEnchant::new
     ),
     WITHERED_ARROWS(() -> EnchantDefinition.builder("Withered Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.)")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
-        .exclusives(EnchantsKeys.create(ENDER_BOW.getId()), EnchantsKeys.create(GHAST.getId()), EnchantsKeys.create(BOMBER.getId()))
+        .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.SNOW_SPECIAL), WitheredArrowsEnchant::new
     ),
     AUTO_REEL(() -> EnchantDefinition.builder("Auto Reel", 1)
@@ -355,7 +356,7 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.TOOL)
         .primaryItems(ItemSetDefaults.MINING_TOOLS)
-        .exclusives(EnchantsKeys.create(SILK_SPAWNER.getId()), EnchantsKeys.create(SILK_CHEST.getId()), EnchantsKeys.SILK_TOUCH)
+        .exclusives(SILK_SPAWNER.getKey(), SILK_CHEST.getKey(), EnchantsKeys.SILK_TOUCH)
         .build(), () -> EnchantDistribution.regular(TradeType.DESERT_COMMON), SmelterEnchant::new
     ),
     TELEKINESIS(() -> EnchantDefinition.builder("Telekinesis", 1)
@@ -376,14 +377,14 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
         .weight(VERY_RARE)
         .supportedItems(ItemSetDefaults.MINING_TOOLS)
         .primaryItems(ItemSetDefaults.PICKAXE)
-        .exclusives(EnchantsKeys.create(BLAST_MINING.getId()))
+        .exclusives(BLAST_MINING.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.SAVANNA_SPECIAL), TunnelEnchant::new
     ),
     VEINMINER(() -> EnchantDefinition.builder("Veinminer", 3)
         .description("Mines up to " + GENERIC_AMOUNT + " blocks of the ore vein at once.")
         .weight(RARE)
         .items(ItemSetDefaults.PICKAXE)
-        .exclusives(EnchantsKeys.create(BLAST_MINING.getId()), EnchantsKeys.create(TUNNEL.getId()))
+        .exclusives(BLAST_MINING.getKey(), TUNNEL.getKey())
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_SPECIAL), VeinminerEnchant::new
     ),
     CURSE_OF_BREAKING(() -> EnchantDefinition.builder("Curse of Breaking", 3)
@@ -707,6 +708,12 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     @NotNull
     public String getId() {
         return this.id;
+    }
+
+    @Override
+    @NotNull
+    public NamespacedKey getKey() {
+        return EnchantsKeys.create(this.id);
     }
 
     @Override

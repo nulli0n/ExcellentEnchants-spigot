@@ -48,11 +48,6 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
         return TagKey.create(RegistryKey.ITEM, Key.key(EnchantsKeys.NAMESPACE, name));
     }
 
-    @NotNull
-    private Key customKey(@NotNull String id) {
-        return EnchantsKeys.create(id);
-    }
-
     @Override
     public void bootstrap(@NotNull BootstrapContext context) {
         Path dataDirectory = context.getDataDirectory();
@@ -117,7 +112,7 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
                 );
 
                 EquipmentSlotGroup[] activeSlots = Stream.of(supportedSet.getSlots()).map(EquipmentSlot::getGroup).toArray(EquipmentSlotGroup[]::new);
-                Key key = this.customKey(data.getId());
+                Key key = data.getKey();
                 Component component = MiniMessage.miniMessage().deserialize(definition.getDisplayName());
                 String nameOnly = MiniMessage.miniMessage().stripTags(definition.getDisplayName());
 
@@ -143,7 +138,7 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
 
             EnchantCatalog.enabled().forEach((data) -> {
                 EnchantDistribution distribution = data.getDistribution();
-                TypedKey<Enchantment> key = EnchantmentKeys.create(this.customKey(data.getId()));
+                TypedKey<Enchantment> key = EnchantmentKeys.create(data.getKey());
 
                 TagEntry<Enchantment> entry = TagEntry.valueEntry(key);
                 Set<TagEntry<Enchantment>> list = Lists.newSet(entry);

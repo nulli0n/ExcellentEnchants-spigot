@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsFiles;
-import su.nightexpress.excellentenchants.EnchantsKeys;
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
@@ -123,7 +122,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
             return false;
         }
 
-        Enchantment bukkitEnchant = BukkitThing.getByKey(RegistryType.ENCHANTMENT, EnchantsKeys.create(id));
+        Enchantment bukkitEnchant = BukkitThing.getByKey(RegistryType.ENCHANTMENT, catalog.getKey());
         if (bukkitEnchant == null) {
             this.plugin.error("No registered bukkit enchant found for '%s'.".formatted(id));
             return false;

@@ -156,9 +156,13 @@ public abstract class GameEnchantment implements CustomEnchantment {
 
     @Override
     @NotNull
-    public Enchantment getBukkitEnchantment() {
-        if (this.enchantment == null) throw new IllegalStateException("Backend enchantment is not assigned!");
+    public NamespacedKey getKey() {
+        return this.enchantment.getKey();
+    }
 
+    @Override
+    @NotNull
+    public Enchantment getBukkitEnchantment() {
         return this.enchantment;
     }
 

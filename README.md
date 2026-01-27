@@ -1,61 +1,101 @@
-# About
-<div align="center">
-  <img src="https://nightexpressdev.com/excellentenchants/header.png">
+<p align="center">
+  <img src="https://nightexpressdev.com/excellentenchants/banner.png">
+</p>
 
-<a href="https://discord.gg/EwNFGsnGaW"><img src="https://img.shields.io/discord/903053383475277844?style=for-the-badge&label=Discord&color=%2333a8ff"></a>&nbsp;
-<a href="https://ko-fi.com/nightexpress"><img src="https://img.shields.io/badge/donate-%E2%9D%A4%EF%B8%8F_to_support-dff33?style=for-the-badge"></a>&nbsp;
-<a href="https://nightexpressdev.com/excellentenchants/"><img src="https://img.shields.io/badge/wiki-documentation-ff9c33?style=for-the-badge"></a>
+<p align="center">
+<b>ExcellentEnchants</b> is a lightweight and modern enchantments plugin that adds <b>80+ vanilla-like</b>, fully customizable enchantments to your server.
+</p>
 
-<a href="https://modrinth.com/plugin/excellentenchants"><img src="https://nightexpressdev.com/img/badge/modrinth.svg"></a>&nbsp;
-<a href="https://spigotmc.org/resources/61693/"><img src="https://nightexpressdev.com/img/badge/spigotmc.svg"></a>&nbsp;
-<a href="https://hangar.papermc.io/NightExpress/ExcellentEnchants"><img src="https://nightexpressdev.com/img/badge/hangar.svg"></a>
+<p align="center">
+<b>ExcellentEnchants</b> does <b>not</b> modify loot tables, villager trades, or enchanting tables - enchantments are seamlessly integrated into your server in the same way as vanilla or datapack enchantments.
+</p>
 
-**ExcellentEnchants** is a lightweight and modern enchantments plugin.<br>
-Provides **75+ vanilla-like** enchantments for your server, where each enchantment has its own configuration file.
+<p align="center">
+<b>ExcellentEnchants</b> leaves <b>no permanent</b> impact on your server after uninstallation, as if the plugin had never been installed - no errors, bugs, or crashes. Ever.
+</p>
 
-<img src="https://nightexpressdev.com/img/excellentenchants/sc_enchanting.gif">
-<img src="https://nightexpressdev.com/img/excellentenchants/sc_anvils.gif">
-<br>
-<img src="https://nightexpressdev.com/img/excellentenchants/sc_villagers.gif">
-<img src="https://nightexpressdev.com/img/excellentenchants/sc_creative.gif">
-</div>
+<p align="center">
+<a href="https://nightexpressdev.com/excellentenchants/enchantments/list/"><b>Click here to view all new enchantments!</b></a>
+</p>
 
-# Features
+<p align="center">
+<img src="https://nightexpressdev.com/excellentenchants/img/gif/enchants_ghast.gif">
+<img src="https://nightexpressdev.com/excellentenchants/img/gif/enchants_flamewalker.gif">
+</p>
+<p align="center">
+<img src="https://nightexpressdev.com/excellentenchants/img/gif/enchants_thunder.gif">
+<img src="https://nightexpressdev.com/excellentenchants/img/gif/enchants_tunnel.gif">
+</p>
 
-- [**Seemless Integration**](https://nightexpressdev.com/excellentenchants/features/compatibility/). Data-driven enchantments that are fully compatible with commands, game mechanics and other plugins.
-- **Anvils** support. Combine new enchantments with vanilla ones with no issues!
-- **Grindstone** support. Grindstone new enchantments just like vanilla ones!
-- [**Enchanting Table**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Use new enchantments in the enchanting table!
-- [**Villager Trades**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Obtain new enchantments through villager trades!
-- [**Random Loot**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Find new enchantments in dungeon chests!
-- [**Fishing**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Fish enchanted books containing new enchantments!
-- [**Mob Equipment**](https://nightexpressdev.com/excellentenchants/features/distribution/) support. Mobs can spawn with items enchanted with new enchantments!
-- **Enchanted Books** support. Get enchanted books with new enchantments right from the Creative menu!
-- **Highly Customizable**. Edit attributes of any enchantment!
-- **Overpowering**. Enchants are allowed to scale beyond their max levels!
-- **Colored Tooltip**. Customize the item tooltip color for new enchantments!
-- [**Description Tooltip**](https://nightexpressdev.com/excellentenchants/features/description/). Display enchantment summary in item's tooltips!
-- [**Disable Enchantments**](https://nightexpressdev.com/excellentenchants/features/disabling/). Disable custom enchantments globally or per world!
-- [**New Curses**](https://nightexpressdev.com/excellentenchants/features/enchants/). Did you ever wanted more curses? We have them!
-- [**Item Sets**](https://nightexpressdev.com/excellentenchants/features/item-sets/). Create your own item sets for new enchantments!
-- **Axes Support**. Sword enchantments are applicable for axes!
-- **Crossbows Support**. Allows bow enchantments for crossbows by default!
-- **Elytra Support**. Allows chestplate enchantments for elytras by default!
-- **Exclusives**. Customize list of incompatible enchantments for each enchantment!
-- **Enchantments GUI**. Customizable GUI for players to browse all the custom enchantments!
-- **Visual Effects**. Enchantments come with particle effects and sounds!
-- [**Enchant Charges**](https://nightexpressdev.com/excellentenchants/features/charges/). Unique feature that brings new mechanics to the custom enchantments!
-- [**PlaceholderAPI**](https://nightexpressdev.com/excellentenchants/hooks/placeholder-api/) support.
+## Features
 
-# Dependencies
-**REQUIRED:**
-- **Java Version:** 21 or newer.
-- **Server Software:** Spigot / Paper / Purpur
-- **Server Version:** 1.21.4 or newer.
-- [nightcore](https://nightexpressdev.com/nightcore/) - Plugin engine.
+### Integration & Compatibility
+- [**Seamless Integration**](https://nightexpressdev.com/excellentenchants/enchantments/integration/). Fully compatible with vanilla mechanics, commands, and other plugins.
+- **Anvil & Grindstone Support**. Combine or remove custom enchantments just like vanilla ones.
+- **Enchanted Books Support**. Access custom enchanted books directly from the Creative menu.
+- [**PlaceholderAPI**](https://nightexpressdev.com/excellentenchants/placeholders/papi/) support.
 
-**OPTIONAL:**
-- [ProtocolLib](https://ci.dmulloy2.net/job/ProtocolLib/) or [PacketEvents](https://spigotmc.org/resources/80279/) - For dynamic enchant description.
+<p align="center">
+<img src="https://nightexpressdev.com/excellentenchants/img/gif/anvil.gif">
+<img src="https://nightexpressdev.com/excellentenchants/img/gif/books.gif">
+</p>
 
-# Donate
-If you like my work or enjoy using my plugins, feel free to [Buy me a coffee](https://ko-fi.com/nightexpress) :) Thank you! 🧡
+### Enchantment Distribution
+- [**Enchanting Table**](https://nightexpressdev.com/excellentenchants/enchantments/distribution/) & **Villager Trades**. Obtain custom enchantments through standard progression.
+- [**Random Loot**](https://nightexpressdev.com/excellentenchants/enchantments/distribution/). Find enchanted items in dungeon chests.
+- [**Fishing**](https://nightexpressdev.com/excellentenchants/enchantments/distribution/). Fish enchanted books with custom enchantments.
+- [**Mob Equipment**](https://nightexpressdev.com/excellentenchants/enchantments/distribution/). Mobs can spawn with custom-enchanted gear.
+
+<p align="center">
+<img src="https://nightexpressdev.com/excellentenchants/img/gif/enchanting.gif">
+<img src="https://nightexpressdev.com/excellentenchants/img/gif/loot.gif">
+</p>
+
+### Customization & Control
+- **Highly Customizable**. Modify attributes of any enchantment.
+- **Overpowering Enchantments**. Allow enchantments to scale beyond max levels.
+- **Exclusives**. Define incompatible enchantments per enchantment.
+- [**Disable Enchantments**](https://nightexpressdev.com/excellentenchants/enchantments/disabling/). Disable enchantments globally or per world.
+
+### Item & Equipment Support
+- **Axes Support**. Apply sword enchantments to axes.
+- **Crossbows Support**. Apply bow enchantments to crossbows by default.
+- **Elytra Support**. Apply chestplate enchantments to elytras by default.
+- [**Item Lists**](https://nightexpressdev.com/excellentenchants/enchantments/item-sets/). Create custom primary & supported item lists for enchantments.
+
+### User Interface & Presentation
+- **Enchantments GUI**. Customizable GUI for browsing all custom enchantments.
+- **Colored Tooltips**. Customize tooltip colors for custom enchantments.
+- [**Description Tooltip**](https://nightexpressdev.com/excellentenchants/features/tooltips/). Display enchantment summaries in item tooltips.
+- **Visual Effects**. Enchantments include particles and sound effects.
+
+### Advanced Mechanics
+- [**Enchant Charges**](https://nightexpressdev.com/excellentenchants/features/charges/). Introduce charge-based mechanics for enchantments.
+- [**New Curses**](https://nightexpressdev.com/excellentenchants/enchantments/list/). Additional curse enchantments beyond vanilla.
+
+## Requirements
+
+You **must** have [NightCore](https://nightexpressdev.com/nightcore/) plugin installed to run **ExcellentEnchants**.
+
+The following versions and platforms are supported:
+
+| **Server Version** | **Paper** | **Spigot** | **Folia** | **Java Version** |
+|:------------------:|:---------:|:----------:|:---------:|:----------------:|
+|      1.21.11       |    ✔️     |     ✔️     |     ❌     |        21        |
+|      1.21.10       |    ✔️     |     ✔️     |     ❌     |        21        |
+|       1.21.9       |    ✔️     |     ❌      |     ❌     |        21        |
+|       1.21.8       |    ✔️     |     ✔️     |     ❌     |        21        |
+
+- Anything not listed in the compatibility table is **NOT** supported.
+- Make sure to check out all known issues and incompatibilities [here](https://nightexpressdev.com/excellentenchants/common-issues/).
+
+**Optional Plugins:**
+- [PacketEvents](https://spigotmc.org/resources/80279/) - For enchantment descriptions in item tooltip (you need only one).
+- [ProtocolLib](https://ci.dmulloy2.net/job/ProtocolLib/) - For enchantment descriptions in item tooltip (you need only one).
+
+## Links
+- [**Website**](https://nightexpressdev.com/) - Check out my other plugins.
+- [**Wiki**](https://nightexpressdev.com/excellentenchants/) - Learn how to configure the plugin.
+- [**Discord**](https://discord.gg/EwNFGsnGaW) - Get support, ask questions.
+- [**Github**](https://github.com/nulli0n/ExcellentEnchants-spigot) - Check out the source code.
+- [**Donate**](https://ko-fi.com/nightexpress) - Support me and my work.

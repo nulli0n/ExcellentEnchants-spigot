@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.api.enchantment;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
@@ -37,6 +38,8 @@ public interface CustomEnchantment {
     boolean isTriggerTime(@NotNull LivingEntity entity);
 
     @NotNull String getId();
+
+    @NotNull NamespacedKey getKey();
 
     @NotNull String getDisplayName();
 

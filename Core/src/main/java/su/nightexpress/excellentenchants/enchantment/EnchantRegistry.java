@@ -4,7 +4,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.excellentenchants.EnchantsKeys;
 import su.nightexpress.excellentenchants.api.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.type.*;
@@ -47,7 +46,7 @@ public class EnchantRegistry {
     public static void registerEnchant(@NotNull CustomEnchantment enchantment) {
         getHolders().forEach(holder -> holder.accept(enchantment));
 
-        BY_KEY.put(EnchantsKeys.create(enchantment.getId()), enchantment);
+        BY_KEY.put(enchantment.getKey(), enchantment);
         BY_ID.put(enchantment.getId(), enchantment);
     }
 

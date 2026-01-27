@@ -14,6 +14,7 @@ import su.nightexpress.nightcore.config.Writeable;
 import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.Randomizer;
+import su.nightexpress.nightcore.util.text.night.wrapper.TagWrappers;
 
 import java.util.*;
 
@@ -25,9 +26,9 @@ public class EnchantDefinition implements Writeable {
     private final String       displayName;
     private final List<String> description;
     private final int          weight;
-    private final int         maxLevel;
-    private final EnchantCost minCost;
-    private final EnchantCost maxCost;
+    private final int          maxLevel;
+    private final EnchantCost  minCost;
+    private final EnchantCost  maxCost;
     private final int          anvilCost;
     private final ItemSet      primaryItemSet;
     private final ItemSet      supportedItemSet;
@@ -223,7 +224,7 @@ public class EnchantDefinition implements Writeable {
         private Set<String>  exclusives;
 
         public Builder(@NotNull String displayName, int maxLevel) {
-            this.displayName = displayName;
+            this.displayName(displayName);
             this.description = new ArrayList<>();
             this.weight = 5;
             this.maxLevel = maxLevel;
@@ -260,7 +261,7 @@ public class EnchantDefinition implements Writeable {
 
         @NotNull
         public Builder displayName(@NotNull String displayName) {
-            this.displayName = displayName;
+            this.displayName = TagWrappers.COLOR.with("#279CF5").wrap(displayName);
             return this;
         }
 
@@ -271,7 +272,7 @@ public class EnchantDefinition implements Writeable {
 
         @NotNull
         public Builder description(@NotNull List<String> description) {
-            this.description = description;
+            this.description = Lists.modify(description, TagWrappers.GRAY::wrap);
             return this;
         }
 
