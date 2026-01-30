@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 
 public interface TooltipController {
 
+    boolean hasHandler();
+
     @NotNull ItemStack addDescription(@NotNull ItemStack itemStack);
 
     boolean isReadyForTooltipUpdate(@NotNull Player player);

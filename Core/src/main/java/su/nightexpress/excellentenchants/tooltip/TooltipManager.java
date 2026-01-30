@@ -79,6 +79,11 @@ public class TooltipManager extends AbstractManager<EnchantsPlugin> implements T
     }
 
     @Override
+    public boolean hasHandler() {
+        return this.handler != null;
+    }
+
+    @Override
     public void runInStopList(@NotNull Player player, @NotNull Runnable runnable) {
         this.addToUpdateStopList(player);
         runnable.run();
