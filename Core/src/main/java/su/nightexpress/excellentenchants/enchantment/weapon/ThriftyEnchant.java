@@ -22,6 +22,7 @@ import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.Enums;
 
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
@@ -41,7 +42,7 @@ public class ThriftyEnchant extends GameEnchantment implements KillEnchant {
     protected void loadAdditional(@NotNull FileConfig config) {
         this.ignoredEntityTypes = ConfigValue.forSet("Thrifty.Ignored_Mobs",
             BukkitThing::getEntityType,
-            (cfg, path, set) -> cfg.set(path, set.stream().map(Enum::name).toList()),
+            (cfg, path, set) -> cfg.set(path, set.stream().filter(Objects::nonNull).map(Enum::name).toList()),
             Set.of(EntityType.WITHER, EntityType.ENDER_DRAGON),
             "List of mobs exempted from this enchantment."
         ).read(config);

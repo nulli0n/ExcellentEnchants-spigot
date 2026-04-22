@@ -65,22 +65,25 @@ public class VampireEnchant extends GameEnchantment implements AttackEnchant {
 
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        double healthMax = EntityUtil.getAttributeValue(damager, Attribute.MAX_HEALTH);
-        double healthHas = damager.getHealth();
-        if (healthHas == healthMax) return false;
-
+        // Compute heal amount synchronously while we still have the settled event damage.
         double healAmount = this.getHealAmount(level);
         double healFinal = this.isHealMultiplier() ? event.getFinalDamage() * healAmount : healAmount;
 
-        EntityRegainHealthEvent healthEvent = new EntityRegainHealthEvent(damager, healFinal, EntityRegainHealthEvent.RegainReason.CUSTOM);
-        plugin.getPluginManager().callEvent(healthEvent);
-        if (healthEvent.isCancelled()) return false;
+        this.plugin.runTask(damager, () -> {
+            double healthMax = EntityUtil.getAttributeValue(damager, Attribute.MAX_HEALTH);
+            double healthHas = damager.getHealth();
+            if (healthHas == healthMax) return;
 
-        damager.setHealth(Math.min(healthMax, healthHas + healthEvent.getAmount()));
+            EntityRegainHealthEvent healthEvent = new EntityRegainHealthEvent(damager, healFinal, EntityRegainHealthEvent.RegainReason.CUSTOM);
+            plugin.getPluginManager().callEvent(healthEvent);
+            if (healthEvent.isCancelled()) return;
 
-        if (this.hasVisualEffects()) {
-            UniParticle.of(Particle.HEART).play(damager.getEyeLocation(), 0.25, 0.15, 5);
-        }
+            damager.setHealth(Math.min(healthMax, healthHas + healthEvent.getAmount()));
+
+            if (this.hasVisualEffects()) {
+                UniParticle.of(Particle.HEART).play(damager.getEyeLocation(), 0.25, 0.15, 5);
+            }
+        });
         return true;
     }
 }

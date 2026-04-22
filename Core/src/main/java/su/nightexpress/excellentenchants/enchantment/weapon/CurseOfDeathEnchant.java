@@ -39,7 +39,7 @@ public class CurseOfDeathEnchant extends GameEnchantment implements KillEnchant 
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, @NotNull ItemStack weapon, int level) {
         if (!(entity instanceof Player)) return false;
 
-        killer.setHealth(0D);
+        this.plugin.runTask(killer, () -> killer.setHealth(0D));
         return true;
     }
 }

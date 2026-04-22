@@ -20,7 +20,6 @@ public class DragonHeartEnchant extends GameEnchantment implements PassiveEnchan
 
     public DragonHeartEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
         super(plugin, manager, file, context);
-
         this.addComponent(EnchantComponent.POTION_EFFECT, PotionEffects.permanent(PotionEffectType.HEALTH_BOOST));
         this.addComponent(EnchantComponent.PERIODIC, Period.ofSeconds(5));
     }
@@ -32,6 +31,7 @@ public class DragonHeartEnchant extends GameEnchantment implements PassiveEnchan
 
     @Override
     public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
-        return this.addPotionEffect(entity, level);
+        this.plugin.runTask(entity, () -> this.addPotionEffect(entity, level));
+        return true;
     }
 }

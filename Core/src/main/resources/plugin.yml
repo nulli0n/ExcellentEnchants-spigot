@@ -2,7 +2,7 @@ main: su.nightexpress.excellentenchants.EnchantsPlugin
 version: '${project.version}'
 name: ExcellentEnchants
 author: NightExpress
-desciption: 75+ vanilla-like enchantments with seemless integration!
+description: 75+ vanilla-like enchantments with seamless integration!
 depend: [ nightcore ]
 softdepend:
   - ProtocolLib

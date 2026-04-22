@@ -165,9 +165,7 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
 
         this.enchantSlots = ConfigValue.create("Enchantment.Slots", IntStream.range(0, 27).toArray()).read(config);
 
-
         loader.addDefaultItem(MenuItem.buildNextPage(this, 35));
         loader.addDefaultItem(MenuItem.buildPreviousPage(this, 27));
     }
 }
-

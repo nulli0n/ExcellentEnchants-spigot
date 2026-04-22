@@ -70,17 +70,19 @@ public class RegrowthEnchant extends GameEnchantment implements PassiveEnchant {
 
     @Override
     public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
-        double maxHealth = EntityUtil.getAttributeValue(entity, Attribute.MAX_HEALTH);
-        double health = entity.getHealth();
-        if (health < this.getMinHealthToHeal(level) || health > this.getMaxHealthToHeal(level)) return false;
-        if (health >= maxHealth) return false;
+        this.plugin.runTask(entity, () -> {
+            double maxHealth = EntityUtil.getAttributeValue(entity, Attribute.MAX_HEALTH);
+            double health = entity.getHealth();
+            if (health < this.getMinHealthToHeal(level) || health > this.getMaxHealthToHeal(level)) return;
+            if (health >= maxHealth) return;
 
-        double amount = Math.min(maxHealth, health + this.getHealAmount(level));
-        entity.setHealth(amount);
+            double amount = Math.min(maxHealth, health + this.getHealAmount(level));
+            entity.setHealth(amount);
 
-        if (this.hasVisualEffects()) {
-            UniParticle.of(Particle.HEART).play(entity.getEyeLocation(), 0.25, 0.1, 5);
-        }
+            if (this.hasVisualEffects()) {
+                UniParticle.of(Particle.HEART).play(entity.getEyeLocation(), 0.25, 0.1, 5);
+            }
+        });
         return true;
     }
 }

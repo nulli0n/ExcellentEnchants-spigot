@@ -40,6 +40,7 @@ public class ColdSteelEnchant extends GameEnchantment implements DefendEnchant {
 
     @Override
     public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        return this.addPotionEffect(damager, level);
+        this.plugin.runTask(damager, () -> this.addPotionEffect(damager, level));
+        return true;
     }
 }

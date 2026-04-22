@@ -26,9 +26,4 @@ public class EnchantsAPI {
     public static EnchantManager getEnchantManager() {
         return getPlugin().getEnchantManager();
     }
-
-//    @NotNull
-//    public static EnchantNMS getInternals() {
-//        return getPlugin().getEnchantNMS();
-//    }
 }

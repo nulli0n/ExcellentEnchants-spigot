@@ -18,6 +18,8 @@ import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.Players;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NimbleEnchant extends GameEnchantment implements KillEnchant {
 
@@ -46,8 +48,9 @@ public class NimbleEnchant extends GameEnchantment implements KillEnchant {
     public boolean onKill(@NotNull EntityDeathEvent event, @NotNull LivingEntity entity, @NotNull Player killer, @NotNull ItemStack weapon, int level) {
         if (this.ignorePlayers && entity instanceof Player) return false;
 
-        event.getDrops().forEach(item -> Players.addItem(killer, item));
+        List<ItemStack> drops = new ArrayList<>(event.getDrops());
         event.getDrops().clear();
+        this.plugin.runTask(killer, () -> drops.forEach(item -> Players.addItem(killer, item)));
         return true;
     }
 }

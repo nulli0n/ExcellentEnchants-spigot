@@ -32,10 +32,7 @@ import su.nightexpress.nightcore.util.sound.VanillaSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class SmelterEnchant extends GameEnchantment implements BlockDropEnchant {
 
@@ -67,7 +64,7 @@ public class SmelterEnchant extends GameEnchantment implements BlockDropEnchant 
 
         this.exemptedItems.addAll(ConfigValue.forSet("Smelter.Exempted_Blocks",
             BukkitThing::getMaterial,
-            (cfg, path, set) -> cfg.set(path, set.stream().map(BukkitThing::getAsString).toList()),
+            (cfg, path, set) -> cfg.set(path, set.stream().filter(Objects::nonNull).map(BukkitThing::getAsString).toList()),
             Lists.newSet(Material.COBBLESTONE),
             "List of blocks / items that are immune to the Smelter effect."
         ).read(config));
@@ -80,12 +77,6 @@ public class SmelterEnchant extends GameEnchantment implements BlockDropEnchant 
             }
         });
     }
-
-//    @Override
-//    public void clear() {
-//        this.recipes.clear();
-//        this.exemptedItems.clear();
-//    }
 
     @Override
     @NotNull

@@ -44,9 +44,9 @@ public class GenericListener extends AbstractListener<EnchantsPlugin> {
             ItemStack result = inventory.getItem(0);
             if (result == null) return;
 
-            event.getEnchantsToAdd().forEach((enchantment, level) -> {
-                EnchantsUtils.restoreCharges(result, enchantment, level);
-            });
+            event.getEnchantsToAdd().forEach((enchantment, level) ->
+                  EnchantsUtils.restoreCharges(result, enchantment, level)
+            );
 
             inventory.setItem(0, result);
         });

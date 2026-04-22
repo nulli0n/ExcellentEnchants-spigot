@@ -56,7 +56,9 @@ public class SaturationEnchant extends GameEnchantment implements PassiveEnchant
         if (player.getFoodLevel() >= this.getMaxFoodLevel(level)) return false;
 
         int amount = this.getFeedAmount(level);
-        player.setFoodLevel(Math.min(20, player.getFoodLevel() + amount));
+        this.plugin.runTask(player, () ->
+              player.setFoodLevel(Math.min(20, player.getFoodLevel() + amount))
+        );
         return true;
     }
 }

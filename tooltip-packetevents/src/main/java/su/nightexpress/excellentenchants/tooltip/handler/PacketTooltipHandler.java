@@ -67,7 +67,6 @@ public class PacketTooltipHandler implements TooltipHandler {
         public void onPacketSend(@NotNull PacketSendEvent event) {
             PacketTypeCommon type = event.getPacketType();
             Player player = event.getPlayer();
-            if (player == null) return;
             if (!this.controller.isReadyForTooltipUpdate(player)) return;
 
             switch (type) {

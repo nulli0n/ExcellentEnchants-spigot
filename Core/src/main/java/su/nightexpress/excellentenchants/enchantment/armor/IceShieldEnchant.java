@@ -45,9 +45,11 @@ public class IceShieldEnchant extends GameEnchantment implements DefendEnchant {
 
     @Override
     public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.addPotionEffect(damager, level)) return false;
+        this.plugin.runTask(damager, () -> {
+            if (!this.addPotionEffect(damager, level)) return;
 
-        damager.setFreezeTicks(damager.getMaxFreezeTicks());
+            damager.setFreezeTicks(damager.getMaxFreezeTicks());
+        });
 
         if (this.hasVisualEffects()) {
             UniParticle.blockCrack(Material.ICE).play(victim.getEyeLocation(), 0.5, 0.1, 35);

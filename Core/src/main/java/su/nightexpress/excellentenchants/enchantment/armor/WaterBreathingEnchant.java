@@ -31,6 +31,7 @@ public class WaterBreathingEnchant extends GameEnchantment implements PassiveEnc
 
     @Override
     public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
-        return this.addPotionEffect(entity, level);
+        this.plugin.runTask(entity, () -> this.addPotionEffect(entity, level));
+        return true;
     }
 }

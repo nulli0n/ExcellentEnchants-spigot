@@ -57,8 +57,9 @@ public class SwiperEnchant extends GameEnchantment implements AttackEnchant {
         int amount = this.getXPAmount(level);
         if (defender.getTotalExperience() < amount) amount = defender.getTotalExperience();
 
-        defender.giveExp(-amount);
-        attacker.giveExp(amount);
+        int finalAmount = amount;
+        this.plugin.runTask(defender, () -> defender.giveExp(-finalAmount));
+        this.plugin.runTask(attacker, () -> attacker.giveExp(finalAmount));
         return true;
     }
 }

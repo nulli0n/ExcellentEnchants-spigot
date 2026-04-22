@@ -44,14 +44,6 @@ public class PotionEffects {
         return new PotionEffects(type, permanentDuration(type), amplifier, true);
     }
 
-//    @NotNull
-//    public static PotionEffects temporal(@NotNull PotionEffectType type) {
-//        Modifier duration = Modifier.multiplier(5).perLevel(1).capacity(60).build();
-//        Modifier amplifier = Modifier.addictive(0).perLevel(1).capacity(5).build();
-//
-//        return temporal(type, duration, amplifier);
-//    }
-
     @NotNull
     public static PotionEffects temporal(@NotNull PotionEffectType type, @NotNull Modifier.Builder duration) {
         return temporal(type, duration, Modifier.addictive(0).perLevel(1).capacity(5));

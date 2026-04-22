@@ -130,7 +130,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
             });
         }
 
-        this.plugin.runTask(() -> this.manager.removeArrowEffects(abstractArrow));
+        this.plugin.runTask(abstractArrow, () -> this.manager.removeArrowEffects(abstractArrow));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -143,14 +143,10 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
         Map<ProtectionEnchant, DamageBonus> damageMap = new HashMap<>();
 
         this.manager.handleInSlots(victim, ARMOR_SLOTS, EnchantRegistry.PROTECTION, (item, enchant, level) -> {
-            if (event.isCancelled()) return false;
-
             DamageBonus damageBonus = damageMap.computeIfAbsent(enchant, k -> enchant.getDamageBonus());
 
             return enchant.onProtection(event, damageBonus, victim, item, level);
         });
-
-        if (event.isCancelled()) return;
 
         double scalarBonus = 0D;
         double normalBonus = 0D;

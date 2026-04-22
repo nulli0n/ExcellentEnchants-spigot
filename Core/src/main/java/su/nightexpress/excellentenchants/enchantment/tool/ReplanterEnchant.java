@@ -127,7 +127,7 @@ public class ReplanterEnchant extends GameEnchantment implements InteractEnchant
                 if (this.takeSeeds(player, seed)) {
                     VanillaSound.of(seed == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT).play(player);
                     player.swingMainHand();
-                    blockPlant.setType(entry.getValue());
+                    this.plugin.runTask(blockPlant.getLocation(), () -> blockPlant.setType(entry.getValue()));
                     break;
                 }
             }
@@ -151,7 +151,7 @@ public class ReplanterEnchant extends GameEnchantment implements InteractEnchant
 
         // Replant the gathered crops with a new one.
         if (this.takeSeeds(player, dataPlant.getPlacementMaterial())) {
-            plugin.runTask(() -> {
+            this.plugin.runTask(blockPlant.getLocation(), () -> {
                 blockPlant.setType(plant.getMaterial());
                 plant.setAge(0);
                 blockPlant.setBlockData(plant);

@@ -1,6 +1,5 @@
 package su.nightexpress.excellentenchants.enchantment.armor;
 
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.damage.DamageType;
@@ -84,7 +83,7 @@ public class ReboundEnchant extends GameEnchantment implements ProtectionEnchant
 
         Vector velocity = entity.getVelocity();
         if (velocity.getY() < 0D) {
-            entity.setVelocity(velocity.setY(power));
+            this.plugin.runTask(entity, () -> entity.setVelocity(velocity.setY(power)));
         }
     }
 }

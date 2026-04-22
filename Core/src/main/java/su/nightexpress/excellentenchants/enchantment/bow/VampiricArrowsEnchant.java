@@ -71,23 +71,25 @@ public class VampiricArrowsEnchant extends GameEnchantment implements ArrowEncha
 
     @Override
     public void onDamage(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull Arrow arrow, int level) {
-        if (shooter.isDead() || shooter.getHealth() <= 0D) return;
-
         double healAmount = this.getHealAmount(level);
         if (healAmount <= 0D) return;
 
-        double health = shooter.getHealth();
-        double maxHealth = EntityUtil.getAttributeValue(shooter, Attribute.MAX_HEALTH);
-        if (health >= maxHealth) return;
+        this.plugin.runTask(shooter, () -> {
+            if (shooter.isDead() || shooter.getHealth() <= 0D) return;
 
-        EntityRegainHealthEvent healthEvent = new EntityRegainHealthEvent(shooter, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
-        plugin.getPluginManager().callEvent(healthEvent);
-        if (healthEvent.isCancelled()) return;
+            double health = shooter.getHealth();
+            double maxHealth = EntityUtil.getAttributeValue(shooter, Attribute.MAX_HEALTH);
+            if (health >= maxHealth) return;
 
-        shooter.setHealth(Math.min(maxHealth, health + healAmount));
+            EntityRegainHealthEvent healthEvent = new EntityRegainHealthEvent(shooter, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
+            plugin.getPluginManager().callEvent(healthEvent);
+            if (healthEvent.isCancelled()) return;
 
-        if (this.hasVisualEffects()) {
-            UniParticle.of(Particle.HEART).play(shooter.getEyeLocation(), 0.25f, 0.15f, 5);
-        }
+            shooter.setHealth(Math.min(maxHealth, health + healAmount));
+
+            if (this.hasVisualEffects()) {
+                UniParticle.of(Particle.HEART).play(shooter.getEyeLocation(), 0.25f, 0.15f, 5);
+            }
+        });
     }
 }
