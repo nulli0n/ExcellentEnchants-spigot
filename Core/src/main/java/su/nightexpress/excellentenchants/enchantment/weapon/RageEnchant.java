@@ -42,11 +42,13 @@ public class RageEnchant extends GameEnchantment implements AttackEnchant {
 
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.addPotionEffect(damager, level)) return false;
+        this.plugin.runTask(damager, () -> {
+            if (!this.addPotionEffect(damager, level)) return;
 
-        if (this.hasVisualEffects()) {
-            UniParticle.of(Particle.LAVA).play(damager.getEyeLocation(), 0.25, 0.1, 30);
-        }
+            if (this.hasVisualEffects()) {
+                UniParticle.of(Particle.LAVA).play(damager.getEyeLocation(), 0.25, 0.1, 30);
+            }
+        });
         return true;
     }
 }
