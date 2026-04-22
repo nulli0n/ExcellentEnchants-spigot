@@ -65,7 +65,6 @@ public class VampireEnchant extends GameEnchantment implements AttackEnchant {
 
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        // Compute heal amount synchronously while we still have the settled event damage.
         double healAmount = this.getHealAmount(level);
         double healFinal = this.isHealMultiplier() ? event.getFinalDamage() * healAmount : healAmount;
 

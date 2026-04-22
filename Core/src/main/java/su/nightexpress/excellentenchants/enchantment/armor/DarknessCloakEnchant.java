@@ -42,13 +42,11 @@ public class DarknessCloakEnchant extends GameEnchantment implements DefendEncha
 
     @Override
     public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        this.plugin.runTask(damager, () -> {
-            if (!this.addPotionEffect(damager, level)) return;
+        if (!this.addPotionEffect(damager, level)) return false;
 
-            if (this.hasVisualEffects()) {
-                UniParticle.of(Particle.ASH).play(damager.getEyeLocation(), 0.75, 0.1, 30);
-            }
-        });
+        if (this.hasVisualEffects()) {
+            UniParticle.of(Particle.ASH).play(damager.getEyeLocation(), 0.75, 0.1, 30);
+        }
 
         return true;
     }
