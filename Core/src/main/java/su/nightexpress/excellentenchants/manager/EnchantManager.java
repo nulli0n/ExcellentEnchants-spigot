@@ -204,7 +204,9 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
     private void tickPassiveEnchants() {
         this.getPassiveEnchantEntities().forEach(entity ->
-              this.handleInSlots(entity, EntityUtil.EQUIPMENT_SLOTS, EnchantRegistry.PASSIVE, (item, enchant, level) -> enchant.onTrigger(entity, item, level))
+              this.plugin.runTask(entity, () ->
+                    this.handleInSlots(entity, EntityUtil.EQUIPMENT_SLOTS, EnchantRegistry.PASSIVE, (item, enchant, level) -> enchant.onTrigger(entity, item, level))
+              )
         );
     }
 
@@ -381,4 +383,3 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
               }));
     }
 }
-
