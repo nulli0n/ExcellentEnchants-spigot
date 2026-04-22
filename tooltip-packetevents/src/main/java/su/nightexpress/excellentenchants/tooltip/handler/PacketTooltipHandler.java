@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
@@ -65,6 +66,8 @@ public class PacketTooltipHandler implements TooltipHandler {
 
         @Override
         public void onPacketSend(@NotNull PacketSendEvent event) {
+            if (event.getConnectionState() != ConnectionState.PLAY) return;
+
             PacketTypeCommon type = event.getPacketType();
             Player player = event.getPlayer();
             if (!this.controller.isReadyForTooltipUpdate(player)) return;
