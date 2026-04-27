@@ -9,7 +9,7 @@
         <version>5.4.2</version>
     </parent>
 
-    <artifactId>tooltip-protocollib</artifactId>
+    <artifactId>spigot-26.1.2</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -17,18 +17,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>codemc-releases</id>
-            <url>https://repo.codemc.io/repository/maven-releases/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>26.1.2.build.51-beta</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>26.1.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -37,13 +30,5 @@
             <artifactId>API</artifactId>
             <version>5.4.2</version>
         </dependency>
-
-        <dependency>
-            <groupId>net.dmulloy2</groupId>
-            <artifactId>ProtocolLib</artifactId>
-            <version>5.4.0</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
-
 </project>

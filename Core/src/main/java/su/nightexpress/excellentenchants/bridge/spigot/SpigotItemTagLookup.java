@@ -5,6 +5,7 @@ import org.bukkit.Tag;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.bridge.ItemTagLookup;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,12 @@ public class SpigotItemTagLookup implements ItemTagLookup {
 
     @Override
     @NotNull
+    public Set<String> getSpears() {
+        return fromTag("ITEMS_SPEARS");
+    }
+
+    @Override
+    @NotNull
     public Set<String> getAxes() {
         return fromTag(Tag.ITEMS_AXES);
     }
@@ -73,5 +80,19 @@ public class SpigotItemTagLookup implements ItemTagLookup {
     @NotNull
     private Set<String> fromTag(@NotNull Tag<Material> tag) {
         return tag.getValues().stream().map(Enum::name).collect(Collectors.toSet());
+    }
+
+    @SuppressWarnings("unchecked")
+    @NotNull
+    private static Set<String> fromTag(@NotNull String fieldName) {
+        try {
+            Object tag = Tag.class.getField(fieldName).get(null);
+            if (tag instanceof Tag<?> bukkitTag) {
+                return ((Tag<Material>) bukkitTag).getValues().stream().map(Enum::name).collect(Collectors.toSet());
+            }
+        }
+        catch (ReflectiveOperationException ignored) {
+        }
+        return Collections.emptySet();
     }
 }

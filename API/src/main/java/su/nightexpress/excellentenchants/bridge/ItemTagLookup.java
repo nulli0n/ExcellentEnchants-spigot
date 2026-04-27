@@ -18,6 +18,11 @@ public interface ItemTagLookup {
 
     @NotNull Set<String> getSwords();
 
+    @NotNull
+    default Set<String> getSpears() {
+        return Set.of();
+    }
+
     @NotNull Set<String> getAxes();
 
     @NotNull Set<String> getHoes();
