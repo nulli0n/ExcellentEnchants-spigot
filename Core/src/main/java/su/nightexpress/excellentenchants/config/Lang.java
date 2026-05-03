@@ -24,7 +24,6 @@ public class Lang implements LangContainer {
         GRAY.wrap("Opened enchantments GUI for " + SOFT_YELLOW.wrap(PLAYER_NAME) + ".")
     );
 
-
     public static final MessageLocale COMMAND_ENCHANT_DONE_SELF = LangEntry.builder("Command.Enchant.Done.Self").chatMessage(
         GRAY.wrap(SOFT_YELLOW.wrap(GENERIC_ITEM) + " enchanted with " + SOFT_YELLOW.wrap(GENERIC_ENCHANT + " " + GENERIC_LEVEL) + "!")
     );
@@ -45,7 +44,6 @@ public class Lang implements LangContainer {
         SOFT_RED.wrap("There is no item to enchant!")
     );
 
-
     public static final MessageLocale ENCHANTED_BOOK_GAVE = LangEntry.builder("Command.Book.Done").chatMessage(
         GRAY.wrap("You gave " + SOFT_YELLOW.wrap(GENERIC_ENCHANT + " " + GENERIC_LEVEL) + " book to " + SOFT_YELLOW.wrap(PLAYER_DISPLAY_NAME) + ".")
     );
@@ -57,7 +55,6 @@ public class Lang implements LangContainer {
     public static final MessageLocale CHARGES_FUEL_BAD_ENCHANTMENT = LangEntry.builder("Charges.Fuel.BadEnchantment").chatMessage(
         GRAY.wrap("Enchantment " + SOFT_RED.wrap(GENERIC_NAME) + " can't be charged.")
     );
-
 
     public static final MessageLocale COMMAND_SYNTAX_INVALID_SLOT = LangEntry.builder("Command.Syntax.InvalidSlot").chatMessage(
         GRAY.wrap(SOFT_RED.wrap(GENERIC_INPUT) + " is not a valid slot!")

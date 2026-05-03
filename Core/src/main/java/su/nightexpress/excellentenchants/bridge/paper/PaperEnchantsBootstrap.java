@@ -176,9 +176,9 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
 
                 // Any enchantment can be tradable (on enchanted books).
                 if (distribution.isTradable() && distributionConfig.isTradingEnabled()) {
-                    distribution.getTrades().forEach(tradeType -> {
-                        registrar.addToTag(getTradeKey(tradeType), list);
-                    });
+                    distribution.getTrades().forEach(tradeType ->
+                          registrar.addToTag(getTradeKey(tradeType), list)
+                    );
                     registrar.addToTag(EnchantmentTagKeys.TRADEABLE, list);
                 }
 

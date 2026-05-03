@@ -73,7 +73,7 @@ public class PlaceholderHook {
                 if (slot == null) return null;
 
                 ItemStack itemStack = player.getInventory().getItem(slot);
-                if (itemStack == null || itemStack.getType().isAir()) return "-";
+                if (itemStack.getType().isAir()) return "-";
 
                 CustomEnchantment enchant = EnchantRegistry.getById(chargesSplit[1]);
                 if (enchant == null) return null;

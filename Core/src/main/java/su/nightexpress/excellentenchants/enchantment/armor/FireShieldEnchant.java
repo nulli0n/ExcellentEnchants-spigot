@@ -66,7 +66,7 @@ public class FireShieldEnchant extends GameEnchantment implements DefendEnchant 
         int fireTicks = (int) (this.getFireDuration(level) * 20);
 
         if (this.addFireImmune) {
-            victim.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, fireTicks, 0));
+            this.plugin.runTask(victim, () -> victim.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, fireTicks, 0)));
         }
 
         int damagerFireTicks = damager.getFireTicks();
@@ -77,7 +77,7 @@ public class FireShieldEnchant extends GameEnchantment implements DefendEnchant 
             VanillaSound.of(Sound.ITEM_FIRECHARGE_USE).play(victim.getLocation());
         }
 
-        damager.setFireTicks(fireTicks);
+        this.plugin.runTask(damager, () -> damager.setFireTicks(fireTicks));
         return true;
     }
 }

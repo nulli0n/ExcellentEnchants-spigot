@@ -91,9 +91,7 @@ public class EnchantsUtils {
     }
 
     public static void remove(@NotNull ItemStack item, @NotNull Enchantment enchantment) {
-        ItemUtil.editMeta(item, meta -> {
-            remove(meta, enchantment);
-        });
+        ItemUtil.editMeta(item, meta -> remove(meta, enchantment));
     }
 
     public static void remove(@NotNull ItemMeta meta, @NotNull Enchantment enchantment) {
@@ -106,9 +104,9 @@ public class EnchantsUtils {
     }
 
     public static void removeAll(@NotNull ItemStack item) {
-        ItemUtil.editMeta(item, meta -> {
-            getEnchantments(meta).keySet().forEach(enchantment -> remove(meta, enchantment));
-        });
+        ItemUtil.editMeta(item, meta ->
+              getEnchantments(meta).keySet().forEach(enchantment -> remove(meta, enchantment))
+        );
     }
 
     public static void restoreCharges(@NotNull ItemStack itemStack, @NotNull Enchantment enchantment, int level) {
@@ -215,9 +213,9 @@ public class EnchantsUtils {
         for (ItemStack itemStack : player.getInventory().getContents()) {
             if (itemStack == null || itemStack.getType().isAir()) continue;
 
-            getCustomEnchantments(itemStack, holder).forEach((enchant, level) -> {
-                map.computeIfAbsent(itemStack, k -> new LinkedHashMap<>()).put(enchant, level);
-            });
+            getCustomEnchantments(itemStack, holder).forEach((enchant, level) ->
+                  map.computeIfAbsent(itemStack, k -> new LinkedHashMap<>()).put(enchant, level)
+            );
         }
 
         return map;

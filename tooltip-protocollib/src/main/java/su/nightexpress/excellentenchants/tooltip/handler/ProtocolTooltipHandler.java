@@ -107,6 +107,4 @@ public class ProtocolTooltipHandler implements TooltipHandler {
             }
         }
     }
-
-
 }

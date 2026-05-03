@@ -33,9 +33,7 @@ import su.nightexpress.nightcore.util.Randomizer;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 public class FlameWalkerEnchant extends GameEnchantment implements MoveEnchant, ProtectionEnchant {
@@ -98,13 +96,7 @@ public class FlameWalkerEnchant extends GameEnchantment implements MoveEnchant, 
         if (!hasLava) return false;
 
         int radius = (int) this.radius.getValue(level);
-        Set<Block> blocks = this.handleFlameWalker(player, level, radius);
-        if (blocks.isEmpty()) return false;
-
-        blocks.forEach(block -> {
-            int lifeTime = (int) (Randomizer.nextDouble(this.getBlockDecayTime(level)) + 1);
-            this.plugin.getEnchantManager().addTickedBlock(block, Material.LAVA, Material.MAGMA_BLOCK, lifeTime);
-        });
+        this.handleFlameWalker(player, level, radius);
         return true;
     }
 
@@ -118,29 +110,28 @@ public class FlameWalkerEnchant extends GameEnchantment implements MoveEnchant, 
         return true;
     }
 
-    @NotNull
-    public Set<Block> handleFlameWalker(@NotNull LivingEntity bukkitEntity, int level, int radius) {
-        Set<Block> blocks = new HashSet<>();
-
+    public void handleFlameWalker(@NotNull LivingEntity bukkitEntity, int level, int radius) {
         for (Block block : this.getCircleBlocks(bukkitEntity, radius)) {
-            if (block.getType() != Material.LAVA) continue;
-            if (!(block.getBlockData() instanceof Levelled levelled)) continue;
-            if (levelled.getLevel() != 0) continue; // Only 'source' (full) lava blocks can be affected.
+            this.plugin.runTask(block.getLocation(), () -> {
+                if (block.getType() != Material.LAVA) return;
+                if (!(block.getBlockData() instanceof Levelled levelled)) return;
+                if (levelled.getLevel() != 0) return; // Only 'source' (full) lava blocks can be affected.
 
-            Block above = block.getRelative(BlockFace.UP);
-            if (!above.isEmpty()) continue;
+                Block above = block.getRelative(BlockFace.UP);
+                if (!above.isEmpty()) return;
 
-            BlockState state = Material.MAGMA_BLOCK.createBlockData().createBlockState();
+                BlockState state = Material.MAGMA_BLOCK.createBlockData().createBlockState();
 
-            BlockFormEvent event = new EntityBlockFormEvent(bukkitEntity, block, state);
-            Bukkit.getPluginManager().callEvent(event);
-            if (event.isCancelled()) continue;
+                BlockFormEvent formEvent = new EntityBlockFormEvent(bukkitEntity, block, state);
+                Bukkit.getPluginManager().callEvent(formEvent);
+                if (formEvent.isCancelled()) return;
 
-            block.setBlockData(state.getBlockData());
-            blocks.add(block);
+                block.setBlockData(state.getBlockData());
+
+                int lifeTime = (int) (Randomizer.nextDouble(this.getBlockDecayTime(level)) + 1);
+                this.plugin.getEnchantManager().addTickedBlock(block, Material.LAVA, Material.MAGMA_BLOCK, lifeTime);
+            });
         }
-
-        return blocks;
     }
 
     @NotNull

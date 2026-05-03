@@ -260,9 +260,9 @@ public class RegistryHack_1_21_11 implements RegistryHack {
         // Any enchantment can be tradable.
         if (experimentalTrades) {
             if (distribution.isTradable() && settings.isTradingEnabled()) {
-                distribution.getTrades().forEach(tradeType -> {
-                    addInTag(getTradeKey(tradeType), reference);
-                });
+                distribution.getTrades().forEach(tradeType ->
+                      addInTag(getTradeKey(tradeType), reference)
+                );
             }
         }
         else {
@@ -340,9 +340,6 @@ public class RegistryHack_1_21_11 implements RegistryHack {
 
         return getFrozenTags(ENCHANTS).get(customKey);
     }
-
-
-
 
     @NotNull
     private static TagKey<Enchantment> getTradeKey(@NotNull TradeType tradeType) {

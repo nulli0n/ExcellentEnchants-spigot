@@ -112,11 +112,9 @@ public class AnvilListener extends AbstractListener<EnchantsPlugin> {
         PDCUtil.set(recharged, this.rechargedKey, count);
         event.setResult(recharged);
 
-        this.plugin.runTask(() -> event.getView().setRepairCost(chargable.size()));
+        this.plugin.runTask(event.getView().getPlayer(), () -> event.getView().setRepairCost(chargable.size()));
         return true;
     }
-
-
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onClickAnvil(InventoryClickEvent event) {
@@ -150,4 +148,3 @@ public class AnvilListener extends AbstractListener<EnchantsPlugin> {
         anvilInventory.setItem(2, null);
     }
 }
-

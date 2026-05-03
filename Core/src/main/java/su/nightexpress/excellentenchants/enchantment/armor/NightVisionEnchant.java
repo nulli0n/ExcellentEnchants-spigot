@@ -31,6 +31,7 @@ public class NightVisionEnchant extends GameEnchantment implements PassiveEnchan
 
     @Override
     public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
-        return this.addPotionEffect(entity, level);
+        this.plugin.runTask(entity, () -> this.addPotionEffect(entity, level));
+        return true;
     }
 }

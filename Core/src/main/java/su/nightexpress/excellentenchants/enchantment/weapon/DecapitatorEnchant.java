@@ -32,6 +32,7 @@ import su.nightexpress.nightcore.util.wrapper.UniParticle;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class DecapitatorEnchant extends GameEnchantment implements KillEnchant {
@@ -57,7 +58,7 @@ public class DecapitatorEnchant extends GameEnchantment implements KillEnchant {
 
         this.ignoredEntityTypes = ConfigValue.forSet("Decapitator.Ignored_Entity_Types",
             BukkitThing::getEntityType,
-            (cfg, path, set) -> cfg.set(path, set.stream().map(BukkitThing::getAsString).toList()),
+            (cfg, path, set) -> cfg.set(path, set.stream().filter(Objects::nonNull).map(BukkitThing::getAsString).toList()),
             () -> Lists.newSet(
                 EntityType.ENDER_DRAGON, EntityType.WITHER, EntityType.WITHER_SKELETON
             ),
@@ -76,7 +77,7 @@ public class DecapitatorEnchant extends GameEnchantment implements KillEnchant {
             (cfg2, path, map) -> map.forEach((type, txt) -> cfg2.set(path + "." + BukkitThing.getAsString(type), txt)),
             DecapitatorEnchant::getDefaultHeads,
             "Head texture values for each entity type.",
-            "You can take some from http://minecraft-heads.com",
+            "You can take some from https://minecraft-heads.com",
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html"
         ).read(config);
     }
@@ -116,7 +117,7 @@ public class DecapitatorEnchant extends GameEnchantment implements KillEnchant {
             }
         }
 
-        entity.getWorld().dropItemNaturally(entity.getLocation(), item.getItemStack());
+        this.plugin.runTask(entity, () -> entity.getWorld().dropItemNaturally(entity.getLocation(), item.getItemStack()));
 
         if (this.hasVisualEffects()) {
             UniParticle.blockCrack(Material.REDSTONE_BLOCK).play(entity.getEyeLocation(), 0.25, 0.15, 30);

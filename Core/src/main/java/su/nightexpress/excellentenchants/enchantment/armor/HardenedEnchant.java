@@ -40,6 +40,7 @@ public class HardenedEnchant extends GameEnchantment implements DefendEnchant {
 
     @Override
     public boolean onProtect(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        return this.addPotionEffect(victim, level);
+        this.plugin.runTask(victim, () -> this.addPotionEffect(victim, level));
+        return true;
     }
 }
