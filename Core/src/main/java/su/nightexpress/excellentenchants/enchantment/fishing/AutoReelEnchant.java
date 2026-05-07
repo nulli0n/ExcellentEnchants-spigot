@@ -1,6 +1,7 @@
 package su.nightexpress.excellentenchants.enchantment.fishing;
 
 import org.bukkit.Material;
+import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -41,13 +42,17 @@ public class AutoReelEnchant extends GameEnchantment implements FishingEnchant {
         Player player = event.getPlayer();
         EquipmentSlot slot = EnchantsUtils.getItemHand(player, Material.FISHING_ROD);
         if (slot == null) return false;
+        if (event.isCancelled()) return false;
 
-        this.plugin.runTask(() -> {
-            if (event.isCancelled()) return;
-            if (!event.getHook().isValid()) return;
+        FishHook hook = event.getHook();
 
+        this.plugin.runTask(hook, () -> {
+            if (!hook.isValid()) return;
+
+            hook.retrieve(slot);
+        });
+        this.plugin.runTask(player, () -> {
             player.swingHand(slot);
-            event.getHook().retrieve(slot);
             player.damageItemStack(itemStack, 1);
         });
         return true;

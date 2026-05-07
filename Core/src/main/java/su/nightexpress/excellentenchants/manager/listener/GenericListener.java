@@ -38,7 +38,7 @@ public class GenericListener extends AbstractListener<EnchantsPlugin> {
     public void onChargesFillOnEnchant(EnchantItemEvent event) {
         if (!Config.isChargesEnabled()) return;
 
-        this.plugin.runTask(() -> {
+        this.plugin.runTask(event.getEnchanter(), () -> {
             Inventory inventory = event.getInventory();
 
             ItemStack result = inventory.getItem(0);

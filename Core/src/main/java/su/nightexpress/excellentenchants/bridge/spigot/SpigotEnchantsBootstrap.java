@@ -9,8 +9,6 @@ import su.nightexpress.excellentenchants.bridge.RegistryHack;
 import su.nightexpress.excellentenchants.enchantment.DistributionConfig;
 import su.nightexpress.excellentenchants.enchantment.EnchantCatalog;
 import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
-import su.nightexpress.excellentenchants.nms.mc_1_21_10.RegistryHack_1_21_10;
-import su.nightexpress.excellentenchants.nms.mc_1_21_8.RegistryHack_1_21_8;
 import su.nightexpress.nightcore.util.Version;
 
 import java.nio.file.Path;
@@ -19,8 +17,6 @@ public class SpigotEnchantsBootstrap {
 
     public void bootstrap(@NotNull EnchantsPlugin plugin) {
         RegistryHack registryHack = switch (Version.getCurrent()) {
-            case MC_1_21_8 -> new RegistryHack_1_21_8(plugin);
-            case MC_1_21_10 -> new RegistryHack_1_21_10(plugin);
             case MC_1_21_11 -> new RegistryHack_1_21_11(plugin);
             default -> null;
         };

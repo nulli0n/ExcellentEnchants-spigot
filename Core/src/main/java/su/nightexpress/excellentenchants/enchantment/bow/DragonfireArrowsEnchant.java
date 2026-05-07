@@ -99,30 +99,35 @@ public class DragonfireArrowsEnchant extends GameEnchantment implements ArrowEnc
                              @Nullable BlockFace hitFace,
                              int level) {
 
-        // There are some tweaks to respect protection plugins by using event call.
-        ItemStack itemStack = new ItemStack(Material.LINGERING_POTION);
-        ItemUtil.editMeta(itemStack, PotionMeta.class, potionMeta -> {
-            potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 20, 0), true);
+        this.plugin.runTask(location, () -> {
+            if (location.getWorld() == null) return;
+
+            // There are some tweaks to respect protection plugins by using event call.
+            ItemStack itemStack = new ItemStack(Material.LINGERING_POTION);
+            ItemUtil.editMeta(itemStack, PotionMeta.class, potionMeta -> {
+                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 20, 0), true);
+            });
+
+            ThrownPotion potion = location.getWorld().spawn(location, ThrownPotion.class, p -> {
+                p.setItem(itemStack);
+                p.setShooter(shooter);
+            });
+
+            AreaEffectCloud cloud = location.getWorld().spawn(location, AreaEffectCloud.class);
+            cloud.clearCustomEffects();
+            cloud.setSource(shooter);
+            cloud.setParticle(Particle.DRAGON_BREATH, 1F);
+            cloud.setRadius((float) this.getFireRadius(level));
+            cloud.setDuration(this.getFireDuration(level));
+            cloud.setRadiusPerTick((7.0F - cloud.getRadius()) / (float) cloud.getDuration());
+            cloud.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 1, 1), true);
+
+            LingeringPotionSplashEvent splashEvent = new LingeringPotionSplashEvent(potion, hitEntity, hitBlock, hitFace, cloud);
+            plugin.getPluginManager().callEvent(splashEvent);
+            if (splashEvent.isCancelled()) {
+                cloud.remove();
+            }
+            potion.remove();
         });
-
-        ThrownPotion potion = shooter.launchProjectile(ThrownPotion.class);
-        potion.setItem(itemStack);
-        potion.teleport(location);
-
-        AreaEffectCloud cloud = potion.getWorld().spawn(location, AreaEffectCloud.class);
-        cloud.clearCustomEffects();
-        cloud.setSource(shooter);
-        cloud.setParticle(Particle.DRAGON_BREATH, 1F);
-        cloud.setRadius((float) this.getFireRadius(level));
-        cloud.setDuration(this.getFireDuration(level));
-        cloud.setRadiusPerTick((7.0F - cloud.getRadius()) / (float) cloud.getDuration());
-        cloud.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 1, 1), true);
-
-        LingeringPotionSplashEvent splashEvent = new LingeringPotionSplashEvent(potion, hitEntity, hitBlock, hitFace, cloud);
-        plugin.getPluginManager().callEvent(splashEvent);
-        if (splashEvent.isCancelled()) {
-            cloud.remove();
-        }
-        potion.remove();
     }
 }

@@ -71,14 +71,18 @@ public class ThunderEnchant extends GameEnchantment implements AttackEnchant {
         if (victim.getLocation().getBlock().getLightFromSky() != 15) return false;
 
         Location location = victim.getLocation();
-        victim.getWorld().strikeLightningEffect(location);
+        this.plugin.runTask(location, () -> {
+            if (location.getWorld() == null) return;
 
-        if (this.hasVisualEffects()) {
-            Block block = location.getBlock().getRelative(BlockFace.DOWN);
-            Location center = LocationUtil.setCenter3D(location.clone());
-            UniParticle.blockCrack(block.getType()).play(center, 0.5, 0.1, 100);
-            UniParticle.of(Particle.ELECTRIC_SPARK).play(center, 0.75, 0.05, 120);
-        }
+            location.getWorld().strikeLightningEffect(location);
+
+            if (this.hasVisualEffects()) {
+                Block block = location.getBlock().getRelative(BlockFace.DOWN);
+                Location center = LocationUtil.setCenter3D(location.clone());
+                UniParticle.blockCrack(block.getType()).play(center, 0.5, 0.1, 100);
+                UniParticle.of(Particle.ELECTRIC_SPARK).play(center, 0.75, 0.05, 120);
+            }
+        });
 
         event.setDamage(event.getDamage() + this.getDamage(level));
 

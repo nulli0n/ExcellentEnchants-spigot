@@ -30,6 +30,7 @@ import su.nightexpress.excellentenchants.enchantment.GameEnchantment;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.util.Randomizer;
+import su.nightexpress.nightcore.util.Version;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -98,6 +99,11 @@ public class FlameWalkerEnchant extends GameEnchantment implements MoveEnchant, 
         if (!hasLava) return false;
 
         int radius = (int) this.radius.getValue(level);
+        if (Version.isFolia()) {
+            this.handleFlameWalkerFolia(player, level, radius);
+            return true;
+        }
+
         Set<Block> blocks = this.handleFlameWalker(player, level, radius);
         if (blocks.isEmpty()) return false;
 
@@ -106,6 +112,31 @@ public class FlameWalkerEnchant extends GameEnchantment implements MoveEnchant, 
             this.plugin.getEnchantManager().addTickedBlock(block, Material.LAVA, Material.MAGMA_BLOCK, lifeTime);
         });
         return true;
+    }
+
+    private void handleFlameWalkerFolia(@NotNull LivingEntity entity, int level, int radius) {
+        Location center = entity.getLocation();
+        World world = entity.getWorld();
+        int fixedY = center.getBlockY() - 1;
+        int centerX = center.getBlockX();
+        int centerZ = center.getBlockZ();
+
+        for (int x = centerX - radius; x <= centerX + radius; x++) {
+            for (int z = centerZ - radius; z <= centerZ + radius; z++) {
+                int dx = centerX - x;
+                int dz = centerZ - z;
+                if ((dx * dx + dz * dz) > (radius * radius)) continue;
+
+                Location location = new Location(world, x, fixedY, z);
+                this.plugin.runTask(location, () -> {
+                    Block block = location.getBlock();
+                    if (!this.applyFlameWalkerBlock(entity, block)) return;
+
+                    int lifeTime = (int) (Randomizer.nextDouble(this.getBlockDecayTime(level)) + 1);
+                    this.plugin.getEnchantManager().addTickedBlock(block, Material.LAVA, Material.MAGMA_BLOCK, lifeTime);
+                });
+            }
+        }
     }
 
     @Override
@@ -118,25 +149,30 @@ public class FlameWalkerEnchant extends GameEnchantment implements MoveEnchant, 
         return true;
     }
 
+    private boolean applyFlameWalkerBlock(@NotNull LivingEntity bukkitEntity, @NotNull Block block) {
+        if (block.getType() != Material.LAVA) return false;
+        if (!(block.getBlockData() instanceof Levelled levelled)) return false;
+        if (levelled.getLevel() != 0) return false; // Only 'source' (full) lava blocks can be affected.
+
+        Block above = block.getRelative(BlockFace.UP);
+        if (!above.isEmpty()) return false;
+
+        BlockState state = Material.MAGMA_BLOCK.createBlockData().createBlockState();
+
+        BlockFormEvent event = new EntityBlockFormEvent(bukkitEntity, block, state);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return false;
+
+        block.setBlockData(state.getBlockData());
+        return true;
+    }
+
     @NotNull
     public Set<Block> handleFlameWalker(@NotNull LivingEntity bukkitEntity, int level, int radius) {
         Set<Block> blocks = new HashSet<>();
 
         for (Block block : this.getCircleBlocks(bukkitEntity, radius)) {
-            if (block.getType() != Material.LAVA) continue;
-            if (!(block.getBlockData() instanceof Levelled levelled)) continue;
-            if (levelled.getLevel() != 0) continue; // Only 'source' (full) lava blocks can be affected.
-
-            Block above = block.getRelative(BlockFace.UP);
-            if (!above.isEmpty()) continue;
-
-            BlockState state = Material.MAGMA_BLOCK.createBlockData().createBlockState();
-
-            BlockFormEvent event = new EntityBlockFormEvent(bukkitEntity, block, state);
-            Bukkit.getPluginManager().callEvent(event);
-            if (event.isCancelled()) continue;
-
-            block.setBlockData(state.getBlockData());
+            if (!this.applyFlameWalkerBlock(bukkitEntity, block)) continue;
             blocks.add(block);
         }
 

@@ -51,14 +51,18 @@ public class RocketEnchant extends GameEnchantment implements AttackEnchant {
 
     @Override
     public boolean onAttack(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (victim.isInsideVehicle()) {
-            victim.leaveVehicle();
-        }
+        this.plugin.runTask(victim, () -> {
+            if (!victim.isValid() || victim.isDead()) return;
 
-        Firework firework = this.createRocket(victim.getWorld(), victim.getLocation(), level);
-        firework.addPassenger(victim);
+            if (victim.isInsideVehicle()) {
+                victim.leaveVehicle();
+            }
 
-        VanillaSound.of(Sound.ENTITY_FIREWORK_ROCKET_LAUNCH).play(victim.getLocation());
+            Firework firework = this.createRocket(victim.getWorld(), victim.getLocation(), level);
+            firework.addPassenger(victim);
+
+            VanillaSound.of(Sound.ENTITY_FIREWORK_ROCKET_LAUNCH).play(victim.getLocation());
+        });
         return true;
     }
 

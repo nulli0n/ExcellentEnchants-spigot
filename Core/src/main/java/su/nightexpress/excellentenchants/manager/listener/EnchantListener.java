@@ -130,7 +130,7 @@ public class EnchantListener extends AbstractListener<EnchantsPlugin> {
             });
         }
 
-        this.plugin.runTask(() -> this.manager.removeArrowEffects(abstractArrow));
+        this.plugin.runTask(abstractArrow, () -> this.manager.removeArrowEffects(abstractArrow));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

@@ -67,22 +67,26 @@ public class FlareEnchant extends GameEnchantment implements ArrowEnchant {
         Block relative = block.getRelative(face);
         if (!relative.getType().isAir()) return;
 
-        if (projectile.getShooter() instanceof Player player) {
-            BlockPlaceEvent placeEvent = new BlockPlaceEvent(relative, relative.getState(), block, new ItemStack(Material.TORCH),  player,true, EquipmentSlot.HAND);
-            plugin.getPluginManager().callEvent(placeEvent);
-            if (placeEvent.isCancelled() || !placeEvent.canBuild()) return;
-        }
+        this.plugin.runTask(relative.getLocation(), () -> {
+            if (!relative.getType().isAir()) return;
 
-        if (face == BlockFace.UP) {
-            relative.setType(Material.TORCH);
-        }
-        else {
-            relative.setType(Material.WALL_TORCH);
+            if (projectile.getShooter() instanceof Player player) {
+                BlockPlaceEvent placeEvent = new BlockPlaceEvent(relative, relative.getState(), block, new ItemStack(Material.TORCH), player, true, EquipmentSlot.HAND);
+                plugin.getPluginManager().callEvent(placeEvent);
+                if (placeEvent.isCancelled() || !placeEvent.canBuild()) return;
+            }
 
-            Directional directional = (Directional) relative.getBlockData();
-            directional.setFacing(face);
-            relative.setBlockData(directional, true);
-        }
+            if (face == BlockFace.UP) {
+                relative.setType(Material.TORCH);
+            }
+            else {
+                relative.setType(Material.WALL_TORCH);
+
+                Directional directional = (Directional) relative.getBlockData();
+                directional.setFacing(face);
+                relative.setBlockData(directional, true);
+            }
+        });
     }
 
     @Override

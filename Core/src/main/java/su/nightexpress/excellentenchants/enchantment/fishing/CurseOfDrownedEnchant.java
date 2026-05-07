@@ -44,15 +44,22 @@ public class CurseOfDrownedEnchant extends GameEnchantment implements FishingEnc
         if (event.getState() != PlayerFishEvent.State.CAUGHT_FISH) return false;
 
         FishHook hook = event.getHook();
-        Drowned drowned = hook.getWorld().spawn(hook.getLocation(), Drowned.class);
-        hook.setHookedEntity(drowned);
-        hook.pullHookedEntity();
+        this.plugin.runTask(hook, () -> {
+            if (!hook.isValid()) return;
+
+            Drowned drowned = hook.getWorld().spawn(hook.getLocation(), Drowned.class);
+            hook.setHookedEntity(drowned);
+            hook.pullHookedEntity();
+
+            if (this.hasVisualEffects()) {
+                UniParticle.of(Particle.UNDERWATER).play(hook.getLocation(), 0.75, 0.1, 50);
+            }
+        });
 
         event.setCancelled(true);
 
         if (this.hasVisualEffects()) {
-            UniParticle.of(Particle.UNDERWATER).play(hook.getLocation(), 0.75, 0.1, 50);
-            VanillaSound.of(Sound.ENTITY_DROWNED_AMBIENT).play(event.getPlayer());
+            this.plugin.runTask(event.getPlayer(), () -> VanillaSound.of(Sound.ENTITY_DROWNED_AMBIENT).play(event.getPlayer()));
         }
         return true;
     }

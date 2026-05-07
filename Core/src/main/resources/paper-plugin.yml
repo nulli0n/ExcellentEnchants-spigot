@@ -4,6 +4,7 @@ name: ExcellentEnchants
 version: '${project.version}'
 description: A lot of new enchantments properly integrated into the server!
 api-version: '1.21'
+folia-supported: true
 #loader: io.papermc.testplugin.TestPluginLoader
 dependencies:
   bootstrap:

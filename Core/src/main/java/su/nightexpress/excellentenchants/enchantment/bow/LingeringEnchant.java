@@ -12,6 +12,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,7 +58,17 @@ public class LingeringEnchant extends GameEnchantment implements ArrowEnchant {
     public void onHit(@NotNull ProjectileHitEvent event, @NotNull LivingEntity shooter, @NotNull Arrow arrow, int level) {
         if (event.getHitEntity() != null) return;
 
-        this.createCloud(arrow, shooter, arrow.getLocation(), event.getHitEntity(), event.getHitBlock(), event.getHitBlockFace());
+        Set<PotionEffect> effects = new HashSet<>();
+        if (arrow.hasCustomEffects()) {
+            effects.addAll(arrow.getCustomEffects());
+        }
+        PotionType basePotionType = arrow.getBasePotionType();
+        if (basePotionType != null) {
+            effects.addAll(basePotionType.getPotionEffects());
+        }
+        if (effects.isEmpty()) return;
+
+        this.createCloud(effects, basePotionType, shooter, arrow.getLocation(), event.getHitEntity(), event.getHitBlock(), event.getHitBlockFace());
     }
 
     @Override
@@ -65,50 +76,47 @@ public class LingeringEnchant extends GameEnchantment implements ArrowEnchant {
 
     }
 
-    private void createCloud(@NotNull Arrow arrow,
-                                @NotNull ProjectileSource shooter,
-                                @NotNull Location location,
-                                @Nullable Entity hitEntity,
-                                @Nullable Block hitBlock,
-                                @Nullable BlockFace hitFace) {
+    private void createCloud(@NotNull Set<PotionEffect> effects,
+                             @Nullable PotionType basePotionType,
+                             @NotNull ProjectileSource shooter,
+                             @NotNull Location location,
+                             @Nullable Entity hitEntity,
+                             @Nullable Block hitBlock,
+                             @Nullable BlockFace hitFace) {
 
-        Set<PotionEffect> effects = new HashSet<>();
-        if (arrow.hasCustomEffects()) {
-            effects.addAll(arrow.getCustomEffects());
-        }
-        if (arrow.getBasePotionType() != null) {
-            effects.addAll(arrow.getBasePotionType().getPotionEffects());
-        }
-        if (effects.isEmpty()) return;
+        this.plugin.runTask(location, () -> {
+            if (location.getWorld() == null) return;
 
-        // There are some tweaks to respect protection plugins by using event call.
-        ItemStack item = new ItemStack(Material.LINGERING_POTION);
-        ItemUtil.editMeta(item, meta -> {
-            if (meta instanceof PotionMeta potionMeta) {
-                effects.forEach(potionEffect -> potionMeta.addCustomEffect(potionEffect, true));
+            // There are some tweaks to respect protection plugins by using event call.
+            ItemStack item = new ItemStack(Material.LINGERING_POTION);
+            ItemUtil.editMeta(item, meta -> {
+                if (meta instanceof PotionMeta potionMeta) {
+                    effects.forEach(potionEffect -> potionMeta.addCustomEffect(potionEffect, true));
+                }
+            });
+
+            ThrownPotion potion = location.getWorld().spawn(location, ThrownPotion.class, p -> {
+                p.setItem(item);
+                p.setShooter(shooter);
+            });
+
+            AreaEffectCloud cloud = location.getWorld().spawn(location, AreaEffectCloud.class);
+            cloud.clearCustomEffects();
+            cloud.setSource(shooter);
+            cloud.setWaitTime(10);
+            cloud.setRadius(3F); // 3.0
+            cloud.setRadiusOnUse(-0.5F);
+            cloud.setDuration(600); // 600
+            cloud.setRadiusPerTick(-cloud.getRadius() / (float) cloud.getDuration());
+            cloud.setBasePotionType(basePotionType);
+            effects.forEach(potionEffect -> cloud.addCustomEffect(potionEffect, false));
+
+            LingeringPotionSplashEvent splashEvent = new LingeringPotionSplashEvent(potion, hitEntity, hitBlock, hitFace, cloud);
+            plugin.getPluginManager().callEvent(splashEvent);
+            if (splashEvent.isCancelled()) {
+                cloud.remove();
             }
+            potion.remove();
         });
-
-        ThrownPotion potion = shooter.launchProjectile(ThrownPotion.class);
-        potion.setItem(item);
-        potion.teleport(location);
-
-        AreaEffectCloud cloud = potion.getWorld().spawn(location, AreaEffectCloud.class);
-        cloud.clearCustomEffects();
-        cloud.setSource(shooter);
-        cloud.setWaitTime(10);
-        cloud.setRadius(3F); // 3.0
-        cloud.setRadiusOnUse(-0.5F);
-        cloud.setDuration(600); // 600
-        cloud.setRadiusPerTick(-cloud.getRadius() / (float)cloud.getDuration());
-        cloud.setBasePotionType(arrow.getBasePotionType());
-        effects.forEach(potionEffect -> cloud.addCustomEffect(potionEffect, false));
-
-        LingeringPotionSplashEvent splashEvent = new LingeringPotionSplashEvent(potion, hitEntity, hitBlock, hitFace, cloud);
-        plugin.getPluginManager().callEvent(splashEvent);
-        if (splashEvent.isCancelled()) {
-            cloud.remove();
-        }
-        potion.remove();
     }
 }

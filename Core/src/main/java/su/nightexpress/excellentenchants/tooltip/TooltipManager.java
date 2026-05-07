@@ -21,6 +21,7 @@ import su.nightexpress.nightcore.util.Plugins;
 import su.nightexpress.nightcore.util.placeholder.PlaceholderContext;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TooltipManager extends AbstractManager<EnchantsPlugin> implements TooltipController {
 
@@ -34,7 +35,7 @@ public class TooltipManager extends AbstractManager<EnchantsPlugin> implements T
         super(plugin);
         this.settings = new TooltipSettings();
         this.factoryMap = new LinkedHashMap<>();
-        this.updateStopList = new HashSet<>();
+        this.updateStopList = ConcurrentHashMap.newKeySet();
     }
 
     @Override

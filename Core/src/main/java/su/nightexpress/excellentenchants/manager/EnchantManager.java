@@ -59,8 +59,8 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
     public EnchantManager(@NotNull EnchantsPlugin plugin) {
         super(plugin);
         this.arrowEffects = new ConcurrentHashMap<>();
-        this.tickedBlocks = new HashMap<>();
-        this.explosions = new HashMap<>();
+        this.tickedBlocks = new ConcurrentHashMap<>();
+        this.explosions = new ConcurrentHashMap<>();
         this.settings = new EnchantSettings();
 
         this.entitySpawnKey = new NamespacedKey(plugin, "entity.spawn_reason");
@@ -81,7 +81,9 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
             this.addListener(new SlotListener(this.plugin, this));
         }
 
-        this.addAsyncTask(this::tickArrowEffects, this.settings.getArrowEffectsTickInterval());
+        // Folia: cannot run as async — tickArrowEffects accesses Entity API (isValid, isDead, getLocation).
+        // We schedule on the global region thread; per-arrow work is dispatched to each entity's scheduler.
+        this.addTask(this::tickArrowEffects, this.settings.getArrowEffectsTickInterval());
 
         if (!EnchantRegistry.PASSIVE.isEmpty()) {
             this.addTask(this::tickPassiveEnchants, this.settings.getPassiveEnchantsTickInterval());
@@ -184,40 +186,75 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
     }
 
     private void tickArrowEffects() {
-        this.arrowEffects.keySet().removeIf(arrow -> !arrow.isValid() || arrow.isDead());
-        this.arrowEffects.forEach((arrow, effects) -> {
-            effects.forEach(particle -> particle.play(arrow.getLocation(), 0f, 0f, 10));
-        });
+        // Snapshot keys to avoid concurrent modification while we re-enter via the entity scheduler.
+        for (AbstractArrow arrow : new java.util.ArrayList<>(this.arrowEffects.keySet())) {
+            if (this.plugin.scheduler().runTask(arrow, () -> {
+                if (!arrow.isValid() || arrow.isDead()) {
+                    this.arrowEffects.remove(arrow);
+                    return;
+                }
+                Set<UniParticle> particles = this.arrowEffects.get(arrow);
+                if (particles == null) return;
+
+                Location loc = arrow.getLocation();
+                particles.forEach(particle -> particle.play(loc, 0f, 0f, 10));
+            }) == null) {
+                // Folia: entity scheduler returned null — entity is no longer tickable. Drop it.
+                this.arrowEffects.remove(arrow);
+            }
+        }
     }
 
     private void tickBlocks() {
-        this.tickedBlocks.values().removeIf(tickedBlock -> {
-            tickedBlock.tick();
-            return tickedBlock.isDead();
-        });
+        // Folia: each block lives in its own region — schedule the tick on the location's region scheduler.
+        for (Map.Entry<Location, TickedBlock> entry : new java.util.ArrayList<>(this.tickedBlocks.entrySet())) {
+            Location location = entry.getKey();
+            TickedBlock tickedBlock = entry.getValue();
+            if (!location.isWorldLoaded()) continue;
+
+            this.plugin.runTask(location, () -> {
+                tickedBlock.tick();
+                if (tickedBlock.isDead()) {
+                    this.tickedBlocks.remove(location);
+                }
+            });
+        }
     }
 
     private void restoreBlocks() {
-        this.tickedBlocks.values().forEach(TickedBlock::restore);
-    }
-
-    private void tickPassiveEnchants() {
-        this.getPassiveEnchantEntities().forEach(entity -> {
-            this.handleInSlots(entity, EntityUtil.EQUIPMENT_SLOTS, EnchantRegistry.PASSIVE, (item, enchant, level) -> enchant.onTrigger(entity, item, level));
+        // Folia: restore each block on its own region thread. On Spigot/Paper this stays on the calling thread.
+        this.tickedBlocks.forEach((location, tickedBlock) -> {
+            if (Version.isFolia()) {
+                this.plugin.runTask(location, tickedBlock::restore);
+            }
+            else {
+                tickedBlock.restore();
+            }
         });
     }
 
+    private void tickPassiveEnchants() {
+        // Folia: each entity must be ticked on its own region/entity scheduler.
+        // Iterating online players + (optionally) world.getLivingEntities() is read-only and acceptable; per-entity work is dispatched.
+        for (LivingEntity entity : this.collectPassiveEnchantCandidates()) {
+            this.plugin.scheduler().runTask(entity, () -> {
+                if (entity.isDead() || !entity.isValid()) return;
+                this.handleInSlots(entity, EntityUtil.EQUIPMENT_SLOTS, EnchantRegistry.PASSIVE, (item, enchant, level) -> enchant.onTrigger(entity, item, level));
+            });
+        }
+    }
+
     @NotNull
-    private Set<LivingEntity> getPassiveEnchantEntities() {
+    private Set<LivingEntity> collectPassiveEnchantCandidates() {
         Set<LivingEntity> entities = new HashSet<>(Players.getOnline());
 
-        if (this.settings.isPassiveEnchantsAllowedForMobs()) {
+        // Folia warning: world.getLivingEntities() is not safe to invoke from arbitrary regions.
+        // Limit mob handling to non-Folia servers; users on Folia should rely on event-driven enchant triggers for mobs.
+        if (this.settings.isPassiveEnchantsAllowedForMobs() && !Version.isFolia()) {
             this.plugin.getServer().getWorlds().forEach(world -> {
                 entities.addAll(world.getLivingEntities());
             });
         }
-
-        entities.removeIf(Entity::isDead);
 
         return entities;
     }
@@ -270,7 +307,25 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
         this.explosions.put(entity.getUniqueId(), explosion);
 
-        return entity.getWorld().createExplosion(location, power, fire, destroy, entity);
+        Runnable explode = () -> {
+            if (location.getWorld() == null) {
+                this.explosions.remove(entity.getUniqueId());
+                return;
+            }
+
+            boolean created = location.getWorld().createExplosion(location, power, fire, destroy, entity);
+            if (!created) {
+                this.explosions.remove(entity.getUniqueId());
+            }
+        };
+
+        if (Version.isFolia()) {
+            this.plugin.runTask(location, explode);
+        }
+        else {
+            explode.run();
+        }
+        return true;
     }
 
     public void handleEnchantExplosion(@NotNull EntityExplodeEvent event, @NotNull LivingEntity entity) {
@@ -279,7 +334,7 @@ public class EnchantManager extends AbstractManager<EnchantsPlugin> {
 
         explosion.handleExplosion(event);
 
-        this.plugin.runTask(() -> this.explosions.remove(entity.getUniqueId()));
+        this.plugin.runTask(entity, () -> this.explosions.remove(entity.getUniqueId()));
     }
 
     public void handleEnchantExplosionDamage(@NotNull EntityDamageByEntityEvent event, @NotNull LivingEntity entity) {
