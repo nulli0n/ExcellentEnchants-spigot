@@ -620,6 +620,7 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
                     value.load(enchantsDir, itemSetRegistry);
                 }
                 catch (IllegalStateException exception) {
+                    value.disabled = true;
                     onError.accept(value, exception);
                 }
             }

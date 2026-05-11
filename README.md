@@ -75,16 +75,17 @@
 
 ## Requirements
 
-You **must** have [NightCore](https://nightexpressdev.com/nightcore/) plugin installed to run **ExcellentEnchants**.
+You **must** have [NightCore](https://nightexpressdev.com/nightcore/) plugin installed to run **ExcellentEnchants**. Minecraft 26.1.2 support requires NightCore 2.15.2 or newer.
 
 The following versions and platforms are supported:
 
 | **Server Version** | **Paper** | **Spigot** | **Folia** | **Java Version** |
 |:------------------:|:---------:|:----------:|:---------:|:----------------:|
-|      1.21.11       |    ✔️     |     ✔️     |     ❌     |        21        |
-|      1.21.10       |    ✔️     |     ✔️     |     ❌     |        21        |
-|       1.21.9       |    ✔️     |     ❌      |     ❌     |        21        |
-|       1.21.8       |    ✔️     |     ✔️     |     ❌     |        21        |
+|       26.1.2       |    Yes    |    Yes     |    No     |        25        |
+|      1.21.11       |    Yes    |    Yes     |    No     |        21        |
+|      1.21.10       |    Yes    |    Yes     |    No     |        21        |
+|       1.21.9       |    Yes    |     No     |    No     |        21        |
+|       1.21.8       |    Yes    |    Yes     |    No     |        21        |
 
 - Anything not listed in the compatibility table is **NOT** supported.
 - Make sure to check out all known issues and incompatibilities [here](https://nightexpressdev.com/excellentenchants/common-issues/).

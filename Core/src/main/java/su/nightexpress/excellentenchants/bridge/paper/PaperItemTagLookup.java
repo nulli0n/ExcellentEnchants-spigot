@@ -1,8 +1,10 @@
 package su.nightexpress.excellentenchants.bridge.paper;
 
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
+import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.tag.TagKey;
 import io.papermc.paper.tag.PostFlattenTagRegistrar;
+import net.kyori.adventure.key.Key;
 import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.bridge.ItemTagLookup;
@@ -56,6 +58,12 @@ public class PaperItemTagLookup implements ItemTagLookup {
 
     @Override
     @NotNull
+    public Set<String> getSpears() {
+        return this.fromRegistry(TagKey.create(RegistryKey.ITEM, Key.key(Key.MINECRAFT_NAMESPACE, "spears")));
+    }
+
+    @Override
+    @NotNull
     public Set<String> getAxes() {
         return this.fromRegistry(ItemTypeTagKeys.AXES);
     }
@@ -80,6 +88,8 @@ public class PaperItemTagLookup implements ItemTagLookup {
 
     @NotNull
     private Set<String> fromRegistry(@NotNull TagKey<ItemType> key) {
+        if (!this.registrar.hasTag(key)) return Set.of();
+
         return this.registrar.getTag(key).stream().map(typedKey -> typedKey.key().value()).collect(Collectors.toSet());
     }
 }
