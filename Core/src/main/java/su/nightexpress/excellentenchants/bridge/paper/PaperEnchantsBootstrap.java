@@ -1,5 +1,17 @@
 package su.nightexpress.excellentenchants.bridge.paper;
 
+import java.nio.file.Path;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
+import org.bukkit.inventory.ItemType;
+import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
+
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -19,28 +31,16 @@ import io.papermc.paper.tag.TagEntry;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.EquipmentSlotGroup;
-import org.bukkit.inventory.ItemType;
-import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 import su.nightexpress.excellentenchants.EnchantsKeys;
-import su.nightexpress.excellentenchants.api.item.ItemSet;
-import su.nightexpress.excellentenchants.api.item.ItemSetRegistry;
 import su.nightexpress.excellentenchants.api.EnchantDefinition;
 import su.nightexpress.excellentenchants.api.EnchantDistribution;
+import su.nightexpress.excellentenchants.api.item.ItemSet;
+import su.nightexpress.excellentenchants.api.item.ItemSetRegistry;
 import su.nightexpress.excellentenchants.api.wrapper.TradeType;
 import su.nightexpress.excellentenchants.enchantment.DistributionConfig;
 import su.nightexpress.excellentenchants.enchantment.EnchantCatalog;
 import su.nightexpress.nightcore.bridge.common.NightKey;
 import su.nightexpress.nightcore.util.Lists;
-
-import java.nio.file.Path;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class PaperEnchantsBootstrap implements PluginBootstrap {
 
@@ -76,13 +76,15 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
             itemSetRegistry.values().forEach(itemSet -> {
                 TagKey<ItemType> tagKey = this.customItemTag(itemSet.getId());
                 // Transform item names into TagEntry values by creating TypedKey for each item.
-                var tagEntries = itemSet.getMaterials().stream().map(itemName -> TypedKey.create(RegistryKey.ITEM, Key.key(itemName))).toList();
+                var tagEntries = itemSet.getMaterials().stream().map(itemName -> TypedKey.create(RegistryKey.ITEM, Key
+                    .key(itemName))).toList();
 
                 registrar.addToTag(tagKey, tagEntries);
             });
 
             // Load defaults and read from the config files Definition and Distribution settings for enchants.
-            EnchantCatalog.loadAll(dataDirectory, itemSetRegistry, (entry, exception) -> context.getLogger().error("Could not load '{}' enchantment: '{}'", entry.getId(), exception.getMessage()));
+            EnchantCatalog.loadAll(dataDirectory, itemSetRegistry, (entry, exception) -> context.getLogger().error(
+                "Could not load '{}' enchantment: '{}'", entry.getId(), exception.getMessage()));
         }));
 
         // Register a new handler for the freeze lifecycle event on the enchantment registry
@@ -100,21 +102,25 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
                 Tag<@NonNull ItemType> primaryItems = event.getOrCreateTag(primaryItemsTag);
                 Tag<@NonNull ItemType> supportedItems = event.getOrCreateTag(supportedItemsTag);
 
-                RegistryKeySet<@NonNull Enchantment> exclusiveSet = RegistrySet.keySet(RegistryKey.ENCHANTMENT, definition.getExclusiveSet()
-                    .stream()
-                    .map(rawKey -> {
-                        Key key = NightKey.key(rawKey).toBukkit();
-                        if (registry.get(key) == null) {
-                            context.getLogger().warn("Unknown enchantment '{}' in exclusive list of '{}'. Ensure excluded enchantments are loaded before they are listed as exclusions for others.", key, data.getId());
-                            return null;
-                        }
-                        return EnchantmentKeys.create(key);
-                    })
-                    .filter(Objects::nonNull)
-                    .toList()
+                RegistryKeySet<@NonNull Enchantment> exclusiveSet = RegistrySet.keySet(RegistryKey.ENCHANTMENT,
+                    definition.getExclusiveSet()
+                        .stream()
+                        .map(rawKey -> {
+                            Key key = NightKey.key(rawKey).toBukkit();
+                            if (registry.get(key) == null) {
+                                context.getLogger().warn(
+                                    "Unknown enchantment '{}' in exclusive list of '{}'. Ensure excluded enchantments are loaded before they are listed as exclusions for others.",
+                                    key, data.getId());
+                                return null;
+                            }
+                            return EnchantmentKeys.create(key);
+                        })
+                        .filter(Objects::nonNull)
+                        .toList()
                 );
 
-                EquipmentSlotGroup[] activeSlots = Stream.of(supportedSet.getSlots()).map(EquipmentSlot::getGroup).toArray(EquipmentSlotGroup[]::new);
+                EquipmentSlotGroup[] activeSlots = Stream.of(supportedSet.getSlots()).map(EquipmentSlot::getGroup)
+                    .toArray(EquipmentSlotGroup[]::new);
                 Key key = data.getKey();
                 Component component = MiniMessage.miniMessage().deserialize(definition.getDisplayName());
                 String nameOnly = MiniMessage.miniMessage().stripTags(definition.getDisplayName());
@@ -129,8 +135,10 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
                         .anvilCost(definition.getAnvilCost())
                         .maxLevel(definition.getMaxLevel())
                         .weight(definition.getWeight())
-                        .minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(definition.getMinCost().base(), definition.getMinCost().perLevel()))
-                        .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(definition.getMaxCost().base(), definition.getMaxCost().perLevel()))
+                        .minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(definition.getMinCost().base(),
+                            definition.getMinCost().perLevel()))
+                        .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(definition.getMaxCost().base(),
+                            definition.getMaxCost().perLevel()))
                         .activeSlots(activeSlots)
                 );
             });
@@ -139,7 +147,7 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
         lifeCycle.registerEventHandler(LifecycleEvents.TAGS.preFlatten(RegistryKey.ENCHANTMENT).newHandler(event -> {
             var registrar = event.registrar();
 
-            EnchantCatalog.enabled().forEach((data) -> {
+            EnchantCatalog.enabled().forEach(data -> {
                 EnchantDistribution distribution = data.getDistribution();
                 TypedKey<Enchantment> key = EnchantmentKeys.create(data.getKey());
 
@@ -179,9 +187,10 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
 
                 // Any enchantment can be tradable (on enchanted books).
                 if (distribution.isTradable() && distributionConfig.isTradingEnabled()) {
-                    distribution.getTrades().stream().map(PaperEnchantsBootstrap::getTradeKey).collect(Collectors.toSet()).forEach(tradeKey -> {
-                        registrar.addToTag(tradeKey, list);
-                    });
+                    distribution.getTrades().stream().map(PaperEnchantsBootstrap::getTradeKey).distinct().forEach(
+                        tradeKey -> {
+                            registrar.addToTag(tradeKey, list);
+                        });
                     registrar.addToTag(EnchantmentTagKeys.TRADEABLE, list);
                 }
 
