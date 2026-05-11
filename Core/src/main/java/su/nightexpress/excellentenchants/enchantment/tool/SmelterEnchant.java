@@ -42,14 +42,14 @@ public class SmelterEnchant extends GameEnchantment implements BlockDropEnchant 
     private NightSound sound;
     private boolean    disableOnCrouch;
 
-    private final Set<Material>      exemptedItems;
+    private final Set<Material>      blacklistedInputs;
     private final Set<FurnaceRecipe> recipes;
 
     public SmelterEnchant(@NotNull EnchantsPlugin plugin, @NotNull EnchantManager manager, @NotNull Path file, @NotNull EnchantContext context) {
         super(plugin, manager, file, context);
         this.addComponent(EnchantComponent.PROBABILITY, Probability.addictive(15, 5));
 
-        this.exemptedItems = new HashSet<>();
+        this.blacklistedInputs = new HashSet<>();
         this.recipes = new HashSet<>();
     }
 
@@ -63,9 +63,9 @@ public class SmelterEnchant extends GameEnchantment implements BlockDropEnchant 
         this.sound = ConfigValue.create("Smelter.Sound", VanillaSound.of(Sound.BLOCK_LAVA_EXTINGUISH), "Sound to play on smelting.").read(config);
 
         this.recipes.clear();
-        this.exemptedItems.clear();
+        this.blacklistedInputs.clear();
 
-        this.exemptedItems.addAll(ConfigValue.forSet("Smelter.Exempted_Blocks",
+        this.blacklistedInputs.addAll(ConfigValue.forSet("Smelter.Exempted_Blocks",
             BukkitThing::getMaterial,
             (cfg, path, set) -> cfg.set(path, set.stream().map(BukkitThing::getAsString).toList()),
             Lists.newSet(Material.COBBLESTONE),
@@ -75,9 +75,7 @@ public class SmelterEnchant extends GameEnchantment implements BlockDropEnchant 
         this.plugin.getServer().recipeIterator().forEachRemaining(recipe -> {
             if (!(recipe instanceof FurnaceRecipe furnaceRecipe)) return;
 
-            if (!this.exemptedItems.contains(furnaceRecipe.getInput().getType())) {
-                this.recipes.add(furnaceRecipe);
-            }
+            this.recipes.add(furnaceRecipe);
         });
     }
 
@@ -102,12 +100,15 @@ public class SmelterEnchant extends GameEnchantment implements BlockDropEnchant 
 
         List<ItemStack> smelts = new ArrayList<>();
         event.getItems().removeIf(drop -> {
-            FurnaceRecipe recipe = this.recipes.stream().filter(rec -> rec.getInputChoice().test(drop.getItemStack())).findFirst().orElse(null);
+            ItemStack dropStack = drop.getItemStack();
+            if (this.blacklistedInputs.contains(dropStack.getType())) return false;
+
+            FurnaceRecipe recipe = this.recipes.stream().filter(rec -> rec.getInputChoice().test(dropStack)).findFirst().orElse(null);
             if (recipe == null) return false;
 
             // Copy amount of the origin drop item. Fixes Fortune compatibility and overall original drop amount.
             // Hopefully furnaces will not require multiple input items in the future, otherwise we'll suck here :D
-            int amount = drop.getItemStack().getAmount();
+            int amount = dropStack.getAmount();
             ItemStack result = new ItemStack(recipe.getResult());
             result.setAmount(amount);
 

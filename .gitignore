@@ -2,3 +2,4 @@
 **/pom.xml.versionsBackup
 **/target/
 !src/**/target/
+.vscode
