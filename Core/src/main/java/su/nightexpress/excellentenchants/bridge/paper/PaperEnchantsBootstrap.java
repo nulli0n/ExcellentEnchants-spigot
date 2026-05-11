@@ -39,9 +39,12 @@ import su.nightexpress.nightcore.util.Lists;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PaperEnchantsBootstrap implements PluginBootstrap {
+
+    private static final boolean HAS_SPECIAL_TRADE_TAGS = hasSpecialTradeTags();
 
     @NotNull
     private TagKey<ItemType> customItemTag(@NotNull String name) {
@@ -176,8 +179,8 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
 
                 // Any enchantment can be tradable (on enchanted books).
                 if (distribution.isTradable() && distributionConfig.isTradingEnabled()) {
-                    distribution.getTrades().forEach(tradeType -> {
-                        registrar.addToTag(getTradeKey(tradeType), list);
+                    distribution.getTrades().stream().map(PaperEnchantsBootstrap::getTradeKey).collect(Collectors.toSet()).forEach(tradeKey -> {
+                        registrar.addToTag(tradeKey, list);
                     });
                     registrar.addToTag(EnchantmentTagKeys.TRADEABLE, list);
                 }
@@ -199,21 +202,36 @@ public class PaperEnchantsBootstrap implements PluginBootstrap {
 
     @NotNull
     private static TagKey<Enchantment> getTradeKey(@NotNull TradeType tradeType) {
+        return EnchantmentTagKeys.create(Key.key(Key.MINECRAFT_NAMESPACE, "trades/" + getTradePath(tradeType)));
+    }
+
+    @NotNull
+    private static String getTradePath(@NotNull TradeType tradeType) {
         return switch (tradeType) {
-            case DESERT_COMMON -> EnchantmentTagKeys.TRADES_DESERT_COMMON;
-            case DESERT_SPECIAL -> EnchantmentTagKeys.TRADES_DESERT_SPECIAL;
-            case PLAINS_COMMON -> EnchantmentTagKeys.TRADES_PLAINS_COMMON;
-            case PLAINS_SPECIAL -> EnchantmentTagKeys.TRADES_PLAINS_SPECIAL;
-            case SAVANNA_COMMON -> EnchantmentTagKeys.TRADES_SAVANNA_COMMON;
-            case SAVANNA_SPECIAL -> EnchantmentTagKeys.TRADES_SAVANNA_SPECIAL;
-            case JUNGLE_COMMON -> EnchantmentTagKeys.TRADES_JUNGLE_COMMON;
-            case JUNGLE_SPECIAL -> EnchantmentTagKeys.TRADES_JUNGLE_SPECIAL;
-            case SNOW_COMMON -> EnchantmentTagKeys.TRADES_SNOW_COMMON;
-            case SNOW_SPECIAL -> EnchantmentTagKeys.TRADES_SNOW_SPECIAL;
-            case SWAMP_COMMON -> EnchantmentTagKeys.TRADES_SWAMP_COMMON;
-            case SWAMP_SPECIAL -> EnchantmentTagKeys.TRADES_SWAMP_SPECIAL;
-            case TAIGA_COMMON -> EnchantmentTagKeys.TRADES_TAIGA_COMMON;
-            case TAIGA_SPECIAL -> EnchantmentTagKeys.TRADES_TAIGA_SPECIAL;
+            case DESERT_COMMON -> "desert_common";
+            case DESERT_SPECIAL -> HAS_SPECIAL_TRADE_TAGS ? "desert_special" : "desert_common";
+            case PLAINS_COMMON -> "plains_common";
+            case PLAINS_SPECIAL -> HAS_SPECIAL_TRADE_TAGS ? "plains_special" : "plains_common";
+            case SAVANNA_COMMON -> "savanna_common";
+            case SAVANNA_SPECIAL -> HAS_SPECIAL_TRADE_TAGS ? "savanna_special" : "savanna_common";
+            case JUNGLE_COMMON -> "jungle_common";
+            case JUNGLE_SPECIAL -> HAS_SPECIAL_TRADE_TAGS ? "jungle_special" : "jungle_common";
+            case SNOW_COMMON -> "snow_common";
+            case SNOW_SPECIAL -> HAS_SPECIAL_TRADE_TAGS ? "snow_special" : "snow_common";
+            case SWAMP_COMMON -> "swamp_common";
+            case SWAMP_SPECIAL -> HAS_SPECIAL_TRADE_TAGS ? "swamp_special" : "swamp_common";
+            case TAIGA_COMMON -> "taiga_common";
+            case TAIGA_SPECIAL -> HAS_SPECIAL_TRADE_TAGS ? "taiga_special" : "taiga_common";
         };
+    }
+
+    private static boolean hasSpecialTradeTags() {
+        try {
+            EnchantmentTagKeys.class.getField("TRADES_DESERT_SPECIAL");
+            return true;
+        }
+        catch (NoSuchFieldException exception) {
+            return false;
+        }
     }
 }

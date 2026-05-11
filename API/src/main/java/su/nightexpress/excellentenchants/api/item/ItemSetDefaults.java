@@ -23,6 +23,7 @@ public enum ItemSetDefaults {
     HOE(tagLookup -> ItemSet.buildByName("hoe", tagLookup.getHoes()).slots(EquipmentSlot.HAND).name("Hoe").build()),
     PICKAXE(tagLookup -> ItemSet.buildByName("pickaxe", tagLookup.getPickaxes()).slots(EquipmentSlot.HAND).name("Pickaxe").build()),
     SHOVEL(tagLookup -> ItemSet.buildByName("shovel", tagLookup.getShovels()).slots(EquipmentSlot.HAND).name("Shovel").build()),
+    SPEAR(tagLookup -> ItemSet.buildByName("spear", tagLookup.getSpears()).slots(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).name("Spear").build()),
     TRIDENT(tagLookup -> ItemSet.buildByType("trident", Material.TRIDENT).slots(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).name("Trident").build()),
     BOW(tagLookup -> ItemSet.buildByType("bow", Material.BOW).slots(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).name("Bow").build()),
     CROSSBOW(tagLookup -> ItemSet.buildByType("crossbow", Material.CROSSBOW).slots(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).name("Crossbow").build()),
@@ -105,6 +106,7 @@ public enum ItemSetDefaults {
         Set<String> materials = new HashSet<>();
         materials.addAll(tagLookup.getAxes());
         materials.addAll(tagLookup.getSwords());
+        materials.addAll(tagLookup.getSpears());
         materials.add(Material.BOW.name());
         materials.add(Material.CROSSBOW.name());
         materials.add(Material.TRIDENT.name());

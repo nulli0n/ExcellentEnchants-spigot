@@ -66,47 +66,41 @@ public class RegistryHack_1_21_10 implements RegistryHack {
         this.plugin = plugin;
     }
 
-    @NotNull
-    private static ResourceLocation customResourceLocation(@NotNull String value) {
+    private static ResourceLocation customResourceLocation(String value) {
         return CraftNamespacedKey.toMinecraft(EnchantsKeys.create(value));
     }
 
-    private static <T> TagKey<T> customTagKey(@NotNull Registry<T> registry, @NotNull String name) {
+    private static <T> TagKey<T> customTagKey(Registry<T> registry, String name) {
         return TagKey.create(registry.key(), customResourceLocation(name));
     }
 
-    @NotNull
-    private static ResourceKey<Enchantment> customEnchantKey(@NotNull String name) {
+    private static ResourceKey<Enchantment> customEnchantKey(String name) {
         ResourceLocation location = customResourceLocation(name);
 
         return ResourceKey.create(ENCHANTS.key(), location);
     }
 
-    @NotNull
-    private static ResourceKey<Enchantment> enchantKey(@NotNull String name) {
+    private static ResourceKey<Enchantment> enchantKey(String name) {
         ResourceLocation location = ResourceLocation.parse(name);
 
         return ResourceKey.create(ENCHANTS.key(), location);
     }
 
-    private static TagKey<Item> customItemsTag(@NotNull String path) {
+    private static TagKey<Item> customItemsTag(String path) {
         return TagKey.create(ITEMS.key(), customResourceLocation(path));
     }
 
     @SuppressWarnings("unchecked")
-    @NotNull
-    private static <T> Map<TagKey<T>, HolderSet.Named<T>> getFrozenTags(@NotNull MappedRegistry<T> registry) {
+    private static <T> Map<TagKey<T>, HolderSet.Named<T>> getFrozenTags(MappedRegistry<T> registry) {
         return (Map<TagKey<T>, HolderSet.Named<T>>) Reflex.getFieldValue(registry, REGISTRY_FROZEN_TAGS_FIELD);
     }
 
-    @NotNull
-    private static <T> Object getAllTags(@NotNull MappedRegistry<T> registry) {
+    private static <T> Object getAllTags(MappedRegistry<T> registry) {
         return Reflex.getFieldValue(registry, REGISTRY_ALL_TAGS_FIELD);
     }
 
     @SuppressWarnings("unchecked")
-    @NotNull
-    private static <T> Map<TagKey<T>, HolderSet.Named<T>> getTagsMap(@NotNull Object tagSet) {
+    private static <T> Map<TagKey<T>, HolderSet.Named<T>> getTagsMap(Object tagSet) {
         // new HashMap, because original is ImmutableMap.
         return new HashMap<>((Map<TagKey<T>, HolderSet.Named<T>>) Reflex.getFieldValue(tagSet, TAG_SET_MAP_FIELD));
     }
@@ -124,12 +118,12 @@ public class RegistryHack_1_21_10 implements RegistryHack {
         //this.displayTags();
     }
 
-    private static <T> void unfreeze(@NotNull MappedRegistry<T> registry) {
+    private static <T> void unfreeze(MappedRegistry<T> registry) {
         Reflex.setFieldValue(registry, "l", false);             // MappedRegistry#frozen
         Reflex.setFieldValue(registry, "m", new IdentityHashMap<>()); // MappedRegistry#unregisteredIntrusiveHolders
     }
 
-    private static <T> void freeze(@NotNull MappedRegistry<T> registry) {
+    private static <T> void freeze(MappedRegistry<T> registry) {
         // Get original TagSet object of the registry before unbound.
         // We MUST keep original TagSet object and only modify an inner map object inside it.
         // Otherwise it will throw an Network Error on client join because of 'broken' tags that were bound to other TagSet object.
@@ -163,7 +157,7 @@ public class RegistryHack_1_21_10 implements RegistryHack {
         Reflex.setFieldValue(registry, REGISTRY_ALL_TAGS_FIELD, tagSet);
     }
 
-    private static <T> void unbound(@NotNull MappedRegistry<T> registry) {
+    private static <T> void unbound(MappedRegistry<T> registry) {
         Class<?> tagSetClass = Reflex.safeInnerClass(MappedRegistry.class.getName(), "a");  // TagSet for PaperMC
 
         Method unboundMethod = Reflex.safeMethod(tagSetClass, TAG_SET_UNBOUND_METHOD);
@@ -230,7 +224,7 @@ public class RegistryHack_1_21_10 implements RegistryHack {
         return CraftEnchantment.minecraftToBukkit(enchantment);
     }
 
-    private void setupDistribution(@NotNull EnchantCatalogEntry entry, @NotNull DistributionSettings settings, @NotNull Holder.Reference<Enchantment> reference) {
+    private void setupDistribution(EnchantCatalogEntry entry, DistributionSettings settings, Holder.Reference<Enchantment> reference) {
         EnchantDistribution distribution = entry.getDistribution();
         boolean experimentalTrades = SERVER.getWorldData().enabledFeatures().contains(FeatureFlags.TRADE_REBALANCE);
 
@@ -286,18 +280,18 @@ public class RegistryHack_1_21_10 implements RegistryHack {
         }
     }
 
-    private void addInTag(@NotNull TagKey<Enchantment> tagKey, @NotNull Holder.Reference<Enchantment> reference) {
+    private void addInTag(TagKey<Enchantment> tagKey, Holder.Reference<Enchantment> reference) {
         modfiyTag(ENCHANTS, tagKey, reference, List::add);
     }
 
-    private void removeFromTag(@NotNull TagKey<Enchantment> tagKey, @NotNull Holder.Reference<Enchantment> reference) {
+    private void removeFromTag(TagKey<Enchantment> tagKey, Holder.Reference<Enchantment> reference) {
         modfiyTag(ENCHANTS, tagKey, reference, List::remove);
     }
 
-    private <T> void modfiyTag(@NotNull MappedRegistry<T> registry,
-                               @NotNull TagKey<T> tagKey,
-                               @NotNull Holder.Reference<T> reference,
-                               @NotNull BiConsumer<List<Holder<T>>, Holder.Reference<T>> consumer) {
+    private <T> void modfiyTag(MappedRegistry<T> registry,
+                               TagKey<T> tagKey,
+                               Holder.Reference<T> reference,
+                               BiConsumer<List<Holder<T>>, Holder.Reference<T>> consumer) {
 
         HolderSet.Named<T> holders = registry.get(tagKey).orElse(null);
         if (holders == null) {
@@ -330,8 +324,7 @@ public class RegistryHack_1_21_10 implements RegistryHack {
         //return getFrozenTags(ITEMS).get(customKey);
     }
 
-    @NotNull
-    private HolderSet.Named<Enchantment> createExclusiveSet(@NotNull String id) {
+    private HolderSet.Named<Enchantment> createExclusiveSet(String id) {
         TagKey<Enchantment> customKey = customTagKey(ENCHANTS, "exclusive_set/" + id);
         List<Holder<Enchantment>> holders = new ArrayList<>();
 
@@ -344,8 +337,7 @@ public class RegistryHack_1_21_10 implements RegistryHack {
 
 
 
-    @NotNull
-    private static TagKey<Enchantment> getTradeKey(@NotNull TradeType tradeType) {
+    private static TagKey<Enchantment> getTradeKey(TradeType tradeType) {
         return switch (tradeType) {
             case DESERT_COMMON -> EnchantmentTags.TRADES_DESERT_COMMON;
             case DESERT_SPECIAL -> EnchantmentTags.TRADES_DESERT_SPECIAL;
@@ -364,12 +356,11 @@ public class RegistryHack_1_21_10 implements RegistryHack {
         };
     }
 
-    @NotNull
-    private static Enchantment.Cost nmsCost(@NotNull EnchantCost cost) {
+    private static Enchantment.Cost nmsCost(EnchantCost cost) {
         return new Enchantment.Cost(cost.base(), cost.perLevel());
     }
 
-    private static EquipmentSlotGroup[] nmsSlots(@NotNull EquipmentSlot[] slots) {
+    private static EquipmentSlotGroup[] nmsSlots(EquipmentSlot[] slots) {
         EquipmentSlotGroup[] nmsSlots = new EquipmentSlotGroup[slots.length];
 
         for (int index = 0; index < nmsSlots.length; index++) {

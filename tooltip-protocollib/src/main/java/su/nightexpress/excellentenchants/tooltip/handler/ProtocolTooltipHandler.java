@@ -79,6 +79,7 @@ public class ProtocolTooltipHandler implements TooltipHandler {
             PacketContainer packet = event.getPacket();
             Player player = event.getPlayer();
 
+            if (player == null || event.isPlayerTemporary()) return;
             if (!this.controller.isReadyForTooltipUpdate(player)) return;
 
             PacketType type = packet.getType();

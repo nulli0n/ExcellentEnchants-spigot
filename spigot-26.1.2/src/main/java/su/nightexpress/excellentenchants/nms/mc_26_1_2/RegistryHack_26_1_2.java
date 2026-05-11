@@ -1,4 +1,4 @@
-package su.nightexpress.excellentenchants.nms.mc_1_21_11;
+package su.nightexpress.excellentenchants.nms.mc_26_1_2;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -17,20 +17,20 @@ import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_21_R7.CraftEquipmentSlot;
-import org.bukkit.craftbukkit.v1_21_R7.CraftServer;
-import org.bukkit.craftbukkit.v1_21_R7.enchantments.CraftEnchantment;
-import org.bukkit.craftbukkit.v1_21_R7.util.CraftChatMessage;
-import org.bukkit.craftbukkit.v1_21_R7.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.CraftEquipmentSlot;
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.enchantments.CraftEnchantment;
+import org.bukkit.craftbukkit.util.CraftChatMessage;
+import org.bukkit.craftbukkit.util.CraftNamespacedKey;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentenchants.EnchantsKeys;
+import su.nightexpress.excellentenchants.api.EnchantDefinition;
+import su.nightexpress.excellentenchants.api.EnchantDistribution;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.api.item.ItemSet;
 import su.nightexpress.excellentenchants.api.wrapper.EnchantCost;
-import su.nightexpress.excellentenchants.api.EnchantDefinition;
-import su.nightexpress.excellentenchants.api.EnchantDistribution;
 import su.nightexpress.excellentenchants.api.wrapper.TradeType;
 import su.nightexpress.excellentenchants.bridge.DistributionSettings;
 import su.nightexpress.excellentenchants.bridge.EnchantCatalogEntry;
@@ -42,17 +42,18 @@ import su.nightexpress.nightcore.util.text.night.NightMessage;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
-public class RegistryHack_1_21_11 implements RegistryHack {
+public class RegistryHack_26_1_2 implements RegistryHack {
 
     private static final MinecraftServer             SERVER;
     private static final MappedRegistry<Enchantment> ENCHANTS;
     private static final MappedRegistry<Item>        ITEMS;
 
-    private static final String REGISTRY_FROZEN_TAGS_FIELD = "j"; // frozenTags
-    private static final String REGISTRY_ALL_TAGS_FIELD    = "k"; // allTags
-    private static final String TAG_SET_UNBOUND_METHOD     = "a"; // .unbound()
-    private static final String TAG_SET_MAP_FIELD          = "a"; // val$map for PaperMC
+    private static final String REGISTRY_FROZEN_TAGS_FIELD = "frozenTags";
+    private static final String REGISTRY_ALL_TAGS_FIELD    = "allTags";
+    private static final String TAG_SET_UNBOUND_METHOD     = "unbound";
+    private static final String TAG_SET_MAP_FIELD          = "val$tags";
 
     static {
         SERVER = ((CraftServer) Bukkit.getServer()).getServer();
@@ -62,7 +63,7 @@ public class RegistryHack_1_21_11 implements RegistryHack {
 
     private final NightPlugin plugin;
 
-    public RegistryHack_1_21_11(@NotNull NightPlugin plugin) {
+    public RegistryHack_26_1_2(@NotNull NightPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -88,6 +89,10 @@ public class RegistryHack_1_21_11 implements RegistryHack {
 
     private static TagKey<Item> customItemsTag(String path) {
         return TagKey.create(ITEMS.key(), customIdentifier(path));
+    }
+
+    private static TagKey<Enchantment> tradeTag(String path) {
+        return TagKey.create(ENCHANTS.key(), Identifier.withDefaultNamespace("trades/" + path));
     }
 
     @SuppressWarnings("unchecked")
@@ -119,8 +124,8 @@ public class RegistryHack_1_21_11 implements RegistryHack {
     }
 
     private static <T> void unfreeze(MappedRegistry<T> registry) {
-        Reflex.setFieldValue(registry, "l", false);             // MappedRegistry#frozen
-        Reflex.setFieldValue(registry, "m", new IdentityHashMap<>()); // MappedRegistry#unregisteredIntrusiveHolders
+        Reflex.setFieldValue(registry, "frozen", false);
+        Reflex.setFieldValue(registry, "unregisteredIntrusiveHolders", new IdentityHashMap<>());
     }
 
     private static <T> void freeze(MappedRegistry<T> registry) {
@@ -158,7 +163,7 @@ public class RegistryHack_1_21_11 implements RegistryHack {
     }
 
     private static <T> void unbound(MappedRegistry<T> registry) {
-        Class<?> tagSetClass = Reflex.safeInnerClass(MappedRegistry.class.getName(), "a");  // TagSet for PaperMC
+        Class<?> tagSetClass = Reflex.safeInnerClass(MappedRegistry.class.getName(), "TagSet");
 
         Method unboundMethod = Reflex.safeMethod(tagSetClass, TAG_SET_UNBOUND_METHOD);
         Object unboundTagSet = Reflex.invokeMethod(unboundMethod, registry); // new TagSet object.
@@ -254,8 +259,8 @@ public class RegistryHack_1_21_11 implements RegistryHack {
         // Any enchantment can be tradable.
         if (experimentalTrades) {
             if (distribution.isTradable() && settings.isTradingEnabled()) {
-                distribution.getTrades().forEach(tradeType -> {
-                    addInTag(getTradeKey(tradeType), reference);
+                distribution.getTrades().stream().map(RegistryHack_26_1_2::getTradeKey).collect(Collectors.toSet()).forEach(tradeKey -> {
+                    addInTag(tradeKey, reference);
                 });
             }
         }
@@ -281,7 +286,9 @@ public class RegistryHack_1_21_11 implements RegistryHack {
     }
 
     private void addInTag(TagKey<Enchantment> tagKey, Holder.Reference<Enchantment> reference) {
-        modfiyTag(ENCHANTS, tagKey, reference, List::add);
+        modfiyTag(ENCHANTS, tagKey, reference, (contents, holder) -> {
+            if (!contents.contains(holder)) contents.add(holder);
+        });
     }
 
     private void removeFromTag(TagKey<Enchantment> tagKey, Holder.Reference<Enchantment> reference) {
@@ -302,7 +309,7 @@ public class RegistryHack_1_21_11 implements RegistryHack {
         List<Holder<T>> contents = new ArrayList<>(holders.stream().toList());
         consumer.accept(contents, reference);
 
-        registry.bindTag(tagKey, contents);
+        bindTag(registry, tagKey, contents);
     }
 
     @Override
@@ -319,7 +326,7 @@ public class RegistryHack_1_21_11 implements RegistryHack {
         });
 
         // Creates new tag, puts it in the 'frozenTags' map and binds holders to it.
-        ITEMS.bindTag(tag, holders);
+        bindTag(ITEMS, tag, holders);
 
         //return getFrozenTags(ITEMS).get(customKey);
     }
@@ -329,30 +336,24 @@ public class RegistryHack_1_21_11 implements RegistryHack {
         List<Holder<Enchantment>> holders = new ArrayList<>();
 
         // Creates new tag, puts it in the 'frozenTags' map and binds holders to it.
-        ENCHANTS.bindTag(customKey, holders);
+        bindTag(ENCHANTS, customKey, holders);
 
         return getFrozenTags(ENCHANTS).get(customKey);
     }
 
-
-
+    private static <T> void bindTag(MappedRegistry<T> registry, TagKey<T> tagKey, List<Holder<T>> holders) {
+        registry.bindTags(Map.of(tagKey, holders));
+    }
 
     private static TagKey<Enchantment> getTradeKey(TradeType tradeType) {
         return switch (tradeType) {
-            case DESERT_COMMON -> EnchantmentTags.TRADES_DESERT_COMMON;
-            case DESERT_SPECIAL -> EnchantmentTags.TRADES_DESERT_SPECIAL;
-            case PLAINS_COMMON -> EnchantmentTags.TRADES_PLAINS_COMMON;
-            case PLAINS_SPECIAL -> EnchantmentTags.TRADES_PLAINS_SPECIAL;
-            case SAVANNA_COMMON -> EnchantmentTags.TRADES_SAVANNA_COMMON;
-            case SAVANNA_SPECIAL -> EnchantmentTags.TRADES_SAVANNA_SPECIAL;
-            case JUNGLE_COMMON -> EnchantmentTags.TRADES_JUNGLE_COMMON;
-            case JUNGLE_SPECIAL -> EnchantmentTags.TRADES_JUNGLE_SPECIAL;
-            case SNOW_COMMON -> EnchantmentTags.TRADES_SNOW_COMMON;
-            case SNOW_SPECIAL -> EnchantmentTags.TRADES_SNOW_SPECIAL;
-            case SWAMP_COMMON -> EnchantmentTags.TRADES_SWAMP_COMMON;
-            case SWAMP_SPECIAL -> EnchantmentTags.TRADES_SWAMP_SPECIAL;
-            case TAIGA_COMMON -> EnchantmentTags.TRADES_TAIGA_COMMON;
-            case TAIGA_SPECIAL -> EnchantmentTags.TRADES_TAIGA_SPECIAL;
+            case DESERT_COMMON, DESERT_SPECIAL -> tradeTag("desert_common");
+            case PLAINS_COMMON, PLAINS_SPECIAL -> tradeTag("plains_common");
+            case SAVANNA_COMMON, SAVANNA_SPECIAL -> tradeTag("savanna_common");
+            case JUNGLE_COMMON, JUNGLE_SPECIAL -> tradeTag("jungle_common");
+            case SNOW_COMMON, SNOW_SPECIAL -> tradeTag("snow_common");
+            case SWAMP_COMMON, SWAMP_SPECIAL -> tradeTag("swamp_common");
+            case TAIGA_COMMON, TAIGA_SPECIAL -> tradeTag("taiga_common");
         };
     }
 
