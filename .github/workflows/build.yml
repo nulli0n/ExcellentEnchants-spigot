@@ -1,0 +1,44 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Cache Spigot Maven artifacts
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/spigotmc
+          key: spigot-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            spigot-${{ runner.os }}-
+
+      - name: Install Spigot dependencies
+        uses: SpraxDev/Action-SpigotMC@v5
+        with:
+          versions: 1.21.8,1.21.10,1.21.11,26.1.2
+          remapped: true
+          disableJavaCheck: true
+
+      - name: Build with Maven
+        run: mvn -B clean package --no-transfer-progress
+
+      - name: Verify artifact
+        run: test -n "$(ls target/ExcellentEnchants-*.jar 2>/dev/null | head -1)"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ExcellentEnchants
+          path: target/ExcellentEnchants-*.jar

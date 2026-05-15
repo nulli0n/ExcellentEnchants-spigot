@@ -146,7 +146,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <outputFile>${project.parent.basedir}\target\${project.parent.name}-${project.version}.jar</outputFile>
+                            <outputFile>${project.parent.basedir}/target/${project.parent.name}-${project.version}.jar</outputFile>
                             <artifactSet>
                                 <includes>
                                     <include>su.nightexpress.excellentenchants*</include>
