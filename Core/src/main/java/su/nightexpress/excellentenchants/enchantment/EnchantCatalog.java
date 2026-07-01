@@ -118,6 +118,18 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
         .primaryItems(ItemSetDefaults.CHESTPLATE)
         .build(), () -> EnchantDistribution.regular(TradeType.JUNGLE_COMMON), KamikadzeEnchant::new
     ),
+    LEAFCUTTER(() -> EnchantDefinition.builder("Leafcutter", 1)
+        .description("Instantly breaks all leaves of a tree when they are no longer connected to a log.")
+        .weight(Weight.UNCOMMON)
+        .items(ItemSetDefaults.AXE)
+        .build(), () -> EnchantDistribution.regular(TradeType.TAIGA_SPECIAL), LeafcutterEnchant::new
+    ),
+    LUMBERJACK(() -> EnchantDefinition.builder("Lumberjack", 3)
+        .description("Grants more wood logs when breaking tree logs and a chance to drop the original log when stripping.")
+        .weight(Weight.UNCOMMON)
+        .items(ItemSetDefaults.AXE)
+        .build(), () -> EnchantDistribution.regular(TradeType.TAIGA_SPECIAL), LumberjackEnchant::new
+    ),
     NIGHT_VISION(() -> EnchantDefinition.builder("Night Vision", 1)
         .description("Grants permanent " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " effect.")
         .weight(VERY_RARE)
