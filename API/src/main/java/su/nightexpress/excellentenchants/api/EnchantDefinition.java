@@ -2,6 +2,7 @@ package su.nightexpress.excellentenchants.api;
 
 import org.bukkit.NamespacedKey;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import su.nightexpress.excellentenchants.EnchantsKeys;
 import su.nightexpress.excellentenchants.EnchantsPlaceholders;
@@ -20,6 +21,7 @@ import su.nightexpress.nightcore.util.text.night.wrapper.TagWrappers;
 import java.util.*;
 
 @NullMarked
+@SuppressWarnings({"deprecation", "removal", "null"})
 public class EnchantDefinition implements Writeable {
 
     private static final int LEVEL_CAP  = 255;
@@ -215,16 +217,16 @@ public class EnchantDefinition implements Writeable {
 
     public static class Builder {
 
-        private String       displayName;
-        private List<String> description;
-        private int          weight;
-        private int          maxLevel;
-        private EnchantCost  minCost;
-        private EnchantCost  maxCost;
-        private int          anvilCost;
-        private ItemSet      primaryItemSet;
-        private ItemSet      supportedItemSet;
-        private Set<String>  exclusives;
+        private @Nullable String displayName;
+        private List<String>     description;
+        private int              weight;
+        private int              maxLevel;
+        private EnchantCost      minCost;
+        private EnchantCost      maxCost;
+        private int              anvilCost;
+        private @Nullable ItemSet primaryItemSet;
+        private @Nullable ItemSet supportedItemSet;
+        private Set<String>      exclusives;
 
         public Builder(String displayName, int maxLevel) {
             this.displayName(displayName);
@@ -246,10 +248,12 @@ public class EnchantDefinition implements Writeable {
 
 
         public EnchantDefinition build() {
-            Objects.requireNonNull(this.supportedItemSet, "Enchantments must have supported items set");
+            String name = Objects.requireNonNull(this.displayName, "Enchantments must have display name set");
+            ItemSet supportedItems = Objects.requireNonNull(this.supportedItemSet, "Enchantments must have supported items set");
+            ItemSet primaryItems = this.primaryItemSet == null ? supportedItems : this.primaryItemSet;
 
             return new EnchantDefinition(
-                this.displayName, this.description, this.weight, this.maxLevel, this.minCost, this.maxCost, this.anvilCost, this.supportedItemSet, this.primaryItemSet == null ? this.supportedItemSet : this.primaryItemSet, this.exclusives
+                name, this.description, this.weight, this.maxLevel, this.minCost, this.maxCost, this.anvilCost, supportedItems, primaryItems, this.exclusives
             );
         }
 
