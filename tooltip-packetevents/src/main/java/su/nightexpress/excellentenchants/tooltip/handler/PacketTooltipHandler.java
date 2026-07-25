@@ -1,12 +1,16 @@
 package su.nightexpress.excellentenchants.tooltip.handler;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Bukkit;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
@@ -80,25 +84,29 @@ public class PacketTooltipHandler implements TooltipHandler {
                 case PacketType.Play.Server.SET_SLOT -> {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
 
-                    this.asBukkit(setSlot.getItem()).map(this.controller::addDescription).map(this::fromBukkit)
+                    this.asBukkit(setSlot.getItem()).map(this.controller::addDescription)
+                        .map(item -> this.applyPlaceholders(player, item)).map(this::fromBukkit)
                         .ifPresent(setSlot::setItem);
                 }
                 case PacketType.Play.Server.WINDOW_ITEMS -> {
                     WrapperPlayServerWindowItems windowItems = new WrapperPlayServerWindowItems(event);
 
                     windowItems.getItems().replaceAll(original -> this.asBukkit(original).map(
-                        this.controller::addDescription).map(this::fromBukkit).orElse(original));
+                        this.controller::addDescription).map(item -> this.applyPlaceholders(player, item))
+                        .map(this::fromBukkit).orElse(original));
                 }
                 case PacketType.Play.Server.SET_PLAYER_INVENTORY -> {
                     WrapperPlayServerSetPlayerInventory setPlayerInventory = new WrapperPlayServerSetPlayerInventory(event);
 
-                    this.asBukkit(setPlayerInventory.getStack()).map(this.controller::addDescription).map(
+                    this.asBukkit(setPlayerInventory.getStack()).map(this.controller::addDescription)
+                        .map(item -> this.applyPlaceholders(player, item)).map(
                         this::fromBukkit).ifPresent(setPlayerInventory::setStack);
                 }
                 case PacketType.Play.Server.SET_CURSOR_ITEM -> {
                     WrapperPlayServerSetCursorItem setCursorItem = new WrapperPlayServerSetCursorItem(event);
 
-                    this.asBukkit(setCursorItem.getStack()).map(this.controller::addDescription).map(this::fromBukkit)
+                    this.asBukkit(setCursorItem.getStack()).map(this.controller::addDescription)
+                        .map(item -> this.applyPlaceholders(player, item)).map(this::fromBukkit)
                         .ifPresent(setCursorItem::setStack);
                 }
                 case PacketType.Play.Server.MERCHANT_OFFERS -> {
@@ -106,7 +114,9 @@ public class PacketTooltipHandler implements TooltipHandler {
 
                     offers.getMerchantOffers().forEach(offer -> {
                         ItemStack result = this.toBukkit(offer.getOutputItem());
-                        offer.setOutputItem(this.fromBukkit(this.controller.addDescription(result)));
+                        ItemStack described = this.controller.addDescription(result);
+                        ItemStack parsed = this.applyPlaceholders(player, described);
+                        offer.setOutputItem(this.fromBukkit(parsed));
                     });
                 }
                 default -> {
@@ -115,6 +125,23 @@ public class PacketTooltipHandler implements TooltipHandler {
             }
 
             event.markForReEncode(true);
+        }
+
+
+        private ItemStack applyPlaceholders(@NonNull Player player, @NonNull ItemStack itemStack) {
+            if (!Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) return itemStack;
+
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta == null) return itemStack;
+
+            List<String> lore = meta.getLore();
+            if (lore != null && !lore.isEmpty()) {
+                lore.replaceAll(line -> PlaceholderAPI.setPlaceholders(player, line));
+                meta.setLore(lore);
+            }
+
+            itemStack.setItemMeta(meta);
+            return itemStack;
         }
 
 
