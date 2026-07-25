@@ -5,9 +5,12 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import org.jspecify.annotations.NonNull;
@@ -80,11 +83,11 @@ public class ProtocolTooltipHandler implements TooltipHandler {
             PacketType type = packet.getType();
             if (type == PacketType.Play.Server.SET_SLOT || type == PacketType.Play.Server.SET_PLAYER_INVENTORY || type == PacketType.Play.Server.SET_CURSOR_ITEM) {
                 ItemStack item = packet.getItemModifier().read(0);
-                packet.getItemModifier().write(0, this.controller.addDescription(item));
+                packet.getItemModifier().write(0, this.applyPlaceholders(player, this.controller.addDescription(item)));
             }
             else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
                 List<ItemStack> items = packet.getItemListModifier().readSafely(0);
-                items.replaceAll(this.controller::addDescription);
+                items.replaceAll(item -> this.applyPlaceholders(player, this.controller.addDescription(item)));
 
                 packet.getItemListModifier().write(0, items);
             }
@@ -92,7 +95,7 @@ public class ProtocolTooltipHandler implements TooltipHandler {
                 List<MerchantRecipe> list = new ArrayList<>();
 
                 packet.getMerchantRecipeLists().read(0).forEach(old -> {
-                    ItemStack result = this.controller.addDescription(old.getResult());
+                    ItemStack result = this.applyPlaceholders(player, this.controller.addDescription(old.getResult()));
 
                     MerchantRecipe recipe = new MerchantRecipe(result, old.getUses(), old.getMaxUses(), old
                         .hasExperienceReward(), old.getVillagerExperience(), old.getPriceMultiplier(), old
@@ -104,7 +107,21 @@ public class ProtocolTooltipHandler implements TooltipHandler {
                 packet.getMerchantRecipeLists().write(0, list);
             }
         }
+
+        private ItemStack applyPlaceholders(@NonNull Player player, @NonNull ItemStack itemStack) {
+            if (!Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) return itemStack;
+
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta == null) return itemStack;
+
+            List<String> lore = meta.getLore();
+            if (lore != null && !lore.isEmpty()) {
+                lore.replaceAll(line -> PlaceholderAPI.setPlaceholders(player, line));
+                meta.setLore(lore);
+            }
+
+            itemStack.setItemMeta(meta);
+            return itemStack;
+        }
     }
-
-
 }
