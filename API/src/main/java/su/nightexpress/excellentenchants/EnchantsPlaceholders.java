@@ -9,6 +9,8 @@ import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.Placeholders;
 import su.nightexpress.nightcore.util.placeholder.PlaceholderList;
 
+import java.util.Locale;
+
 public class EnchantsPlaceholders extends Placeholders {
 
     public static final String WIKI_URL          = "https://nightexpressdev.com/excellentenchants/";
@@ -55,11 +57,15 @@ public class EnchantsPlaceholders extends Placeholders {
 
 
     public static PlaceholderList<Integer> forEnchant(CustomEnchantment enchantment) {
+        return forEnchant(enchantment, Locale.ENGLISH);
+    }
+
+    public static PlaceholderList<Integer> forEnchant(CustomEnchantment enchantment, Locale locale) {
         return PlaceholderList.create(list -> list
             .add(ENCHANTMENT_ID, level -> enchantment.getId())
-            .add(ENCHANTMENT_NAME, level -> enchantment.getDisplayName())
-            .add(ENCHANTMENT_DESCRIPTION, level -> String.join("\n", enchantment.getDescription()))
-            .add(ENCHANTMENT_DESCRIPTION_REPLACED, level -> String.join("\n", enchantment.getDescription(level)))
+            .add(ENCHANTMENT_NAME, level -> enchantment.getDisplayName(locale))
+            .add(ENCHANTMENT_DESCRIPTION, level -> String.join("\n", enchantment.getDescription(locale)))
+            .add(ENCHANTMENT_DESCRIPTION_REPLACED, level -> String.join("\n", enchantment.getDescription(level, locale)))
             .add(ENCHANTMENT_LEVEL, NumberUtil::toRoman)
             .add(ENCHANTMENT_LEVEL_MIN, level -> String.valueOf(1))
             .add(ENCHANTMENT_LEVEL_MAX, level -> String.valueOf(enchantment.getDefinition().getMaxLevel()))
