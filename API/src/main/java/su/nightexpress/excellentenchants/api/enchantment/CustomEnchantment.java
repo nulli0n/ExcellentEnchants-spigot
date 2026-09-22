@@ -13,7 +13,9 @@ import su.nightexpress.excellentenchants.api.item.ItemSet;
 import su.nightexpress.excellentenchants.api.EnchantDefinition;
 import su.nightexpress.excellentenchants.api.EnchantDistribution;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.UnaryOperator;
 
 @NullMarked
@@ -48,6 +50,22 @@ public interface CustomEnchantment {
     List<String> getDescription();
 
     List<String> getDescription(int level);
+
+    default String getDisplayName(Locale locale) {
+        return this.getDefinition().getDisplayName(locale);
+    }
+
+    default List<String> getDescription(Locale locale) {
+        return this.getDefinition().getDescription(locale);
+    }
+
+    default List<String> getDescription(int level, Locale locale) {
+        List<String> description = new ArrayList<>(this.getDescription(locale));
+        description.replaceAll(this.replacePlaceholders(level, locale));
+        return description;
+    }
+
+    UnaryOperator<String> replacePlaceholders(int level, Locale locale);
 
     ItemSet getPrimaryItems();
 
