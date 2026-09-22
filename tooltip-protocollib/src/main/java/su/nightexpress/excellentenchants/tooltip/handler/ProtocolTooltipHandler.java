@@ -80,11 +80,11 @@ public class ProtocolTooltipHandler implements TooltipHandler {
             PacketType type = packet.getType();
             if (type == PacketType.Play.Server.SET_SLOT || type == PacketType.Play.Server.SET_PLAYER_INVENTORY || type == PacketType.Play.Server.SET_CURSOR_ITEM) {
                 ItemStack item = packet.getItemModifier().read(0);
-                packet.getItemModifier().write(0, this.controller.addDescription(item));
+                packet.getItemModifier().write(0, this.controller.addDescription(item, player));
             }
             else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
                 List<ItemStack> items = packet.getItemListModifier().readSafely(0);
-                items.replaceAll(this.controller::addDescription);
+                items.replaceAll(item -> this.controller.addDescription(item, player));
 
                 packet.getItemListModifier().write(0, items);
             }
@@ -92,7 +92,7 @@ public class ProtocolTooltipHandler implements TooltipHandler {
                 List<MerchantRecipe> list = new ArrayList<>();
 
                 packet.getMerchantRecipeLists().read(0).forEach(old -> {
-                    ItemStack result = this.controller.addDescription(old.getResult());
+                    ItemStack result = this.controller.addDescription(old.getResult(), player);
 
                     MerchantRecipe recipe = new MerchantRecipe(result, old.getUses(), old.getMaxUses(), old
                         .hasExperienceReward(), old.getVillagerExperience(), old.getPriceMultiplier(), old

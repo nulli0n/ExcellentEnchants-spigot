@@ -117,13 +117,13 @@ public class TooltipManager extends AbstractManager<EnchantsPlugin> implements T
     }
 
 
-    private String getDescription(CustomEnchantment enchantment, int level, int charges) {
+    private String getDescription(CustomEnchantment enchantment, int level, int charges, Locale locale) {
         String format = enchantment.isChargeable() ? this.settings.getTooltipFormatWithCharges() : this.settings
             .getTooltipFormat();
 
         PlaceholderContext context = PlaceholderContext.builder()
-            .with(EnchantsPlaceholders.GENERIC_DESCRIPTION, () -> String.join("\n", enchantment.getDescription(level)))
-            .with(EnchantsPlaceholders.GENERIC_NAME, enchantment::getDisplayName)
+            .with(EnchantsPlaceholders.GENERIC_DESCRIPTION, () -> String.join("\n", enchantment.getDescription(level, locale)))
+            .with(EnchantsPlaceholders.GENERIC_NAME, () -> enchantment.getDisplayName(locale))
             .with(EnchantsPlaceholders.GENERIC_CHARGES, () -> {
                 if (!enchantment.isChargeable() || charges < 0) return "";
 
@@ -140,7 +140,7 @@ public class TooltipManager extends AbstractManager<EnchantsPlugin> implements T
 
     @Override
 
-    public ItemStack addDescription(ItemStack itemStack) {
+    public ItemStack addDescription(ItemStack itemStack, Player player) {
         if (itemStack.getType().isAir() || !this.isEnchantTooltipAllowed(itemStack)) return itemStack;
 
         ItemStack copy = new ItemStack(itemStack);
@@ -150,11 +150,12 @@ public class TooltipManager extends AbstractManager<EnchantsPlugin> implements T
         Map<CustomEnchantment, Integer> enchants = EnchantsUtils.getCustomEnchantments(meta);
         if (enchants.isEmpty()) return itemStack;
 
+        Locale locale = EnchantsUtils.resolveLocale(player);
         List<String> lore = ItemUtil.getLoreSerialized(meta);
 
         enchants.forEach((enchant, level) -> {
             int chargesAmount = enchant.getCharges(meta);
-            lore.add(this.getDescription(enchant, level, chargesAmount));
+            lore.add(this.getDescription(enchant, level, chargesAmount, locale));
         });
 
         ItemUtil.setLore(meta, lore);

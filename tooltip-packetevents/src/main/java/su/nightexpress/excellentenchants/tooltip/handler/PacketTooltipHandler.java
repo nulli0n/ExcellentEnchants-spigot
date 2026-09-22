@@ -80,25 +80,25 @@ public class PacketTooltipHandler implements TooltipHandler {
                 case PacketType.Play.Server.SET_SLOT -> {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
 
-                    this.asBukkit(setSlot.getItem()).map(this.controller::addDescription).map(this::fromBukkit)
+                    this.asBukkit(setSlot.getItem()).map(item -> this.controller.addDescription(item, player)).map(this::fromBukkit)
                         .ifPresent(setSlot::setItem);
                 }
                 case PacketType.Play.Server.WINDOW_ITEMS -> {
                     WrapperPlayServerWindowItems windowItems = new WrapperPlayServerWindowItems(event);
 
                     windowItems.getItems().replaceAll(original -> this.asBukkit(original).map(
-                        this.controller::addDescription).map(this::fromBukkit).orElse(original));
+                        item -> this.controller.addDescription(item, player)).map(this::fromBukkit).orElse(original));
                 }
                 case PacketType.Play.Server.SET_PLAYER_INVENTORY -> {
                     WrapperPlayServerSetPlayerInventory setPlayerInventory = new WrapperPlayServerSetPlayerInventory(event);
 
-                    this.asBukkit(setPlayerInventory.getStack()).map(this.controller::addDescription).map(
+                    this.asBukkit(setPlayerInventory.getStack()).map(item -> this.controller.addDescription(item, player)).map(
                         this::fromBukkit).ifPresent(setPlayerInventory::setStack);
                 }
                 case PacketType.Play.Server.SET_CURSOR_ITEM -> {
                     WrapperPlayServerSetCursorItem setCursorItem = new WrapperPlayServerSetCursorItem(event);
 
-                    this.asBukkit(setCursorItem.getStack()).map(this.controller::addDescription).map(this::fromBukkit)
+                    this.asBukkit(setCursorItem.getStack()).map(item -> this.controller.addDescription(item, player)).map(this::fromBukkit)
                         .ifPresent(setCursorItem::setStack);
                 }
                 case PacketType.Play.Server.MERCHANT_OFFERS -> {
@@ -106,7 +106,7 @@ public class PacketTooltipHandler implements TooltipHandler {
 
                     offers.getMerchantOffers().forEach(offer -> {
                         ItemStack result = this.toBukkit(offer.getOutputItem());
-                        offer.setOutputItem(this.fromBukkit(this.controller.addDescription(result)));
+                        offer.setOutputItem(this.fromBukkit(this.controller.addDescription(result, player)));
                     });
                 }
                 default -> {
