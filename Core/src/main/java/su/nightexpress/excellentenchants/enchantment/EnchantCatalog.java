@@ -43,6 +43,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     COLD_STEEL(() -> EnchantDefinition.builder("Cold Steel", 3)
         .description(TRIGGER_CHANCE + "% chance to apply " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) on attacker.")
+        .translation("de", "Kalter Stahl",
+            TRIGGER_CHANCE + "% Chance, dem Angreifer " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu verleihen.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.CHESTPLATE_ELYTRA)
         .primaryItems(ItemSetDefaults.CHESTPLATE)
@@ -51,6 +53,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     DARKNESS_CLOAK(() -> EnchantDefinition.builder("Darkness Cloak", 3)
         .description(TRIGGER_CHANCE + "% chance to apply " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) on attacker.")
+        .translation("de", "Umhang der Dunkelheit",
+            TRIGGER_CHANCE + "% Chance, dem Angreifer " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu verleihen.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.CHESTPLATE_ELYTRA)
         .primaryItems(ItemSetDefaults.CHESTPLATE)
@@ -58,6 +62,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     DRAGON_HEART(() -> EnchantDefinition.builder("Dragon Heart", 5)
         .description("Grants permanent " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " effect.")
+        .translation("de", "Drachenherz",
+            "Gewährt dauerhaft den Effekt " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + ".")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.CHESTPLATE_ELYTRA)
         .primaryItems(ItemSetDefaults.CHESTPLATE)
@@ -65,12 +71,16 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     ELEMENTAL_PROTECTION(() -> EnchantDefinition.builder("Elemental Protection", 4)
         .description("Reduces potion and elemental damage by " + GENERIC_AMOUNT + "%.")
+        .translation("de", "Elementarschutz",
+            "Reduziert Trank- und Elementarschaden um " + GENERIC_AMOUNT + "%.")
         .weight(COMMON)
         .items(ItemSetDefaults.ARMOR)
         .build(), () -> EnchantDistribution.regular(TradeType.SWAMP_COMMON), ElementalProtectionEnchant::new
     ),
     FIRE_SHIELD(() -> EnchantDefinition.builder("Fire Shield", 4)
         .description(TRIGGER_CHANCE + "% chance to ignite attackers for " + GENERIC_DURATION + "s.")
+        .translation("de", "Feuerschild",
+            TRIGGER_CHANCE + "% Chance, Angreifer für " + GENERIC_DURATION + "s. in Brand zu setzen.")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.CHESTPLATE_ELYTRA)
         .primaryItems(ItemSetDefaults.CHESTPLATE)
@@ -78,6 +88,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     FLAME_WALKER(() -> EnchantDefinition.builder("Flame Walker", 2)
         .description("Ability to walk on lava, immunity to magma damage.")
+        .translation("de", "Lavawanderer",
+            "Ermöglicht das Gehen auf Lava und macht immun gegen Magmaschaden.")
         .weight(VERY_RARE)
         .items(ItemSetDefaults.BOOTS)
         .exclusives(EnchantsKeys.FROST_WALKER)
@@ -86,6 +98,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     HARDENED(() -> EnchantDefinition.builder("Hardened", 2)
         .description(TRIGGER_CHANCE + "% chance to get " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) when damaged.")
+        .translation("de", "Gehärtet",
+            TRIGGER_CHANCE + "% Chance, bei Schaden " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu erhalten.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.CHESTPLATE_ELYTRA)
         .primaryItems(ItemSetDefaults.CHESTPLATE)
@@ -94,6 +108,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ICE_SHIELD(() -> EnchantDefinition.builder("Ice Shield", 3)
         .description(TRIGGER_CHANCE + "% chance to freeze and apply " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) on attacker.")
+        .translation("de", "Eisschild",
+            TRIGGER_CHANCE + "% Chance, den Angreifer einzufrieren und ihm " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu verleihen.")
         .weight(COMMON)
         .supportedItems(ItemSetDefaults.CHESTPLATE_ELYTRA)
         .primaryItems(ItemSetDefaults.CHESTPLATE)
@@ -101,18 +117,24 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     LIGHTWEIGHT(() -> EnchantDefinition.builder("Lightweight", 1)
         .description("You can safely jump on turtle eggs, farmlands and big dripleaf.")
+        .translation("de", "Leichtfüßig",
+            "Du kannst gefahrlos auf Schildkröteneiern, Ackerland und Tropfblättern landen.")
         .weight(COMMON)
         .items(ItemSetDefaults.BOOTS)
         .build(), () -> EnchantDistribution.regular(TradeType.SNOW_COMMON), LightweightEnchant::new
     ),
     JUMPING(() -> EnchantDefinition.builder("Jumping", 2)
         .description("Grants permanent " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " effect.")
+        .translation("de", "Sprungkraft",
+            "Gewährt dauerhaft den Effekt " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + ".")
         .weight(RARE)
         .items(ItemSetDefaults.BOOTS)
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_COMMON), JumpingEnchant::new
     ),
     KAMIKADZE(() -> EnchantDefinition.builder("Kamikadze", 3)
         .description(TRIGGER_CHANCE + "% chance to explode on death.")
+        .translation("de", "Kamikaze",
+            TRIGGER_CHANCE + "% Chance, beim Tod zu explodieren.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.CHESTPLATE_ELYTRA)
         .primaryItems(ItemSetDefaults.CHESTPLATE)
@@ -120,12 +142,16 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     NIGHT_VISION(() -> EnchantDefinition.builder("Night Vision", 1)
         .description("Grants permanent " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " effect.")
+        .translation("de", "Nachtsicht",
+            "Gewährt dauerhaft den Effekt " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + ".")
         .weight(VERY_RARE)
         .items(ItemSetDefaults.HELMET)
         .build(), () -> EnchantDistribution.treasure(TradeType.TAIGA_SPECIAL), NightVisionEnchant::new
     ),
     REBOUND(() -> EnchantDefinition.builder("Rebound", 1)
         .description("Effect of landing on a slime block.")
+        .translation("de", "Abprall",
+            "Wirkt wie eine Landung auf einem Schleimblock.")
         .weight(RARE)
         .items(ItemSetDefaults.BOOTS)
         .exclusives(EnchantsKeys.FEATHER_FALLING)
@@ -133,6 +159,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     REGROWTH(() -> EnchantDefinition.builder("Regrowth", 4)
         .description("Restores " + GENERIC_AMOUNT + "❤ every few seconds.")
+        .translation("de", "Nachwuchs",
+            "Stellt alle paar Sekunden " + GENERIC_AMOUNT + "❤ wieder her.")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.CHESTPLATE_ELYTRA)
         .primaryItems(ItemSetDefaults.CHESTPLATE)
@@ -140,30 +168,40 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     SATURATION(() -> EnchantDefinition.builder("Saturation", 2)
         .description("Restores " + GENERIC_AMOUNT + " food points every few seconds.")
+        .translation("de", "Sättigung",
+            "Stellt alle paar Sekunden " + GENERIC_AMOUNT + " Nahrungspunkte wieder her.")
         .weight(RARE)
         .items(ItemSetDefaults.HELMET)
         .build(), () -> EnchantDistribution.regular(TradeType.SAVANNA_SPECIAL), SaturationEnchant::new
     ),
     SPEED(() -> EnchantDefinition.builder("Speed", 2)
         .description("Grants permanent " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " effect.")
+        .translation("de", "Geschwindigkeit",
+            "Gewährt dauerhaft den Effekt " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + ".")
         .weight(RARE)
         .items(ItemSetDefaults.BOOTS)
         .build(), () -> EnchantDistribution.regular(TradeType.DESERT_SPECIAL), SpeedyEnchant::new
     ),
     STOPPING_FORCE(() -> EnchantDefinition.builder("Stopping Force", 3)
         .description(TRIGGER_CHANCE + "% chance to reduce knockback for " + GENERIC_AMOUNT + "%.")
+        .translation("de", "Bremskraft",
+            TRIGGER_CHANCE + "% Chance, den Rückstoß um " + GENERIC_AMOUNT + "% zu verringern.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.LEGGINGS)
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_COMMON), StoppingForceEnchant::new
     ),
     WATER_BREATHING(() -> EnchantDefinition.builder("Water Breathing", 1)
         .description("Grants permanent " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " effect.")
+        .translation("de", "Wasseratmung",
+            "Gewährt dauerhaft den Effekt " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + ".")
         .weight(VERY_RARE)
         .items(ItemSetDefaults.HELMET)
         .build(), () -> EnchantDistribution.treasure(TradeType.PLAINS_SPECIAL), WaterBreathingEnchant::new
     ),
     BOMBER(() -> EnchantDefinition.builder("Bomber", 3)
         .description(TRIGGER_CHANCE + "% chance to shoot a TNT ignited for " + GENERIC_TIME + "s.")
+        .translation("de", "Bomber",
+            TRIGGER_CHANCE + "% Chance, ein für " + GENERIC_TIME + "s. gezündetes TNT abzuschießen.")
         .weight(VERY_RARE)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(EnchantsKeys.FLAME, EnchantsKeys.PUNCH, EnchantsKeys.POWER)
@@ -171,6 +209,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     ENDER_BOW(() -> EnchantDefinition.builder("Ender Bow", 1)
         .description("Shoots ender pearls instead of arrows.")
+        .translation("de", "Enderbogen",
+            "Schießt Enderperlen anstelle von Pfeilen.")
         .weight(VERY_RARE)
         .items(ItemSetDefaults.BOW)
         .exclusives(BOMBER.getKey(), EnchantsKeys.FLAME, EnchantsKeys.PUNCH, EnchantsKeys.POWER)
@@ -178,6 +218,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     GHAST(() -> EnchantDefinition.builder("Ghast", 1)
         .description("Shoots fireballs instead of arrows.")
+        .translation("de", "Ghast",
+            "Schießt Feuerbälle anstelle von Pfeilen.")
         .weight(VERY_RARE)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), BOMBER.getKey(), EnchantsKeys.FLAME, EnchantsKeys.PUNCH, EnchantsKeys.POWER)
@@ -186,6 +228,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     CONFUSING_ARROWS(() -> EnchantDefinition.builder("Confusing Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.)")
+        .translation("de", "Pfeile der Verwirrung",
+            TRIGGER_CHANCE + "% Chance, dass der Pfeil " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) verleiht.")
         .weight(COMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -194,6 +238,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     DARKNESS_ARROWS(() -> EnchantDefinition.builder("Darkness Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.)")
+        .translation("de", "Pfeile der Dunkelheit",
+            TRIGGER_CHANCE + "% Chance, dass der Pfeil " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) verleiht.")
         .weight(COMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -202,6 +248,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     DRAGONFIRE_ARROWS(() -> EnchantDefinition.builder("Dragonfire Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have Dragonfire Effect (R=" + GENERIC_RADIUS + ", " +
             GENERIC_DURATION + "s).")
+        .translation("de", "Drachenfeuer-Pfeile",
+            TRIGGER_CHANCE + "% Chance, dass der Pfeil den Drachenfeuer-Effekt auslöst (R=" + GENERIC_RADIUS + ", " + GENERIC_DURATION + "s).")
         .weight(RARE)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -210,6 +258,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ELECTRIFIED_ARROWS(() -> EnchantDefinition.builder("Electrified Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for an arrow to strike lightning with " + GENERIC_DAMAGE +
             "❤ extra damage.")
+        .translation("de", "Elektrisierte Pfeile",
+            TRIGGER_CHANCE + "% Chance, dass ein Pfeil einen Blitz mit " + GENERIC_DAMAGE + "❤ Extraschaden einschlagen lässt.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -217,6 +267,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     EXPLOSIVE_ARROWS(() -> EnchantDefinition.builder("Explosive Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance to shoot an explosive arrow.")
+        .translation("de", "Explosivpfeile",
+            TRIGGER_CHANCE + "% Chance, einen explosiven Pfeil abzuschießen.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -224,6 +276,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     FLARE(() -> EnchantDefinition.builder("Flare", 1)
         .description(TRIGGER_CHANCE + "% chance to create a torch where arrow lands.")
+        .translation("de", "Leuchtspur",
+            TRIGGER_CHANCE + "% Chance, dort eine Fackel zu erschaffen, wo der Pfeil landet.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.BOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -232,6 +286,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     HOVER(() -> EnchantDefinition.builder("Hover", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.)")
+        .translation("de", "Schwebe",
+            TRIGGER_CHANCE + "% Chance, dass der Pfeil " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) verleiht.")
         .weight(COMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -239,6 +295,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     LINGERING(() -> EnchantDefinition.builder("Lingering", 3)
         .description(TRIGGER_CHANCE + "% chance for tipped arrows to generate a lingering effect.")
+        .translation("de", "Verweilend",
+            TRIGGER_CHANCE + "% Chance, dass getränkte Pfeile einen Verweileffekt erzeugen.")
         .weight(RARE)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -247,6 +305,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     POISONED_ARROWS(() -> EnchantDefinition.builder("Poisoned Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.)")
+        .translation("de", "Giftpfeile",
+            TRIGGER_CHANCE + "% Chance, dass der Pfeil " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) verleiht.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -254,12 +314,16 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     SNIPER(() -> EnchantDefinition.builder("Sniper", 2)
         .description("Increases projectile speed by " + GENERIC_AMOUNT + "%")
+        .translation("de", "Scharfschütze",
+            "Erhöht die Geschossgeschwindigkeit um " + GENERIC_AMOUNT + "%.")
         .weight(COMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_SPECIAL), SniperEnchant::new
     ),
     VAMPIRIC_ARROWS(() -> EnchantDefinition.builder("Vampiric Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance to restore " + GENERIC_AMOUNT + "❤ on arrow hit.")
+        .translation("de", "Vampirpfeile",
+            TRIGGER_CHANCE + "% Chance, bei einem Pfeiltreffer " + GENERIC_AMOUNT + "❤ wiederherzustellen.")
         .weight(RARE)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -268,6 +332,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     WITHERED_ARROWS(() -> EnchantDefinition.builder("Withered Arrows", 3)
         .description(TRIGGER_CHANCE + "% chance for arrow to have " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.)")
+        .translation("de", "Verwelkte Pfeile",
+            TRIGGER_CHANCE + "% Chance, dass der Pfeil " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) verleiht.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.BOW_CROSSBOW)
         .exclusives(ENDER_BOW.getKey(), GHAST.getKey(), BOMBER.getKey())
@@ -275,48 +341,64 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     AUTO_REEL(() -> EnchantDefinition.builder("Auto Reel", 1)
         .description("Automatically reels in a hook on bite.")
+        .translation("de", "Autoeinholer",
+            "Holt den Haken bei einem Biss automatisch ein.")
         .weight(VERY_RARE)
         .items(ItemSetDefaults.FISHING_ROD)
         .build(), () -> EnchantDistribution.treasure(TradeType.JUNGLE_SPECIAL), AutoReelEnchant::new, false, true
     ),
     CURSE_OF_DROWNED(() -> EnchantDefinition.builder("Curse of Drowned", 3)
         .description(TRIGGER_CHANCE + "% chance to fish up a Drowned Zombie.")
+        .translation("de", "Fluch der Ertrunkenen",
+            TRIGGER_CHANCE + "% Chance, einen ertrunkenen Zombie zu angeln.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.FISHING_ROD)
         .build(), () -> EnchantDistribution.treasure(TradeType.SWAMP_COMMON), CurseOfDrownedEnchant::new, true
     ),
     DOUBLE_CATCH(() -> EnchantDefinition.builder("Double Catch", 3)
         .description("Increases amount of caught item by x2 with " + TRIGGER_CHANCE + "% chance.")
+        .translation("de", "Doppelfang",
+            "Erhöht die Menge des gefangenen Gegenstands mit " + TRIGGER_CHANCE + "% Chance um das Doppelte.")
         .weight(RARE)
         .items(ItemSetDefaults.FISHING_ROD)
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_COMMON), DoubleCatchEnchant::new
     ),
     RIVER_MASTER(() -> EnchantDefinition.builder("River Master", 5)
         .description("Increases casting distance.")
+        .translation("de", "Flussmeister",
+            "Erhöht die Wurfweite.")
         .weight(COMMON)
         .items(ItemSetDefaults.FISHING_ROD)
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_COMMON), RiverMasterEnchant::new
     ),
     SEASONED_ANGLER(() -> EnchantDefinition.builder("Seasoned Angler", 3)
         .description("Increases amount of XP gained from fishing by " + GENERIC_AMOUNT + "%.")
+        .translation("de", "Erfahrener Angler",
+            "Erhöht die beim Angeln erhaltene XP um " + GENERIC_AMOUNT + "%.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.FISHING_ROD)
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_COMMON), SeasonedAnglerEnchant::new
     ),
     SURVIVALIST(() -> EnchantDefinition.builder("Survivalist", 1)
         .description("Automatically cooks fish if what is caught is raw.")
+        .translation("de", "Überlebenskünstler",
+            "Brät gefangenen rohen Fisch automatisch.")
         .weight(RARE)
         .items(ItemSetDefaults.FISHING_ROD)
         .build(), () -> EnchantDistribution.treasure(TradeType.SNOW_SPECIAL), SurvivalistEnchant::new
     ),
     BLAST_MINING(() -> EnchantDefinition.builder("Blast Mining", 5)
         .description(TRIGGER_CHANCE + "% chance to mine blocks by explosion.")
+        .translation("de", "Sprengabbau",
+            TRIGGER_CHANCE + "% Chance, Blöcke durch eine Explosion abzubauen.")
         .weight(RARE)
         .items(ItemSetDefaults.PICKAXE)
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_COMMON), BlastMiningEnchant::new
     ),
     GLASSBREAKER(() -> EnchantDefinition.builder("Glass Breaker", 1)
         .description("Breaks glass instantly")
+        .translation("de", "Glasbrecher",
+            "Zerbricht Glas sofort.")
         .weight(COMMON)
         .supportedItems(ItemSetDefaults.TOOL)
         .primaryItems(ItemSetDefaults.MINING_TOOLS)
@@ -324,6 +406,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     HASTE(() -> EnchantDefinition.builder("Haste", 3)
         .description("Grants " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " effect when mining blocks.")
+        .translation("de", "Eile",
+            "Gewährt beim Abbauen von Blöcken den Effekt " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + ".")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.TOOL)
         .primaryItems(ItemSetDefaults.MINING_TOOLS)
@@ -331,18 +415,24 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     LUCKY_MINER(() -> EnchantDefinition.builder("Lucky Miner", 3)
         .description(TRIGGER_CHANCE + "% chance to gain " + GENERIC_AMOUNT + "% more XP from ores.")
+        .translation("de", "Glücksbergbau",
+            TRIGGER_CHANCE + "% Chance, " + GENERIC_AMOUNT + "% mehr XP von Erzen zu erhalten.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.PICKAXE)
         .build(), () -> EnchantDistribution.regular(TradeType.JUNGLE_COMMON), LuckyMinerEnchant::new
     ),
     REPLANTER(() -> EnchantDefinition.builder("Replanter", 1)
         .description("Automatically replant crops on right click and when harvest.")
+        .translation("de", "Wiederpflanzer",
+            "Pflanzt Nutzpflanzen bei Rechtsklick und Ernte automatisch neu an.")
         .weight(VERY_RARE)
         .items(ItemSetDefaults.HOE)
         .build(), () -> EnchantDistribution.regular(TradeType.PLAINS_COMMON), ReplanterEnchant::new
     ),
     SILK_CHEST(() -> EnchantDefinition.builder("Silk Chest", 1)
         .description("Drop chests and saves all its content.")
+        .translation("de", "Behutsame Truhe",
+            "Lässt Truhen fallen und bewahrt ihren gesamten Inhalt.")
         .weight(VERY_RARE)
         .supportedItems(ItemSetDefaults.MINING_TOOLS)
         .primaryItems(ItemSetDefaults.AXE)
@@ -350,6 +440,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     SILK_SPAWNER(() -> EnchantDefinition.builder("Silk Spawner", 1)
         .description(TRIGGER_CHANCE + "% chance to mine spawner.")
+        .translation("de", "Behutsamer Spawner",
+            TRIGGER_CHANCE + "% Chance, einen Spawner abzubauen.")
         .weight(VERY_RARE)
         .supportedItems(ItemSetDefaults.MINING_TOOLS)
         .primaryItems(ItemSetDefaults.PICKAXE)
@@ -357,6 +449,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     SMELTER(() -> EnchantDefinition.builder("Smelter", 5)
         .description("Smelts mined blocks with " + TRIGGER_CHANCE + "% chance.")
+        .translation("de", "Schmelzer",
+            "Schmilzt abgebaute Blöcke mit " + TRIGGER_CHANCE + "% Chance.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.TOOL)
         .primaryItems(ItemSetDefaults.MINING_TOOLS)
@@ -365,6 +459,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     TELEKINESIS(() -> EnchantDefinition.builder("Telekinesis", 1)
         .description("Moves all blocks loot directly to your inventory.")
+        .translation("de", "Telekinese",
+            "Befördert die gesamte Beute von Blöcken direkt in dein Inventar.")
         .weight(VERY_RARE)
         .supportedItems(ItemSetDefaults.TOOL)
         .primaryItems(ItemSetDefaults.MINING_TOOLS)
@@ -372,12 +468,16 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     TREEFELLER(() -> EnchantDefinition.builder("Treefeller", 1)
         .description("Cuts down an entire tree.")
+        .translation("de", "Baumfäller",
+            "Fällt einen ganzen Baum.")
         .weight(RARE)
         .items(ItemSetDefaults.AXE)
         .build(), () -> EnchantDistribution.regular(TradeType.TAIGA_SPECIAL), TreefellerEnchant::new
     ),
     TUNNEL(() -> EnchantDefinition.builder("Tunnel", 3)
         .description("Mines multiple blocks at once in a certain shape.")
+        .translation("de", "Tunnel",
+            "Baut mehrere Blöcke gleichzeitig in einer bestimmten Form ab.")
         .weight(VERY_RARE)
         .supportedItems(ItemSetDefaults.MINING_TOOLS)
         .primaryItems(ItemSetDefaults.PICKAXE)
@@ -386,6 +486,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     VEINMINER(() -> EnchantDefinition.builder("Veinminer", 3)
         .description("Mines up to " + GENERIC_AMOUNT + " blocks of the ore vein at once.")
+        .translation("de", "Aderabbau",
+            "Baut bis zu " + GENERIC_AMOUNT + " Blöcke der Erzader auf einmal ab.")
         .weight(RARE)
         .items(ItemSetDefaults.PICKAXE)
         .exclusives(BLAST_MINING.getKey(), TUNNEL.getKey())
@@ -393,6 +495,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     CURSE_OF_BREAKING(() -> EnchantDefinition.builder("Curse of Breaking", 3)
         .description(TRIGGER_CHANCE + "% chance to consume extra " + GENERIC_AMOUNT + " durability points.")
+        .translation("de", "Fluch der Zerstörung",
+            TRIGGER_CHANCE + "% Chance, " + GENERIC_AMOUNT + " zusätzliche Haltbarkeitspunkte zu verbrauchen.")
         .weight(COMMON)
         .items(ItemSetDefaults.BREAKABLE)
         .exclusives(EnchantsKeys.UNBREAKING)
@@ -400,12 +504,16 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     CURSE_OF_FRAGILITY(() -> EnchantDefinition.builder("Curse of Fragility", 1)
         .description("Prevents an item from being grindstoned or anviled.")
+        .translation("de", "Fluch der Zerbrechlichkeit",
+            "Verhindert, dass ein Gegenstand am Schleifstein oder Amboss bearbeitet wird.")
         .weight(COMMON)
         .items(ItemSetDefaults.BREAKABLE)
         .build(), () -> EnchantDistribution.treasure(TradeType.TAIGA_COMMON), CurseOfFragilityEnchant::new, true
     ),
     CURSE_OF_MEDIOCRITY(() -> EnchantDefinition.builder("Curse of Mediocrity", 3)
         .description(TRIGGER_CHANCE + "% chance to disenchant item drops.")
+        .translation("de", "Fluch der Mittelmäßigkeit",
+            TRIGGER_CHANCE + "% Chance, fallengelassene Gegenstände zu entzaubern.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.TOOLS_WEAPONS)
         .primaryItems(ItemSetDefaults.ALL_WEAPON)
@@ -413,6 +521,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     CURSE_OF_MISFORTUNE(() -> EnchantDefinition.builder("Curse of Misfortune", 3)
         .description(TRIGGER_CHANCE + "% chance to have no drops from blocks or mobs.")
+        .translation("de", "Fluch des Unglücks",
+            TRIGGER_CHANCE + "% Chance, dass Blöcke oder Mobs keine Beute fallen lassen.")
         .weight(UNCOMMON)
         .items(ItemSetDefaults.TOOLS_WEAPONS)
         .exclusives(EnchantsKeys.FORTUNE, EnchantsKeys.LOOTING)
@@ -420,12 +530,16 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     RESTORE(() -> EnchantDefinition.builder("Restore", 3)
         .description(TRIGGER_CHANCE + "% chance to save item from breaking back to " + GENERIC_AMOUNT + "%")
+        .translation("de", "Wiederherstellung",
+            TRIGGER_CHANCE + "% Chance, den Gegenstand vor dem Zerbrechen zu bewahren und auf " + GENERIC_AMOUNT + "% zurückzusetzen.")
         .weight(RARE)
         .items(ItemSetDefaults.BREAKABLE)
         .build(), () -> EnchantDistribution.regular(TradeType.DESERT_COMMON), RestoreEnchant::new
     ),
     SOULBOUND(() -> EnchantDefinition.builder("Soulbound", 1)
         .description("Protects from being dropped on death.")
+        .translation("de", "Seelengebunden",
+            "Schützt davor, beim Tod fallengelassen zu werden.")
         .weight(RARE)
         .items(ItemSetDefaults.BREAKABLE)
         .exclusives(EnchantsKeys.VANISHING_CURSE)
@@ -433,6 +547,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     BANE_OF_NETHERSPAWN(() -> EnchantDefinition.builder("Bane of Netherspawn", 5)
         .description("Inflicts " + GENERIC_DAMAGE + "❤ more damage to nether mobs.")
+        .translation("de", "Fluch der Nethergeburt",
+            "Fügt Nether-Mobs " + GENERIC_DAMAGE + "❤ mehr Schaden zu.")
         .weight(COMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -441,6 +557,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     BLINDNESS(() -> EnchantDefinition.builder("Blindness", 2)
         .description(TRIGGER_CHANCE + "% chance to apply " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) on hit.")
+        .translation("de", "Blindheit",
+            TRIGGER_CHANCE + "% Chance, bei einem Treffer " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu verleihen.")
         .weight(COMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -449,6 +567,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     CONFUSION(() -> EnchantDefinition.builder("Confusion", 2)
         .description(TRIGGER_CHANCE + "% chance to apply " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) on hit.")
+        .translation("de", "Verwirrung",
+            TRIGGER_CHANCE + "% Chance, bei einem Treffer " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu verleihen.")
         .weight(COMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -456,6 +576,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     CURE(() -> EnchantDefinition.builder("Cure", 3)
         .description(TRIGGER_CHANCE + "% chance to cure Zombified Piglins and Zombie Villagers on hit.")
+        .translation("de", "Heilung",
+            TRIGGER_CHANCE + "% Chance, bei einem Treffer Zombifizierte Piglins und Zombiedorfbewohner zu heilen.")
         .weight(COMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -463,6 +585,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     CURSE_OF_DEATH(() -> EnchantDefinition.builder("Curse of Death", 3)
         .description("When killing players, you have a chance of dying too.")
+        .translation("de", "Fluch des Todes",
+            "Wenn du Spieler tötest, besteht die Chance, dass du ebenfalls stirbst.")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -471,6 +595,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     CUTTER(() -> EnchantDefinition.builder("Cutter", 3)
         .description(TRIGGER_CHANCE + "% chance to throw away enemy''s armor and damage it for " + GENERIC_DAMAGE +
             "%.")
+        .translation("de", "Zerschneider",
+            TRIGGER_CHANCE + "% Chance, die Rüstung des Gegners wegzuschleudern und sie um " + GENERIC_DAMAGE + "% zu beschädigen.")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -478,6 +604,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     DECAPITATOR(() -> EnchantDefinition.builder("Decapitator", 2)
         .description(TRIGGER_CHANCE + "% chance to obtain player's or mob's head.")
+        .translation("de", "Enthaupter",
+            TRIGGER_CHANCE + "% Chance, den Kopf eines Spielers oder Mobs zu erhalten.")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -485,6 +613,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     DOUBLE_STRIKE(() -> EnchantDefinition.builder("Double Strike", 2)
         .description(TRIGGER_CHANCE + "% chance to inflict double damage.")
+        .translation("de", "Doppelschlag",
+            TRIGGER_CHANCE + "% Chance, doppelten Schaden zuzufügen.")
         .weight(VERY_RARE)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -493,6 +623,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     EXHAUST(() -> EnchantDefinition.builder("Exhaust", 4)
         .description(TRIGGER_CHANCE + "% chance to apply " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) on hit.")
+        .translation("de", "Erschöpfung",
+            TRIGGER_CHANCE + "% Chance, bei einem Treffer " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu verleihen.")
         .weight(COMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -501,6 +633,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ICE_ASPECT(() -> EnchantDefinition.builder("Ice Aspect", 3)
         .description("Freezes and applies " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION +
             "s.) on hit.")
+        .translation("de", "Eisaspekt",
+            "Friert den Gegner bei einem Treffer ein und verleiht " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.).")
         .weight(COMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -508,12 +642,16 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     INFERNUS(() -> EnchantDefinition.builder("Infernus", 3)
         .description("Launched trident will ignite the enemy for " + GENERIC_TIME + "s. on hit.")
+        .translation("de", "Infernus",
+            "Ein geworfener Dreizack setzt den Gegner bei einem Treffer für " + GENERIC_TIME + "s. in Brand.")
         .weight(COMMON)
         .items(ItemSetDefaults.TRIDENT)
         .build(), () -> EnchantDistribution.regular(TradeType.SAVANNA_COMMON), InfernusEnchant::new
     ),
     NIMBLE(() -> EnchantDefinition.builder("Nimble", 1)
         .description("Moves all entity's loot directly to your inventory.")
+        .translation("de", "Flink",
+            "Befördert die gesamte Beute eines Wesens direkt in dein Inventar.")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -522,6 +660,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     PARALYZE(() -> EnchantDefinition.builder("Paralyze", 5)
         .description(TRIGGER_CHANCE + "% chance to apply " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) on hit.")
+        .translation("de", "Lähmung",
+            TRIGGER_CHANCE + "% Chance, bei einem Treffer " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu verleihen.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -530,6 +670,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     RAGE(() -> EnchantDefinition.builder("Rage", 2)
         .description(TRIGGER_CHANCE + "% chance to get " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) on hit.")
+        .translation("de", "Wut",
+            TRIGGER_CHANCE + "% Chance, bei einem Treffer " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu erhalten.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -537,6 +679,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     ROCKET(() -> EnchantDefinition.builder("Rocket", 3)
         .description(TRIGGER_CHANCE + "% chance to launch your enemy into the space.")
+        .translation("de", "Rakete",
+            TRIGGER_CHANCE + "% Chance, deinen Gegner ins All zu schleudern.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -544,6 +688,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     SWIPER(() -> EnchantDefinition.builder("Swiper", 3)
         .description(TRIGGER_CHANCE + "% chance to steal " + GENERIC_AMOUNT + " XP from players.")
+        .translation("de", "Dieb",
+            TRIGGER_CHANCE + "% Chance, " + GENERIC_AMOUNT + " XP von Spielern zu stehlen.")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -551,6 +697,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     TEMPER(() -> EnchantDefinition.builder("Temper", 5)
         .description("Inflicts " + GENERIC_AMOUNT + "% more damage for each " + GENERIC_RADIUS + "❤ missing.")
+        .translation("de", "Jähzorn",
+            "Fügt " + GENERIC_AMOUNT + "% mehr Schaden zu für jede fehlenden " + GENERIC_RADIUS + "❤.")
         .weight(VERY_RARE)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -558,6 +706,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     THRIFTY(() -> EnchantDefinition.builder("Thrifty", 3)
         .description(TRIGGER_CHANCE + "% chance for mobs to drop spawn egg.")
+        .translation("de", "Sparsam",
+            TRIGGER_CHANCE + "% Chance, dass Mobs ein Spawn-Ei fallen lassen.")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -565,6 +715,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     THUNDER(() -> EnchantDefinition.builder("Thunder", 5)
         .description(TRIGGER_CHANCE + "% chance to strike lightning with " + GENERIC_DAMAGE + "❤ extra damage.")
+        .translation("de", "Donner",
+            TRIGGER_CHANCE + "% Chance, einen Blitz mit " + GENERIC_DAMAGE + "❤ Extraschaden einschlagen zu lassen.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -572,6 +724,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     VAMPIRE(() -> EnchantDefinition.builder("Vampire", 3)
         .description(TRIGGER_CHANCE + "% chance to heal for " + GENERIC_AMOUNT + "❤ on hit.")
+        .translation("de", "Vampir",
+            TRIGGER_CHANCE + "% Chance, bei einem Treffer " + GENERIC_AMOUNT + "❤ zu heilen.")
         .weight(RARE)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -580,6 +734,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     VENOM(() -> EnchantDefinition.builder("Venom", 2)
         .description(TRIGGER_CHANCE + "% chance to apply " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) on hit.")
+        .translation("de", "Gift",
+            TRIGGER_CHANCE + "% Chance, bei einem Treffer " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu verleihen.")
         .weight(COMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -587,6 +743,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     VILLAGE_DEFENDER(() -> EnchantDefinition.builder("Village Defender", 5)
         .description("Inflicts " + GENERIC_AMOUNT + "❤ more damage to all pillagers.")
+        .translation("de", "Dorfverteidiger",
+            "Fügt allen Plünderern " + GENERIC_AMOUNT + "❤ mehr Schaden zu.")
         .weight(COMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -594,6 +752,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     ),
     WISDOM(() -> EnchantDefinition.builder("Wisdom", 5)
         .description("Mobs drops x" + GENERIC_MODIFIER + " more XP.")
+        .translation("de", "Weisheit",
+            "Mobs lassen das " + GENERIC_MODIFIER + "-fache an XP fallen.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
@@ -602,6 +762,8 @@ public enum EnchantCatalog implements EnchantCatalogEntry {
     WITHER(() -> EnchantDefinition.builder("Wither", 2)
         .description(TRIGGER_CHANCE + "% chance to apply " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" +
             EFFECT_DURATION + "s.) on hit.")
+        .translation("de", "Verwelkung",
+            TRIGGER_CHANCE + "% Chance, bei einem Treffer " + EFFECT_TYPE + " " + EFFECT_AMPLIFIER + " (" + EFFECT_DURATION + "s.) zu verleihen.")
         .weight(UNCOMMON)
         .supportedItems(ItemSetDefaults.SWORDS_AXES)
         .primaryItems(ItemSetDefaults.SWORD)
