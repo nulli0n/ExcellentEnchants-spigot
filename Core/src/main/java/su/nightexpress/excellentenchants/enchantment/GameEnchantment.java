@@ -147,6 +147,11 @@ public abstract class GameEnchantment implements CustomEnchantment {
         return this.placeholders.replacer(level);
     }
 
+    @Override
+    public UnaryOperator<String> replacePlaceholders(int level, Locale locale) {
+        return EnchantsPlaceholders.forEnchant(this, locale).replacer(level);
+    }
+
     protected void addPlaceholder(String key, Function<Integer, String> replacer) {
         this.placeholders.add(key, replacer);
     }

@@ -254,7 +254,7 @@ public class BaseCommands {
 
         if (!enchantment.isChargeable()) {
             context.send(Lang.CHARGES_FUEL_BAD_ENCHANTMENT, replacer -> replacer.replace(
-                EnchantsPlaceholders.GENERIC_NAME, enchantment.getDisplayName()));
+                EnchantsPlaceholders.GENERIC_NAME, enchantment.getDisplayName(EnchantsUtils.resolveLocale(context.getSender()))));
             return false;
         }
 

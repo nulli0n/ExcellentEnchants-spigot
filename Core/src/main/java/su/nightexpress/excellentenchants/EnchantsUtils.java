@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.block.BlockDropItemEvent;
@@ -33,6 +34,14 @@ public class EnchantsUtils {
 
     public static boolean isBusy() {
         return busyBreak;
+    }
+
+    public static Locale resolveLocale(@Nullable Player player) {
+        return player == null ? Locale.ENGLISH : player.locale();
+    }
+
+    public static Locale resolveLocale(CommandSender sender) {
+        return sender instanceof Player player ? resolveLocale(player) : Locale.ENGLISH;
     }
 
     public static boolean isMythicMob(Entity entity) {

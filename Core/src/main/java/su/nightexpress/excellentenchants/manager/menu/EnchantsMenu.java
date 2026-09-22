@@ -10,6 +10,7 @@ import org.jspecify.annotations.NullMarked;
 
 import su.nightexpress.excellentenchants.EnchantsPlugin;
 import su.nightexpress.excellentenchants.EnchantsFiles;
+import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.excellentenchants.api.enchantment.CustomEnchantment;
 import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 import su.nightexpress.nightcore.bridge.common.NightKey;
@@ -72,15 +73,17 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
     @Override
 
     public MenuFiller<CustomEnchantment> createFiller(MenuViewer viewer) {
+        Locale locale = EnchantsUtils.resolveLocale(viewer.getPlayer());
+
         var autoFill = MenuFiller.builder(this);
 
         autoFill.setSlots(this.enchantSlots);
         autoFill.setItems(EnchantRegistry.getRegistered().stream()
             .filter(Predicate.not(CustomEnchantment::isHiddenFromList))
-            .sorted(Comparator.comparing(data -> NightMessage.stripTags(data.getDisplayName())))
+            .sorted(Comparator.comparing(data -> NightMessage.stripTags(data.getDisplayName(locale))))
             .toList()
         );
-        autoFill.setItemCreator(enchantmentData -> this.buildEnchantIcon(enchantmentData, 1));
+        autoFill.setItemCreator(enchantmentData -> this.buildEnchantIcon(enchantmentData, 1, locale));
         autoFill.setItemClick(enchantmentData -> (viewer1, event) -> {
             if (!event.isLeftClick()) return;
 
@@ -92,7 +95,7 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
                 levelHas = 1;
             }
 
-            ItemStack item = this.buildEnchantIcon(enchantmentData, levelHas).getItemStack();
+            ItemStack item = this.buildEnchantIcon(enchantmentData, levelHas, EnchantsUtils.resolveLocale(viewer1.getPlayer())).getItemStack();
             PDCUtil.set(item, this.levelKey, levelHas);
             event.setCurrentItem(item);
         });
@@ -101,7 +104,7 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
     }
 
 
-    private NightItem buildEnchantIcon(CustomEnchantment enchant, int level) {
+    private NightItem buildEnchantIcon(CustomEnchantment enchant, int level, Locale locale) {
         List<String> conflicts = new ArrayList<>();
         if (enchant.getDefinition().hasConflicts()) {
             for (String line : this.enchantLoreConflicts) {
@@ -129,7 +132,7 @@ public class EnchantsMenu extends NormalMenu<EnchantsPlugin> implements ConfigBa
             .replacement(replacer -> replacer
                 .replace(CHARGES, charges)
                 .replace(CONFLICTS, conflicts)
-                .replace(enchant.replacePlaceholders(level))
+                .replace(enchant.replacePlaceholders(level, locale))
             );
     }
 

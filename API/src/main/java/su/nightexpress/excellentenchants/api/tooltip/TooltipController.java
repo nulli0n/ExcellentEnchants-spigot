@@ -10,7 +10,7 @@ public interface TooltipController {
 
     boolean hasHandler();
 
-    ItemStack addDescription(ItemStack itemStack);
+    ItemStack addDescription(ItemStack itemStack, Player player);
 
     boolean isReadyForTooltipUpdate(Player player);
 
