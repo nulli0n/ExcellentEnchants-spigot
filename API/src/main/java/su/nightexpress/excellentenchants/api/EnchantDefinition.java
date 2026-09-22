@@ -27,6 +27,7 @@ public class EnchantDefinition implements Writeable {
 
     private final String       displayName;
     private final List<String> description;
+    private final Map<String, EnchantTranslation> translations;
     private final int          weight;
     private final int          maxLevel;
     private final EnchantCost  minCost;
@@ -46,8 +47,23 @@ public class EnchantDefinition implements Writeable {
                              ItemSet supportedItems,
                              ItemSet primaryItems,
                              Set<String> exclusiveSet) {
+        this(displayName, description, Collections.emptyMap(), weight, maxLevel, minCost, maxCost, anvilCost, supportedItems, primaryItems, exclusiveSet);
+    }
+
+    public EnchantDefinition(String displayName,
+                             List<String> description,
+                             Map<String, EnchantTranslation> translations,
+                             int weight,
+                             int maxLevel,
+                             EnchantCost minCost,
+                             EnchantCost maxCost,
+                             int anvilCost,
+                             ItemSet supportedItems,
+                             ItemSet primaryItems,
+                             Set<String> exclusiveSet) {
         this.displayName = displayName;
         this.description = description;
+        this.translations = translations;
         this.weight = Math.clamp(weight, 1, WEIGHT_CAP);
         this.maxLevel = Math.clamp(maxLevel, 1, LEVEL_CAP);
         this.minCost = minCost;
@@ -79,6 +95,11 @@ public class EnchantDefinition implements Writeable {
             "Enchantment description.",
             "[*] Reboot required when changed."
         ).read(config);
+
+        Map<String, EnchantTranslation> translations = new HashMap<>();
+        for (String code : config.getSection(path + ".Translations")) {
+            translations.put(code.toLowerCase(), EnchantTranslation.read(config, path + ".Translations." + code));
+        }
 
         int weight = ConfigValue.create(path + ".Weight",
             5,
@@ -145,13 +166,14 @@ public class EnchantDefinition implements Writeable {
             "[*] Reboot required when changed."
         ).read(config);
 
-        return new EnchantDefinition(displayName, description, weight, maxLevel, minCost, maxCost, anvilCost, supportedItems, primaryItems, conflicts);
+        return new EnchantDefinition(displayName, description, translations, weight, maxLevel, minCost, maxCost, anvilCost, supportedItems, primaryItems, conflicts);
     }
 
     @Override
     public void write(FileConfig config, String path) {
         config.set(path + ".DisplayName", this.displayName);
         config.set(path + ".Description", this.description);
+        this.translations.forEach((code, translation) -> translation.write(config, path + ".Translations." + code));
         config.set(path + ".Weight", this.weight);
         config.set(path + ".MaxLevel", this.maxLevel);
         config.set(path + ".MinCost", this.minCost);
@@ -170,6 +192,20 @@ public class EnchantDefinition implements Writeable {
 
     public List<String> getDescription() {
         return this.description;
+    }
+
+    public Map<String, EnchantTranslation> getTranslations() {
+        return this.translations;
+    }
+
+    public String getDisplayName(Locale locale) {
+        EnchantTranslation translation = this.translations.get(locale.getLanguage().toLowerCase());
+        return translation == null ? this.displayName : translation.getDisplayName();
+    }
+
+    public List<String> getDescription(Locale locale) {
+        EnchantTranslation translation = this.translations.get(locale.getLanguage().toLowerCase());
+        return translation == null ? this.description : translation.getDescription();
     }
 
     public int getWeight() {
@@ -217,6 +253,7 @@ public class EnchantDefinition implements Writeable {
 
         private String       displayName;
         private List<String> description;
+        private Map<String, EnchantTranslation> translations;
         private int          weight;
         private int          maxLevel;
         private EnchantCost  minCost;
@@ -229,6 +266,7 @@ public class EnchantDefinition implements Writeable {
         public Builder(String displayName, int maxLevel) {
             this.displayName(displayName);
             this.description = new ArrayList<>();
+            this.translations = new HashMap<>();
             this.weight = 5;
             this.maxLevel = maxLevel;
             this.anvilCost = Randomizer.nextInt(8);
@@ -249,7 +287,7 @@ public class EnchantDefinition implements Writeable {
             Objects.requireNonNull(this.supportedItemSet, "Enchantments must have supported items set");
 
             return new EnchantDefinition(
-                this.displayName, this.description, this.weight, this.maxLevel, this.minCost, this.maxCost, this.anvilCost, this.supportedItemSet, this.primaryItemSet == null ? this.supportedItemSet : this.primaryItemSet, this.exclusives
+                this.displayName, this.description, this.translations, this.weight, this.maxLevel, this.minCost, this.maxCost, this.anvilCost, this.supportedItemSet, this.primaryItemSet == null ? this.supportedItemSet : this.primaryItemSet, this.exclusives
             );
         }
 
@@ -267,6 +305,19 @@ public class EnchantDefinition implements Writeable {
 
         public Builder description(List<String> description) {
             this.description = Lists.modify(description, TagWrappers.GRAY::wrap);
+            return this;
+        }
+
+
+        public Builder translation(String code, String displayName, String... description) {
+            return this.translation(code, displayName, Lists.newList(description));
+        }
+
+        public Builder translation(String code, String displayName, List<String> description) {
+            this.translations.put(code.toLowerCase(), new EnchantTranslation(
+                TagWrappers.COLOR.with("#279CF5").wrap(displayName),
+                Lists.modify(description, TagWrappers.GRAY::wrap)
+            ));
             return this;
         }
 
