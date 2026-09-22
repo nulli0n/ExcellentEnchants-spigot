@@ -1,0 +1,33 @@
+Command:
+  Argument:
+    Name:
+      Level: Level
+      Slot: Slot
+  List:
+    Desc: Liste der benutzerdefinierten Verzauberungen.
+    DoneOthers: <gray>Verzauberungs-GUI für <soft_yellow>%player_name%</soft_yellow> geöffnet.</gray>
+  Enchant:
+    Desc: Verzaubere den Gegenstand in einem bestimmten Slot.
+    Done:
+      Self: <gray><soft_yellow>%item%</soft_yellow> wurde mit <soft_yellow>%enchant% %level%</soft_yellow> verzaubert!</gray>
+      Others: <gray><soft_yellow>%player_display_name%</soft_yellow>s <soft_yellow>%item%</soft_yellow> wurde mit <soft_yellow>%enchant% %level%</soft_yellow> verzaubert!</gray>
+    Error:
+      NoItem: <soft_red>Es gibt keinen Gegenstand zum Verzaubern!</soft_red>
+  Disenchant:
+    Desc: Entzaubere den Gegenstand in einem bestimmten Slot.
+    Done:
+      Self: <gray><soft_yellow>%item%</soft_yellow> wurde von <soft_yellow>%enchant%</soft_yellow> entzaubert!</gray>
+      Others: <gray><soft_yellow>%player_display_name%</soft_yellow>s <soft_yellow>%item%</soft_yellow> wurde von <soft_yellow>%enchant%</soft_yellow> entzaubert!</gray>
+  Book:
+    Desc: Gib ein Buch mit einer bestimmten Verzauberung.
+    Done: <gray>Du hast <soft_yellow>%player_display_name%</soft_yellow> ein <soft_yellow>%enchant% %level%</soft_yellow>-Buch gegeben.</gray>
+  RandomBook:
+    Desc: Gib ein Buch mit einer zufälligen Verzauberung.
+  GiveFuel:
+    Desc: Gib einen Verzauberungs-Treibstoff-Gegenstand.
+  Syntax:
+    InvalidSlot: <gray><soft_red>%input%</soft_red> ist kein gültiger Slot!</gray>
+Charges:
+  Fuel:
+    Gave: <gray>Du hast <soft_yellow>%player_name%</soft_yellow> <soft_yellow>x%amount% %name%</soft_yellow> Treibstoff gegeben.</gray>
+    BadEnchantment: <gray>Die Verzauberung <soft_red>%name%</soft_red> kann nicht aufgeladen werden.</gray>
