@@ -71,50 +71,53 @@ public class PacketTooltipHandler implements TooltipHandler {
 
         @Override
         public void onPacketSend(PacketSendEvent event) {
-            PacketTypeCommon type = event.getPacketType();
-            Player player = event.getPlayer();
-            if (player == null) return;
-            if (!this.controller.isReadyForTooltipUpdate(player)) return;
+            try {
+                PacketTypeCommon type = event.getPacketType();
+                Player player = event.getPlayer();
+                if (player == null) return;
+                if (!this.controller.isReadyForTooltipUpdate(player)) return;
 
-            switch (type) {
-                case PacketType.Play.Server.SET_SLOT -> {
-                    WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
+                switch (type) {
+                    case PacketType.Play.Server.SET_SLOT -> {
+                        WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
 
-                    this.asBukkit(setSlot.getItem()).map(this.controller::addDescription).map(this::fromBukkit)
-                        .ifPresent(setSlot::setItem);
-                }
-                case PacketType.Play.Server.WINDOW_ITEMS -> {
-                    WrapperPlayServerWindowItems windowItems = new WrapperPlayServerWindowItems(event);
+                        this.asBukkit(setSlot.getItem()).map(this.controller::addDescription).map(this::fromBukkit)
+                            .ifPresent(setSlot::setItem);
+                    }
+                    case PacketType.Play.Server.WINDOW_ITEMS -> {
+                        WrapperPlayServerWindowItems windowItems = new WrapperPlayServerWindowItems(event);
 
-                    windowItems.getItems().replaceAll(original -> this.asBukkit(original).map(
-                        this.controller::addDescription).map(this::fromBukkit).orElse(original));
-                }
-                case PacketType.Play.Server.SET_PLAYER_INVENTORY -> {
-                    WrapperPlayServerSetPlayerInventory setPlayerInventory = new WrapperPlayServerSetPlayerInventory(event);
+                        windowItems.getItems().replaceAll(original -> this.asBukkit(original).map(
+                            this.controller::addDescription).map(this::fromBukkit).orElse(original));
+                    }
+                    case PacketType.Play.Server.SET_PLAYER_INVENTORY -> {
+                        WrapperPlayServerSetPlayerInventory setPlayerInventory = new WrapperPlayServerSetPlayerInventory(event);
 
-                    this.asBukkit(setPlayerInventory.getStack()).map(this.controller::addDescription).map(
-                        this::fromBukkit).ifPresent(setPlayerInventory::setStack);
-                }
-                case PacketType.Play.Server.SET_CURSOR_ITEM -> {
-                    WrapperPlayServerSetCursorItem setCursorItem = new WrapperPlayServerSetCursorItem(event);
+                        this.asBukkit(setPlayerInventory.getStack()).map(this.controller::addDescription).map(
+                            this::fromBukkit).ifPresent(setPlayerInventory::setStack);
+                    }
+                    case PacketType.Play.Server.SET_CURSOR_ITEM -> {
+                        WrapperPlayServerSetCursorItem setCursorItem = new WrapperPlayServerSetCursorItem(event);
 
-                    this.asBukkit(setCursorItem.getStack()).map(this.controller::addDescription).map(this::fromBukkit)
-                        .ifPresent(setCursorItem::setStack);
-                }
-                case PacketType.Play.Server.MERCHANT_OFFERS -> {
-                    WrapperPlayServerMerchantOffers offers = new WrapperPlayServerMerchantOffers(event);
+                        this.asBukkit(setCursorItem.getStack()).map(this.controller::addDescription).map(this::fromBukkit)
+                            .ifPresent(setCursorItem::setStack);
+                    }
+                    case PacketType.Play.Server.MERCHANT_OFFERS -> {
+                        WrapperPlayServerMerchantOffers offers = new WrapperPlayServerMerchantOffers(event);
 
-                    offers.getMerchantOffers().forEach(offer -> {
-                        ItemStack result = this.toBukkit(offer.getOutputItem());
-                        offer.setOutputItem(this.fromBukkit(this.controller.addDescription(result)));
-                    });
+                        offers.getMerchantOffers().forEach(offer -> {
+                            ItemStack result = this.toBukkit(offer.getOutputItem());
+                            offer.setOutputItem(this.fromBukkit(this.controller.addDescription(result)));
+                        });
+                    }
+                    default -> {
+                        return;
+                    }
                 }
-                default -> {
-                    return;
-                }
+
+                event.markForReEncode(true);
+            } catch (Throwable ignored) {
             }
-
-            event.markForReEncode(true);
         }
 
 

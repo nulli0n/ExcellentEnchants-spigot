@@ -18,7 +18,6 @@ import su.nightexpress.excellentenchants.tooltip.handler.ProtocolTooltipHandler;
 import su.nightexpress.excellentenchants.EnchantsUtils;
 import su.nightexpress.nightcore.manager.AbstractManager;
 import su.nightexpress.nightcore.util.ItemUtil;
-import su.nightexpress.nightcore.util.Plugins;
 import su.nightexpress.nightcore.util.placeholder.PlaceholderContext;
 
 import java.util.*;
@@ -65,17 +64,23 @@ public class TooltipManager extends AbstractManager<EnchantsPlugin> implements T
 
     private void loadHandler() {
         for (var entry : this.factoryMap.entrySet()) {
-            if (!Plugins.isInstalled(entry.getKey())) continue;
+            if (!this.plugin.getServer().getPluginManager().isPluginEnabled(entry.getKey())) continue;
 
-            this.handler = entry.getValue().create(this);
-            this.handler.setup();
-            this.plugin.info("Using tooltip handler: " + entry.getKey());
-            break;
+            try {
+                TooltipHandler tooltipHandler = entry.getValue().create(this);
+                tooltipHandler.setup();
+                this.handler = tooltipHandler;
+                this.plugin.info("Using tooltip handler: " + entry.getKey());
+                break;
+            }
+            catch (Throwable t) {
+                this.plugin.warn("Failed to initialize tooltip handler '%s': %s".formatted(entry.getKey(), t.getMessage()));
+            }
         }
 
         if (this.handler == null) {
-            this.plugin.error(
-                "No compatible enchantment tooltip provider found. Please install one of the following plugins for the feature to work: [%s]"
+            this.plugin.warn(
+                "No compatible enchantment tooltip provider found. Tooltips will be disabled. Please install one of the following plugins for the feature to work: [%s]"
                     .formatted(String.join(", ", this.factoryMap.keySet()))
             );
         }
