@@ -25,8 +25,20 @@ public class SpigotEnchantsBootstrap {
             case MC_1_21_8 -> new RegistryHack_1_21_8(plugin);
             case MC_1_21_10 -> new RegistryHack_1_21_10(plugin);
             case MC_1_21_11 -> new RegistryHack_1_21_11(plugin);
-            case MC_26_1_2 -> new RegistryHack_26_1_2(plugin);
-            default -> null;
+            case MC_26_1, MC_26_1_1, MC_26_1_2, MC_26_2, MC_26_3, MC_26_4 -> new RegistryHack_26_1_2(plugin);
+            default -> {
+                if (Version.isAbove(Version.MC_26_1_2) || Version.getCurrent() == Version.UNKNOWN) {
+                    plugin.warn("Unrecognized or newer server version (" + Version.getCurrent().getLocalized() + "), attempting 26.x registry hack...");
+                    RegistryHack fallback = null;
+                    try {
+                        fallback = new RegistryHack_26_1_2(plugin);
+                    } catch (Throwable t) {
+                        plugin.error("Failed to initialize registry hack: " + t.getMessage());
+                    }
+                    yield fallback;
+                }
+                yield null;
+            }
         };
 
         if (registryHack == null) {
